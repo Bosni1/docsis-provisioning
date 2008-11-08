@@ -8,6 +8,7 @@ import tkMessageBox, traceback
 from gettext import gettext as _
 
 def partial (f, *defargs):
+    ""
     def _f(*largs):
         args = defargs + largs        
         return f( *args )
