@@ -1,0 +1,7 @@
+To set up the development environment make sure you have the following
+software packages installed:
+
+python2.6 (#!/bin/env python)
+PyPgSQL
+Tkinter & Tix
+

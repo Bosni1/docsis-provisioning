@@ -23,13 +23,22 @@ class CFG:
     class tCX(pg.DB):
         def __init__(self):
             pg.DB.__init__(self, dbname=CFG.DB.DBNAME, user=CFG.DB.ROLE)
-                           
+            idmap = {}
             tableinfo = self.query ( "SELECT * FROM abstract.class").dictresult()
             for ti in tableinfo:
                 with Table.New ( ti['name'] ) as t:
                     columninfo = self.query ( "SELECT * FROM abstract.field WHERE classid = %d" % ti['id'] ).dictresult()
                     for ci in columninfo:                        
                         t.addField ( Field (size=ci['length'], **ci) )
+                    idmap[t.id] = t
+                    
+            #import foreign key relationships
+            for t in Table.__all_tables__.values():
+                for f in t.fields:
+                    if f.reference: 
+                        f.reference = idmap[t.id]
+                        idmap[t.id].reference_ch.append ( (t, f) )
+                        idmap[t.id].reference_ch_hash[(t.name, f.name)] = (t,f)
     CX = None
 
 def array_as_text(arr):
@@ -147,8 +156,11 @@ class Table(object):
         
     def __init__(self, name, inherits="object", **kwargs):
         self.name = name
+        self.id = kwargs.get("id", None)
         self.fields = []
         self.fields_hash = {}
+        self.reference_ch = []
+        self.reference_ch_hash = {}
 
     def addField(self, field):
         assert isinstance(field, Field)
@@ -360,8 +372,7 @@ class Record(object):
         assert isinstance(record, Record)
         pass
 
-CFG.CX = CFG.tCX()    
-print text_to_array ( "{{as,asas},{},{qwqwqwqw},{wewewewe}}", 1 )
+CFG.CX = CFG.tCX()
 
 
 

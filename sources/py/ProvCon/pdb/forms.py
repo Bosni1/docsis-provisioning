@@ -7,11 +7,11 @@ import tkCommonDialog
 import tkMessageBox, traceback
 from gettext import gettext as _
 
-def partial (f, *defargs):
+def partial (f, *defargs, **defkwargs):
     ""
-    def _f(*largs):
+    def _f(*largs, **lkwargs):
         args = defargs + largs        
-        return f( *args )
+        return f( *args, **lkwargs )
     return _f
 
 class Form(object):
@@ -167,32 +167,45 @@ class ValueEditorWidget(Tix.Frame):
         Tix.Frame.__init__(self, master, *args, **kwargs)
         self.field = field
         self.form = form
+        #the tkvar traced back to the record value
         self.tkvar = self.form.tkvars[field.name]
-        self.ve_parent = master        
+        #we need this to build subwidgets
+        self.ve_parent = master
+        #subwidgets
         self.ve_label = None
         self.ve_entry = None 
         self.ve_entry = self.entry
                 
     def get_entry(self):
+        """The entry widget is created on first access to the property"""
         if self.ve_entry is None:
             self.ve_entry = Tix.Entry ( self, textvariable=self.tkvar )
             self.ve_entry.pack ( fill = X, expand=1 )
     entry = property(get_entry)
         
     def get_label(self):
+        """The label widget is created on first access to the property"""
         if self.ve_label is None: 
             self.ve_label = Tix.Label ( self.ve_parent, text = self.field.label )
         return self.ve_label
     label = property (get_label)
 
 class ArrayEditorWidget(ValueEditorWidget):
+    """A winbox-like widget to edit array values."""
     def __init__(self, master, field, form, *args, **kwargs):
         ValueEditorWidget.__init__ (self, master, field, form, *args, **kwargs)
+        #We keep a tkvar for each array element
         self.tkelemvars = []
+        #Every update to the record's tkvar triggers an update of this
+        #widget's tkvars.
         self.tkvar.trace ( 'w', self.value_change_handler ) 
+        #this array holds the actual values of the elements
         self.array = []
-        self.controls = []
-        self.bplus = None
+        self.controls = []        
+        self.bplus = None 
+        #these flags disable tkvar value change handlers to avoid
+        #infinite recursion, since update of the record value
+        #triggers a change of the internal values and vice versa
         self.disable_external_update_handler = False
         self.disable_internal_update_handler = False
         
@@ -204,11 +217,14 @@ class ArrayEditorWidget(ValueEditorWidget):
     entry = property(get_entry)
         
     def value_change_handler(self, *args):          
+        """Handle a change of the record's value"""
         if self.disable_external_update_handler: return
         self.array = self.field.val_txt2py ( self.tkvar.get() )
         self.rebuild()
 
     def item_update_handler(self, idx, *args):
+        """Handle a change of one of the element's values
+        (triggered by UI) """
         if self.disable_internal_update_handler: return        
         self.array[idx] = self.controls[idx][3].get()  
 
@@ -217,10 +233,11 @@ class ArrayEditorWidget(ValueEditorWidget):
         self.disable_external_update_handler = False
     
     def update_record(self):
-        print self.field.val_py2txt (self.array)
+        """Copy the current edited value to the record"""
         self.tkvar.set ( self.field.val_py2txt (self.array) )        
 
     def clear(self):
+        """Reset the UI"""
         for e,bp,bd,v,cbname in self.controls:
             e.grid_forget()
             bp.grid_forget()
@@ -251,7 +268,7 @@ class ArrayEditorWidget(ValueEditorWidget):
         del self.array[idx]
         self.update_record()
     
-    def rebuild(self):
+    def rebuild(self):        
         self.clear()
         if self.array is None or len(self.array) == 0:
             self.bplus = Tix.Button ( self.entry, text='+', font=('Courier', 8, 'normal'), padx=0, pady=0, command=partial(self.insert_item, 0) )                  
@@ -274,7 +291,7 @@ class ArrayEditorWidget(ValueEditorWidget):
 root = Tix.Tk()
 print root
 wm = root.winfo_toplevel()
-wm.geometry( "600x800+10+10" )
+wm.geometry( "800x600+10+10" )
 f = Form ( Table.Get ( "subscriber" ) )
 #f.setid ( 1 )            
 tf = TabularObjectEditor ( root, f)
