@@ -108,16 +108,16 @@ class NavigatorWidget (Tix.Frame, Navigator):
     def __init__(self, parent, form, *args, **kwargs):
         Tix.Frame.__init__(self, parent, *args, **kwargs)
         Navigator.__init__(self)
-        self.form = form
+        self.__form = form        
         self.buttons = {
             "prev" : Tix.Button (self, padx=4, pady=1, width=3, text="<<", command=self.prev),
             "next" : Tix.Button (self, padx=4, pady=1, width=3, text=">>", command=self.next),
-            "save" : Tix.Button (self, padx=4, pady=1, width=3, text=">>", command=self.form.save),
+            "save" : Tix.Button (self, padx=4, pady=1, width=3, text=">>", command=self.__form.save),
         }
         self.inputvar = Tix.StringVar()
         self.entry = Tix.Entry (self, width=40, textvariable = self.inputvar )        
-        for b in self.buttons.values(): b.pack (side=LEFT)
-        self.entry.pack (side=LEFT )
+        for i, b in enumerate(self.buttons.values()): b.pack (side=LEFT )
+        self.entry.pack (side=RIGHT, fill=X )
         self.notify = []
         
     def onrecordchange(self, idx):
@@ -126,40 +126,46 @@ class NavigatorWidget (Tix.Frame, Navigator):
         
 class TabularObjectEditor(Tix.Frame):
     def __init__(self, master, form, *args, **kwargs):
+        #kwargs['label'] = kwargs.get ("label", form.table.label)
+        #kwargs['options'] = kwargs.get ("options", """
+        #borderWidth 2
+        #""")
         Tix.Frame.__init__(self, master, *args, **kwargs)
-        self.form = form
+        
+        self.__form = form
         self.controls = {}
-        self.editingframe = Tix.Frame (self)
+        self.editingframe = Tix.LabelFrame (self, label="Editor")
 
-        self.editingframe.pack ( side=TOP, fill=Y, expand=1 )
-        for idx, f in enumerate(self.form.table):
+        
+        for idx, f in enumerate(self.__form.table):
             if f.name in Table.__special_columns__: continue
             if f.reference:
-                e = StaticReferenceWidget(self.editingframe, f, self.form)
+                e = StaticReferenceWidget(self.editingframe, f, self.__form)
             elif f.isarray:
-                e = ArrayEditorWidget(self.editingframe, f, self.form)
+                e = ArrayEditorWidget(self.editingframe, f, self.__form)
             else:
-                e = ValueEditorWidget (self.editingframe, f, self.form)
+                e = ValueEditorWidget (self.editingframe, f, self.__form)
             l = e.label
             self.controls[f.name] = (e,None)
             l.grid(row=idx, column=0)
             e.grid(row=idx, column=1)
+
+        #self.editingframe.pack ( side=TOP, fill=BOTH )
             
-        self.toolboxframe = Tix.Frame (self)
-        self.toolboxframe.pack (side=BOTTOM, fill=X )
-        self.action = Tix.Button (self.toolboxframe, text="Action!", command = self.onAction )
-        self.action.pack()
+#        self.toolboxframe = Tix.Frame (self)
+#        self.toolboxframe.form ( left=0, top=self.editingframe )
         
-        self.pack()
-        
-        self.nav = NavigatorWidget(self, self.form)
-        self.nav.pack (side=BOTTOM, fill=Y)
-        self.nav.records = self.form.table.recordlist()
+#        self.action = Tix.Button (self.toolboxframe, text="Action!", command = self.onAction )
+#        self.action.pack()
+                        
+        self.nav = NavigatorWidget(self, self.__form)
+        #self.nav.pack (side=BOTTOM, fill=X)
+        self.nav.records = self.__form.table.recordlist()
         self.nav.notify.append ( self.onrecordchanged )
         self.nav.navigateabsolute(0)
     
     def onrecordchanged(self, *args):
-        self.form.setid ( self.nav.currentid() )
+        self.__form.setid ( self.nav.currentid() )
     
     def onAction(self):
         tkMessageBox.showinfo ( 'action', self.form.current.PP_TABLE )
@@ -168,9 +174,9 @@ class StaticReferenceWidget(Tix.Frame):
     def __init__(self, master, field, form, *args, **kwargs):
         Tix.Frame.__init__(self, master, *args, **kwargs)
         self.field = field
-        self.form = form
+        self.__form = form
 
-        self.tkvar = self.form.tkvars[field.name]
+        self.tkvar = self.__form.tkvars[field.name]
         self.tkvar.trace ( 'w', self.value_change_handler )         
         self.disable_external_update_handler = False
 
@@ -196,9 +202,9 @@ class ValueEditorWidget(Tix.Frame):
     def __init__(self, master, field, form, *args, **kwargs):
         Tix.Frame.__init__(self, master, *args, **kwargs)
         self.field = field
-        self.form = form
+        self.__form = form
         #the tkvar traced back to the record value
-        self.tkvar = self.form.tkvars[field.name]
+        self.tkvar = self.__form.tkvars[field.name]
         #we need this to build subwidgets
         self.ve_parent = master
         #subwidgets
@@ -318,20 +324,20 @@ class ArrayEditorWidget(ValueEditorWidget):
                 self.controls.append ( (entry, bplus, bdel, var,cbname) )
                 
     
-root = Tix.Tk()
-print root
-wm = root.winfo_toplevel()
-wm.geometry( "800x600+10+10" )
-f = Form ( Table.Get ( "field_info" ) )
-#f.setid ( 1 )            
-tf = TabularObjectEditor ( root, f)
+#root = Tix.Tk()
+#print root
+#wm = root.winfo_toplevel()
+#wm.geometry( "800x600+10+10" )
+#f = Form ( Table.Get ( "field_info" ) )
+##f.setid ( 1 )            
+#tf = TabularObjectEditor ( root, f)
+#tf.pack()
+#exitloop = -1
 
-exitloop = -1
-
-def report_callback_exception(exc, val, tb):
-    text = ""
-    for line in traceback.format_exception(exc,val,tb):
-        text += line + "\n"
-    tkMessageBox.showerror ( _("Error"), message=text )
-root.report_callback_exception = report_callback_exception
-root.mainloop()
+#def report_callback_exception(exc, val, tb):
+    #text = ""
+    #for line in traceback.format_exception(exc,val,tb):
+        #text += line + "\n"
+    #tkMessageBox.showerror ( _("Error"), message=text )
+#root.report_callback_exception = report_callback_exception
+#root.mainloop()

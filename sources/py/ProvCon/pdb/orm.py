@@ -20,8 +20,12 @@ class CFG:
     class RT:
         DATASCOPE = 0
     class tCX(pg.DB):
+        instanceCount = 0
+        instance = None
         def __init__(self):
             pg.DB.__init__(self, dbname=CFG.DB.DBNAME, user=CFG.DB.ROLE)
+            CFG.tCX.instanceCount += 1
+            print "tCX init [%d]" % self.instanceCount
             idmap = {}
             tableinfo = self.query ( "SELECT * FROM " + CFG.DB.SCHEMA + ".table_info").dictresult()
             for ti in tableinfo:
@@ -38,6 +42,7 @@ class CFG:
                         f.reference = idmap[t.id]
                         idmap[t.id].reference_child.append ( (t, f) )
                         idmap[t.id].reference_child_hash[(t.name, f.name)] = (t,f)
+            self.instance = self
     CX = None
 
 def array_as_text(arr):
@@ -161,6 +166,7 @@ class Table(object):
         self.reference_child = []
         self.reference_child_hash = {}
         self.schema = kwargs.get ( "schema", CFG.DB.SCHEMA )
+        self.label = kwargs.get ( "label", self.name )
         
     def addField(self, field):
         assert isinstance(field, Field)
@@ -382,7 +388,10 @@ class Record(object):
 class ReferencedRecord(Record):
     pass
 
-CFG.CX = CFG.tCX()
+def StartupDatabaseConnection():
+    print "DB STARTUP"
+    CFG.CX = CFG.tCX.instance or CFG.tCX()
 
+StartupDatabaseConnection()
 
 
