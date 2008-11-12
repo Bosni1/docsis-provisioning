@@ -344,12 +344,100 @@ create table pv.mac_interface (
 SELECT pv.setup_object_subtable ( 'mac_interface' );
 
 ----------------------------------------------------------------------------------------------------
+----------------   METADATA   ----------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------
+
+CREATE TABLE pv.table_info (
+  schema name not null,
+  name name not null unique,  
+  label varchar(128) null,
+  title varchar(128) null,
+  info text null,
+  pprint_expression text default '#%(objectid)s',
+  pk name not null default 'objectid',
+  UNIQUE (schema, name)
+) inherits (pv."object");
+SELECT pv.setup_object_subtable ( 'table_info' );
+
+
+CREATE TABLE pv.field_info (  
+  lp smallint not null,
+  name name not null,
+  path varchar(128) null,
+  type name not null,
+  ndims smallint not null,
+  length smallint null,
+  classid int REFERENCES pv.table_info ON DELETE CASCADE ON UPDATE CASCADE NOT NULL,
+  reference int REFERENCES pv.table_info ON DELETE SET NULL ON UPDATE CASCADE NULL,
+  reference_editable bit not null default '0',
+  pprint_fkexpression text default null,  
+  required bit not null default '0',
+  label varchar(128) null,
+  quickhelp varchar(256) null,
+  info text null,
+  editor_class name default 'ValueEditor'
+) inherits (pv."object");
+SELECT pv.setup_object_subtable ( 'field_info' );
+
+
+
+CREATE VIEW pv.map_class_ids AS
+select c.oid as systemid, ac.objectid as localid 
+from pv.table_info ac inner join pg_class c on c.relname = ac.name 
+inner join pg_namespace n on n.oid = c.relnamespace 
+where n.nspname = ac.schema;
+
+CREATE VIEW pv.reference_info AS
+select c1.name || '(' || f1.name || ') REFERENCES ' || c2.name  from 
+    pv.table_info c1 INNER JOIN pv.field_info f1 ON f1.classid = c1.objectid 
+    INNER JOIN pv.table_info c2 ON c2.objectid = f1.reference 
+    WHERE f1.reference is not null;
+
+create function pv.handle_field_info_change() RETURNS trigger AS $body$
+  DECLARE
+    tname text;
+  BEGIN
+    IF (TG_OP = 'INSERT') OR (TG_OP = 'UPDATE') THEN
+      SELECT name INTO tname FROM pv.table_info WHERE objectid = NEW.classid;
+      NEW.path = tname || '.' || NEW.name;            
+      RETURN NEW;      
+    END IF;
+  END;
+$body$ LANGUAGE plpgsql;
+CREATE TRIGGER set_field_info_path BEFORE UPDATE OR INSERT ON pv.field_info 
+FOR EACH ROW EXECUTE PROCEDURE pv.handle_field_info_change();
+  
 ----------------------------------------------------------------------------------------------------
 ----------------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------
+  
 
 UPDATE pv.object_txt_expressions SET objecttxtexpr = '''['' || subscriberid || ''] '' || name' WHERE objecttype='subscriber';
 UPDATE pv.object_txt_expressions SET objecttxtexpr = '''['' || typeid || ''] '' || name' WHERE objecttype='type_of_service';
 UPDATE pv.object_txt_expressions SET objecttxtexpr = '''['' || name || ''] '' || network::text' WHERE objecttype='ip_subnet';
+UPDATE pv.object_txt_expressions SET objecttxtexpr = '''[TABLE] '' || name' WHERE objecttype='table_info';
+UPDATE pv.object_txt_expressions SET objecttxtexpr = '''[FIELD] '' || path' WHERE objecttype='field_info';
+
+INSERT INTO pv.table_info (schema, name, label, title, info) 
+SELECT n.nspname, c.relname, c.relname, c.relname, 'Table ' || c.relname || '.'
+FROM pg_class c INNER JOIN pg_namespace n ON n.oid = c.relnamespace
+WHERE n.nspname = 'pv' AND c.relkind = 'r'::char;
+
+INSERT INTO pv.field_info(name, lp, ndims, type, length, classid, label, quickhelp, reference)
+SELECT att.attname, att.attnum, att.attndims, 
+    CASE WHEN att.attndims > 0 THEN 'array:' || substring(t.typname from 2) ELSE t.typname END, 
+    att.attlen, ac.objectid, att.attname, 
+    ac.name || '.' || att.attname || ' : ' || t.typname || '(' ||  att.attlen || ') [' || att.attndims || ']',
+    m2.localid
+   FROM 
+    pv.table_info ac INNER JOIN pv.map_class_ids m ON m.localid = ac.objectid
+    INNER JOIN pg_attribute att ON att.attrelid = m.systemid
+    INNER JOIN pg_type t ON t.oid = att.atttypid
+    LEFT JOIN pg_constraint con ON (att.attnum = ANY ( con.conkey ) AND con.conrelid = m.systemid AND con.contype='f'::char)
+    LEFT JOIN pv.map_class_ids m2 ON (con.confrelid = m2.systemid)
+WHERE    
+  att.attnum > 0;
 
 
 COPY pv.type_of_service(typeid, name,classmap) FROM STDIN DELIMITER '|';
@@ -372,4 +460,3 @@ COPY pv.subscriber (subscriberid, name) FROM STDIN DELIMITER '|';
 1001|Roman Pawłowski
 1002|Paweł Romanowski
 \.
-

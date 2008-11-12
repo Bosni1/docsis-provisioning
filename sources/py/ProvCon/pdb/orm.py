@@ -14,20 +14,19 @@ class CFG:
         HOST = "localhost"
         PORT = 5432
         DBNAME = "Provisioning"
-        ROLE = "kuba"
+        ROLE = None
         PASS = None
-        SCHEMA = "pv"
-        INFOSCHEMA = "abstract"
+        SCHEMA = "pv"        
     class RT:
         DATASCOPE = 0
     class tCX(pg.DB):
         def __init__(self):
             pg.DB.__init__(self, dbname=CFG.DB.DBNAME, user=CFG.DB.ROLE)
             idmap = {}
-            tableinfo = self.query ( "SELECT * FROM abstract.class").dictresult()
+            tableinfo = self.query ( "SELECT * FROM " + CFG.DB.SCHEMA + ".table_info").dictresult()
             for ti in tableinfo:
                 with Table.New ( ti['name'] ) as t:
-                    columninfo = self.query ( "SELECT * FROM abstract.field WHERE classid = %d" % ti['id'] ).dictresult()
+                    columninfo = self.query ( "SELECT * FROM " + CFG.DB.SCHEMA + ".field_info WHERE classid = %d" % ti['objectid'] ).dictresult()
                     for ci in columninfo:                        
                         t.addField ( Field (size=ci['length'], **ci) )
                     idmap[t.id] = t
@@ -37,8 +36,8 @@ class CFG:
                 for f in t.fields:
                     if f.reference: 
                         f.reference = idmap[t.id]
-                        idmap[t.id].reference_ch.append ( (t, f) )
-                        idmap[t.id].reference_ch_hash[(t.name, f.name)] = (t,f)
+                        idmap[t.id].reference_child.append ( (t, f) )
+                        idmap[t.id].reference_child_hash[(t.name, f.name)] = (t,f)
     CX = None
 
 def array_as_text(arr):
@@ -156,12 +155,13 @@ class Table(object):
         
     def __init__(self, name, inherits="object", **kwargs):
         self.name = name
-        self.id = kwargs.get("id", None)
+        self.id = kwargs.get("objectid", None)
         self.fields = []
         self.fields_hash = {}
-        self.reference_ch = []
-        self.reference_ch_hash = {}
-
+        self.reference_child = []
+        self.reference_child_hash = {}
+        self.schema = kwargs.get ( "schema", CFG.DB.SCHEMA )
+        
     def addField(self, field):
         assert isinstance(field, Field)
         if field.lp < 0: field.lp = len(self.fields)
@@ -170,7 +170,7 @@ class Table(object):
         self.fields.sort ( lambda x, y: x.lp - y.lp )
         
     def recordlist(self, _filter="TRUE", order="objectid"):
-        from_clause = CFG.DB.SCHEMA + "." + self.name + " o LEFT JOIN " + CFG.DB.SCHEMA + ".object_search_txt t ON o.objectid = t.objectid"
+        from_clause = self.schema + "." + self.name + " o LEFT JOIN " + self.schema + ".object_search_txt t ON o.objectid = t.objectid"
         return CFG.CX.query ( "SELECT o.objectid, t.txt, o.objectmodification FROM {0} WHERE {1} ORDER BY {2}".format (from_clause, _filter, order )).dictresult()
     
     def __iter__(self):        
@@ -191,11 +191,13 @@ class Record(object):
         self._isnew = False
         self._hasdata = False        
         self._isinstalled = False
+        self._isreference = False
         self._objectid = None
         self._ismodified = False
         self._original_values = {}
         self._modified_values = {}
         self._table = None
+        self._astxt = None
         
                 
     def __setattr__(self, attrname, attrval):
@@ -237,11 +239,11 @@ class Record(object):
         self._modified_values.clear()
         self._ismodified = False
         self._hasdata = False
+        self._astxt = None
         if self._table:            
             for f in self._table:
                 self._original_values[f.name] = None                
-        
-    
+                        
     def setupRecord(self, vals={}):        
         if not self._table:
             if not self._objectid:
@@ -302,6 +304,11 @@ class Record(object):
         try:
             row = CFG.CX.get ( CFG.DB.SCHEMA + "." + self._table.name, { 'objectid' : self._objectid, 
                                                                          'objectscope' : CFG.RT.DATASCOPE } )
+            try:
+                self._astxt = CFG.CX.get (CFG.DB.SCHEMA + ".object_search_txt", 
+                                          { 'objectid' : self._objectid} )['txt']
+            except KeyError:
+                self._astxt = None
         except pg.DatabaseError, e:
             print e
             raise Record.RecordNotFound("#{0} in {1}".format(self._objectid, self._table.name))
@@ -371,6 +378,9 @@ class Record(object):
     def COPY(record):
         assert isinstance(record, Record)
         pass
+
+class ReferencedRecord(Record):
+    pass
 
 CFG.CX = CFG.tCX()
 

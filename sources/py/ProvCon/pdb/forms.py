@@ -134,7 +134,9 @@ class TabularObjectEditor(Tix.Frame):
         self.editingframe.pack ( side=TOP, fill=Y, expand=1 )
         for idx, f in enumerate(self.form.table):
             if f.name in Table.__special_columns__: continue
-            if f.isarray:
+            if f.reference:
+                e = StaticReferenceWidget(self.editingframe, f, self.form)
+            elif f.isarray:
                 e = ArrayEditorWidget(self.editingframe, f, self.form)
             else:
                 e = ValueEditorWidget (self.editingframe, f, self.form)
@@ -161,6 +163,34 @@ class TabularObjectEditor(Tix.Frame):
     
     def onAction(self):
         tkMessageBox.showinfo ( 'action', self.form.current.PP_TABLE )
+
+class StaticReferenceWidget(Tix.Frame):
+    def __init__(self, master, field, form, *args, **kwargs):
+        Tix.Frame.__init__(self, master, *args, **kwargs)
+        self.field = field
+        self.form = form
+
+        self.tkvar = self.form.tkvars[field.name]
+        self.tkvar.trace ( 'w', self.value_change_handler )         
+        self.disable_external_update_handler = False
+
+        self.label = Tix.Label ( master, text = field.label )
+        self.dispvar = Tix.StringVar()
+        self.editor = Tix.Label ( self, textvariable = self.dispvar )
+        self.editor.pack (fill=X)
+        self.referencedrecord = Record()
+    
+    def value_change_handler(self, *args):          
+        if self.disable_external_update_handler: return
+        try:
+            objectid = int(self.tkvar.get())
+        except ValueError:
+            self.dispvar.set ( "<empty>" )
+            return        
+        self.referencedrecord.setObjectID (objectid)
+        self.dispvar.set ( self.referencedrecord._astxt )
+        
+        
 
 class ValueEditorWidget(Tix.Frame):
     def __init__(self, master, field, form, *args, **kwargs):
@@ -292,7 +322,7 @@ root = Tix.Tk()
 print root
 wm = root.winfo_toplevel()
 wm.geometry( "800x600+10+10" )
-f = Form ( Table.Get ( "subscriber" ) )
+f = Form ( Table.Get ( "field_info" ) )
 #f.setid ( 1 )            
 tf = TabularObjectEditor ( root, f)
 
