@@ -29,7 +29,7 @@ class CFG:
             idmap = {}
             tableinfo = self.query ( "SELECT * FROM " + CFG.DB.SCHEMA + ".table_info").dictresult()
             for ti in tableinfo:
-                with Table.New ( ti['name'] ) as t:
+                with Table.New ( ti['name'], **ti ) as t:
                     columninfo = self.query ( "SELECT * FROM " + CFG.DB.SCHEMA + ".field_info WHERE classid = %d" % ti['objectid'] ).dictresult()
                     for ci in columninfo:                        
                         t.addField ( Field (size=ci['length'], **ci) )
@@ -103,6 +103,7 @@ class Field(object):
             self.arraysize = kkw.get("arraysize", ndims )
             self.label = kkw.get("label", self.name)
             self.auto = kkw.get("auto", False)
+            self.id = kkw.get("objectid", None)
             for k in kkw:
                 if k not in self.__dict__: self.__dict__[k] = kkw[k]
         except KeyError, e:
@@ -150,16 +151,16 @@ class Table(object):
     
     @staticmethod
     @contextlib.contextmanager
-    def New(name, *args, **kwargs):
-        Table.__all_tables__[name] = Table(name, *args, **kwargs)
-        yield Table.__all_tables__[name]
+    def New(tablename, *args, **kwargs):
+        Table.__all_tables__[tablename] = Table(tablename, *args, **kwargs)
+        yield Table.__all_tables__[tablename]
     
     @staticmethod
     def Get(name):
         return Table.__all_tables__.get (name, None)
         
-    def __init__(self, name, inherits="object", **kwargs):
-        self.name = name
+    def __init__(self, tablename, inherits="object", **kwargs):
+        self.name = tablename
         self.id = kwargs.get("objectid", None)
         self.fields = []
         self.fields_hash = {}
@@ -340,14 +341,17 @@ class Record(object):
             rec = CFG.CX.insert ( CFG.DB.SCHEMA + "." + self._table.name,
                             self._modified_values )
             self._objectid = rec['objectid']
+            self.read()
         elif self._ismodified:
             for m in self._modified_values:
+                print "mod:", m
                 self._modified_values[m] = self._table[m].val_py2sql(self._modified_values[m])
             self._modified_values['objectid'] = self._objectid
             rec = CFG.CX.update ( CFG.DB.SCHEMA + "." + self._table.name,
                                   self._modified_values )
+            self.read()        
             print rec
-            
+    
     def delete(self):
         if not self._isnew:
             CFG.CX.delete ( CFG.DB.SCHEMA + ".object", { 'objectid' : self._objectid } )
@@ -384,7 +388,7 @@ class Record(object):
     def COPY(record):
         assert isinstance(record, Record)
         pass
-
+    
 class ReferencedRecord(Record):
     pass
 

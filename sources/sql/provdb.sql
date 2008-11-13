@@ -6,9 +6,23 @@ SET default_with_oids=TRUE;
 --    BASIC OBJECT
 ----------------------------------------------------------------------------------------------------
 create table pv.object_txt_expressions (
-  objecttype VARCHAR(64) NOT NULL PRIMARY KEY,
+  objecttype name NOT NULL PRIMARY KEY,
   objecttxtexpr text NOT NULL
 );
+
+create function pv.object_txt_expression_change() RETURNS trigger AS $body$  
+  BEGIN
+    IF (NEW.objecttxtexpr <> OLD.objecttxtexpr) THEN
+      UPDATE pv.object_search_txt AS ost SET 
+        txt = pv.obj_txt_repr ( ost.objectid::int8, o.objecttype::name ) 
+        FROM pv.object o WHERE o.objectid = ost.objectid AND o.objecttype = NEW.objecttype;
+    END IF;    
+    RETURN NEW;
+  END;
+$body$ LANGUAGE plpgsql;
+CREATE TRIGGER bulk_update_txt_expressions AFTER UPDATE ON pv.object_txt_expressions
+FOR EACH ROW EXECUTE PROCEDURE pv.object_txt_expression_change();
+
 
 create table pv.object_search_txt (
   objectid int8 PRIMARY KEY,
@@ -21,7 +35,7 @@ create table pv.object (
   objectcreation TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   objectmodification TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   objectdeletion TIMESTAMP NULL,
-  objecttype VARCHAR(64) NOT NULL DEFAULT 'object',
+  objecttype name NOT NULL DEFAULT 'object',
   objecttypeid oid NULL,
   PRIMARY KEY (objectid)
 );
@@ -91,12 +105,12 @@ create function pv.obj (objid int8) returns record AS $obj$
   END;
 $obj$ LANGUAGE plpgsql;
 
-CREATE FUNCTION pv.obj_txt_repr (objid int8, objtype text) returns text as $repr$
+CREATE FUNCTION pv.obj_txt_repr (objid int8, objtype name) returns text as $repr$
   DECLARE
     expr text;
     repr text;
   BEGIN
-  SELECT e.objecttxtexpr INTO expr FROM pv.object_txt_expressions e INNER JOIN pv.object o ON o.objecttype = e.objecttype AND o.objectid = objid LIMIT 1;
+    SELECT e.objecttxtexpr INTO expr FROM pv.object_txt_expressions e INNER JOIN pv.object o ON o.objecttype = e.objecttype AND o.objectid = objid LIMIT 1;
     EXECUTE 'SELECT ' || expr || ' FROM pv.' || objtype || ' WHERE objectid = ' || objid INTO repr;
     RETURN repr;
   END;
@@ -355,6 +369,9 @@ CREATE TABLE pv.table_info (
   info text null,
   pprint_expression text default '#%(objectid)s',
   pk name not null default 'objectid',
+  disabledfields name[] not null default '{}',
+  excludedfields name[] not null default '{}',
+  txtexpression text null,  
   UNIQUE (schema, name)
 ) inherits (pv."object");
 SELECT pv.setup_object_subtable ( 'table_info' );
@@ -406,22 +423,36 @@ create function pv.handle_field_info_change() RETURNS trigger AS $body$
 $body$ LANGUAGE plpgsql;
 CREATE TRIGGER set_field_info_path BEFORE UPDATE OR INSERT ON pv.field_info 
 FOR EACH ROW EXECUTE PROCEDURE pv.handle_field_info_change();
-  
-----------------------------------------------------------------------------------------------------
-----------------------------------------------------------------------------------------------------
-----------------------------------------------------------------------------------------------------
-----------------------------------------------------------------------------------------------------
-  
 
+create function pv.handle_table_info_change() RETURNS trigger AS $body$
+  DECLARE
+    tname text;
+  BEGIN
+    IF (NEW.txtexpression <> OLD.txtexpression) THEN
+      UPDATE pv.object_txt_expressions SET objecttxtexpr = NEW.txtexpression WHERE objecttype = NEW.name;      
+    END IF;    
+    RETURN NEW;
+  END;
+$body$ LANGUAGE plpgsql;
+CREATE TRIGGER set_table_info BEFORE UPDATE ON pv.table_info 
+FOR EACH ROW EXECUTE PROCEDURE pv.handle_table_info_change();
+
+----------------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------
+  
 UPDATE pv.object_txt_expressions SET objecttxtexpr = '''['' || subscriberid || ''] '' || name' WHERE objecttype='subscriber';
 UPDATE pv.object_txt_expressions SET objecttxtexpr = '''['' || typeid || ''] '' || name' WHERE objecttype='type_of_service';
 UPDATE pv.object_txt_expressions SET objecttxtexpr = '''['' || name || ''] '' || network::text' WHERE objecttype='ip_subnet';
 UPDATE pv.object_txt_expressions SET objecttxtexpr = '''[TABLE] '' || name' WHERE objecttype='table_info';
 UPDATE pv.object_txt_expressions SET objecttxtexpr = '''[FIELD] '' || path' WHERE objecttype='field_info';
 
-INSERT INTO pv.table_info (schema, name, label, title, info) 
-SELECT n.nspname, c.relname, c.relname, c.relname, 'Table ' || c.relname || '.'
+INSERT INTO pv.table_info (schema, name, label, title, info, txtexpression) 
+SELECT n.nspname, c.relname, c.relname, c.relname, 'Table ' || c.relname || '.',
+  ote.objecttxtexpr
 FROM pg_class c INNER JOIN pg_namespace n ON n.oid = c.relnamespace
+LEFT JOIN pv.object_txt_expressions ote ON ote.objecttype = c.relname
 WHERE n.nspname = 'pv' AND c.relkind = 'r'::char;
 
 INSERT INTO pv.field_info(name, lp, ndims, type, length, classid, label, quickhelp, reference)

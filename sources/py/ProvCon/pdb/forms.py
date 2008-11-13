@@ -25,11 +25,19 @@ class Form(object):
         #when this is set, changes to tkvars are not propagated to
         #the record
         self.disable_value_change_handler = False
+    
     def save(self):
         self.current.write()
+        self.disable_value_change_handler = True
+        self.on_record_changed_handler()
+        self.disable_value_change_handler = False
 
     def reload(self):
         self.current.read()
+        self.disable_value_change_handler = True
+        self.on_record_changed_handler()
+        self.disable_value_change_handler = False
+        
 
     def new(self):
         pass
