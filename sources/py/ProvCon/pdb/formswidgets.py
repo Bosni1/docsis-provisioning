@@ -5,7 +5,68 @@ from orm import *
 from forms import *
 from gettext import gettext as _
 
+class FieldEntry(object):
+    
+    def __init__(self, formeditor, parent, field, **kwargs):
+        self.parent = parent
+        self.formeditor = formeditor
+        self.field = field
+        self.form = self.formeditor.form
+        self.variable = self.formeditor.form.tkvars[self.field.name]
 
+    def disable(self):
+        self.widget.config ( state='disabled' )
+        
+class TextEntry(FieldEntry):
+    def __init__(self, *args, **kwargs):
+        FieldEntry.__init__(self, *args, **kwargs)
+        self.widget = Tix.Entry (self.parent, 
+                                 width=self.formeditor.entrywidth, 
+                                 textvariable = self.variable)
+        
+
+class StaticEntry(FieldEntry):
+    def __init__(self, *args, **kwargs):
+        FieldEntry.__init__(self, *args, **kwargs)
+        self.widget = Tix.Label (self.parent, 
+                                 width=self.formeditor.entrywidth, 
+                                 textvariable = self.variable)    
+
+class ReferenceEntry(FieldEntry):
+    def __init__(self, *args, **kwargs):
+        FieldEntry.__init__(self, *args, **kwargs)        
+        self.variable.trace ( 'w', self.value_change )
+    
+    def value_change(self, *args):
+        pass
+    
+    
+class StaticReferenceEntry(ReferenceEntry):    
+    def __init__(self, *args, **kwargs):
+        ReferenceEntry.__init__(self, *args, **kwargs)        
+        self.display_variable = Tix.StringVar()
+        self.widget = Tix.Label (self.parent, 
+                                 width=self.formeditor.entrywidth, 
+                                 textvariable = self.display_variable)
+
+    def value_change(self, *args):
+        self.display_variable.set ( getattr(self.formeditor.form.current, self.field.name + "_REF") )
+
+class ComboReferenceEntry(ReferenceEntry):
+    def __init__(self, *args, **kwargs):
+        ReferenceEntry.__init__(self, *args, **kwargs)        
+        reftable = self.field.reference
+        print self.field.path, reftable.name
+        records = reftable.recordObjectList()
+        #print "\n".join ( map(str, records) )
+        self.display_variable = Tix.StringVar()
+        self.widget = Tix.Label (self.parent, 
+                                 width=self.formeditor.entrywidth, 
+                                 textvariable = self.display_variable)
+
+    def value_change(self, *args):
+        self.display_variable.set ( getattr(self.formeditor.form.current, self.field.name + "_REF") )
+        
 class GenericFormEditor(object):    
     """ 
     ==GenericFormEditor==
@@ -29,7 +90,22 @@ class GenericFormEditor(object):
             self.__dict__[attrname] = kwargs.get ( attrname, defval )
             
         self.parent = parent
-        self.toplevel = Tix.Frame (parent)
+        self.create_toplevel()
+        self.pack = self.toplevel.pack
+        self.place = self.toplevel.place
+
+        
+        self.form = form
+        self.editor_widgets = {}
+
+        self.create_form_container()        
+        self.build_form()
+    
+    def create_toplevel(self):
+        self.toplevel = Tix.Frame (self.parent)
+        
+
+    def create_form_container(self):
         scrolled = Tix.ScrolledHList (self.toplevel, options="hlist.columns 3")
 
         self.hlist = scrolled.subwidget('hlist')
@@ -37,46 +113,54 @@ class GenericFormEditor(object):
                                background="white", foreground="black",
                                selectbackground="white", selectforeground="black")
         
-        self.pack = self.toplevel.pack
-        self.place = self.toplevel.place
       
         scrolled.pack(side=TOP, fill=BOTH, expand=1)
         scrolled.propagate(0)
         
-        if self.showbuttons:
-            self.buttonbox = Tix.ButtonBox(self.toplevel, pady=0)
-            for b in self.buttons: self.add_button(b)
-            self.buttonbox.pack (side=BOTTOM, anchor=W )
+        self.create_button_box()
         
         self.hlist.column_width(0, chars=1)
         self.hlist.column_width(1, chars=self.labelwidth)
         self.hlist.column_width(2, chars=self.entrywidth)
-        
-        self.form = form
-        self.editor_widgets = {}
-        style = Tix.DisplayStyle(Tix.WINDOW, refwindow=self.hlist)
-
-        self.build_form()
+    
+    def create_button_box(self):
+        if self.showbuttons:
+            self.buttonbox = Tix.ButtonBox(self.toplevel, pady=0)
+            for b in self.buttons: self.add_button(b)
+            self.buttonbox.pack (side=BOTTOM, anchor=W )        
         
     def build_form(self):
         for f in self.form.table:            
             if (f.name in Table.__special_columns__ 
                 or f.name in self.excludefields): continue           
-            self.hlist.add ( f.name, itemtype=Tix.TEXT, text="*" )
-            self.set_label ( f.name, f.label )
-            self.set_entry ( f.name, f )
+            form_element = self.create_form_element(f)
+            self.set_label ( form_element, self.create_label(f) )
+            self.set_entry ( form_element, self.create_entry(f) )
+
+    def create_form_element(self, field):
+        self.hlist.add ( field.name, itemtype=Tix.TEXT, text=" " )
+        return field.name
             
+    def create_label(self, field):
+        return field.label
 
     def set_label(self, form_element, label):
         self.hlist.item_create ( form_element, 1, itemtype=Tix.TEXT, text=label)
 
-    def set_entry(self, form_element, field):
-        entry = Tix.Entry (self.hlist, width=self.entrywidth)
-        entry.__var = self.form.tkvars[form_element]
-        entry.config ( textvariable = entry.__var )
-        if form_element in self.disablefields: entry.config ( state='disabled' )
-        self.editor_widgets[form_element] = entry
-        self.hlist.item_create ( form_element, 2, itemtype=Tix.WINDOW, window=entry )
+    def create_entry(self, field):
+        var = self.form.tkvars[field.name]
+        if field.reference:
+            entry = ComboReferenceEntry ( self, self.hlist, field )
+        else:
+            entry = TextEntry ( self, self.hlist, field )
+            
+        self.editor_widgets[field.name] = entry
+        if field.name in self.disablefields: entry.disable()
+        
+        return entry
+    
+    def set_entry(self, form_element, entry):
+        self.hlist.item_create ( form_element, 2, itemtype=Tix.WINDOW, window=entry.widget )
         
     def button_command(self, buttonname, *args):                
         if hasattr(self, "handle_button_" + buttonname):

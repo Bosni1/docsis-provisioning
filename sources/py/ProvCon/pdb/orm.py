@@ -23,26 +23,30 @@ class CFG:
         instanceCount = 0
         instance = None
         def __init__(self):
-            pg.DB.__init__(self, dbname=CFG.DB.DBNAME, user=CFG.DB.ROLE)
+            pg.DB.__init__(self, dbname=CFG.DB.DBNAME, user=CFG.DB.ROLE, host=CFG.DB.HOST)
+            print "\n".join(self.get_tables())
             CFG.tCX.instanceCount += 1
             print "tCX init [%d]" % self.instanceCount
             idmap = {}
             tableinfo = self.query ( "SELECT * FROM " + CFG.DB.SCHEMA + ".table_info").dictresult()
             for ti in tableinfo:
+                print ti['name'], ti['objectid']
                 with Table.New ( ti['name'], **ti ) as t:
                     columninfo = self.query ( "SELECT * FROM " + CFG.DB.SCHEMA + ".field_info WHERE classid = %d" % ti['objectid'] ).dictresult()
                     for ci in columninfo:                        
                         t.addField ( Field (size=ci['length'], **ci) )
-                    idmap[t.id] = t
+                    idmap[t.objectid] = t
                     
             #import foreign key relationships
             for t in Table.__all_tables__.values():
                 for f in t.fields:
                     if f.reference: 
-                        f.reference = idmap[t.id]
-                        idmap[t.id].reference_child.append ( (t, f) )
-                        idmap[t.id].reference_child_hash[(t.name, f.name)] = (t,f)
+                        f.reference = idmap[t.objectid]
+                        print "reference ", f.path, 'to', t.objectid, '-', t.name
+                        idmap[t.objectid].reference_child.append ( (t, f) )
+                        idmap[t.objectid].reference_child_hash[(t.name, f.name)] = (t,f)
             self.instance = self
+        
     CX = None
 
 def array_as_text(arr):
@@ -104,8 +108,12 @@ class Field(object):
             self.label = kkw.get("label", self.name)
             self.auto = kkw.get("auto", False)
             self.id = kkw.get("objectid", None)
+
             for k in kkw:
                 if k not in self.__dict__: self.__dict__[k] = kkw[k]
+            
+            
+            
         except KeyError, e:
             kwname, = e.args
             raise Field.IncompleteDefinition ( "missing: '%s' in field definition." % kwname )
@@ -113,6 +121,7 @@ class Field(object):
     def __repr__(self):
         return "{0} : {1}".format (self.name, self.type)
 
+    
     def val_sql2py(self, sqlval):
         """convert the value returned by pg into a python variable"""
         if self.isarray:
@@ -169,6 +178,7 @@ class Table(object):
     def __init__(self, tablename, inherits="object", **kwargs):
         self.name = tablename
         self.id = kwargs.get("objectid", None)
+        self.objectid = kwargs.get("objectid", None)
         self.fields = []
         self.fields_hash = {}
         self.reference_child = []
@@ -183,9 +193,18 @@ class Table(object):
         self.fields_hash[field.name] = field
         self.fields.sort ( lambda x, y: x.lp - y.lp )
         
-    def recordlist(self, _filter="TRUE", order="objectid"):
+    def recordList(self, _filter="TRUE", select=[], order="objectid"):
         from_clause = self.schema + "." + self.name + " o LEFT JOIN " + self.schema + ".object_search_txt t ON o.objectid = t.objectid"
-        return CFG.CX.query ( "SELECT o.objectid, t.txt, o.objectmodification FROM {0} WHERE {1} ORDER BY {2}".format (from_clause, _filter, order )).dictresult()
+        return CFG.CX.query ( "SELECT o.objectid, t.txt as _astxt, o.objectmodification {3} FROM {0} WHERE {1} ORDER BY {2}".format (from_clause, _filter, order, ",".join(select) )).dictresult()
+
+    def recordObjectList(self, _filter="TRUE", select=[], order="objectid"):
+        rl = self.recordList(_filter, select, order)
+        li = []
+        for r in rl:
+            rec = Record.EMPTY (self)
+            rec.feedDataRow ( r )
+            li.append (rec)
+        return li
     
     def __iter__(self):        
         return iter(self.fields)            
@@ -198,10 +217,12 @@ class Table(object):
             return self.fields_hash[idx]
         return None
     
-class Record(object):
+class Record(object):    
     class RecordNotFound(ORMError): pass
+
+    __default_reference_mode__ = "text"
     
-    def __init__(self):
+    def __init__(self, **kkw):
         self._isnew = False
         self._hasdata = False        
         self._isinstalled = False
@@ -210,8 +231,12 @@ class Record(object):
         self._ismodified = False
         self._original_values = {}
         self._modified_values = {}
+        self._references = {}
         self._table = None
         self._astxt = None
+        self._feed = False
+        self._resolvereference = kkw.get("resolvereference", self.__default_reference_mode__)  # none | text | record
+        self._reprfunc = kkw.get ( "reprfunc", None )        
         
                 
     def __setattr__(self, attrname, attrval):
@@ -228,7 +253,7 @@ class Record(object):
                 if self._table:
                     self.setupRecord()
             elif attrname == "_objectid" and valuechange:
-                if attrval:
+                if attrval and not self._feed:
                     self.read()
                 elif attrval is None:
                     if self._hasdata:
@@ -245,12 +270,15 @@ class Record(object):
                 for f in self._table:                    
                     sio.write( "| {0:24} | {1:40} |\n".format (f.name, self.getFieldValue (f.name) )  )
             return sio.getvalue()
-        
+        elif attrname.endswith("_REF"):
+            fname = attrname[:-4]
+            if fname in self._references: return self._references[fname]
         return self.__dict__[attrname]
 
     def nullify(self):
         self._original_values.clear()
         self._modified_values.clear()
+        self._references.clear()
         self._ismodified = False
         self._hasdata = False
         self._astxt = None
@@ -307,7 +335,57 @@ class Record(object):
 
     def getFieldStringValue (self, fieldname):
         v = self.getFieldValue ( fieldname )
-        return self._table[fieldname].val_py2txt ( v )
+        return self._table[fieldname].val_py2txt ( v )    
+
+    def updateReferenceField(self, field):
+        if not field.reference: return
+        decoded = self.__dict__[field.name]
+        if not decoded: self._references[field.name] = None; return
+        if self._resolvereference == "none":
+            self._references[field.name] = decoded
+        elif self._resolvereference == "text":
+            try:
+                self._references[field.name] = CFG.CX.get ( CFG.DB.SCHEMA + ".object_search_txt",
+                                                    {"objectid" : decoded} )['txt']
+            except KeyError:
+                self._references[field.name] = "<null>"
+        elif self._resolvereference == "record":
+            self._references[field.name] = Record.ID (decoded)
+
+    
+    def feedDataRow(self, row, **kwargs):
+        self._feed = True
+        self._objectid = row['objectid']
+        self._feed = False
+
+        self._original_values.clear()
+        for cn in row:
+            if cn not in self._table: continue
+            field = self._table[cn]
+            decoded = field.val_sql2py ( row[cn] )
+            self.__dict__[cn] = decoded
+            self._original_values[cn] = decoded
+            if field.reference:
+                self.updateReferenceField(field)
+
+        if '_astxt' in row:
+            self._astxt = row['_astxt']
+        elif self._reprfunc:
+            self._astxt = self._reprfunc (self)
+        else:            
+            try:
+                self._astxt = CFG.CX.get (CFG.DB.SCHEMA + ".object_search_txt", 
+                                          { 'objectid' : self._objectid} )['txt']
+            except KeyError:
+                if self._reprfunc: self._astxt = self._reprfunc (self)
+                else: self._astxt = None
+        
+            
+        self._hasdata = True
+        self._isnew = False
+        self._ismodified = False
+        self._modified_values.clear()
+        
     
     def read(self):
         if not self._table :
@@ -318,26 +396,12 @@ class Record(object):
         try:
             row = CFG.CX.get ( CFG.DB.SCHEMA + "." + self._table.name, { 'objectid' : self._objectid, 
                                                                          'objectscope' : CFG.RT.DATASCOPE } )
-            try:
-                self._astxt = CFG.CX.get (CFG.DB.SCHEMA + ".object_search_txt", 
-                                          { 'objectid' : self._objectid} )['txt']
-            except KeyError:
-                self._astxt = None
+            self.feedDataRow(row)
+            
         except pg.DatabaseError, e:
             print e
             raise Record.RecordNotFound("#{0} in {1}".format(self._objectid, self._table.name))
             
-        self._original_values.clear()
-        for cn in row:
-            if cn not in self._table: continue
-            decoded = self._table[cn].val_sql2py ( row[cn] )
-            self.__dict__[cn] = decoded
-            self._original_values[cn] = decoded
-            
-        self._hasdata = True
-        self._isnew = False
-        self._ismodified = False
-        self._modified_values.clear()
         
     def write(self):
         if not self._table: raise ValueError ( "_table is Null" )
@@ -373,20 +437,25 @@ class Record(object):
         elif isinstance(tabledef, Table):
             self._table = tabledef
         else:
-            raise ValueError ("table - must be table name or Table instance." )
-
+            raise ValueError ("table - must be table name or Table instance." )    
+        
     def ofTable(tablename):
         return tablename == self._table.name
     
+    def __repr__(self):
+        if self._table:
+            return "<record of {0} #{1}> {2}".format (self._table.name, self._objectid,
+                                                      self._astxt )
+        return "<record>"
     @staticmethod
-    def ID(objectid):
-        rec = Record()
+    def ID(objectid, **kkw):
+        rec = Record(**kkw)
         rec.setObjectID(objectid)        
         return rec
     
     @staticmethod
-    def EMPTY(tabledef):
-        rec = Record()
+    def EMPTY(tabledef, **kkw):
+        rec = Record(**kkw)
         rec.setTable (tabledef)
         rec._isnew = True
         return rec
@@ -395,6 +464,34 @@ class Record(object):
     def COPY(record):
         assert isinstance(record, Record)
         pass
+
+    @staticmethod
+    def CHILDREN(parentid, reftable, refcolumn, **kwargs):
+        limit = kwargs.get ( "limit", None )
+        order = kwargs.get ( "order", ['o.objectid'] )
+        reprfunc = kwargs.get ( "reprfunc", None )
+        gettxt = kwargs.get ( "gettxt", True )
+        select = kwargs.get ( "select", ["*"] )
+        if limit:
+            limit = "OFFSET {0} LIMIT {1}".format ( *limit )
+        else:
+            limit = ""
+        order = ",".join(order)
+        select = ",".join(select)
+        if gettxt:
+            gettxtq = ("LEFT JOIN pv.object_search_txt t ON t.objectid = o.objectid", ", t.txt as _astxt" )
+        else:
+            gettxtq = ( "", "" )
+        query = "SELECT {6}{8} FROM {5}.{0} o {7} WHERE \"{1}\" = '{2}' ORDER BY {3} {4}".format (
+            reftable, refcolumn, int(parentid), order, limit, CFG.DB.SCHEMA,
+            select, gettxtq[0], gettxtq[1] )
+        rowset = CFG.CX.query ( query ).dictresult()
+        table = Table.Get ( reftable )
+        for row in rowset:
+            record = Record.EMPTY (table, reprfunc = reprfunc )
+            record.feedDataRow ( row )
+            yield record
+
     
 class ReferencedRecord(Record):
     pass
@@ -405,4 +502,10 @@ def StartupDatabaseConnection():
 
 StartupDatabaseConnection()
 
+table = Record.ID(3)
+print table
 
+
+for r in Record.CHILDREN (3, "field_info", "classid", gettxt=False):
+    print r
+    
