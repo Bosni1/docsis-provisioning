@@ -8,7 +8,7 @@ from gettext import gettext as _
 
 class GenericFormEditor(object):    
     """ 
-    GenericFormEditor
+    ==GenericFormEditor==
     """
     __defaults__ = [ 
         ( "labelwidth", 20 ),
@@ -30,7 +30,7 @@ class GenericFormEditor(object):
             
         self.parent = parent
         self.toplevel = Tix.Frame (parent)
-        scrolled = Tix.ScrolledHList (self.toplevel, options="hlist.columns 2")
+        scrolled = Tix.ScrolledHList (self.toplevel, options="hlist.columns 3")
 
         self.hlist = scrolled.subwidget('hlist')
         self.hlist.configure ( separator="/",
@@ -47,25 +47,37 @@ class GenericFormEditor(object):
             self.buttonbox = Tix.ButtonBox(self.toplevel, pady=0)
             for b in self.buttons: self.add_button(b)
             self.buttonbox.pack (side=BOTTOM, anchor=W )
-        self.hlist.column_width(0, chars=self.labelwidth)
-        self.hlist.column_width(1, chars=self.entrywidth)
+        
+        self.hlist.column_width(0, chars=1)
+        self.hlist.column_width(1, chars=self.labelwidth)
+        self.hlist.column_width(2, chars=self.entrywidth)
         
         self.form = form
         self.editor_widgets = {}
         style = Tix.DisplayStyle(Tix.WINDOW, refwindow=self.hlist)
+
+        self.build_form()
         
+    def build_form(self):
         for f in self.form.table:            
             if (f.name in Table.__special_columns__ 
                 or f.name in self.excludefields): continue           
-            self.hlist.add ( f.name, itemtype=Tix.TEXT, text=f.label )
-            entry = Tix.Entry (self.hlist, width=self.entrywidth)
-            entry.__var = form.tkvars[f.name]
-            entry.config ( textvariable = entry.__var )
-            entry.pack ( expand=1, fill=BOTH)
-            if f.name in self.disablefields: entry.config ( state='disabled' )
-            self.editor_widgets[f.name] = entry
-            self.hlist.item_create ( f.name, 1, itemtype=Tix.WINDOW, window=entry )
+            self.hlist.add ( f.name, itemtype=Tix.TEXT, text="*" )
+            self.set_label ( f.name, f.label )
+            self.set_entry ( f.name, f )
+            
 
+    def set_label(self, form_element, label):
+        self.hlist.item_create ( form_element, 1, itemtype=Tix.TEXT, text=label)
+
+    def set_entry(self, form_element, field):
+        entry = Tix.Entry (self.hlist, width=self.entrywidth)
+        entry.__var = self.form.tkvars[form_element]
+        entry.config ( textvariable = entry.__var )
+        if form_element in self.disablefields: entry.config ( state='disabled' )
+        self.editor_widgets[form_element] = entry
+        self.hlist.item_create ( form_element, 2, itemtype=Tix.WINDOW, window=entry )
+        
     def button_command(self, buttonname, *args):                
         if hasattr(self, "handle_button_" + buttonname):
             getattr(self, "handle_button_" + buttonname)(*args)
@@ -89,10 +101,9 @@ class MetadataEditorApp:
         wm = self._root.winfo_toplevel()        
         wm.title ( "Provisioning meta-data editor" )
         wm.geometry ( "1024x768+10+10" )
-
-        self.rootwindow.propagate(0)
-        self.rootwindow.pack(expand=1, fill=BOTH)
         
+        self.rootwindow.pack(expand=1, fill=BOTH)
+        self.rootwindow.propagate(0)
                 
         self.table_list_frame = Tix.LabelFrame(self.rootwindow, label="Table list")
         self.table_list_frame.place ( relx=0, rely=0, relwidth=0.5, relheight=0.5)
@@ -115,6 +126,7 @@ class MetadataEditorApp:
         
         self.table_properties_frame = Tix.LabelFrame (self.rootwindow, label="Table properties" )
         self.table_properties_frame.place (relx=0.50, rely=0, relwidth=0.5, relheight=0.5)
+        self.table_properties_frame.propagate(0)
         self.table_properties_form = Form ( Table.Get ( "table_info" ) )
         self.table_properties = GenericFormEditor (self.table_properties_frame, 
                                                    self.table_properties_form,
@@ -123,6 +135,7 @@ class MetadataEditorApp:
         
         self.field_list_frame = Tix.LabelFrame(self.rootwindow, label="Fields")
         self.field_list_frame.place ( relx=0, rely=0.51, relwidth=0.4, relheight=0.45)
+        self.field_list_frame.propagate(0)
         scrolled = Tix.ScrolledTList(self.field_list_frame, scrollbars='y')
         self.field_list = scrolled.subwidget('tlist')
         self.field_list.configure (selectmode="single",
@@ -131,9 +144,10 @@ class MetadataEditorApp:
                                    command=self.field_change_handler )
         self.field_items = {}
         scrolled.pack (expand=1, fill=BOTH, padx=7, pady=20)
-
+        
         self.field_properties_frame = Tix.LabelFrame (self.rootwindow, label="Field properties" )
         self.field_properties_frame.place (relx=0.40, rely=0.51, relwidth=0.6, relheight=0.45)
+        self.field_properties_frame.propagate(0)
         self.field_properties_form = Form ( Table.Get ( "field_info" ) )
         self.field_properties = GenericFormEditor (self.field_properties_frame,
                                                    self.field_properties_form ,

@@ -114,20 +114,27 @@ class Field(object):
         return "{0} : {1}".format (self.name, self.type)
 
     def val_sql2py(self, sqlval):
+        """convert the value returned by pg into a python variable"""
         if self.isarray:
             return text_to_array (sqlval, self.arraysize-1)
         return sqlval
     
     def val_py2sql(self, pyval):
+        """convert a python variable into something we can insert into an pgSQL statement"""
         if self.isarray:
             return array_as_text (pyval)
-        return str(pyval)
+        elif isinstance(pyval, str):
+            return str(pyval.encode('utf-8'))
+        else:
+            return str(pyval)
     
     def val_py2txt(self, pyval):
         if self.isarray:
             return "array:" + array_as_text(pyval)
         if pyval is None:
             return ''
+        elif isinstance(pyval, str):
+            return str(pyval.encode('utf-8'))
         else:
             return str(pyval)
     
