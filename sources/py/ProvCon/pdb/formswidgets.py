@@ -5,6 +5,7 @@ from orm import *
 from forms import *
 from gettext import gettext as _
 
+
 class FieldEntry(object):
     
     def __init__(self, formeditor, parent, field, **kwargs):
@@ -48,6 +49,7 @@ class StaticReferenceEntry(ReferenceEntry):
         self.widget = Tix.Label (self.parent, 
                                  width=self.formeditor.entrywidth, 
                                  textvariable = self.display_variable)
+        
 
     def value_change(self, *args):
         self.display_variable.set ( getattr(self.formeditor.form.current, self.field.name + "_REF") )
@@ -55,17 +57,41 @@ class StaticReferenceEntry(ReferenceEntry):
 class ComboReferenceEntry(ReferenceEntry):
     def __init__(self, *args, **kwargs):
         ReferenceEntry.__init__(self, *args, **kwargs)        
-        reftable = self.field.reference
-        print self.field.path, reftable.name
-        records = reftable.recordObjectList()
-        #print "\n".join ( map(str, records) )
+        reftable = self.field.reference        
+        self.records = reftable.recordObjectList()        
         self.display_variable = Tix.StringVar()
-        self.widget = Tix.Label (self.parent, 
-                                 width=self.formeditor.entrywidth, 
-                                 textvariable = self.display_variable)
-
-    def value_change(self, *args):
-        self.display_variable.set ( getattr(self.formeditor.form.current, self.field.name + "_REF") )
+        self.value_change_off = False
+        self.cmb_command_off = False
+        self.widget = Tix.ComboBox (self.parent, 
+                                    editable=False, dropdown=True,
+                                    options = "label.width 0 entry.width " + str(self.formeditor.entrywidth),                                     
+                                    variable = self.display_variable,
+                                    command=self.cmb_command, fancy=True)
+        self.listbox = self.widget.subwidget('slistbox').subwidget('listbox')
+        self.records_hash = {}
+        self.records_id_hash = {}
+        for idx,r in enumerate(self.records):
+            self.widget.insert (Tix.END, r._astxt)
+            self.records_hash[idx] = r
+            self.records_id_hash[r.objectid] = r 
+        self.current = None
+    
+    def cmb_command(self, *args):
+        if self.cmb_command_off: return
+        if not hasattr(self, 'listbox'): return
+        idx, = self.listbox.curselection()
+        self.current = self.records_hash[int(idx)]
+        self.value_change_off = True
+        self.variable.set (self.current.objectid)
+        self.value_change_off = False
+        
+    def value_change(self, *args):        
+        if self.value_change_off: return
+        print "vc=", self.variable.get()
+        self.current = self.records_id_hash[int(self.variable.get())]        
+        self.cmb_command_off = True
+        self.display_variable.set ( self.current._astxt )
+        self.cmb_command_off = False
         
 class GenericFormEditor(object):    
     """ 
@@ -150,7 +176,10 @@ class GenericFormEditor(object):
     def create_entry(self, field):
         var = self.form.tkvars[field.name]
         if field.reference:
-            entry = ComboReferenceEntry ( self, self.hlist, field )
+            if field.editor_class == "StaticReferenceEntry":
+                entry = StaticReferenceEntry ( self, self.hlist, field )
+            else:
+                entry = ComboReferenceEntry ( self, self.hlist, field )
         else:
             entry = TextEntry ( self, self.hlist, field )
             

@@ -23,16 +23,15 @@ class CFG:
         instanceCount = 0
         instance = None
         def __init__(self):
-            pg.DB.__init__(self, dbname=CFG.DB.DBNAME, user=CFG.DB.ROLE, host=CFG.DB.HOST)
-            print "\n".join(self.get_tables())
+            pg.DB.__init__(self, dbname=CFG.DB.DBNAME, user=CFG.DB.ROLE, host=CFG.DB.HOST)            
             CFG.tCX.instanceCount += 1
             print "tCX init [%d]" % self.instanceCount
             idmap = {}
-            tableinfo = self.query ( "SELECT * FROM " + CFG.DB.SCHEMA + ".table_info").dictresult()
+            tableinfo = self.query ( "SELECT * FROM {0}.table_info".format(CFG.DB.SCHEMA) ).dictresult()
             for ti in tableinfo:
-                print ti['name'], ti['objectid']
+                #print "TABLE {name}  == {objectid}".format(**ti)
                 with Table.New ( ti['name'], **ti ) as t:
-                    columninfo = self.query ( "SELECT * FROM " + CFG.DB.SCHEMA + ".field_info WHERE classid = %d" % ti['objectid'] ).dictresult()
+                    columninfo = self.query ( "SELECT * FROM {0}.field_info WHERE classid = {objectid}".format(CFG.DB.SCHEMA, **ti)).dictresult()
                     for ci in columninfo:                        
                         t.addField ( Field (size=ci['length'], **ci) )
                     idmap[t.objectid] = t
@@ -41,8 +40,9 @@ class CFG:
             for t in Table.__all_tables__.values():
                 for f in t.fields:
                     if f.reference: 
-                        f.reference = idmap[t.objectid]
-                        print "reference ", f.path, 'to', t.objectid, '-', t.name
+                        #print "{0.name}.{1.name} -> references {1.reference}".format (t,f)
+                        f.reference = idmap[f.reference]
+                        #print "reference ", f.path, 'to', t.objectid, '-', t.name
                         idmap[t.objectid].reference_child.append ( (t, f) )
                         idmap[t.objectid].reference_child_hash[(t.name, f.name)] = (t,f)
             self.instance = self
@@ -502,10 +502,10 @@ def StartupDatabaseConnection():
 
 StartupDatabaseConnection()
 
-table = Record.ID(3)
-print table
+#table = Record.ID(3)
+#print table
 
 
-for r in Record.CHILDREN (3, "field_info", "classid", gettxt=False):
-    print r
+#for r in Record.CHILDREN (3, "field_info", "classid", gettxt=False):
+    #print r
     
