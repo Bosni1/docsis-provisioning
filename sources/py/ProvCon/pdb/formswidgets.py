@@ -130,6 +130,7 @@ class BooleanEntry(FieldEntry):
         else:
             self.display_variable.set (_("NO"))
             
+###########################################################################################
 class ArrayEntryTextMixin:    
     class ItemEditor(object):
         def __init__(self, arrayentry, idx):
@@ -165,10 +166,11 @@ class ArrayEntryButtonMixin:
 
 class ArrayEntryComboMixin:
     class ItemEditor(object):
-        def __init__(self, arrayentry, idx):
+        def __init__(self, arrayentry, arrayidx):
             self.variable = Tix.StringVar()
             self.display_variable = Tix.StringVar()
             self.combo_selection = conditionalmethod(self.combo_selection)
+            self.external_change = conditionalmethod(self.external_change)
             self.entry = Tix.ComboBox ( arrayentry.parent, 
                                         editable=False, dropdown=True,
                                         options = "label.width 0 entry.width " + str(arrayentry.formeditor.entrywidth),                                     
@@ -185,21 +187,31 @@ class ArrayEntryComboMixin:
                     self.value_idx.append(varval)
                     self.disp_idx.append (dispval)
                     self.entry.insert ( Tix.END, dispval )
-            self.tracecb = self.variable.trace ('w', partial(arrayentry.item_change, idx))
-
+            self.tracecb = self.variable.trace ('w', partial(arrayentry.item_change, arrayidx))
+            self.localtrace = self.variable.trace ('w', self.external_change)
             arrayentry.editors.append (self)
-            self.tracecb = None
-
+            
+        def external_change (self, *args):
+            try:
+                self.combo_selection.freeze()
+                self.external_change.freeze()
+                self.display_variable.set ( self.disp_idx[int(self.variable.get())] )
+            except IndexError:
+                self.display_variable.set ( self.variable.get() + " <no text>" )
+            finally:
+                self.external_change.thaw()
+                self.combo_selection.thaw()
+            
         def combo_selection(self, *args):
             print args
             idx, = self.listbox.curselection()
             self.combo_selection.freeze()
-            self.variable.set ( self.value_idx[int(idx)] )
+            self.variable.set ( self.value_idx[int(idx)] )            
             self.combo_selection.thaw()
             
-        def destroy(self):
-            if self.tracecb:
-                self.variable.trace_vdelete ( 'w', self.tracecb )
+        def destroy(self):        
+            self.variable.trace_vdelete ( 'w', self.tracecb )        
+            self.variable.trace_vdelete ( 'w', self.localtrace)
             self.entry.forget()
             del self.entry, self.variable
     
@@ -291,13 +303,16 @@ class ArrayEntry(FieldEntry):
         self.item_change.thaw()
         
         
-class ArrayTextEntry(ArrayEntry, ArrayEntryComboMixin, ArrayEntryButtonMixin):
+class ArrayTextEntry(ArrayEntry, ArrayEntryTextMixin, ArrayEntryButtonMixin):
     pass
 
 
 class ArrayReadOnlyEntry(ArrayEntry, ArrayEntryLabelMixin):
     pass
 
+
+class ArrayComboEntry(ArrayEntry, ArrayEntryComboMixin, ArrayEntryButtonMixin):
+    pass
 
 ###########################################################################################
 class GenericFormEditor(object):    
@@ -385,7 +400,7 @@ class GenericFormEditor(object):
     def create_entry(self, field):
         var = self.form.tkvars[field.name]
         if field.isarray:
-            entry = ArrayTextEntry(self, self.hlist, field, branch="array_" + field.name,
+            entry = ArrayComboEntry(self, self.hlist, field, branch="array_" + field.name,
                                    choices = [ (1, "AAA"), (3, "BBB"), (4, "XXX") ])
         elif field.reference:
             if field.editor_class == "StaticReferenceEntry":
@@ -418,7 +433,8 @@ class GenericFormEditor(object):
     def add_button(self, buttonname, **kwargs):
         self.buttonbox.add ( buttonname, text=buttonname, command=lambda *x: self.button_command(buttonname, *x) )
     
-class MetadataEditorApp:
+###########################################################################################
+class MetadataEditorApp:    
     resource_dir = '/home/kuba/src/docsis-resources/'
     def __init__(self):
         self._root = Tix.Tk()
@@ -508,4 +524,5 @@ class MetadataEditorApp:
         self.field_properties_form.setid ( field.id )
         self.field_properties_frame.configure ( label = self.field_properties_form.current._astxt )
         
+###########################################################################################
 MetadataEditorApp()
