@@ -23,6 +23,7 @@ class TextEntry(FieldEntry):
         FieldEntry.__init__(self, *args, **kwargs)
         self.widget = Tix.Entry (self.parent, 
                                  width=self.formeditor.entrywidth, 
+                                 disabledforeground="black",
                                  textvariable = self.variable)
         
 
@@ -31,8 +32,9 @@ class StaticEntry(FieldEntry):
         FieldEntry.__init__(self, *args, **kwargs)
         self.widget = Tix.Label (self.parent, 
                                  width=self.formeditor.entrywidth, 
+                                 disabledforeground="black",
                                  textvariable = self.variable)    
-
+        
 class ReferenceEntry(FieldEntry):
     def __init__(self, *args, **kwargs):
         FieldEntry.__init__(self, *args, **kwargs)    
@@ -48,7 +50,7 @@ class StaticReferenceEntry(ReferenceEntry):
         ReferenceEntry.__init__(self, *args, **kwargs)        
         self.display_variable = Tix.StringVar()
         self.widget = Tix.Label (self.parent, 
-                                 width=self.formeditor.entrywidth, 
+                                 width=self.formeditor.entrywidth,                                  
                                  textvariable = self.display_variable)
         
 
@@ -71,7 +73,8 @@ class ComboReferenceEntry(ReferenceEntry):
                                     options = "label.width 0 entry.width " + str(self.formeditor.entrywidth),                                     
                                     variable = self.display_variable,
                                     command=self.cmb_command)        
-                                                                    
+        self.entry = self.widget.subwidget ('entry')
+        self.entry.config (disabledforeground="black")
         self.listbox = self.widget.subwidget('slistbox').subwidget('listbox')
         for r in self.records:
             self.widget.insert (Tix.END, r._astxt)
@@ -90,6 +93,7 @@ class ComboReferenceEntry(ReferenceEntry):
             self.variable.set (self.current.objectid)
         except IndexError:
             self.current = None
+            self.variable.set (None)
             self.display_variable.set ( "<error> out of bounds" )
         finally:
             self.value_change.thaw()
@@ -99,9 +103,11 @@ class ComboReferenceEntry(ReferenceEntry):
         this editor"""                
         try:
             self.cmb_command.freeze()
+            v = self.variable.get()
             self.current = None
-            self.display_variable.set ( "")
-            self.current = self.records.getid(int(self.variable.get()))
+            self.display_variable.set ( "" )
+            if v is None or v == '': self.display_variable.set ( "<null> " )
+            self.current = self.records.getid(int(v))
             self.display_variable.set ( self.current._astxt )
         except ValueError:
             pass            
@@ -110,16 +116,7 @@ class ComboReferenceEntry(ReferenceEntry):
         finally:
             self.cmb_command.thaw()
         
-        
-        
-
-
-
-class ArrayEntry(FieldEntry):
-    def __init__(self, *args, **kwargs):
-        FieldEntry.__init__(self, *args, **kwargs)
-        self.branch = kwargs.get ( "branch", None )
-class BooleanEntry(FieldEntry):
+class BooleanEntry(FieldEntry):    
     def __init__(self, *args, **kwargs):
         FieldEntry.__init__(self, *args, **kwargs)
         self.display_variable = Tix.StringVar()        
@@ -132,7 +129,177 @@ class BooleanEntry(FieldEntry):
             self.display_variable.set (_("YES"))
         else:
             self.display_variable.set (_("NO"))
+            
+class ArrayEntryTextMixin:    
+    class ItemEditor(object):
+        def __init__(self, arrayentry, idx):
+            self.variable = Tix.StringVar()
+            self.entry = Tix.Entry ( arrayentry.parent, textvariable=self.variable )
+            self.tracecb = self.variable.trace ('w', partial(arrayentry.item_change, idx))
+            self.entry.config ( width=arrayentry.formeditor.entrywidth )            
+            arrayentry.editors.append (self)
+            self.tracecb = None
+            
+        def destroy(self):
+            if self.tracecb:
+                self.variable.trace_vdelete ( 'w', self.tracecb )
+            self.entry.forget()
+            del self.entry, self.variable
+
+class ArrayEntryButtonMixin:
+    class ButtonBox(object):
+        def __init__(self, arrentry,idx,_add=True,_del=True):
+            self.frame = Tix.Frame ( arrentry.parent, width=arrentry.formeditor.commandwidth )
+            if _add:
+                self.bt_add = Tix.Button (self.frame, text='+', font=('Courier', 8, 'normal'), padx=0, pady=0, command=partial(arrentry.item_add, idx+1) )
+                self.bt_add.pack(side=LEFT)
+            if _del:
+                self.bt_del = Tix.Button (self.frame, text='x', font=('Courier', 8, 'normal'), padx=0, pady=0, command=partial(arrentry.item_remove, idx) )            
+                self.bt_del.pack(side=LEFT)
+            if idx >= 0:
+                arrentry.buttons.append (self)
+        
+        def destroy(self):
+            self.frame.forget()
+            del self.bt_add, self.bt_del, self.frame
+
+class ArrayEntryComboMixin:
+    class ItemEditor(object):
+        def __init__(self, arrayentry, idx):
+            self.variable = Tix.StringVar()
+            self.display_variable = Tix.StringVar()
+            self.combo_selection = conditionalmethod(self.combo_selection)
+            self.entry = Tix.ComboBox ( arrayentry.parent, 
+                                        editable=False, dropdown=True,
+                                        options = "label.width 0 entry.width " + str(arrayentry.formeditor.entrywidth),                                     
+                                        variable=self.display_variable,
+                                        command=self.combo_selection
+                                        )
+            self.listbox = self.entry.subwidget('slistbox').subwidget('listbox') 
+            self.textbox = self.entry.subwidget('entry')
+            self.textbox.config ( disabledforeground = "black" )
+            self.value_idx = []
+            self.disp_idx = []
+            if arrayentry.choices:                
+                for idx, (varval, dispval) in enumerate(arrayentry.choices):
+                    self.value_idx.append(varval)
+                    self.disp_idx.append (dispval)
+                    self.entry.insert ( Tix.END, dispval )
+            self.tracecb = self.variable.trace ('w', partial(arrayentry.item_change, idx))
+
+            arrayentry.editors.append (self)
+            self.tracecb = None
+
+        def combo_selection(self, *args):
+            print args
+            idx, = self.listbox.curselection()
+            self.combo_selection.freeze()
+            self.variable.set ( self.value_idx[int(idx)] )
+            self.combo_selection.thaw()
+            
+        def destroy(self):
+            if self.tracecb:
+                self.variable.trace_vdelete ( 'w', self.tracecb )
+            self.entry.forget()
+            del self.entry, self.variable
     
+class ArrayEntryLabelMixin:
+    class ItemEditor(object):        
+        def __init__(self, arrayentry, idx):
+            self.variable = Tix.StringVar()
+            self.entry = Tix.Label ( arrayentry.parent, textvariable=self.variable )
+        def destroy(self):
+            del self.entry
+            del self.variable
+            
+class ArrayEntry(FieldEntry):                
+    def __init__(self, *args, **kwargs):
+        FieldEntry.__init__(self, *args, **kwargs)
+        self.value_change = conditionalmethod(self.value_change)        
+        self.item_change = conditionalmethod(self.item_change)        
+        self.branch = kwargs.get ( "branch", None )        
+        self.recordlist = kwargs.get ("recordlist", None )
+        self.choices = kwargs.get ("choices", None )
+        
+        self.widget = Tix.Label (self.parent, 
+                                 width=self.formeditor.entrywidth, 
+                                 textvariable = self.variable)
+        if hasattr(self, "ButtonBox"):
+            self.default_buttons = self.ButtonBox (self, -1, _del=False)
+            self.parent.item_create ( self.field.name, 3, itemtype = Tix.WINDOW, window=self.default_buttons.frame )
+        
+        self.buttons = []
+        self.array = []
+        self.editors = []
+        
+        self.variable.trace ( 'w', self.value_change )
+
+    def redisplay_array(self, newarray):
+        print newarray
+        if self.branch:                                
+            for idx, val in enumerate(self.array):
+                self.parent.delete_offsprings (self.field.name)
+            for c in self.editors + self.buttons:
+                c.destroy()
+    
+            self.buttons = []
+            self.editors = []
+            
+            for idx, val in enumerate(newarray):
+                                                
+                self.parent.add (self.field.name+"/" + str(idx), itemtype=Tix.TEXT, text="+")                                        
+                
+                if hasattr(self, "ItemEditor"):
+                    it = self.ItemEditor (self, idx )                                        
+                    self.parent.item_create ( self.field.name+"/" + str(idx), 2, itemtype = Tix.WINDOW, window=it.entry )
+
+                if hasattr(self, "ButtonBox"):
+                    bb = self.ButtonBox(self, idx)                    
+                    self.parent.item_create ( self.field.name+"/" + str(idx), 3, itemtype = Tix.WINDOW, window=bb.frame )
+                
+                it.variable.set ( val )
+            self.array = newarray
+        
+    def value_change(self, *args):
+        try:
+            self.item_change.freeze()            
+            self.redisplay_array(self.field.val_txt2py ( self.variable.get() ) or [])
+        finally:
+            self.item_change.thaw()
+
+    
+    def item_change(self, idx, *args):
+        try:
+            self.value_change.freeze()
+            arr = map (lambda e: e.variable.get(), self.editors)            
+            self.variable.set ( self.field.val_py2txt ( arr ) )
+            self.array = arr
+        finally:
+            self.value_change.thaw()
+        
+    def item_add (self, atidx, *args):            
+        self.array.insert (atidx, ' ')
+        self.item_change.freeze()
+        self.variable.set (self.field.val_py2txt (self.array))
+        self.item_change.thaw()
+        
+    
+    def item_remove (self, idx, *args):
+        del self.array[idx]
+        self.item_change.freeze()
+        self.variable.set (self.field.val_py2txt (self.array))
+        self.item_change.thaw()
+        
+        
+class ArrayTextEntry(ArrayEntry, ArrayEntryComboMixin, ArrayEntryButtonMixin):
+    pass
+
+
+class ArrayReadOnlyEntry(ArrayEntry, ArrayEntryLabelMixin):
+    pass
+
+
+###########################################################################################
 class GenericFormEditor(object):    
     """ 
     ==GenericFormEditor==
@@ -140,6 +307,7 @@ class GenericFormEditor(object):
     __defaults__ = [ 
         ( "labelwidth", 20 ),
         ( "entrywidth", 40 ),
+        ( "commandwidth", 10),
         ( "excludefields", []),
         ( "disablefields", []),
         ( "shownavigator", False),
@@ -172,7 +340,7 @@ class GenericFormEditor(object):
         
 
     def create_form_container(self):
-        scrolled = Tix.ScrolledHList (self.toplevel, options="hlist.columns 3")
+        scrolled = Tix.ScrolledHList (self.toplevel, options="hlist.columns 4")
 
         self.hlist = scrolled.subwidget('hlist')
         self.hlist.configure ( separator="/",
@@ -188,6 +356,7 @@ class GenericFormEditor(object):
         self.hlist.column_width(0, chars=1)
         self.hlist.column_width(1, chars=self.labelwidth)
         self.hlist.column_width(2, chars=self.entrywidth)
+        self.hlist.column_width(3, chars=self.commandwidth)
     
     def create_button_box(self):
         if self.showbuttons:
@@ -215,11 +384,14 @@ class GenericFormEditor(object):
 
     def create_entry(self, field):
         var = self.form.tkvars[field.name]
-        if field.reference:
+        if field.isarray:
+            entry = ArrayTextEntry(self, self.hlist, field, branch="array_" + field.name,
+                                   choices = [ (1, "AAA"), (3, "BBB"), (4, "XXX") ])
+        elif field.reference:
             if field.editor_class == "StaticReferenceEntry":
                 entry = StaticReferenceEntry ( self, self.hlist, field )
             else:
-                entry = ComboReferenceEntry ( self, self.hlist, field )
+                entry = ComboReferenceEntry ( self, self.hlist, field )        
         elif field.type == "bit":
             entry = BooleanEntry (self, self.hlist, field)
         else:

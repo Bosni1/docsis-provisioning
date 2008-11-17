@@ -45,6 +45,8 @@ class CFG:
                         #print "reference ", f.path, 'to', t.objectid, '-', t.name
                         idmap[t.objectid].reference_child.append ( (t, f) )
                         idmap[t.objectid].reference_child_hash[(t.name, f.name)] = (t,f)
+                    if f.arrayof:
+                        f.arrayof = idmap[f.arrayof]
             self.instance = self
         
     CX = None
@@ -69,10 +71,13 @@ def text_to_array(text, depth):
                 bracestate += 1
                 if bracestate == 1: continue
             
-            if bracestate == 0:
+            if bracestate == 0:                
                 content.append ( curitem )
+                if len(content) == 1 and curitem == '':
+                    yield []
+                else:                
+                    yield content
                 curitem = ''
-                yield content
                 content = []      
                 continue
             
@@ -216,6 +221,9 @@ class Table(object):
         if idx in self:
             return self.fields_hash[idx]
         return None
+
+    def __repr__(self):
+        return "<TABLE [" + self.schema + "." + self.name + "]>"
     
 class Record(object):    
     class RecordNotFound(ORMError): pass
@@ -507,6 +515,7 @@ class RecordList(list):
     
     def reload(self):
         list.__init__(self)
+        print self.table, self.select
         self += self.table.recordObjectList (self._filter, self.select, self.order)
         self.hash_id.clear()
         for r in self: self.hash_id[r.objectid] = r

@@ -401,6 +401,7 @@ CREATE TABLE pv.field_info (
   length smallint null,
   classid int REFERENCES pv.objectids ON DELETE CASCADE ON UPDATE CASCADE NOT NULL,
   reference int REFERENCES pv.objectids ON DELETE SET NULL ON UPDATE CASCADE NULL,
+  arrayof int REFERENCES pv.objectids ON DELETE SET NULL ON UPDATE CASCADE NULL,
   constraintid oid NULL,
   reference_editable bit not null default '0',
   pprint_fkexpression text default null,  
@@ -598,6 +599,7 @@ BEGIN
  PERFORM pv.set_reference ( 'core_radio_link.interfaceid', 'object');
  PERFORM pv.set_reference ( 'core_radio_link.otherend', 'object');
  PERFORM pv.set_reference ( 'table_info.superclass', 'table_info');
+ PERFORM pv.set_reference ( 'table_info.arrayof', 'table_info');
  PERFORM pv.set_reference ( 'event.refobjectid', 'object');
  PERFORM pv.set_reference ( 'note.refobjectid', 'object');
  PERFORM pv.set_reference ( 'building.streetid', 'street');
