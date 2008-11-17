@@ -4,7 +4,7 @@ from Tkconstants import *
 from orm import *
 from forms import *
 from gettext import gettext as _
-
+from misc import *
 
 class FieldEntry(object):
     
@@ -35,7 +35,8 @@ class StaticEntry(FieldEntry):
 
 class ReferenceEntry(FieldEntry):
     def __init__(self, *args, **kwargs):
-        FieldEntry.__init__(self, *args, **kwargs)        
+        FieldEntry.__init__(self, *args, **kwargs)    
+        self.value_change = conditionalmethod(self.value_change)        
         self.variable.trace ( 'w', self.value_change )
     
     def value_change(self, *args):
@@ -56,43 +57,82 @@ class StaticReferenceEntry(ReferenceEntry):
 
 class ComboReferenceEntry(ReferenceEntry):
     def __init__(self, *args, **kwargs):
-        ReferenceEntry.__init__(self, *args, **kwargs)        
+        ReferenceEntry.__init__(self, *args, **kwargs)                
+        self.cmb_command = conditionalmethod(self.cmb_command)
+
         reftable = self.field.reference        
-        self.records = reftable.recordObjectList()        
+        self.records = RecordList(reftable)
+        self.records.reload()
+        
         self.display_variable = Tix.StringVar()
-        self.value_change_off = False
-        self.cmb_command_off = False
+        
         self.widget = Tix.ComboBox (self.parent, 
                                     editable=False, dropdown=True,
                                     options = "label.width 0 entry.width " + str(self.formeditor.entrywidth),                                     
                                     variable = self.display_variable,
-                                    command=self.cmb_command, fancy=True)
+                                    command=self.cmb_command)        
+                                                                    
         self.listbox = self.widget.subwidget('slistbox').subwidget('listbox')
-        self.records_hash = {}
-        self.records_id_hash = {}
-        for idx,r in enumerate(self.records):
+        for r in self.records:
             self.widget.insert (Tix.END, r._astxt)
-            self.records_hash[idx] = r
-            self.records_id_hash[r.objectid] = r 
-        self.current = None
+        self.widget.insert (Tix.END, "<no object>" )
+        
+        self.current = None        
     
-    def cmb_command(self, *args):
-        if self.cmb_command_off: return
-        if not hasattr(self, 'listbox'): return
-        idx, = self.listbox.curselection()
-        self.current = self.records_hash[int(idx)]
-        self.value_change_off = True
-        self.variable.set (self.current.objectid)
-        self.value_change_off = False
+    def cmb_command(self, *args):  
         
-    def value_change(self, *args):        
-        if self.value_change_off: return
-        print "vc=", self.variable.get()
-        self.current = self.records_id_hash[int(self.variable.get())]        
-        self.cmb_command_off = True
-        self.display_variable.set ( self.current._astxt )
-        self.cmb_command_off = False
+        #Was the call initiated by the ComboBox constructor?
+        if not hasattr(self, 'listbox'): return        
+        try:
+            self.value_change.freeze()        
+            idx, = self.listbox.curselection()
+            self.current = self.records[int(idx)]
+            self.variable.set (self.current.objectid)
+        except IndexError:
+            self.current = None
+            self.display_variable.set ( "<error> out of bounds" )
+        finally:
+            self.value_change.thaw()
+    
+    def value_change(self, *args):                
+        """Handle a change in the field value initiated outside of 
+        this editor"""                
+        try:
+            self.cmb_command.freeze()
+            self.current = None
+            self.display_variable.set ( "")
+            self.current = self.records.getid(int(self.variable.get()))
+            self.display_variable.set ( self.current._astxt )
+        except ValueError:
+            pass            
+        except KeyError:
+            pass
+        finally:
+            self.cmb_command.thaw()
         
+        
+        
+
+
+
+class ArrayEntry(FieldEntry):
+    def __init__(self, *args, **kwargs):
+        FieldEntry.__init__(self, *args, **kwargs)
+        self.branch = kwargs.get ( "branch", None )
+class BooleanEntry(FieldEntry):
+    def __init__(self, *args, **kwargs):
+        FieldEntry.__init__(self, *args, **kwargs)
+        self.display_variable = Tix.StringVar()        
+        self.widget = Tix.Checkbutton ( self.parent, textvariable = self.display_variable, 
+                                        variable = self.variable )
+        self.variable.trace ( 'w', self.value_change )
+    
+    def value_change(self, *args):
+        if self.variable.get() == '1':
+            self.display_variable.set (_("YES"))
+        else:
+            self.display_variable.set (_("NO"))
+    
 class GenericFormEditor(object):    
     """ 
     ==GenericFormEditor==
@@ -180,6 +220,8 @@ class GenericFormEditor(object):
                 entry = StaticReferenceEntry ( self, self.hlist, field )
             else:
                 entry = ComboReferenceEntry ( self, self.hlist, field )
+        elif field.type == "bit":
+            entry = BooleanEntry (self, self.hlist, field)
         else:
             entry = TextEntry ( self, self.hlist, field )
             
