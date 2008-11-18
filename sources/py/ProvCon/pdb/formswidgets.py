@@ -313,7 +313,6 @@ class ArrayReadOnlyEntry(ArrayEntry, ArrayEntryLabelMixin):
 
 class ArrayComboEntry(ArrayEntry, ArrayEntryComboMixin, ArrayEntryButtonMixin):
     pass
-
 ###########################################################################################
 class GenericFormEditor(object):    
     """ 
@@ -398,15 +397,19 @@ class GenericFormEditor(object):
         self.hlist.item_create ( form_element, 1, itemtype=Tix.TEXT, text=label)
 
     def create_entry(self, field):
+        try:
+            return getattr(self, "_create_entry_" + field.name)(field)
+        except AttributeError:
+            pass
+            
         var = self.form.tkvars[field.name]
         if field.isarray:
-            entry = ArrayComboEntry(self, self.hlist, field, branch="array_" + field.name,
-                                   choices = [ (1, "AAA"), (3, "BBB"), (4, "XXX") ])
+            entry = ArrayComboEntry(self, self.hlist, field, branch="array_" + field.name)
         elif field.reference:
             if field.editor_class == "StaticReferenceEntry":
                 entry = StaticReferenceEntry ( self, self.hlist, field )
             else:
-                entry = ComboReferenceEntry ( self, self.hlist, field )        
+                entry = ComboReferenceEntry ( self, self.hlist, field )
         elif field.type == "bit":
             entry = BooleanEntry (self, self.hlist, field)
         else:
@@ -434,6 +437,128 @@ class GenericFormEditor(object):
         self.buttonbox.add ( buttonname, text=buttonname, command=lambda *x: self.button_command(buttonname, *x) )
     
 ###########################################################################################
+class RecordPager(object):
+    def __init__(self, *args, **kwargs):
+        #kwargs: query, table, pagesize, idlist
+        self.records = []
+        self.records_hash = {}
+        self.total_record_count = -1
+        self.current_page = -1
+        
+    def getrecordbyid(self, objectid): return self.records_hash[objectid]
+    def setobjectids(self, objids): pass
+    def setrecords(self, records): pass
+    def setpage(self, idx): pass
+    def moverel(self, moveby): pass
+    def next(self): pass
+    def prev(self): pass
+    def first(self): pass
+    def last(self): pass
+    def refresh(self): pass
+    def __iter__(self): pass
+    
+class AbstractRecordListWidget(eventemitter):
+    def __init__(self, *args, **kwargs):
+        eventemitter.__init__ (self, [ 
+            "current_record_changed", 
+            "record_deleted",
+            "navigate"
+        ])
+        
+        self.records = []
+        self.records_hash = {}
+        
+        self.parentform = kwargs.get ( "parentform", None )
+        self.referencefield = kwargs.get ( "referencefield", None )        
+        
+        self.objecttype = kwargs.get ( "objecttype", "object" )
+        self.allowsubclasses = kwargs.get ( "allowsubclasses", True )
+        
+        self.pager = kwargs.get ( "pager", None )
+        self.records = kwargs.get ( "records", None )
+
+        self.emitonbrowse = kwargs.get ( "emitonbrowse", True )
+        self.recordtoolbox = kwargs.get ( "recordtoolbox", True )
+        self.recordpopup = kwargs.get ( "recordpopup", True )        
+        
+        self.filterfunc = kwargs.get ( "filterfunc", lambda x: True )
+        
+        if self.parentform:
+            self.parent_change_hook = self.parentform.register_event_hook ( "current_record_changed", self.parent_form_record_changed )
+            
+    def refreshDisplay(self):
+        pass
+        
+    def setObjectIDs(self, objids):
+        if self.pager:
+            self.pager.setobjectids (objids)
+            self.refreshDisplay()
+        else:            
+            self.setRecords ( [Record.ID (i) for i in objids] )
+            
+    def setRecords(self, recordlist):
+        if self.pager:
+            self.pager.setrecords (recordlist)
+        else:
+            self.records = recordlist
+            self.records_hash.clear()
+            for r in self.records: self.records_hash[r.objectid] = r
+        self.refreshDisplay()
+    
+    def getRecordById (self, objid):
+        if self.pager:
+            return self.pager.getrecordbyid (objid)
+        else:
+            return self.records_hash[objid]
+
+    def update(self):
+        if self.parentform:
+            self.setObjectIDs ( Record.IDLIST ( self.objecttype, where = [ self.referencefield + ' = ' + self.parentform.current.objectid ] ) )        
+
+    def parent_form_record_changed(self, parentrecord, *args, **kwargs):        
+        self.update()
+        
+class RecordListWidget(AbstractRecordListWidget):
+    def __init__(self, parent, *args, **kwargs):
+        AbstractRecordListWidget.__init__(self, *args, **kwargs)
+        self.widget = Tix.ScrolledHList (parent, options="hlist.columns 4")
+                                         
+        self.hlist = self.widget.subwidget('hlist')
+        self.hlist.config ( selectforeground="black", command = self.command_handler)
+        if self.emitonbrowse:
+            self.hlist.config ( browsecmd = self.command_handler)
+        self.pack = self.widget.pack
+        self.current_selected_record = None            
+        
+    def append_list_item(self, r):
+        self.hlist.add ( r.objectid, itemtype=Tix.TEXT, text=str(r.objectid) )            
+        self.hlist.item_create ( r.objectid, 1, itemtype=Tix.TEXT, text=r._astxt )
+    
+    def append_list_item_table_info(self, r):
+        self.hlist.add ( r.objectid, itemtype=Tix.TEXT, text=str(r.objectid) )            
+        self.hlist.item_create ( r.objectid, 1, itemtype=Tix.TEXT, text=r.name)
+
+    def append_list_item_field_info(self, r):
+        self.hlist.add ( r.objectid, itemtype=Tix.TEXT, text=str(r.objectid) )            
+        self.hlist.item_create ( r.objectid, 1, itemtype=Tix.TEXT, text=r.name)
+        self.hlist.item_create ( r.objectid, 2, itemtype=Tix.TEXT, text=r.type)
+        
+    def refreshDisplay(self):
+        self.hlist.delete_all()        
+        for r in self.records:
+            try:
+                getattr(self, "append_list_item_" + r.objecttype)(r)
+            except AttributeError:
+                self.append_list_item ( r )
+    
+    def command_handler(self, idx, *args):        
+        if self.current_selected_record != idx:
+            self.current_selected_record = idx
+            record = self.getRecordById (int(idx))
+            self.emit_event ( "current_record_changed", record )
+            self.emit_event ( "navigate", record.objectid )
+        
+###########################################################################################
 class MetadataEditorApp:    
     resource_dir = '/home/kuba/src/docsis-resources/'
     def __init__(self):
@@ -451,42 +576,43 @@ class MetadataEditorApp:
         self.table_list_frame = Tix.LabelFrame(self.rootwindow, label="Table list")
         self.table_list_frame.place ( relx=0, rely=0, relwidth=0.5, relheight=0.5)
         self.table_list_frame.propagate(0)
-        
-        scrolled = Tix.ScrolledTList ( self.table_list_frame, scrollbars='auto y' )
-        self.table_list = scrolled.subwidget('tlist')
-        self.table_list.configure(selectmode="single",
-                                  bg='white', selectbackground="blue",
-                                  selectforeground="white",                                      
-                                  orient='horizontal', command=self.table_change_handler)
-        scrolled.pack (expand=1, fill=BOTH, padx=7, pady=20)
 
-        self.table_icon = Tix.Image ('bitmap','table', file= (self.resource_dir + 'bitmaps/justify.xbm') ) 
-        self.table_items = {}
-        for idx, t in enumerate(Table.__all_tables__):
-            self.table_items[idx] = Table.Get(t)
-            self.table_list.insert (END, itemtype="imagetext", text=t, image=self.table_icon)
+        self.table_record_list = RecordListWidget(self.table_list_frame)        
+        self.table_record_list.pack(expand=1, fill=BOTH)
+        self.table_record_list.setObjectIDs ( Record.IDLIST ( "table_info", order=["name"] ) )
+        self.table_change_hook = self.table_record_list.register_event_hook ( "current_record_changed", self.table_changed )
             
         
         self.table_properties_frame = Tix.LabelFrame (self.rootwindow, label="Table properties" )
         self.table_properties_frame.place (relx=0.50, rely=0, relwidth=0.5, relheight=0.5)
         self.table_properties_frame.propagate(0)
-        self.table_properties_form = Form ( Table.Get ( "table_info" ) )
+        self.table_properties_form = Form ( Table.Get ( "table_info" ) )        
         self.table_properties = GenericFormEditor (self.table_properties_frame, 
                                                    self.table_properties_form,
                                                    disablefields = ["name", "schema"] )
+        
         self.table_properties.pack(fill=BOTH, expand=1,padx=7, pady=20)
         
         self.field_list_frame = Tix.LabelFrame(self.rootwindow, label="Fields")
         self.field_list_frame.place ( relx=0, rely=0.51, relwidth=0.4, relheight=0.45)
         self.field_list_frame.propagate(0)
-        scrolled = Tix.ScrolledTList(self.field_list_frame, scrollbars='y')
-        self.field_list = scrolled.subwidget('tlist')
-        self.field_list.configure (selectmode="single",
-                                   bg='white', selectbackground="blue",
-                                   selectforeground="white", orient='vertical',                                   
-                                   command=self.field_change_handler )
-        self.field_items = {}
-        scrolled.pack (expand=1, fill=BOTH, padx=7, pady=20)
+        
+        self.field_record_list = RecordListWidget (self.field_list_frame, 
+                                                   parentform=self.table_properties_form,
+                                                   referencefield = "classid",
+                                                   objecttype = "field_info" )
+        self.field_record_list.pack (expand=1, fill=BOTH)
+        self.field_change_hook = self.field_record_list.register_event_hook ( "current_record_changed", self.field_change )
+        
+        
+        #scrolled = Tix.ScrolledTList(self.field_list_frame, scrollbars='y')
+        #self.field_list = scrolled.subwidget('tlist')
+        #self.field_list.configure (selectmode="single",
+        #                           bg='white', selectbackground="blue",
+        #                           selectforeground="white", orient='vertical',                                   
+        #                           command=self.field_change_handler )
+        #self.field_items = {}
+        #scrolled.pack (expand=1, fill=BOTH, padx=7, pady=20)
         
         self.field_properties_frame = Tix.LabelFrame (self.rootwindow, label="Field properties" )
         self.field_properties_frame.place (relx=0.40, rely=0.51, relwidth=0.6, relheight=0.45)
@@ -499,25 +625,32 @@ class MetadataEditorApp:
                                                    )
         self.field_properties.pack (fill=BOTH, expand=1,padx=7, pady=20)
         
-        self.normal_field_style = Tix.DisplayStyle ( Tix.IMAGETEXT, refwindow=self.field_list, font = ("Helvetica", 11, "bold" ), foreground="black", bg='white' )
-        self.special_field_style = Tix.DisplayStyle ( Tix.IMAGETEXT, refwindow=self.field_list, font = ("Helvetica", 11, "italic" ), foreground="grey", bg='white' )        
+        #self.normal_field_style = Tix.DisplayStyle ( Tix.IMAGETEXT, refwindow=self.field_list, font = ("Helvetica", 11, "bold" ), foreground="black", bg='white' )
+        #self.special_field_style = Tix.DisplayStyle ( Tix.IMAGETEXT, refwindow=self.field_list, font = ("Helvetica", 11, "italic" ), foreground="grey", bg='white' )        
         self._root.mainloop()        
                 
     def table_change_handler(self, idx):
         table = self.table_items[int(idx)] 
-        for m in self.field_items:
-            self.field_list.delete(m)
-        self.field_items.clear()
+        
+    def table_changed(self,table_record,*args,**kwargs):
+        table = Table.Get ( table_record.name )
+        
+        #for m in self.field_items:
+        #    self.field_list.delete(m)
+        #self.field_items.clear()
 
-        for idx, f in enumerate(table):
-            if f.name in Table.__special_columns__: style = self.special_field_style
-            else: style = self.normal_field_style
-            self.field_list.insert (END, itemtype="imagetext", text=str(f),style=style) 
-            self.field_items[idx] = f
+        #for idx, f in enumerate(table):
+        #    if f.name in Table.__special_columns__: style = self.special_field_style
+        #    else: style = self.normal_field_style
+        #    self.field_list.insert (END, itemtype="imagetext", text=str(f),style=style) 
+        #    self.field_items[idx] = f
         
         self.table_properties_form.setid ( table.id )
         self.table_properties_frame.configure ( label = self.table_properties_form.current._astxt ) 
         
+    def field_change(self, field_record,*args, **kwargs):
+        self.field_properties_form.setid ( field_record.objectid )
+        self.field_properties_frame.configure ( label = self.field_properties_form.current._astxt )        
         
     def field_change_handler(self, idx):
         field = self.field_items[int(idx)]
@@ -525,4 +658,7 @@ class MetadataEditorApp:
         self.field_properties_frame.configure ( label = self.field_properties_form.current._astxt )
         
 ###########################################################################################
+abw = AbstractRecordListWidget()
+abw.setObjectIDs ( Record.IDLIST ( "object", limit=10 ) )
+#raise SystemExit
 MetadataEditorApp()

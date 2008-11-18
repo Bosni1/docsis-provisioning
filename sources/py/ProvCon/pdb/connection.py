@@ -2,6 +2,8 @@
 
 import pg
 
+raise DeprecationWarning
+
 class Abstract(dict):
     instance = None
     def __new__(cls, *args, **kargs):        

@@ -2,6 +2,8 @@
 
 from connection import Abstract, ProvisioningDatabase
 
+raise DeprecationWarning
+
 class recordstub(object):
     __slots__ = ["rpr"]
     def __init__(self, rpr):

@@ -385,8 +385,9 @@ CREATE TABLE pv.table_info (
   pprint_expression text default '#%(objectid)s',
   pk name not null default 'objectid',
   disabledfields name[] not null default '{}',
-  excludedfields name[] not null default '{}',
+  excludedfields name[] not null default '{}',  
   txtexpression text null,  
+  recordlisttoolbox varchar(128)[] not null default '{}',
   UNIQUE (schema, name)
 ) inherits (pv."object");
 SELECT pv.setup_object_subtable ( 'table_info' );

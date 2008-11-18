@@ -2,6 +2,8 @@ from cStringIO import StringIO
 from connection import Abstract, ProvisioningDatabase
 from re import match as regmatch
 
+raise DeprecationWarning
+
 class tablesignature(object):
     class field(object):
         def __init__(self, **params):

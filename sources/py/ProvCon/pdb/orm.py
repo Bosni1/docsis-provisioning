@@ -4,12 +4,14 @@ import contextlib
 import cStringIO
 import pg, re
 import exceptions
+from misc import *
 
 __all__ = ["CFG", "Field", "Table", "Record", "RecordList"]
 
 class ORMError(exceptions.BaseException): pass
 
 class CFG:
+    """not really a class, just a nice-looking storage for application settings"""
     class DB:
         HOST = "localhost"
         PORT = 5432
@@ -20,16 +22,24 @@ class CFG:
     class RT:
         DATASCOPE = 0
     class tCX(pg.DB):
+        """==tCX==
+        Besides being a PostgreSQL connection object, this class builds the ER
+        structures used by forms, records, reference editors etc.
+        Ideally it should only be instatiated once, the constructor attempts to
+        ensure that it is so. The CFG.CX static variable should hold an active
+        connection at all times.
+        """
         instanceCount = 0
         instance = None
         def __init__(self):
             pg.DB.__init__(self, dbname=CFG.DB.DBNAME, user=CFG.DB.ROLE, host=CFG.DB.HOST)            
+            #Attempt to make sure this class is a singleton.
             CFG.tCX.instanceCount += 1
             print "tCX init [%d]" % self.instanceCount
+            
             idmap = {}
             tableinfo = self.query ( "SELECT * FROM {0}.table_info".format(CFG.DB.SCHEMA) ).dictresult()
             for ti in tableinfo:
-                #print "TABLE {name}  == {objectid}".format(**ti)
                 with Table.New ( ti['name'], **ti ) as t:
                     columninfo = self.query ( "SELECT * FROM {0}.field_info WHERE classid = {objectid}".format(CFG.DB.SCHEMA, **ti)).dictresult()
                     for ci in columninfo:                        
@@ -39,10 +49,11 @@ class CFG:
             #import foreign key relationships
             for t in Table.__all_tables__.values():
                 for f in t.fields:
+                    #For columns that reference a table_info row, replace the appropriate
+                    #values with actual, python-object references
                     if f.reference: 
-                        #print "{0.name}.{1.name} -> references {1.reference}".format (t,f)
                         f.reference = idmap[f.reference]
-                        #print "reference ", f.path, 'to', t.objectid, '-', t.name
+                        #fill the table's children list
                         idmap[t.objectid].reference_child.append ( (t, f) )
                         idmap[t.objectid].reference_child_hash[(t.name, f.name)] = (t,f)
                     if f.arrayof:
@@ -51,7 +62,10 @@ class CFG:
         
     CX = None
 
+
+
 def array_as_text(arr):
+    """convert a python list to a textual representation of a postgres array"""
     if isinstance(arr, list):
         return "{" + ",".join(map(array_as_text, arr)) + "}"
     else:
@@ -59,6 +73,9 @@ def array_as_text(arr):
         else: return str(arr)
 
 def text_to_array(text, depth):
+    """parse a textual postgres array into a python list
+    depth - the number of dimensions the array has
+    """
     def inside_array(t):
         bracestate = 0
         content = []
@@ -99,8 +116,17 @@ def text_to_array(text, depth):
     
         
 class Field(object):
-    class IncompleteDefinition(ORMError): pass
+    """ ==Field==
+    Field objects hold meta data about columns in the database.
+    They also provide data-conversion services.
+    A Field object is created from a row of the 'field_info' table.
+    """    
+    class IncompleteDefinition(ORMError): 
+        """raised when the Field constructor receives incomplete meta-data"""
+        pass
+    
         
+    
     def __init__(self, name=None, type='text', size=-1, ndims=0, **kkw):
         try:            
             ndims = ndims or kkw.get('ndims', 0)
@@ -115,9 +141,7 @@ class Field(object):
             self.id = kkw.get("objectid", None)
 
             for k in kkw:
-                if k not in self.__dict__: self.__dict__[k] = kkw[k]
-            
-            
+                if k not in self.__dict__: self.__dict__[k] = kkw[k]                        
             
         except KeyError, e:
             kwname, = e.args
@@ -164,6 +188,7 @@ class Field(object):
         raise DeprecationWarning
         
 class Table(object):
+    """Table objects hold database meta-data"""
     __special_columns__ = [ "objectid", 
                             "objectmodification", "objectcreation", 
                             "objectdeletion", "objecttype", "objecttypeid",
@@ -173,6 +198,9 @@ class Table(object):
     @staticmethod
     @contextlib.contextmanager
     def New(tablename, *args, **kwargs):
+        """a convenience static method allowing creation of Table objects
+        using the 'with' statement'. Not really what the 'with' statement was
+        designed for, but looks nice..."""
         Table.__all_tables__[tablename] = Table(tablename, *args, **kwargs)
         yield Table.__all_tables__[tablename]
     
@@ -181,6 +209,9 @@ class Table(object):
         return Table.__all_tables__.get (name, None)
         
     def __init__(self, tablename, inherits="object", **kwargs):
+        for k in kwargs:
+            if k not in self.__dict__: self.__dict__[k] = kwargs[k]                        
+        
         self.name = tablename
         self.id = kwargs.get("objectid", None)
         self.objectid = kwargs.get("objectid", None)
@@ -225,7 +256,39 @@ class Table(object):
     def __repr__(self):
         return "<TABLE [" + self.schema + "." + self.name + "]>"
     
-class Record(object):    
+class Record(object):
+    """==Record==
+    Record objects are the heart of the database abstraction layer. A Record object is 
+    capabable of manipulating a row of data in a table which fulfills the following
+    requirements:
+     - is a direct or indirect descendant of the "object" table
+     - has an "oid" column
+     - is described by a Table object
+     All tables that inherit "object" are uniquely identified by the "objectid" column. 
+     Moreover, the objectid is unique throughout these tables, and each row(record) 
+     holds information about the actual table the record belongs to. It is therefore 
+     possible to retrieve a record providing only its objectid.
+     
+     A Record object's state is defined by the following flags (instance attributes):
+     _isnew   ->  record is new, the data is only in memory, objectid is empty
+     _hasdata ->  data was read from the database
+     _isinstalled ->  the record's table definition was used to initialize object's
+                    attributes
+    _isreference  ->  the record is a reference column in another record, some columns
+                      may be unavailable
+    _ismodified     
+    
+    All object variables have names starting with an '_' character. Field values are 
+    stored in instance variables with the same names as fields.
+    
+    The getattr and setattr methods are overridden to provide the following functionality:
+    - changing the _objectid attribute causes the object to be read from the database (this
+      is wrapped be the setObjectID method.
+    - changing the _table attribute causes the record to be reset as an empty record
+      of the newly set table
+    - special attributes PP_* can be used to get a nice textual representation of the record      
+    - attributes named <field_name>_REF return the Record referenced by the field.
+    """
     class RecordNotFound(ORMError): pass
 
     __default_reference_mode__ = "text"
@@ -249,6 +312,7 @@ class Record(object):
                 
     def __setattr__(self, attrname, attrval):
         if attrname.startswith ( "_" ):
+            #this is an object attribute
             try:
                 valuechange = attrval != self.__dict__[attrname]
             except KeyError:
@@ -256,17 +320,26 @@ class Record(object):
                 valuechange = True
             self.__dict__[attrname]  = attrval
             
+            #special treatment for _objectid and _table attributes
             if attrname == "_table" and valuechange:
+                #clear ("uninstall") table definition
                 self.clearRecord()
+                #if a new table definition was give, install it
                 if self._table:
                     self.setupRecord()
             elif attrname == "_objectid" and valuechange:
                 if attrval and not self._feed:
+                    #if the objectid is not empty, is changed, and we 
+                    #are not doing a manual data feed, read the record
                     self.read()
                 elif attrval is None:
+                    #if the objectid is empty, and we have some data 
+                    self._isnew = True
                     if self._hasdata:
+                        #lose it
                         self.nullify()
         else:
+            #this is a record attribute
             if attrname in self._table:
                 self.setFieldValue ( attrname, attrval )
                 
@@ -283,7 +356,10 @@ class Record(object):
             if fname in self._references: return self._references[fname]
         return self.__dict__[attrname]
 
+    
     def nullify(self):
+        """Clear all data. Note that _objectid remains unchanged, so
+        after a Record has been nullified, it may be read again"""
         self._original_values.clear()
         self._modified_values.clear()
         self._references.clear()
@@ -295,6 +371,13 @@ class Record(object):
                 self._original_values[f.name] = None                
                         
     def setupRecord(self, vals={}):        
+        """This method sets up the internal data structures,
+        If the _table attribute is set, the values are written into
+        appropriate intance attributes.
+        If _table is not set, the object header is read from the the "object" table
+        and _table is set based on the "objecttype" column.
+        At _table or _objectid must be set before this method is called.
+        """
         if not self._table:
             if not self._objectid:
                 raise ValueError ( "_table and _objectid are void." )
@@ -317,6 +400,7 @@ class Record(object):
         return True
     
     def clearRecord(self):
+        """Clear all data, and lose the _table information."""            
         if self._isinstalled:
             for f in self._table:
                 del self.__dict__[f.name]
@@ -327,25 +411,38 @@ class Record(object):
             self._hasdata = False
             self._isnew = False
             self._objectid = None
+            self._isinstalled = False
 
     def setFieldValue (self, fieldname, fieldvalue):
+        """set the field value to a python value"""
         if fieldname in self._table:
             self._modified_values[fieldname] = fieldvalue
             self.__dict__[fieldname] = fieldvalue
             self._ismodified = True
     def setFieldStringValue (self, fieldname, fieldstrvalue):
+        """set field value parsed from a string"""
         if fieldname in self._table:
             pyval = self._table[fieldname].val_txt2py ( fieldstrvalue )
             self.setFieldValue (fieldname, pyval )
 
     def getFieldValue (self, fieldname):
+        """get a python value for a particular field"""
         return self._modified_values.get(fieldname, None) or self._original_values[fieldname]
 
     def getFieldStringValue (self, fieldname):
+        """get text value for a particular field"""
         v = self.getFieldValue ( fieldname )
         return self._table[fieldname].val_py2txt ( v )    
 
     def updateReferenceField(self, field):
+        """read a record referenced by one of the fields
+        There are 3 modes of resolving references:
+        "none" : just the field value is kept in the record, <field>_REF is None
+        "text" : the text from "object_search_txt" is stored in <field>_REF
+        "record" : a whole Record object is kept in <field>_REF
+        the mode is set with the "resolvereference" keyword argument to the
+        constructor, default mode is kept in the class variable"""
+        
         if not field.reference: return
         decoded = self.__dict__[field.name]
         if not decoded: self._references[field.name] = None; return
@@ -362,10 +459,13 @@ class Record(object):
 
     
     def feedDataRow(self, row, **kwargs):
+        """fill record data from a dictionary object"""
+        
+        #avoid calling "read" after changing the _objectid
         self._feed = True
         self._objectid = row['objectid']
         self._feed = False
-
+        
         self._original_values.clear()
         for cn in row:
             if cn not in self._table: continue
@@ -375,7 +475,9 @@ class Record(object):
             self._original_values[cn] = decoded
             if field.reference:
                 self.updateReferenceField(field)
-
+        
+        #if _astxt was not provided with the data, _reprfunc is not set,
+        #get the text from database
         if '_astxt' in row:
             self._astxt = row['_astxt']
         elif self._reprfunc:
@@ -396,11 +498,13 @@ class Record(object):
         
     
     def read(self):
-        if not self._table :
-            if not self.setupRecord():
-                raise ValueError ( "no _table" )
         if not self._objectid:
             raise ValueError ( "no _objectid" )
+
+        if not self._table :
+            #prepare meta-data if not available
+            if not self.setupRecord():
+                raise ValueError ( "no _table" )
         try:
             row = CFG.CX.get ( CFG.DB.SCHEMA + "." + self._table.name, { 'objectid' : self._objectid, 
                                                                          'objectscope' : CFG.RT.DATASCOPE } )
@@ -419,8 +523,11 @@ class Record(object):
                 
             rec = CFG.CX.insert ( CFG.DB.SCHEMA + "." + self._table.name,
                             self._modified_values )
+            #this will automatically re-read the data from the db, to take all changes
+            #done by triggers and default values into account.
             self._objectid = rec['objectid']
-            self.read()
+            #self.read()
+            print rec
         elif self._ismodified:
             for m in self._modified_values:
                 print "mod:", m
@@ -457,24 +564,36 @@ class Record(object):
         return "<record>"
     @staticmethod
     def ID(objectid, **kkw):
+        """create a new record from objectid"""
         rec = Record(**kkw)
         rec.setObjectID(objectid)        
         return rec
     
     @staticmethod
     def EMPTY(tabledef, **kkw):
+        """create a new record of given type"""
         rec = Record(**kkw)
         rec.setTable (tabledef)
         rec._isnew = True
         return rec
     
     @staticmethod
-    def COPY(record):
+    def COPY(record):        
         assert isinstance(record, Record)
         pass
 
     @staticmethod
     def CHILDREN(parentid, reftable, refcolumn, **kwargs):
+        """Generate a collection of records from "reftable"
+        that reference an object with objectid = "parentid" by
+        the "refcolumn".
+        additional arguments: 
+        limit - max number of records, default None
+        order - expression to be used in the ORDER BY clause
+        reprfunc - function to generate _astxt values for each record
+        gettxt - boolean, fetch _astxt from database
+        select - array of fields to select from reftable, default ['*']
+        """
         limit = kwargs.get ( "limit", None )
         order = kwargs.get ( "order", ['o.objectid'] )
         reprfunc = kwargs.get ( "reprfunc", None )
@@ -501,6 +620,26 @@ class Record(object):
             yield record
 
     
+    @staticmethod
+    def IDLIST(tablename, **kwargs):
+        limit = kwargs.get ( "limit", None )
+        if limit: limit = "LIMIT " + str(limit)
+        else: limit = ""
+        offset = kwargs.get ( "offset", None )
+        if offset: offset = "OFFSET " + str(offset)
+        else: offset = ""
+        
+        order = kwargs.get ( "order", ['objectid ASC'] )
+        order = ",".join (order)
+        where = kwargs.get ( "where", ['TRUE'] )
+        where = " AND ".join (where)
+        query = "SELECT objectid FROM {0}.{1} WHERE {2} ORDER BY {3} {4} {5}".format (
+            CFG.DB.SCHEMA, tablename, where, order, limit, offset )
+        rowset = map(lambda x: x[0], CFG.CX.query ( query ).getresult() )
+        return rowset
+        
+
+        
 class ReferencedRecord(Record):
     pass
 
@@ -519,6 +658,7 @@ class RecordList(list):
         self += self.table.recordObjectList (self._filter, self.select, self.order)
         self.hash_id.clear()
         for r in self: self.hash_id[r.objectid] = r
+    
     def getid(self, objectid):
         return self.hash_id[objectid]
     
