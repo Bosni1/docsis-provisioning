@@ -2,7 +2,7 @@
 import Tix
 from Tkconstants import *
 from gettext import gettext as _
-from ProvCon.pdb import *
+from ProvCon.dbui import *
 
 class MetadataEditorApp:    
     resource_dir = '/home/kuba/src/docsis-resources/'
