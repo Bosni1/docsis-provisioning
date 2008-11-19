@@ -21,7 +21,7 @@ class CFG:
         SCHEMA = "pv"        
     class RT:
         DATASCOPE = 0
-    class tCX(pg.DB):
+    class tCX(pg.DB):        
         """==tCX==
         Besides being a PostgreSQL connection object, this class builds the ER
         structures used by forms, records, reference editors etc.
@@ -31,6 +31,10 @@ class CFG:
         """
         instanceCount = 0
         instance = None
+        @staticmethod
+        def reconnect():
+            CFG.CX = CFG.tCX()
+            
         def __init__(self):
             pg.DB.__init__(self, dbname=CFG.DB.DBNAME, user=CFG.DB.ROLE, host=CFG.DB.HOST)            
             #Attempt to make sure this class is a singleton.
