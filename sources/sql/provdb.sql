@@ -403,6 +403,7 @@ CREATE TABLE pv.field_info (
   classid int REFERENCES pv.objectids ON DELETE CASCADE ON UPDATE CASCADE NOT NULL,
   reference int REFERENCES pv.objectids ON DELETE SET NULL ON UPDATE CASCADE NULL,
   arrayof int REFERENCES pv.objectids ON DELETE SET NULL ON UPDATE CASCADE NULL,
+  arraychoices varchar(128)[] NOT NULL DEFAULT '{}',
   constraintid oid NULL,
   reference_editable bit not null default '0',
   pprint_fkexpression text default null,  

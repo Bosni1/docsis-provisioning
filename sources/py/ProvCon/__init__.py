@@ -3,8 +3,11 @@ from log import LoggingServer, LoggingClient
 from cli import CLIServer, CLIClient
 from TFTP import pcTFTPD as TFTPD
 from ProvCon.wronolib import set_process_name
+from os import getenv
 
-ConfigFile = "/Provisioning/etc/ProvCon.cfg"
+ConfigFileBE = getenv("PROVISIONING_ROOT") + "/etc/ProvisioningBE.cfg"
+ConfigFileFE =  getenv("PROVISIONING_ROOT") + "/etc/ProvisioningFE.cfg"
+
 ControllerKey = "VERY_VERY_QUIET"
 
 def PreLaunchCheck():
@@ -34,7 +37,13 @@ def ControllerAction (path, action):
 def Configuration():
     from ConfigParser import ConfigParser
     cfg = ConfigParser()
-    cfg.read ( ConfigFile )
+    cfg.read ( ConfigFileBE )
+    return cfg
+
+def ConfigurationFE():
+    from ConfigParser import ConfigParser
+    cfg = ConfigParser()
+    cfg.read ( ConfigFileFE )
     return cfg
 
 def ConfigurationChecksum():

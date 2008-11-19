@@ -98,7 +98,9 @@ class Form(eventemitter):
             self.emit_event ( "current_record_modified", self.current )
             
     def value_change_handler(self, fname, *args):                        
-        """The tkVariable was changed, propagate this value to the handler"""
+        """The tkVariable was changed, propagate this value to the handler
+        This is invoked when the set method on one of the form's tkvars is called
+        """
         try:
             self.value_change_handler.freeze()
             if fname in self.table: self.on_edit_handler ( fname )
@@ -107,8 +109,13 @@ class Form(eventemitter):
                     
     def on_record_changed_handler(self):
         """The current record was changed, so fill the tkVariables with the record values"""
-        for f in self.table:
-            self.tkvars[f.name].set ( self.current.getFieldStringValue ( f.name ) )
+        try:
+            #We will be changing the tkvars so freeze their handler for now
+            self.value_change_handler.freeze()
+            for f in self.table:
+                self.tkvars[f.name].set ( self.current.getFieldStringValue ( f.name ) )
+        finally:
+            self.value_change_handler.thaw()
     
 def BaseSpecializedForm(table):
     class _Form(Form):
@@ -160,25 +167,26 @@ class Navigator(eventemitter):
 
     def last(self):
         return self.navigateabsolute( len(self) )
-    
 
-class NavigatorWidget (Tix.Frame, Navigator):
-    def __init__(self, parent, form, *args, **kwargs):
-        Tix.Frame.__init__(self, parent, *args, **kwargs)
-        Navigator.__init__(self)
-        self.__form = form        
-        self.buttons = {
-            "prev" : Tix.Button (self, padx=4, pady=1, width=3, text="<<", command=self.prev),
-            "next" : Tix.Button (self, padx=4, pady=1, width=3, text=">>", command=self.next),
-            "save" : Tix.Button (self, padx=4, pady=1, width=3, text=">>", command=self.__form.save),
-        }
-        self.inputvar = Tix.StringVar()
-        self.entry = Tix.Entry (self, width=40, textvariable = self.inputvar )        
-        for i, b in enumerate(self.buttons.values()): b.pack (side=LEFT )
-        self.entry.pack (side=RIGHT, fill=X )
-        self.notify = []
+class RecordPager(object):
+    def __init__(self, *args, **kwargs):
+        #kwargs: query, table, pagesize, idlist
+        self.records = []
+        self.records_hash = {}
+        self.total_record_count = -1
+        self.current_page = -1
         
-    def onrecordchange(self, idx):
-        self.inputvar.set ( self.current()['txt'] )
-        for n in self.notify: n()
+    def getrecordbyid(self, objectid): return self.records_hash[objectid]
+    def setobjectids(self, objids): pass
+    def setrecords(self, records): pass
+    def setpage(self, idx): pass
+    def moverel(self, moveby): pass
+    def next(self): pass
+    def prev(self): pass
+    def first(self): pass
+    def last(self): pass
+    def refresh(self): pass
+    def __iter__(self): pass    
+
+
         
