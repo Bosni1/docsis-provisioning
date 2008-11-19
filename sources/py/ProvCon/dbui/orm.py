@@ -5,6 +5,7 @@ import cStringIO
 import pg, re
 import exceptions
 from misc import *
+from config import config
 
 __all__ = ["CFG", "Field", "Table", "Record", "RecordList"]
 
@@ -13,14 +14,14 @@ class ORMError(exceptions.BaseException): pass
 class CFG:
     """not really a class, just a nice-looking storage for application settings"""
     class DB:
-        HOST = "localhost"
-        PORT = 5432
-        DBNAME = "Provisioning"
+        HOST = config.get ( "DATABASE", "host" )
+        PORT = config.get ( "DATABASE", "port" )
+        DBNAME = config.get ( "DATABASE", "dbname" )
         ROLE = None
         PASS = None
-        SCHEMA = "pv"        
+        SCHEMA = config.get ( "DATABASE", "schema" )        
     class RT:
-        DATASCOPE = 0
+        DATASCOPE = config.get ( "DATABASE", "scope" )        
     class tCX(pg.DB):        
         """==tCX==
         Besides being a PostgreSQL connection object, this class builds the ER
@@ -391,7 +392,7 @@ class Record(object):
                                                                     'objectscope' : CFG.RT.DATASCOPE } )
                 except pg.DatabaseError:
                     return False
-                print row
+
                 self._table = Table.Get ( row['objecttype'] )
 
         for f in self._table:
@@ -530,16 +531,16 @@ class Record(object):
             #done by triggers and default values into account.
             self._objectid = rec['objectid']
             #self.read()
-            print rec
+            print "Record Written"
         elif self._ismodified:
             for m in self._modified_values:
-                print "mod:", m
+                print "Modified field:", m
                 self._modified_values[m] = self._table[m].val_py2sql(self._modified_values[m])
             self._modified_values['objectid'] = self._objectid
             rec = CFG.CX.update ( CFG.DB.SCHEMA + "." + self._table.name,
                                   self._modified_values )
             self.read()        
-            print rec
+            print "Record Updated"
     
     def delete(self):
         if not self._isnew:
@@ -657,7 +658,6 @@ class RecordList(list):
     
     def reload(self):
         list.__init__(self)
-        print self.table, self.select
         self += self.table.recordObjectList (self._filter, self.select, self.order)
         self.hash_id.clear()
         for r in self: self.hash_id[r.objectid] = r

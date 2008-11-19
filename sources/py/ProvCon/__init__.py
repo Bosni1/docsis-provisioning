@@ -5,10 +5,10 @@ from TFTP import pcTFTPD as TFTPD
 from ProvCon.wronolib import set_process_name
 from os import getenv
 
-ConfigFileBE = (getenv("PROVISIONING_ROOT") or "") + "/etc/ProvisioningBE.cfg"
-ConfigFileFE =  (getenv("PROVISIONING_ROOT") or "") + "/etc/ProvisioningFE.cfg"
+ConfigFileBE = (getenv("PROVISIONING_ROOT") or "./") + "/etc/ProvisioningBE.cfg"
+ConfigFileFE =  (getenv("PROVISIONING_ROOT") or "./") + "/etc/ProvisioningFE.cfg"
 
-
+print ConfigFileFE
 ControllerKey = "VERY_VERY_QUIET"
 
 def PreLaunchCheck():

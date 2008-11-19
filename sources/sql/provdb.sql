@@ -434,8 +434,7 @@ select c1.objectid as reftableid, c1.name as reftable,  f1.name as refcolumn, f1
     pv.table_info c1 INNER JOIN pv.field_info f1 ON f1.classid = c1.objectid 
     INNER JOIN pv.table_info c2 ON c2.objectid = f1.reference 
     WHERE f1.reference is not null;
-
-create table pv.x ( x text );    
+ 
 create function pv.handle_field_info_change() RETURNS trigger AS $body$
   DECLARE
     tname text;
@@ -614,6 +613,7 @@ BEGIN
  PERFORM pv.set_reference ( 'docsis_cable_modem.deviceid', 'device');
  PERFORM pv.set_reference ( 'field_info.reference', 'table_info');
  PERFORM pv.set_reference ( 'field_info.classid', 'table_info');
+ PERFORM pv.set_reference ( 'field_info.arrayof', 'table_info');
  PERFORM pv.set_reference ( 'routeros_device.deviceid', 'device');
  PERFORM pv.set_reference ( 'nat_router.deviceid', 'device');
  PERFORM pv.set_reference ( 'core_radio_link.deviceid', 'device');
