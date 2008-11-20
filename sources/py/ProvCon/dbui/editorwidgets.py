@@ -298,8 +298,7 @@ class ArrayEntry(FieldEntry):
         
         self.variable.trace ( 'w', self.value_change )
 
-    def redisplay_array(self, newarray):
-        print newarray
+    def redisplay_array(self, newarray):        
         if self.branch:                                
             for idx, val in enumerate(self.array):
                 self.parent.delete_offsprings (self.field.name)
@@ -356,9 +355,11 @@ class ArrayEntry(FieldEntry):
     
     def item_remove (self, idx, *args):
         """A callback function called when item removal is requested"""
-        del self.array[idx]
-        self.item_change.freeze()
-        self.variable.set (self.field.val_py2txt (self.array))
+        newarray = list(self.array)
+        del newarray[idx]
+        self.item_change.freeze()        
+        self.variable.set (self.field.val_py2txt (newarray))
+        self.redisplay_array (newarray)
         self.item_change.thaw()
         
         
@@ -366,7 +367,7 @@ class ArrayTextEntry(ArrayEntry, ArrayEntryTextMixin, ArrayEntryButtonMixin):
     pass
 
 
-class ArrayReadOnlyEntry(ArrayEntry, ArrayEntryLabelMixin):
+class ArrayStaticEntry(ArrayEntry, ArrayEntryLabelMixin):
     pass
 
 

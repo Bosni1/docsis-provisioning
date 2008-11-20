@@ -6,4 +6,4 @@ class FE(object):
         pass    
     
 def Run():
-    print "Bye"
+    FE()

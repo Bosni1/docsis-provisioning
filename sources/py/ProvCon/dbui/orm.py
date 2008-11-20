@@ -234,6 +234,10 @@ class Table(object):
         self.fields_hash[field.name] = field
         self.fields.sort ( lambda x, y: x.lp - y.lp )
         
+    def recordCount(self):
+        return CFG.CX.query ( "SELECT count(*) as recordCount FROM {0}.{1} WHERE objectscope={2}".format(
+            CFG.DB.SCHEMA, self.name, CFG.RT.DATASCOPE )).dictresult()[0]['recordCount']
+                              
     def recordList(self, _filter="TRUE", select=[], order="objectid"):
         from_clause = self.schema + "." + self.name + " o LEFT JOIN " + self.schema + ".object_search_txt t ON o.objectid = t.objectid"
         return CFG.CX.query ( "SELECT o.objectid, t.txt as _astxt, o.objectmodification {3} FROM {0} WHERE {1} ORDER BY {2}".format (from_clause, _filter, order, ",".join(select) )).dictresult()

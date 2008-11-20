@@ -4,10 +4,14 @@ from Tkconstants import *
 from gettext import gettext as _
 from ProvCon.dbui import *
 
+def err(*args):
+    raise
+
 class MetadataEditorApp:    
     resource_dir = '/home/kuba/src/docsis-resources/'
     def __init__(self):
         self._root = Tix.Tk()
+        self._root.report_callback_exception = err
         
         self.rootwindow = Tix.Frame(self._root)
 

@@ -41,10 +41,23 @@ class GenericFormEditor(object):
 
         self.create_form_container()        
         self.build_form()
+        self.form.register_event_hook ( "current_record_changed", self.handle_form_record_changed )
     
     def create_toplevel(self):
         self.toplevel = Tix.Frame (self.parent)
+        self.info_variable = Tix.StringVar()
+        self.status_variable = Tix.StringVar()
+        self.infobar = Tix.Label (self.toplevel, textvariable=self.info_variable,
+                                  font=('Helvetica', 9, 'normal' ),
+                                  padx=3, pady=2, justify=LEFT, anchor=W)
+        self.infobar.pack (side=TOP, fill=X)
+
+#        self.statusbar = Tix.Label (self.toplevel, textvariable=self.status_variable,
+#                                   padx=20, relief=SUNKEN, anchor=W)
+#        self.statusbar.pack (side=BOTTOM, fill=X, padx=5, pady=5)
         
+        self.info_variable.set ( "[    ]" )
+        self.status_variable.set ( "<null>" )
 
     def create_form_container(self):
         scrolled = Tix.ScrolledHList (self.toplevel, options="hlist.columns 4")
@@ -91,13 +104,15 @@ class GenericFormEditor(object):
 
     def create_entry(self, field):
         try:
-            return getattr(self, "_create_entry_" + field.name)(field)
+            entry = getattr(self, "create_entry_" + field.name)(field)
+            self.editor_widgets[field.name] = entry
+            if field.name in self.disablefields: entry.disable()
+            return entry
         except AttributeError:
             pass
             
-        var = self.form.tkvars[field.name]
         if field.isarray:
-            if field.arrayof:
+            if field.arrayof:                
                 entry = ArrayComboEntry(self, self.hlist, field, branch=True,
                                         recordlist=RecordList(field.arrayof).reload() )
             else:
@@ -132,7 +147,9 @@ class GenericFormEditor(object):
             
     def add_button(self, buttonname, **kwargs):
         self.buttonbox.add ( buttonname, text=buttonname, command=lambda *x: self.button_command(buttonname, *x) )
-    
+    def handle_form_record_changed (self, record, *args):
+        self.info_variable.set ( str(record) )
+        
 class AbstractRecordListWidget(eventemitter):
     def __init__(self, *args, **kwargs):
         eventemitter.__init__ (self, [ 

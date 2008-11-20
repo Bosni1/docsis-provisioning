@@ -264,6 +264,7 @@ create table pv.service (
   subscriberid int8 REFERENCES pv.objectids ON DELETE CASCADE ON UPDATE CASCADE NOT NULL,
   typeofservice int8 REFERENCES pv.objectids ON DELETE SET NULL ON UPDATE CASCADE NOT NULL,
   classofservice int8 REFERENCES pv.objectids ON DELETE SET NULL ON UPDATE CASCADE NULL,
+  parentservice int8 REFERENCES pv.objectids ON DELETE CASCADE ON UPDATE CASCADE NULL,
   locationid int8 REFERENCES pv.objectids ON DELETE SET NULL ON UPDATE CASCADE NOT NULL,
   handle varchar(24) NULL,
   status smallint not null default 1  
@@ -305,7 +306,7 @@ create table pv.docsis_cable_modem (
   cpemacfilter bit NOT NULL DEFAULT '0',
   cpeipfilter bit NOT NULL DEFAULT '1',
   netbiosfilter bit NOT NULL DEFAULT '1',
-  docsisversion numeric(2,1) NOT NULL DEFAULT 1.0,
+  docsisversion numeric(2,2) NOT NULL DEFAULT 1.00,
   nightsurf bit NULL,
   networkaccess bit NOT NULL DEFAULT '1',
   upgradefilename varchar(128) NULL,
@@ -403,15 +404,19 @@ CREATE TABLE pv.field_info (
   classid int REFERENCES pv.objectids ON DELETE CASCADE ON UPDATE CASCADE NOT NULL,
   reference int REFERENCES pv.objectids ON DELETE SET NULL ON UPDATE CASCADE NULL,
   arrayof int REFERENCES pv.objectids ON DELETE SET NULL ON UPDATE CASCADE NULL,
-  arraychoices varchar(128)[] NOT NULL DEFAULT '{}',
+  choices varchar(256)[] NOT NULL DEFAULT '{}',
   constraintid oid NULL,
   reference_editable bit not null default '0',
   pprint_fkexpression text default null,  
   required bit not null default '0',
+  protected bit not null default '0',
+  nullable bit not null default '1',
   label varchar(128) null,
   quickhelp varchar(256) null,
+  helptopic varchar(128) null,
   info text null,
-  editor_class name default 'ValueEditor'
+  editor_class name default null,
+  editor_class_params text null  
 ) inherits (pv."object");
 SELECT pv.setup_object_subtable ( 'field_info' );
 
@@ -571,6 +576,14 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+CREATE FUNCTION pv.set_editor_class ( field text, editor text, params text) returns int as $$
+BEGIN
+  UPDATE pv.field_info SET editor_class = editor, editor_class_params = params  
+  WHERE path = field;
+  RETURN 0;
+END;
+$$ LANGUAGE plpgsql;
+
 CREATE FUNCTION pv.constraint_constrtuct ( ev text, t text) returns text as $$
 DECLARE
   r text;
@@ -631,8 +644,25 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+CREATE FUNCTION pv.set_editors() returns int as $$
+BEGIN
+ UPDATE pv.field_info SET editor_class = 'Text';
+ UPDATE pv.field_info SET editor_class = 'Memo' WHERE type='text';
+ UPDATE pv.field_info SET editor_class = 'Boolean' WHERE type='bit';
+ UPDATE pv.field_info SET editor_class = 'Time' WHERE type='timestamp';
+ PERFORM pv.set_editor_class ( 'field_info.editor_class', 'Radio', NULL );
+ RETURN 0;
+END;
+$$ LANGUAGE plpgsql;
+
+
 SELECT pv.fill_subclass_array ( pv.table_object_id ( 'object' ) );
 SELECT pv.propagate_references();
 UPDATE pv.field_info SET reference = pv.table_object_id ('object') WHERE reference IS NOT NULL;
 SELECT pv.set_all_references();
 
+UPDATE pv.field_info SET 
+choices = ARRAY['Text', 'Memo', 'Static', 'Combo', 'Search', 'Time', 'Boolean', 'Radio', 'Inet', 'InetPrefix', 'MAC', 'Spin'] 
+WHERE classid = pv.table_object_id('field_info') AND name = 'editor_class';
+
+SELECT pv.set_editors();
