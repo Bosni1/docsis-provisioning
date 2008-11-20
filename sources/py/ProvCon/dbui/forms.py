@@ -36,7 +36,7 @@ class Form(eventemitter):
     """
     def __init__(self, table):
         eventemitter.__init__(self,                               
-                              [ "before_current_record_change",
+                              [ "request_record_change",
                                 "current_record_changed",
                                 "current_record_modified",
                                 "current_record_deleted",

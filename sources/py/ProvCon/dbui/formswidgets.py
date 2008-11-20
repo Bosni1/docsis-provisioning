@@ -42,7 +42,8 @@ class GenericFormEditor(object):
         self.create_form_container()        
         self.build_form()
         self.form.register_event_hook ( "current_record_changed", self.handle_form_record_changed )
-    
+        self.form.register_event_hook ( "current_record_modified", self.handle_form_record_modified )
+        self.form.register_event_hook ( "current_record_saved", self.handle_form_record_saved )
     def create_toplevel(self):
         self.toplevel = Tix.Frame (self.parent)
         self.info_variable = Tix.StringVar()
@@ -147,6 +148,13 @@ class GenericFormEditor(object):
             
     def add_button(self, buttonname, **kwargs):
         self.buttonbox.add ( buttonname, text=buttonname, command=lambda *x: self.button_command(buttonname, *x) )
+    
+    def handle_form_record_modified (self, record, *args):
+        self.buttonbox.subwidget ( 'save' ).config ( bg = 'red' ) 
+        
+    def handle_form_record_saved (self, record, *args):
+        self.buttonbox.subwidget ( 'save' ).config ( bg = 'grey' ) 
+        
     def handle_form_record_changed (self, record, *args):
         self.info_variable.set ( str(record) )
         
