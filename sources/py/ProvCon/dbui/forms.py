@@ -59,9 +59,10 @@ class Form(eventemitter):
         
     
     def save(self):
+        wasnew = self.current._isnew
         self.current.write()        
         self.on_record_changed_handler()
-        self.emit_event ( "current_record_saved", self.current )
+        self.emit_event ( "current_record_saved", self.current, wasnew )
         self.modification_notification = False
 
     def reload(self):
@@ -81,6 +82,8 @@ class Form(eventemitter):
         ##   1. this function calls setObjectID on the current record
         ##   2. the record emits a 'record_changed' event
         ##   3. form's handler of this event fills in the values
+        if self.emit_event ( "request_record_change", self.current, objectid ) is not None:
+            return False
         self.current.setObjectID ( objectid )
         self.on_record_changed_handler()
         self.emit_event ( "current_record_changed", self.current )

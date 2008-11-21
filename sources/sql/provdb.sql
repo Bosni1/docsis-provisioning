@@ -416,7 +416,7 @@ CREATE TABLE pv.field_info (
   helptopic varchar(128) null,
   info text null,
   editor_class name default null,
-  editor_class_params text null  
+  editor_class_params varchar(128)[] null default '{}'
 ) inherits (pv."object");
 SELECT pv.setup_object_subtable ( 'field_info' );
 
@@ -576,7 +576,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE FUNCTION pv.set_editor_class ( field text, editor text, params text) returns int as $$
+CREATE FUNCTION pv.set_editor_class ( field text, editor text, params varchar[]) returns int as $$
 BEGIN
   UPDATE pv.field_info SET editor_class = editor, editor_class_params = params  
   WHERE path = field;

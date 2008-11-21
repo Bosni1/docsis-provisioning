@@ -1,3 +1,4 @@
+import exceptions
 
 def partial (func, *args, **kwargs):
     def __fobj(*cargs, **kwcargs):
@@ -21,6 +22,13 @@ class conditionalmethod:
     def thaw(self):
         self.frozen = False
 
+class eventexception(exceptions.Exception):
+    def __init__(self, retval):
+        exceptions.Exception.__init__ (self)
+        self.ret = retval    
+
+class eventcancelled(eventexception):
+    pass
 
 class eventemitter(object):
     class evthook(object):
@@ -49,8 +57,13 @@ class eventemitter(object):
             return self[-1]
         
         def emit(self, *args, **kwargs):
-            if not self.frozen:
-                for h in self: h(*args, **kwargs)
+            try:
+                if not self.frozen:
+                    for h in self: h(*args, **kwargs)
+            except eventexception, e:
+                return e.ret
+            return None
+        
         def freeze(self): self.frozen = True
         def thaw(self): self.frozen = False
     

@@ -19,7 +19,9 @@ class GenericFormEditor(object):
         ( "disablefields", []),
         ( "shownavigator", False),
         ( "showbuttons", True),
-        ( "buttons", ["save", "reload", "new"] ),
+        ( "showinfo", True),
+        ( "showhandle", True),
+        ( "buttons", ["save", "reload", "new"] ),     
     ]
     _button_label_ = {
         "save" : ( _("Save"), None),
@@ -48,17 +50,19 @@ class GenericFormEditor(object):
         self.toplevel = Tix.Frame (self.parent)
         self.info_variable = Tix.StringVar()
         self.status_variable = Tix.StringVar()
+        
+        self.handlevar = Tix.StringVar()
+        self.handlebar = Tix.Button (self.toplevel, anchor=N, width=1, textvariable=self.handlevar, padx=2, pady=2, borderwidth=1)
+        if self.showhandle:
+            self.handlebar.pack ( side=LEFT, fill=Y, padx=4)
+        
         self.infobar = Tix.Label (self.toplevel, textvariable=self.info_variable,
                                   font=('Helvetica', 9, 'normal' ),
                                   padx=3, pady=2, justify=LEFT, anchor=W)
-        self.infobar.pack (side=TOP, fill=X)
-
-#        self.statusbar = Tix.Label (self.toplevel, textvariable=self.status_variable,
-#                                   padx=20, relief=SUNKEN, anchor=W)
-#        self.statusbar.pack (side=BOTTOM, fill=X, padx=5, pady=5)
-        
-        self.info_variable.set ( "[    ]" )
-        self.status_variable.set ( "<null>" )
+        if self.showinfo:
+            self.infobar.pack (side=TOP, fill=X)
+                
+        self.info_variable.set ( "[    ]" )        
 
     def create_form_container(self):
         scrolled = Tix.ScrolledHList (self.toplevel, options="hlist.columns 4")
@@ -82,7 +86,9 @@ class GenericFormEditor(object):
     def create_button_box(self):
         if self.showbuttons:
             self.buttonbox = Tix.ButtonBox(self.toplevel, pady=0)
-            for b in self.buttons: self.add_button(b)
+            for b in self.buttons: 
+                print b, self._button_label_.get(b, (b,None))[0]
+                self.add_button(b)                
             self.buttonbox.pack (side=BOTTOM, anchor=W )        
         
     def build_form(self):
@@ -104,6 +110,8 @@ class GenericFormEditor(object):
         self.hlist.item_create ( form_element, 1, itemtype=Tix.TEXT, text=label)
 
     def create_entry(self, field):
+        #if this class has a "create_entry_<fieldname>" attribute, 
+        #use it to create this entry
         try:
             entry = getattr(self, "create_entry_" + field.name)(field)
             self.editor_widgets[field.name] = entry
@@ -111,23 +119,39 @@ class GenericFormEditor(object):
             return entry
         except AttributeError:
             pass
-            
+        options = {}
+        options.update ( field.editor_class_params )        
+        #else use the default
+        cls = Entry.Text    #the 'default default' :)
         if field.isarray:
             if field.arrayof:                
-                entry = ArrayComboEntry(self, self.hlist, field, branch=True,
-                                        recordlist=RecordList(field.arrayof).reload() )
+                cls = Entry.ArrayCombo
+                options["recordlist"] = RecordList(field.arrayof).reload()
             else:
-                entry = ArrayTextEntry(self, self.hlist, field, branch=True)
+                classname = "Array" + field.editor_class                
+                try:
+                    cls = getattr(Entry, classname)
+                except AttributeError:
+                    cls = Entry.ArrayText 
+            options["branch"] = True            
         elif field.reference:
-            if field.editor_class == "StaticReferenceEntry":
-                entry = StaticReferenceEntry ( self, self.hlist, field )
-            else:
-                entry = ComboReferenceEntry ( self, self.hlist, field )
-        elif field.type == "bit":
-            entry = BooleanEntry (self, self.hlist, field)
+            classname = field.editor_class + "Reference"
+            try:
+                cls = getattr(Entry, classname)
+            except AttributeError:
+                cls = Entry.ComboReference
         else:
-            entry = TextEntry ( self, self.hlist, field )
-            
+            classname = field.editor_class
+            try:
+                cls = getattr(Entry, classname)
+            except AttributeError:        
+                if len(field.choices) > 0:
+                    cls = Entry.Combo                    
+                else:
+                    cls = Entry.Text
+
+        
+        entry = cls(self, self.hlist, field, **options)
         self.editor_widgets[field.name] = entry
         if field.name in self.disablefields: entry.disable()
         
@@ -145,15 +169,23 @@ class GenericFormEditor(object):
 
     def handle_button_reload(self, *args):
         self.form.reload()
-            
+
+    def handle_handle_clicked(self, *args):
+        pass
+    
     def add_button(self, buttonname, **kwargs):
-        self.buttonbox.add ( buttonname, text=buttonname, command=lambda *x: self.button_command(buttonname, *x) )
+        self.buttonbox.add ( buttonname, 
+                             text=self._button_label_.get(buttonname, (buttonname,None))[0], 
+                             command=lambda *x: self.button_command(buttonname, *x) )
     
     def handle_form_record_modified (self, record, *args):
-        self.buttonbox.subwidget ( 'save' ).config ( bg = 'red' ) 
+        self.handlevar.set ( '*' )
+        self.handlebar.config ( fg = 'red' )
         
     def handle_form_record_saved (self, record, *args):
-        self.buttonbox.subwidget ( 'save' ).config ( bg = 'grey' ) 
+        self.handlevar.set ( '' )
+        self.handlebar.config ( fg = 'black' )
+
         
     def handle_form_record_changed (self, record, *args):
         self.info_variable.set ( str(record) )

@@ -62,7 +62,7 @@ class CFG:
                         idmap[t.objectid].reference_child.append ( (t, f) )
                         idmap[t.objectid].reference_child_hash[(t.name, f.name)] = (t,f)
                     if f.arrayof:
-                        f.arrayof = idmap[f.arrayof]
+                        f.arrayof = idmap[f.arrayof]                
             self.instance = self
         
     CX = None
@@ -144,10 +144,25 @@ class Field(object):
             self.label = kkw.get("label", self.name)
             self.auto = kkw.get("auto", False)
             self.id = kkw.get("objectid", None)
-
+            
             for k in kkw:
                 if k not in self.__dict__: self.__dict__[k] = kkw[k]                        
             
+            choices = text_to_array ( self.choices, 0 )
+            self.choices = []
+            for c in choices:
+                if c.startswith("<["):
+                    cv,cd = c[2:-2].split("::=")[:2]
+                else:
+                    cv,cd = c, c
+                self.choices.append ( (cv, cd) )
+                
+
+            params = text_to_array ( self.editor_class_params, 0 ) or []            
+            params = map ( lambda x: tuple(x.split("::=")), params )
+            self.editor_class_params = {}
+            for (pname, pvalue) in params:
+                self.editor_class_params[pname] = pvalue
         except KeyError, e:
             kwname, = e.args
             raise Field.IncompleteDefinition ( "missing: '%s' in field definition." % kwname )
