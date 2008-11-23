@@ -9,12 +9,14 @@ from misc import *
 class Entry:
     class Field(object):
         """An abstract base class for field editors"""
-        def __init__(self, formeditor, parent, field, **kwargs):
+        def __init__(self, formeditor, parent, field, **kwargs):            
             self.parent = parent 
             self.formeditor = formeditor
             self.field = field
             self.form = self.formeditor.form
             self.variable = self.formeditor.form.tkvars[self.field.name]
+            self.choices = kwargs.get ( "choices", self.field.choices )
+            self.recordlist = kwargs.get ( "recordlist", None )
     
         def disable(self):
             self.widget.config ( state='disabled' )
@@ -76,11 +78,11 @@ class Entry:
                                       selectcolor="yellow")
                 b.pack()            
             
-    Inet = Text
+   
 
     class Select(Field):
         def __init__(self, *args, **kwargs):
-            Entry.Field.__init__(self, *args, **kwargs)
+            Entry.Field.__init__(self, *args, **kwargs)            
             self.selection_change = conditionalmethod (self.selection_change)
             self.value_change = conditionalmethod (self.value_change)
             self.widget = Tix.Select ( self.parent, radio=True,allowzero=True,                                       
@@ -351,11 +353,9 @@ class Entry:
             Entry.Field.__init__(self, *args, **kwargs)
             self.value_change = conditionalmethod(self.value_change)        
             self.item_change = conditionalmethod(self.item_change)        
-            self.branch = kwargs.get ( "branch", None )        
-            self.recordlist = kwargs.get ("recordlist", None )
+            self.branch = kwargs.get ( "branch", None )                    
             self.recorddispfunc = kwargs.get ("recorddispfunc", lambda x: x._astxt )
-            self.choices = kwargs.get ("choices", None )
-            
+                        
             self.widget = Tix.Label (self.parent, 
                                      width=self.formeditor.entrywidth, 
                                      textvariable = self.variable)
@@ -445,6 +445,33 @@ class Entry:
     
     class ArrayCombo(Array, ArrayEntryComboMixin, ArrayEntryButtonMixin):
         pass
+    class ArraySelect(Array):
+        def __init__(self, *args, **kwargs):
+            Entry.Array.__init__(self, *args, **kwargs)
+
+            self.options = Tix.Select ( self.parent, allowzero=True,                                       
+                                       orientation=VERTICAL, command=self.item_change)
+            self.idx_map = {}
+            self.val_map = {}
+            if self.recordlist:
+                pass
+            elif self.choices:
+                for idx, (cv, cd) in enumerate(self.choices):
+                    self.idx_map[cv] = idx
+                    self.val_map[idx] = cv
+                    self.widget.add ( idx, text=cd )
+            
+        def item_change(self, *args):
+            """A callback function called by the Select widget when an item 
+            is toggled"""
+            try:
+                self.value_change.freeze()
+                #rebuild the array from individual elements' values
+                #arr = map (lambda e: e.variable.get(), self.editors)
+                #self.variable.set ( self.field.val_py2txt (arr) )
+                #self.array = arr
+            finally:
+                self.value_change.thaw()
 ###########################################################################################
 
 ###########################################################################################

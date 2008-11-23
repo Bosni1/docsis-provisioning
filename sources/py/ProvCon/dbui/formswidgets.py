@@ -46,6 +46,7 @@ class GenericFormEditor(object):
         self.form.register_event_hook ( "current_record_changed", self.handle_form_record_changed )
         self.form.register_event_hook ( "current_record_modified", self.handle_form_record_modified )
         self.form.register_event_hook ( "current_record_saved", self.handle_form_record_saved )
+    
     def create_toplevel(self):
         self.toplevel = Tix.Frame (self.parent)
         self.info_variable = Tix.StringVar()
