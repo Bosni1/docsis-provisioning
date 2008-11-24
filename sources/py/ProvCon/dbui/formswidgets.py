@@ -195,7 +195,8 @@ class AbstractRecordListWidget(eventemitter):
     def __init__(self, *args, **kwargs):
         eventemitter.__init__ (self, [ 
             "current_record_changed", 
-            "record_deleted",
+            "current_record_deleted",
+            "current_record_modified",
             "navigate"
         ])
         
@@ -210,7 +211,7 @@ class AbstractRecordListWidget(eventemitter):
         
         self.pager = kwargs.get ( "pager", None )
         self.records = kwargs.get ( "records", None )
-
+        
         self.emitonbrowse = kwargs.get ( "emitonbrowse", True )
         self.recordtoolbox = kwargs.get ( "recordtoolbox", True )
         self.recordpopup = kwargs.get ( "recordpopup", True )        
@@ -252,7 +253,17 @@ class AbstractRecordListWidget(eventemitter):
 
     def parent_form_record_changed(self, parentrecord, *args, **kwargs):        
         self.update()
-        
+
+class RecordListFormatter:
+    def append_item (self, rec
+    pass
+
+class RecordListToolbox:
+    pass
+
+class RecordListPopup:
+    pass
+
 class RecordListWidget(AbstractRecordListWidget):
     def __init__(self, parent, *args, **kwargs):
         AbstractRecordListWidget.__init__(self, *args, **kwargs)
@@ -292,3 +303,4 @@ class RecordListWidget(AbstractRecordListWidget):
             record = self.getRecordById (int(idx))
             self.emit_event ( "current_record_changed", record )
             self.emit_event ( "navigate", record.objectid )
+            

@@ -357,8 +357,7 @@ class Entry:
             self.recorddispfunc = kwargs.get ("recorddispfunc", lambda x: x._astxt )
                         
             self.widget = Tix.Label (self.parent, 
-                                     width=self.formeditor.entrywidth, 
-                                     textvariable = self.variable)
+                                     width=self.formeditor.entrywidth )
             
             if hasattr(self, "ButtonBox"):
                 self.default_buttons = self.ButtonBox (self, -1, _del=False)
@@ -401,6 +400,7 @@ class Entry:
             try:
                 self.item_change.freeze()            
                 self.redisplay_array(self.field.val_txt2py ( self.variable.get() ) or [])
+                self.widget.config ( text = "array(%d)" % len(self.array) )
             finally:
                 self.item_change.thaw()
         
