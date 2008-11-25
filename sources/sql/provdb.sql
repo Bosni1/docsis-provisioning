@@ -389,6 +389,7 @@ CREATE TABLE pv.table_info (
   excludedfields name[] not null default '{}',  
   txtexpression text null,  
   recordlisttoolbox varchar(128)[] not null default '{}',
+  recordlistpopup varchar(128)[] not null default '{}',
   UNIQUE (schema, name)
 ) inherits (pv."object");
 SELECT pv.setup_object_subtable ( 'table_info' );
@@ -419,8 +420,6 @@ CREATE TABLE pv.field_info (
   editor_class_params varchar(128)[] null default '{}'
 ) inherits (pv."object");
 SELECT pv.setup_object_subtable ( 'field_info' );
-
-
 
 CREATE VIEW pv.map_class_ids AS
 select c.oid as systemid, ac.objectid as localid 
@@ -552,7 +551,7 @@ DECLARE
   cmd text;
 BEGIN
   FOR refs IN SELECT * FROM pv.all_references LOOP
-    SELECT * INTO stbl FROM pv.table_info WHERE objectid = refs.reftableid;
+    SELECT * INTO stbl FROM ONLY pv.table_info WHERE objectid = refs.reftableid;
     FOR child IN SELECT * FROM pv.table_info WHERE objectid = ANY ( stbl.subclasses ) LOOP
       cmd := 'ALTER TABLE pv.' || child.name || ' ADD  FOREIGN KEY (' || refs.refcolumn || ') REFERENCES pv.objectids ';
       SELECT * INTO con FROM pg_constraint WHERE oid = refs.refcon;                       
@@ -627,6 +626,8 @@ BEGIN
  PERFORM pv.set_reference ( 'field_info.reference', 'table_info');
  PERFORM pv.set_reference ( 'field_info.classid', 'table_info');
  PERFORM pv.set_reference ( 'field_info.arrayof', 'table_info');
+ --PERFORM pv.set_reference ( 'field_info_variant.fieldid', 'field_info');
+ --PERFORM pv.set_reference ( 'table_info_variant.classid', 'table_info');
  PERFORM pv.set_reference ( 'routeros_device.deviceid', 'device');
  PERFORM pv.set_reference ( 'nat_router.deviceid', 'device');
  PERFORM pv.set_reference ( 'core_radio_link.deviceid', 'device');

@@ -64,6 +64,10 @@ class MetadataEditorApp:
                                                    excludefields = [ "path", "ndims" ]
                                                    )
         self.field_properties.pack (fill=BOTH, expand=1,padx=7, pady=20)
+
+        self.xw = Tix.ButtonBox(self._root, orientation=VERTICAL )
+        self.xw.add ( "aAAA", text="Hide", command=lambda x=self.xw: x.forget() )
+        self.xw.place ( x=10,y=10,width=100,height=100)
         
         self._root.mainloop()        
                         

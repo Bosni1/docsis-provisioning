@@ -43,14 +43,15 @@ class CFG:
             print "tCX init [%d]" % self.instanceCount
             
             idmap = {}
-            tableinfo = self.query ( "SELECT * FROM {0}.table_info".format(CFG.DB.SCHEMA) ).dictresult()
+            tableinfo = self.query ( "SELECT * FROM ONLY {0}.table_info".format(CFG.DB.SCHEMA) ).dictresult()
             for ti in tableinfo:
                 with Table.New ( ti['name'], **ti ) as t:
-                    columninfo = self.query ( "SELECT * FROM {0}.field_info WHERE classid = {objectid}".format(CFG.DB.SCHEMA, **ti)).dictresult()
+                    columninfo = self.query ( "SELECT * FROM ONLY {0}.field_info WHERE classid = {objectid}".format(CFG.DB.SCHEMA, **ti)).dictresult()
                     for ci in columninfo:                        
                         t.addField ( Field (size=ci['length'], **ci) )
                     idmap[t.objectid] = t
                     t.recordlisttoolbox = text_to_array ( t.recordlisttoolbox, 0 )
+                    t.recordlistpopup = text_to_array ( t.recordlistpopup, 0 )
                     
             #import foreign key relationships
             for t in Table.__all_tables__.values():
@@ -135,8 +136,7 @@ class Field(object):
         """raised when the Field constructor receives incomplete meta-data"""
         pass
     
-        
-    
+            
     def __init__(self, name=None, type='text', size=-1, ndims=0, **kkw):
         try:            
             ndims = ndims or kkw.get('ndims', 0)
@@ -179,12 +179,14 @@ class Field(object):
     def val_sql2py(self, sqlval):
         """convert the value returned by pg into a python variable"""
         if self.isarray:
+            print "s2p", text_to_array (sqlval, self.arraysize-1)
             return text_to_array (sqlval, self.arraysize-1)
         return sqlval
     
     def val_py2sql(self, pyval):
-        """convert a python variable into something we can insert into an pgSQL statement"""
+        """convert a python variable into something we can insert into an pgSQL statement"""        
         if self.isarray:
+            print "p2s", pyval, array_as_text (pyval)
             return array_as_text (pyval)
         elif isinstance(pyval, str):
             return str(pyval.encode('utf-8'))
@@ -203,6 +205,7 @@ class Field(object):
     
     def val_txt2py(self, txtval):
         if self.isarray:
+            #print "t2p", text_to_array ( txtval[6:], self.arraysize-1 )
             return text_to_array ( txtval[6:], self.arraysize-1 )
         return txtval
     

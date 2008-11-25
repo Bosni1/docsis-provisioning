@@ -243,9 +243,9 @@ class AbstractRecordListWidget(eventemitter):
     
     def getRecordById (self, objid):
         if self.pager:
-            return self.pager.getrecordbyid (objid)
+            return self.pager.getrecordbyid (int(objid))
         else:
-            return self.records_hash[objid]
+            return self.records_hash[int(objid)]
 
     def update(self):
         if self.parentform:
@@ -300,14 +300,43 @@ class RecordListToolbox:
         return method(record)
 
 class RecordListPopup:
-    pass
+    def __init__(self, recordlist, **kwargs):
+        self.recordlist = recordlist
+        self.menus = {}
+        
+    def popup(self, event, record, *args,  **kwargs):        
+        if record.objecttype not in self.menus:        
+            self.build_menu ( record )        
+        
+        if self.menus[record.objecttype]:        
+            #try:
+            print record
+            self.menus[record.objecttype].tk_popup ( event.x_root, event.y_root, 0)
+            #finally:
+            #    self.menus[record.objecttype].grab_release()
+                
+    def build_menu (self, record):
+        table = record._table        
+        if len(table.recordlistpopup) > 0:
+            menu = Tix.Menu ( self.recordlist.widget, tearoff=0 )
+            for p in table.recordlistpopup:
+                cmdid, lbl = p.split("||")[:2]
+                menu.add_command ( label=lbl )
+                print lbl, cmdid            
+            self.menus[record.objecttype] = menu
+            
+        
+    def invoke(self, commandid, record):
+        method = find_method_for_superclass (self, "invoke_" + commandid, record, lambda x: None )
+        return method(record)
+
 
 class RecordListWidget(AbstractRecordListWidget):
     def __init__(self, parent, *args, **kwargs):
         AbstractRecordListWidget.__init__(self, *args, **kwargs)
         self.formatter = kwargs.get("formatter", RecordListFormatter(self))
         self.toolbox = kwargs.get("toolbox", RecordListToolbox(self) )
-        self.popup = kwargs.get("popup", RecordListPopup )        
+        self.popup = kwargs.get("popup", RecordListPopup(self) )        
 
         self.width = kwargs.get("width", [None for i in xrange(0,self.formatter.columns)] )
         self.parent = parent
@@ -317,13 +346,20 @@ class RecordListWidget(AbstractRecordListWidget):
                                     
         self.hlist = self.widget.subwidget('hlist')
         self.hlist.config ( selectforeground="black", command = self.command_handler)
+        
+        self.hlist.bind ( "<3>", self.popup_menu )
         if self.emitonbrowse: self.hlist['browsecmd'] = self.command_handler
 
         for idx, w in enumerate(self.width): 
-            if w: self.hlist.column_width (idx, w)
+            objid =self.hlist.column_width (idx, w)
+            
         
         self.pack = self.widget.pack        
         self.current_selected_record = None            
+
+    def popup_menu(self, event):
+        record = self.getRecordById ( self.hlist.nearest (event.y) )
+        self.popup.popup ( event, record )
         
     def append_list_item(self, r):
         self.hlist.add ( r.objectid, itemtype=Tix.TEXT, text=str(r.objectid) )            
@@ -335,12 +371,6 @@ class RecordListWidget(AbstractRecordListWidget):
         for r in self.records:
             self.formatter.insert_item (self.hlist, r)
             self.toolbox.insert_buttons(self.hlist, r)
-        print self.widget['width']
-        print self.parent['width']
-#        for i in self.widget['master'].configure():
-#            print i, self.widget['master'][i]
-        
-        #self.hlist.column_width(tbcolumn, 0)
     def command_handler(self, idx, *args):        
         if self.current_selected_record != idx:
             self.current_selected_record = idx
