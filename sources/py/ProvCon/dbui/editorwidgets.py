@@ -19,7 +19,7 @@ class Entry:
             self.recordlist = kwargs.get ( "recordlist", None )
     
         def disable(self):
-            self.widget.config ( state='disabled' )
+            self.widget['state'] = 'disabled' 
             
     class Text(Field):
         """A simple text entry"""
@@ -42,8 +42,6 @@ class Entry:
                                      scrollbar=Y )
                                                                       
             self.text = self.widget.subwidget('text')
-            print self.text.config()
-            print self.text
             self.text.config ( disabledforeground="black", textvariable = self.variable)
     
     class Static(Field):
@@ -102,9 +100,9 @@ class Entry:
                 self.selection_change.freeze()
                 if v in self.idx_map:
                     print "idx=", self.idx_map[v]
-                    self.widget.config (value = self.idx_map[v] )
+                    self.widget['value']  = self.idx_map[v] 
                 else:
-                    self.widget.config (value = None )
+                    self.widget['value'] = None 
             finally:
                 self.selection_change.thaw()
         
@@ -400,7 +398,7 @@ class Entry:
             try:
                 self.item_change.freeze()            
                 self.redisplay_array(self.field.val_txt2py ( self.variable.get() ) or [])
-                self.widget.config ( text = "array(%d)" % len(self.array) )
+                self.widget['text'] = "array(%d)" % len(self.array)
             finally:
                 self.item_change.thaw()
         

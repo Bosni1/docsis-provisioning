@@ -9,6 +9,15 @@ def partial (func, *args, **kwargs):
     #__fobj.____ = "Partially applied " + func.__name__ + "\n" + func.__doc__
     return __fobj
 
+def find_method_for_superclass(obj, prefix, record, default):
+    table = record._table
+    while table is not None:
+        try:
+            return getattr(obj, prefix + "_" + table.name)
+        except AttributeError:
+            table = table.superclass
+    return default
+
 
 class conditionalmethod:
     def __init__(self, method):

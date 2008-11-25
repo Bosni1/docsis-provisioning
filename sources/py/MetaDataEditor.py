@@ -26,7 +26,7 @@ class MetadataEditorApp:
         self.table_list_frame.place ( relx=0, rely=0, relwidth=0.5, relheight=0.5)
         self.table_list_frame.propagate(0)
 
-        self.table_record_list = RecordListWidget(self.table_list_frame)        
+        self.table_record_list = RecordListWidget(self.table_list_frame, width=["3i"])        
         self.table_record_list.pack(expand=1, fill=BOTH, padx=10, pady=20)
         self.table_record_list.setObjectIDs ( Record.IDLIST ( "table_info", order=["name"] ) )        
         self.table_change_hook = self.table_record_list.register_event_hook ( "current_record_changed", self.table_changed )

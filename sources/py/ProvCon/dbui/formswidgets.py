@@ -254,12 +254,50 @@ class AbstractRecordListWidget(eventemitter):
     def parent_form_record_changed(self, parentrecord, *args, **kwargs):        
         self.update()
 
+
+            
 class RecordListFormatter:
-    def append_item (self, rec
-    pass
+    """comment this ASAP, before you forget all this crap"""
+    def __init__(self, recordlist, **kwargs):
+        self.recordlist = recordlist
+        self.columns = kwargs.get ( "columns", 1 )
+        self.reprfunc = kwargs.get ( "reprfunc", lambda r,col: r._astxt )
+        self.stylefunc = kwargs.get ( "stylefunc", lambda r,col: None )
+    
+    def item_object (self, record, column, reprstr, style, **kwargs):        
+        return (Tix.TEXT, reprstr, style)
+
+    def insert_item (self, hlist, record):        
+        hlist.add ( record.objectid, itemtype=Tix.TEXT, text="" )            
+        it, txt, style = self.get_item ( record, 0 )
+        hlist.item_create ( record.objectid, 0, itemtype=it, text=txt, style=style )
+            
+    def get_item (self, record, column, *args, **kwargs):
+        datatype = record.objecttype
+        reprfunc = find_method_for_superclass (self, "repr", record, self.reprfunc )
+        itemfunc = find_method_for_superclass (self, "item", record, self.item_object )
+        stylefunc = find_method_for_superclass (self, "style", record, self.stylefunc )
+        return itemfunc (record, column, reprfunc(record, column), stylefunc(record, column) )
 
 class RecordListToolbox:
-    pass
+    def __init__(self, recordlist, **kwargs):
+        self.recordlist = recordlist
+        
+    def insert_buttons(self, hlist, record, **kwargs):
+        column = self.recordlist.formatter.columns
+        frame = Tix.Frame (hlist, padx=0, pady=0)
+        
+        for tbitem in record._table.recordlisttoolbox:
+            commandid, txt = tbitem.split ("//")
+            stylefn = find_method_for_superclass (self, "style_" + commandid, record, lambda x: None )            
+            bt = Tix.Label ( frame,  text=txt, bg='white', fg='black')
+            bt.pack (side=LEFT,padx=2,pady=0,ipadx=0,ipady=0)
+        #frame.pack (expand = 1, fill=X)
+        hlist.item_create ( record.objectid, column, itemtype=Tix.WINDOW, window=frame)
+        
+    def invoke(self, commandid, record):
+        method = find_method_for_superclass (self, "invoke_" + commandid, record, lambda x: None )
+        return method(record)
 
 class RecordListPopup:
     pass
@@ -267,36 +305,42 @@ class RecordListPopup:
 class RecordListWidget(AbstractRecordListWidget):
     def __init__(self, parent, *args, **kwargs):
         AbstractRecordListWidget.__init__(self, *args, **kwargs)
-        self.widget = Tix.ScrolledHList (parent, options="hlist.columns 4")
-                                         
+        self.formatter = kwargs.get("formatter", RecordListFormatter(self))
+        self.toolbox = kwargs.get("toolbox", RecordListToolbox(self) )
+        self.popup = kwargs.get("popup", RecordListPopup )        
+
+        self.width = kwargs.get("width", [None for i in xrange(0,self.formatter.columns)] )
+        self.parent = parent
+        
+        columns = self.formatter.columns + 1
+        self.widget = Tix.ScrolledHList (parent, options="hlist.columns " + str(columns))
+                                    
         self.hlist = self.widget.subwidget('hlist')
         self.hlist.config ( selectforeground="black", command = self.command_handler)
-        if self.emitonbrowse:
-            self.hlist.config ( browsecmd = self.command_handler)
-        self.pack = self.widget.pack
+        if self.emitonbrowse: self.hlist['browsecmd'] = self.command_handler
+
+        for idx, w in enumerate(self.width): 
+            if w: self.hlist.column_width (idx, w)
+        
+        self.pack = self.widget.pack        
         self.current_selected_record = None            
         
     def append_list_item(self, r):
         self.hlist.add ( r.objectid, itemtype=Tix.TEXT, text=str(r.objectid) )            
-        self.hlist.item_create ( r.objectid, 1, itemtype=Tix.TEXT, text=r._astxt )
-    
-    def append_list_item_table_info(self, r):
-        self.hlist.add ( r.objectid, itemtype=Tix.TEXT, text=str(r.objectid) )            
-        self.hlist.item_create ( r.objectid, 1, itemtype=Tix.TEXT, text=r.name)
-
-    def append_list_item_field_info(self, r):
-        self.hlist.add ( r.objectid, itemtype=Tix.TEXT, text=str(r.objectid) )            
-        self.hlist.item_create ( r.objectid, 1, itemtype=Tix.TEXT, text=r.name)
-        self.hlist.item_create ( r.objectid, 2, itemtype=Tix.TEXT, text=r.type)
+        self.hlist.item_create ( r.objectid, 1, itemtype=Tix.TEXT, text=r._astxt )    
         
     def refreshDisplay(self):
+        tbcolumn = self.formatter.columns
         self.hlist.delete_all()        
         for r in self.records:
-            try:
-                getattr(self, "append_list_item_" + r.objecttype)(r)
-            except AttributeError:
-                self.append_list_item ( r )
-    
+            self.formatter.insert_item (self.hlist, r)
+            self.toolbox.insert_buttons(self.hlist, r)
+        print self.widget['width']
+        print self.parent['width']
+#        for i in self.widget['master'].configure():
+#            print i, self.widget['master'][i]
+        
+        #self.hlist.column_width(tbcolumn, 0)
     def command_handler(self, idx, *args):        
         if self.current_selected_record != idx:
             self.current_selected_record = idx

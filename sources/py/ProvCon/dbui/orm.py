@@ -50,9 +50,13 @@ class CFG:
                     for ci in columninfo:                        
                         t.addField ( Field (size=ci['length'], **ci) )
                     idmap[t.objectid] = t
+                    t.recordlisttoolbox = text_to_array ( t.recordlisttoolbox, 0 )
                     
             #import foreign key relationships
             for t in Table.__all_tables__.values():
+                if t.superclass: t.superclass = idmap[t.superclass]
+                
+                else: t.superclass = None
                 for f in t.fields:
                     #For columns that reference a table_info row, replace the appropriate
                     #values with actual, python-object references
@@ -66,6 +70,7 @@ class CFG:
             self.instance = self
         
     CX = None
+
 
 
 
