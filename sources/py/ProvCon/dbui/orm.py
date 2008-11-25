@@ -4,10 +4,9 @@ import contextlib
 import cStringIO
 import pg, re
 import exceptions
-from misc import *
 from config import config
 
-__all__ = ["CFG", "Field", "Table", "Record", "RecordList"]
+__all__ = ["CFG", "Field", "Table", "Record", "RecordList", "find_method_for_superclass"]
 
 class ORMError(exceptions.BaseException): pass
 
@@ -214,7 +213,16 @@ class Field(object):
     
     def decode(self, value):
         raise DeprecationWarning
-        
+
+def find_method_for_superclass(obj, prefix, record, default):
+    table = record._table
+    while table is not None:
+        try:
+            return getattr(obj, prefix + "_" + table.name)
+        except AttributeError:
+            table = table.superclass
+    return default
+
 class Table(object):
     """Table objects hold database meta-data"""
     __special_columns__ = [ "objectid", 

@@ -6,7 +6,7 @@ from Tkconstants import *
 import tkCommonDialog
 import tkMessageBox, traceback
 from gettext import gettext as _
-from misc import *
+from ProvCon.func import *
 
 class Form(eventemitter):
     """ ==class Form==

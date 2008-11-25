@@ -1,36 +1,5 @@
 import exceptions
 
-def partial (func, *args, **kwargs):
-    def __fobj(*cargs, **kwcargs):
-        call_args = args + cargs
-        kwcargs.update (kwargs)        
-        return func(*call_args, **kwcargs)
-    #__fobj.__name__ = "partial " + func.__name__ + "(" + ",".join(map (str, args)) + ")"
-    #__fobj.____ = "Partially applied " + func.__name__ + "\n" + func.__doc__
-    return __fobj
-
-def find_method_for_superclass(obj, prefix, record, default):
-    table = record._table
-    while table is not None:
-        try:
-            return getattr(obj, prefix + "_" + table.name)
-        except AttributeError:
-            table = table.superclass
-    return default
-
-
-class conditionalmethod:
-    def __init__(self, method):
-        self.frozen = False
-        self.method = method               
-    def __call__(self, *args, **kwargs):        
-        if self.frozen: return None        
-        return self.method ( *args, **kwargs )
-    def freeze (self):
-        self.frozen = True        
-    def thaw(self):
-        self.frozen = False
-
 class eventexception(exceptions.Exception):
     def __init__(self, retval):
         exceptions.Exception.__init__ (self)
@@ -85,4 +54,3 @@ class eventemitter(object):
     
     def emit_event (self, evtname, *args, **kwargs):
         self.__myevents[evtname].emit(*args, **kwargs)
-        
