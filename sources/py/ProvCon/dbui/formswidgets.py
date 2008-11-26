@@ -4,7 +4,6 @@ from Tkconstants import *
 from orm import *
 from forms import *
 from gettext import gettext as _
-from misc import *
 from editorwidgets import *
 
 class GenericFormEditor(object):    
@@ -21,7 +20,7 @@ class GenericFormEditor(object):
         ( "showbuttons", True),
         ( "showinfo", True),
         ( "showhandle", True),
-        ( "buttons", ["save", "reload", "new"] ),     
+        ( "buttons", ["save", "reload", "new"] )             
     ]
     _button_label_ = {
         "save" : ( _("Save"), None),

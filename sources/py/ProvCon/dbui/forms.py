@@ -2,6 +2,8 @@
 # -*- coding: utf8 -*-
 from orm import *
 import Tix
+from Tix import StringVar as tVar
+from ProvCon.func.variables import TracedVariable as StringVar
 from Tkconstants import *
 import tkCommonDialog
 import tkMessageBox, traceback
@@ -34,7 +36,7 @@ class Form(eventemitter):
     new_record
     data_loaded
     """
-    def __init__(self, table):
+    def __init__(self, table, **kkw):
         eventemitter.__init__(self,                               
                               [ "request_record_change",
                                 "current_record_changed",
@@ -47,6 +49,8 @@ class Form(eventemitter):
         self.on_record_changed_handler = conditionalmethod (self.on_record_changed_handler)
         self.value_change_handler = conditionalmethod (self.value_change_handler)
         self.on_edit_handler = conditionalmethod(self.on_edit_handler)
+
+        self.variableclass = kkw.get ( "variableclass" , StringVar )
         
         self.table = table
         self.current = Record.EMPTY (table.name)
@@ -54,9 +58,11 @@ class Form(eventemitter):
         self.modification_notification = False
         
         for f in self.table:
-            self.tkvars[f.name] = Tix.StringVar()
+            self.tkvars[f.name] = self.variableclass()
             self.tkvars[f.name].trace ( 'w', partial (self.value_change_handler, f.name) ) 
         
+    def __getitem__(self, itemidx):
+        return self.tkvars[itemidx]
     
     def save(self):
         wasnew = self.current._isnew
@@ -116,7 +122,7 @@ class Form(eventemitter):
             #We will be changing the tkvars so freeze their handler for now
             self.value_change_handler.freeze()
             for f in self.table:
-                self.tkvars[f.name].set ( self.current.getFieldStringValue ( f.name ) )
+                self.tkvars[f.name].set ( self.current.getFieldValue ( f.name ) )
         finally:
             self.value_change_handler.thaw()
     

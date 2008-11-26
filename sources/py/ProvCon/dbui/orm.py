@@ -213,6 +213,9 @@ class Field(object):
     
     def decode(self, value):
         raise DeprecationWarning
+    
+    def is_special(self):
+        return self.name in Table.__special_columns__
 
 def find_method_for_superclass(obj, prefix, record, default):
     table = record._table
@@ -257,12 +260,16 @@ class Table(object):
         self.reference_child_hash = {}
         self.schema = kwargs.get ( "schema", CFG.DB.SCHEMA )
         self.label = kwargs.get ( "label", self.name )
-        
+    
+    def fieldCount(self):
+        return len ( filter (lambda f: not f.is_special(), self.fields ) )
+    
     def addField(self, field):
         assert isinstance(field, Field)
         if field.lp < 0: field.lp = len(self.fields)
-        self.fields.append (field)
+        self.fields.append (field)        
         self.fields_hash[field.name] = field
+        field.table = self
         self.fields.sort ( lambda x, y: x.lp - y.lp )
         
     def recordCount(self):
