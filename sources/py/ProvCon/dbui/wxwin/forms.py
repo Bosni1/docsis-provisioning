@@ -1,5 +1,5 @@
 from ProvCon.dbui.abstractui.forms import BaseForm
-from fields import Field as EntryWidgets
+from fields import Entry as EntryWidgets
 import wx
 
 class GenericForm(BaseForm, wx.Panel):
@@ -48,5 +48,5 @@ class GenericForm(BaseForm, wx.Panel):
 
     def cmd(self, event, *args):
         print self.form.current.PP_TABLE
-        self.form.setid ( 24 )
+        self.form.setid ( 19 )
         

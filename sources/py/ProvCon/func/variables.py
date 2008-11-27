@@ -13,12 +13,17 @@ class TracedVariable(object):
         W = 'w'
         R = 'r'
         RW = 'rw'
+        
         def __init__(self, variable, mode, callback):
             self.variable = variable
             self.mode = mode
             self.callback = callback
             self.variable._append_tracer (self)
             self.frozen = False
+
+        def __del__(self):
+            print "del", self
+            self.variable.untrace (self)
             
         def __call__(self, action, value, var=None, idx=None):
             if not self.frozen:
@@ -29,13 +34,16 @@ class TracedVariable(object):
             
             
     def __init__(self, **kkw):
-        self.tracers = { 'r' : set(), 'w' : set() }
-        self.recursion = kkw.get("recursion", False)
-        if not self.recursion: self.set = singleentry ( False ) ( self.set )
+        self.tracers = { 'r' : set(), 'w' : set() }        
+        self.set = singleentry ( False ) ( self.set )
+        self.__setitem__ = singleentry ( False ) ( self.__setitem__ )
+        self.pending_tracers = []
         self.value = None
 
-    def _append_tracer(self, tracer):
-        assert isinstance(tracer, TracedVariable.Tracer )
+    def _append_tracer(self, tracer, ignore_reentry=False):
+        if not ignore_reentry and (self.set.entered or self.__setitem__.entered):
+            self.pending_tracers.append (tracer)
+            return
         for m in tracer.mode:
             try:
                 self.tracers[m].add ( tracer )
@@ -48,12 +56,14 @@ class TracedVariable(object):
 
     def __setitem__(self, itemidx, itemvalue):
         if not (isinstance(self.value, (list, tuple, dict))):
-            return        
-        
+            return                
         try:
             item = self.value[itemidx]
             for t in self.tracers['w']: t( 'w', itemvalue, self, itemidx )
             self.value[itemidx] = itemvalue
+            ##Add tracers added while current tracers were iterated
+            for t in self.pending_tracers: self._append_tracer(t, True)
+            self.pending_tracers = []
         except KeyError:
             return
 
@@ -70,6 +80,9 @@ class TracedVariable(object):
         try:
             for t in self.tracers['w']: t( 'w', value, self )
             self.value = value
+            ##Add tracers added while current tracers were iterated
+            for t in self.pending_tracers: self._append_tracer(t, True)
+            self.pending_tracers = []
         except VariableCancel:
             pass
         
