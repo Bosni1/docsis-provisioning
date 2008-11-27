@@ -14,12 +14,16 @@ class TracedVariable(object):
         R = 'r'
         RW = 'rw'
         
-        def __init__(self, variable, mode, callback):
+        def __init__(self, variable, mode, callback, name = ""):
             self.variable = variable
             self.mode = mode
+            self.name = name
             self.callback = callback
             self.variable._append_tracer (self)
             self.frozen = False
+            
+        def __repr__(self):
+            return "<Tracer '" + self.mode + "' of " + str(self.variable) + " '" + self.name + "' (%x)>" % id(self)
 
         def __del__(self):
             print "del", self
@@ -27,6 +31,7 @@ class TracedVariable(object):
             
         def __call__(self, action, value, var=None, idx=None):
             if not self.frozen:
+                #print "Calling: " + str(self)
                 return self.callback ( action, value, var, idx )
         
         def freeze(self): self.frozen = True
@@ -38,7 +43,10 @@ class TracedVariable(object):
         self.set = singleentry ( False ) ( self.set )
         self.__setitem__ = singleentry ( False ) ( self.__setitem__ )
         self.pending_tracers = []
+        self.frozen_callbacks = False
         self.value = None
+        
+        self.name = "TracedVariable(" + str(kkw.get("name", hash(self))) + ")"
 
     def _append_tracer(self, tracer, ignore_reentry=False):
         if not ignore_reentry and (self.set.entered or self.__setitem__.entered):
@@ -59,7 +67,8 @@ class TracedVariable(object):
             return                
         try:
             item = self.value[itemidx]
-            for t in self.tracers['w']: t( 'w', itemvalue, self, itemidx )
+            if not self.frozen_callbacks:
+                for t in self.tracers['w']: t( 'w', itemvalue, self, itemidx )
             self.value[itemidx] = itemvalue
             ##Add tracers added while current tracers were iterated
             for t in self.pending_tracers: self._append_tracer(t, True)
@@ -78,7 +87,8 @@ class TracedVariable(object):
         
     def set(self, value):
         try:
-            for t in self.tracers['w']: t( 'w', value, self )
+            if not self.frozen_callbacks:
+                for t in self.tracers['w']: t( 'w', value, self )
             self.value = value
             ##Add tracers added while current tracers were iterated
             for t in self.pending_tracers: self._append_tracer(t, True)
@@ -87,8 +97,8 @@ class TracedVariable(object):
             pass
         
     
-    def trace(self, mode, callback):
-        return TracedVariable.Tracer ( self, mode, callback )
+    def trace(self, mode, callback, **kkw):
+        return TracedVariable.Tracer ( self, mode, callback, **kkw )
     
     def untrace(self, tracer):
         for m in self.tracers: 
@@ -103,4 +113,10 @@ class TracedVariable(object):
         return self.tracers
     
     trace_vinfo = info
+    
+    def freeze(self): self.frozen_callbacks = True
+    def thaw(self): self.frozen_callbacks = False
+    
+    def __repr__(self):
+        return self.name
     

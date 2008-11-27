@@ -11,7 +11,7 @@ def singleentry(raise_exception=True, default_value=None):
         def __init__(self, fn):
             self.entered = False
             self.fn = fn
-            self.__repr__ = lambda self=self: "<singlentry " + fn.__name__ + ">"            
+            self.__repr__ = lambda self=self: "<singlentry " + str(fn) + ">"            
             
         def __call__(self, *args, **kwargs):            
             if not self.entered:

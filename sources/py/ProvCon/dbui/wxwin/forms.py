@@ -1,4 +1,6 @@
 from ProvCon.dbui.abstractui.forms import BaseForm
+from ProvCon.dbui.orm import RecordList
+from ProvCon.dbui.meta import Table
 from fields import Entry as EntryWidgets
 import wx
 
@@ -26,7 +28,7 @@ class GenericForm(BaseForm, wx.Panel):
         if field.isarray:
             if field.arrayof:
                 editor_class_name = "ArrayCombo"
-                options['recordlist'] = []
+                options['recordlist'] = RecordList ( field.arrayof ).reload()           
             else:
                 editor_class_name = "Array" + field.editor_class
                 if not hasattr(EntryWidgets, editor_class_name):
@@ -37,7 +39,7 @@ class GenericForm(BaseForm, wx.Panel):
                 editor_class_name = "ComboReference"
         else:
             editor_class_name = field.editor_class
-            
+        
         try:
             editor_class = getattr(EntryWidgets, editor_class_name)
         except AttributeError:
@@ -48,5 +50,5 @@ class GenericForm(BaseForm, wx.Panel):
 
     def cmd(self, event, *args):
         print self.form.current.PP_TABLE
-        self.form.setid ( 19 )
+        self.form.setid ( 4 )
         

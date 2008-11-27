@@ -490,7 +490,7 @@ SELECT n.nspname, c.relname, c.relname, c.relname, 'Table ' || c.relname || '.',
   ote.objecttxtexpr
 FROM pg_class c INNER JOIN pg_namespace n ON n.oid = c.relnamespace
 LEFT JOIN pv.object_txt_expressions ote ON ote.objecttype = c.relname
-WHERE n.nspname = 'pv' AND c.relkind = 'r'::char;
+WHERE n.nspname = 'pv' AND c.relkind = 'r'::char ORDER BY c.oid;
 
 
 INSERT INTO pv.field_info(name, lp, ndims, type, length, classid, label, quickhelp, reference,constraintid)
