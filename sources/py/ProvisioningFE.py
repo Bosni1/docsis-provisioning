@@ -1,6 +1,5 @@
 #!/bin/env python
 from ProvCon.dbui.database import CFG
-from ProvCon.func.decorators import singleentry
 from ProvCon.dbui import meta, orm
 from ProvCon.dbui import wxwin as guitk
 
