@@ -1,1 +1,1 @@
-import fields, forms, navigators, recordlists
+import fields, forms, navigators, recordlists, complete, art

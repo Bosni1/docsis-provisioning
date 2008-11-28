@@ -50,11 +50,11 @@ class Table(object):
         return CFG.CX.query ( "SELECT count(*) as recordCount FROM {0}.{1} WHERE objectscope={2}".format(
             CFG.DB.SCHEMA, self.name, CFG.RT.DATASCOPE )).dictresult()[0]['recordCount']
                               
-    def recordList(self, _filter="TRUE", select=[], order="objectid"):
+    def recordList(self, _filter="TRUE", select=['0'], order="objectid"):
         from_clause = self.schema + "." + self.name + " o LEFT JOIN " + self.schema + ".object_search_txt t ON o.objectid = t.objectid"
-        return CFG.CX.query ( "SELECT o.objectid, t.txt as _astxt, o.objectmodification {3} FROM {0} WHERE {1} ORDER BY {2}".format (from_clause, _filter, order, ",".join(select) )).dictresult()
+        return CFG.CX.query ( "SELECT o.objectid, t.txt as _astxt, o.objectmodification, {3} FROM {0} WHERE {1} ORDER BY {2}".format (from_clause, _filter, order, ",".join(select) )).dictresult()
 
-    def recordObjectList(self, _filter="TRUE", select=[], order="objectid"):
+    def recordObjectList(self, _filter="TRUE", select=['0'], order="objectid"):
         from ProvCon.dbui.orm import Record
         rl = self.recordList(_filter, select, order)
         li = []

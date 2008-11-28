@@ -1,6 +1,7 @@
 from ProvCon.dbui.database import CFG
 from errors import ORMError
 from ProvCon.dbui.meta import Table
+import cStringIO
 
 class Record(object):
     """==Record==

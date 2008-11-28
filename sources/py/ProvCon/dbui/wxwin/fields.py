@@ -164,7 +164,7 @@ class Entry:
         
         def set_current_editor_value(self, value):
             try:
-                if self.mode == 'record': value = int(value)                
+                if self.mode == 'record' and value is not None: value = int(value)                
                 self.Select ( self.obj_idx_hash[value] )
             except KeyError:
                 self.Select ( self.obj_idx_hash[()] )
@@ -172,7 +172,7 @@ class Entry:
         def get_current_editor_value(self):
             val = self.GetClientData ( self.GetSelection() )
             if self.mode == 'record':                
-                if val: return record.objectid
+                if val: return val.objectid
             elif self.mode == 'choice':
                 return val
             return None
@@ -265,6 +265,9 @@ class Entry:
                 if bb: bb.Show()
             
             self.parent.Layout()
+            self.parent.Fit()
+            print "my size", self.sizer.Size
+            print "parent size", self.parent.sizer.Size
             self.size = newsize
             
         def set_current_editor_item_value(self, idx, value):

@@ -85,12 +85,15 @@ class BaseArrayEditor(BaseFieldEditor):
         self.variable[idx1] = a2
         self.variable[idx2] = a1
                 
-    def set_current_editor_value(self, value):        
+    def set_current_editor_value(self, value):         
         self.array = value
-        self.resize_editor ( len (self.array) )
-        for idx, item in enumerate(self.array):
-            if idx < self.size:
-                self.set_current_editor_item_value (idx, item)
+        if value is None:
+            self.resize_editor(0)
+        else:
+            self.resize_editor ( len (self.array) )        
+            for idx, item in enumerate(self.array):
+                if idx < self.size:
+                    self.set_current_editor_item_value (idx, item)
             
     def set_current_editor_item_value(self, idx, value):
         raise NotImplementedError()

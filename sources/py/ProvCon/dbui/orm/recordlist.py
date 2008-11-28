@@ -1,6 +1,6 @@
 
 class RecordList(list):
-    def __init__(self, table, _filter="TRUE", select=[], order="objectid"):
+    def __init__(self, table, _filter="TRUE", select=['0'], order="objectid"):
         list.__init__(self)
         self.table = table
         self._filter = _filter
