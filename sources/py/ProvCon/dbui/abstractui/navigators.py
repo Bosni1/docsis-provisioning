@@ -24,6 +24,7 @@ class BaseNavigator(eventemitter):
     def set_records(self, records):
         self.records = records
         self.records_count = len(self.records)
+        self.current_index = None
         
     def currentid(self):
         try:
@@ -70,45 +71,7 @@ class BaseNavigator(eventemitter):
     
     
         
-class BasePager(eventemitter):
-    def __init__(self, records, pagesize, **kkw):
-        eventemitter.__init__ (self, [ "page" ] )
-        self.records = records
-        self.pagesize = pagesize
-        self.current_page = None
-        self.page_count = None
-        self.current_record_set = []
-        self.set_page(1)
-    
-    def set_records (self, records):
-        self.records = records
-        self.record_count = len(records)
-        self.page_count = self.record_count / self.pagesize
-        if self.record_count % self.pagesize > 0: self.page_count += 1
 
-    def get_current_page ( self ):
-        return self.current_record_set
-    
-    def set_page(self, pageno):
-        if pageno < 0 or pageno >= self.page_count: return
-        self.current_page = pageno
-        self.current_record_set = self.records[pageno*self.pagesize:][:self.pagesize]
-        self.emit_event ( "page", pageno, self.current_record_set )
-
-    def page_relative(self, move):
-        self.set_page ( (self.current_page + move) % self.page_count )
-        
-    def pageup(self): 
-        self.page_relative ( 1 )
-        
-    def pagedown(self):
-        self.page_relative ( -1 )
-    
-    def pagelast(self):
-        self.page (self.page_count-1)
-    
-    def pagefirst(self):
-        self.page (0)
         
         
         

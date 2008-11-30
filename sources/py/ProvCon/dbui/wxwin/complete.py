@@ -4,24 +4,47 @@ from ProvCon.dbui import orm, meta
 import art
 import wx
 
+class FormToolbar(wx.ToolBar):
+    def __init__(self, form):
+        wx.ToolBar.__init__ (self, form)
+        self.AddLabelTool(-1, "new", art.TB_NEW )
+        self.AddLabelTool(-1, "del", art.TB_DEL )
+        self.AddLabelTool(-1, "save", art.TB_SAVE )
+        self.AddLabelTool(-1, "reload", art.TB_RELOAD )
+        self.label = wx.StaticText ( self, label="toolbar" )
+        self.AddControl ( self.label )        
+        
+        
 
 class CompleteGenericForm(wx.Panel):
     
-    def __init__(self, table, parent, **kwargs):
+    def __init__(self, parent, **kwargs):
         wx.Panel.__init__ (self, parent, style=wx.SUNKEN_BORDER)
-        self.form = orm.Form ( meta.Table.Get ( table ) )        
+        
+        self.tablename = kwargs.get ( "tablename", None)
+        self.table = kwargs.get ( "table", None)
+        self.form = kwargs.get ( "form", None )
+
+        if self.tablename:
+            self.table = meta.Table.Get ( self.tablename )
+        if self.table:
+            self.tablename = self.table.name
+            self.form = orm.Form ( self.table )
+        if self.form:
+            self.table = self.form.table
+            self.tablename = self.table.name
+            
         self.mainsizer = wx.BoxSizer (wx.VERTICAL)
         
+        self.toolbarconfig = kwargs.get ( "toolbar", FormToolbar)
         
         #tool bar
-        self.toolbar = wx.ToolBar(self)
-        self.toolbar.AddLabelTool(-1, "new", art.TB_NEW )
-        self.toolbar.AddLabelTool(-1, "save", art.TB_SAVE )
-        self.toolbar.AddLabelTool(-1, "reload", art.TB_RELOAD )
-        self.toolbarlabel = wx.StaticText ( self.toolbar, label="toolbar" )
-        self.toolbar.AddControl ( self.toolbarlabel )        
-        self.mainsizer.Add ( self.toolbar )    
-        
+        if self.toolbarconfig:
+            self.toolbar = self.toolbarconfig(self)
+            self.mainsizer.Add ( self.toolbar, flag=wx.EXPAND )
+        else:
+            self.toolbar = None
+            
         #editor
         self.editor_scrolled_window = wx.ScrolledWindow ( self, style=wx.VSCROLL )            
         self.editor = GenericForm ( self.form, self.editor_scrolled_window )  
@@ -33,20 +56,25 @@ class CompleteGenericForm(wx.Panel):
         self.mainsizer.Add ( self.editor_scrolled_window, 1, flag=wx.EXPAND )
         
         #navigator
-        self.navigator = Navigator(self)
-        self.mainsizer.Add ( self.navigator, flag=wx.EXPAND )
-        
+        navigator_config = kwargs.get ( "navigator", Navigator )
+        navigator_options = kwargs.get ( "navigatoroptions", {} )
+        if navigator_config:
+            navigator = navigator_config(self, **navigator_options)
+            self.recordlist = orm.RecordList (self.form.table).reload()
+            navigator.set_records ( self.recordlist )
+            navigator.first()
+            self.mainsizer.Add ( navigator, flag=wx.EXPAND )            
+        else:
+            navigator = None
+            
         self.SetSizer ( self.mainsizer )
         self.SetSize ( parent.GetSize() )
         #handlers
         self.editor_scrolled_window.Bind ( wx.EVT_SIZE, self.on_resize)         
         self.editor.Bind ( wx.EVT_SIZE, self.on_editor_resize )
-        self.navigator.register_event_hook ( "navigate", self.navigate )
-        
-        #initialization
-        self.recordlist = orm.RecordList (self.form.table).reload()
-        self.navigator.set_records ( self.recordlist )
-        self.navigator.first()
+
+        if navigator:
+            self.set_navigator ( navigator )
 
     def on_editor_resize(self, event, *args):
         self.editor_scrolled_window.SetVirtualSize ( event.GetSize() )        
@@ -60,5 +88,12 @@ class CompleteGenericForm(wx.Panel):
         event.Skip()
     
     def navigate (self, objectid):
-        self.form.setid ( objectid )
-        self.toolbarlabel.SetLabel ( str(self.form.current) )
+        self.form.setid ( objectid )        
+        if self.toolbar:
+            self.toolbar.label.SetLabel ( str(self.form.current) )
+    
+    def set_navigator(self, navigator):
+        self.navigator = navigator
+        self.navigator.register_event_hook ( "navigate", self.navigate )                
+        self.navigate ( self.navigator.currentid() )
+        

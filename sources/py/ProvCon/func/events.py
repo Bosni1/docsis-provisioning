@@ -47,8 +47,11 @@ class eventemitter(object):
     
     def __init__(self, events=[]):
         self.__myevents = {}
-        for i in events: self.__myevents[i] = self.evt(self)
-    
+        for i in events: self.add_emitted_event ( i )
+
+    def add_emitted_event (self, eventname):
+        self.__myevents[eventname] = self.evt(self)
+        
     def register_event_hook (self, evtname, cb):
         return self.__myevents[evtname].listen (cb)
     
