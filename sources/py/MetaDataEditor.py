@@ -1,84 +1,73 @@
 #!/bin/env python
-import Tix
-from Tkconstants import *
-from gettext import gettext as _
-from ProvCon.dbui import *
+from ProvCon.dbui.database import CFG
+from ProvCon.dbui import meta, orm
+from ProvCon.dbui import wxwin as guitk
 
-def err(*args):
-    raise
+import wx
+#from wx.lib import scrolledpanel as scrolled
 
-class MetadataEditorApp:    
-    resource_dir = '/home/kuba/src/docsis-resources/'
-    def __init__(self):
-        self._root = Tix.Tk()
-        self._root.report_callback_exception = err
+class MetaDataEditor(wx.App):
+    def OnInit(self):
+        #wx.App.__init__(self)
         
-        self.rootwindow = Tix.Frame(self._root)
+        self.toplevel = wx.Frame (None, title="Provisioning meta-data editor", size=(1100,800))
+        sizer = wx.BoxSizer(wx.VERTICAL)
+        hsizer = wx.BoxSizer (wx.HORIZONTAL)
+        lsizer = wx.BoxSizer ( wx.VERTICAL )
+  
+        self.tableeditor = guitk.complete.CompleteGenericForm ( self.toplevel, tablename="table_info",
+                                                                navigator = False)
+        lsizer.Add (self.tableeditor, 4, flag=wx.EXPAND)
+        
+        self.fieldlist = guitk.recordlists.RecordList ([], self.toplevel)        
+        self.fieldlist.register_event_hook ( "current_record_changed", self.current_field_changed )
+        lsizer.Add (self.fieldlist, 2, flag=wx.EXPAND)
+        
+        fieldinfotable = meta.Table.Get ( "field_info" )
 
-        wm = self._root.winfo_toplevel()        
-        wm.title ( "Provisioning meta-data editor" )
-        wm.geometry ( "1024x768+10+10" )
+        self.fieldrecords = orm.RecordList ( fieldinfotable, select=['name'], order="lp" )
+        self.fieldrecords.filterfunc = lambda r: r.name not in meta.Table.__special_columns__
         
-        self.rootwindow.pack(expand=1, fill=BOTH)
-        self.rootwindow.propagate(0)
-                
-        self.table_list_frame = Tix.LabelFrame(self.rootwindow, label="Table list")
-        self.table_list_frame.place ( relx=0, rely=0, relwidth=0.5, relheight=0.5)
-        self.table_list_frame.propagate(0)
+        self.tableeditor.form.register_event_hook ( "current_record_changed", self.current_table_changed )
+        
+        rsizer = wx.BoxSizer (wx.VERTICAL)
+        self.fieldeditor = guitk.complete.CompleteGenericForm ( self.toplevel, table = fieldinfotable,
+                                                                navigator = False)
+        rsizer.Add ( self.fieldeditor, 1, flag=wx.EXPAND )
+        
+        hsizer.Add(lsizer, 1, flag=wx.EXPAND)
+        hsizer.Add(rsizer, 1, flag=wx.EXPAND)
+        sizer.Add ( hsizer, 1, flag=wx.EXPAND)
 
-        self.table_record_list = RecordListWidget(self.table_list_frame, width=["3i"])        
-        self.table_record_list.pack(expand=1, fill=BOTH, padx=10, pady=20)
-        self.table_record_list.setObjectIDs ( Record.IDLIST ( "table_info", order=["name"] ) )        
-        self.table_change_hook = self.table_record_list.register_event_hook ( "current_record_changed", self.table_changed )
-            
+        tablenav = guitk.navigators.Navigator (self.toplevel)
+        tablenav.set_records ( orm.RecordList ( self.tableeditor.table ).reload() )
+        tablenav.navigate (1)
+        sizer.Add (tablenav, 0, flag=wx.EXPAND)
+        tablenav.Show()
+        self.tableeditor.set_navigator ( tablenav )
         
-        self.table_properties_frame = Tix.LabelFrame (self.rootwindow, label="Table properties" )
-        self.table_properties_frame.place (relx=0.50, rely=0, relwidth=0.5, relheight=0.5)
-        self.table_properties_frame.propagate(0)
-        self.table_properties_form = Form ( Table.Get ( "table_info" ) )        
-        self.table_properties = GenericFormEditor (self.table_properties_frame, 
-                                                   self.table_properties_form,
-                                                   disablefields = ["name", "schema"] )
+        self.toplevel.SetSizer (sizer)
+        self.toplevel.Show()
+        return True
+    
+    def current_table_changed(self, tablerecord):
+        self.fieldrecords.filter = '"classid" = %d' % tablerecord.objectid
+        self.fieldrecords.reload()
+        self.fieldlist.set_records ( self.fieldrecords )
+    
+    def current_field_changed(self, field):
+        if field:
+            self.fieldeditor.navigate ( field.objectid )
+        else:
+            self.fieldeditor.navigate ( None )
         
-        self.table_properties.pack(fill=BOTH, expand=1,padx=7, pady=20)
         
-        self.field_list_frame = Tix.LabelFrame(self.rootwindow, label="Fields")
-        self.field_list_frame.place ( relx=0, rely=0.51, relwidth=0.4, relheight=0.45)
-        self.field_list_frame.propagate(0)
-        
-        self.field_record_list = RecordListWidget (self.field_list_frame, 
-                                                   parentform=self.table_properties_form,
-                                                   referencefield = "classid",
-                                                   objecttype = "field_info",
-                                                   filterfunc = lambda x: x.name not in Table.__special_columns__ )
-        self.field_record_list.pack (expand=1, fill=BOTH, padx=10, pady=20)
-        self.field_change_hook = self.field_record_list.register_event_hook ( "current_record_changed", self.field_change )
-                    
-        self.field_properties_frame = Tix.LabelFrame (self.rootwindow, label="Field properties" )
-        self.field_properties_frame.place (relx=0.40, rely=0.51, relwidth=0.6, relheight=0.45)
-        self.field_properties_frame.propagate(0)
-        self.field_properties_form = Form ( Table.Get ( "field_info" ) )
-        self.field_properties = GenericFormEditor (self.field_properties_frame,
-                                                   self.field_properties_form ,
-                                                   disablefields = [ "name", "type"],
-                                                   excludefields = [ "path", "ndims" ]
-                                                   )
-        self.field_properties.pack (fill=BOTH, expand=1,padx=7, pady=20)
+app = MetaDataEditor()
+app.MainLoop()
 
-        self.xw = Tix.ButtonBox(self._root, orientation=VERTICAL )
-        self.xw.add ( "aAAA", text="Hide", command=lambda x=self.xw: x.forget() )
-        self.xw.place ( x=10,y=10,width=100,height=100)
-        
-        self._root.mainloop()        
-                        
-    def table_changed(self,table_record,*args,**kwargs):
-        table = Table.Get ( table_record.name )                
-        self.table_properties_form.setid ( table.id )
-        self.table_properties_frame.configure ( label = self.table_properties_form.current._astxt ) 
-        
-    def field_change(self, field_record,*args, **kwargs):
-        self.field_properties_form.setid ( field_record.objectid )
-        self.field_properties_frame.configure ( label = self.field_properties_form.current._astxt )        
-                
 
-MetadataEditorApp()
+
+
+
+
+

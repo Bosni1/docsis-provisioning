@@ -306,7 +306,7 @@ class Record(object):
     
     def __repr__(self):
         if self._table:
-            return "<record of {0} #{1}> {2}".format (self._table.name, self._objectid,
+            return "<{1}> {2}".format (self._table.name, self._objectid,
                                                       self._astxt )
         return "<record>"
     @staticmethod

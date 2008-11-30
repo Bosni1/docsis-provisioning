@@ -6,19 +6,32 @@ import art
 import wx
 
 class FormToolbar(wx.ToolBar):
-    def __init__(self, form):
+    def __init__(self, form, **kkw):
         wx.ToolBar.__init__ (self, form)
-        self.AddLabelTool(-1, "new", art.TB_NEW )
-        self.AddLabelTool(-1, "del", art.TB_DEL )
-        self.AddLabelTool(-1, "save", art.TB_SAVE )
-        self.AddLabelTool(-1, "reload", art.TB_RELOAD )
+        self.form = form
+        self.tools = {}
+        for b in [ "NEW", "DEL", "SAVE", "RELOAD" ]:
+            if not kkw.get ( "no_" + b, False):
+                wxid = wx.NewId()
+                self.tools[wxid] = (b, self.AddLabelTool (wxid, b, art.TB[b] ))
+        
+        self.Bind (wx.EVT_TOOL, self.command)
+        
         self.label = wx.StaticText ( self, label="toolbar" )
         self.AddControl ( self.label )        
         
     def SetRecordLabel(self, label):
         self.label.SetLabel ( label )
         
-
+    def command(self, event):
+        toolname, tool = self.tools.get ( event.GetId(), None)
+        if tool:
+            try:
+                getattr(self.form, "on_toolbar_" + toolname) ()
+            except AttributeError:
+                pass                            
+            
+        
 class CompleteGenericForm(wx.Panel):
     
     def __init__(self, parent, **kwargs):
@@ -40,7 +53,13 @@ class CompleteGenericForm(wx.Panel):
         self.save = conditionalmethod ( self.form.save )
         self.reload = conditionalmethod ( self.form.reload )
         self.new = conditionalmethod ( self.form.new )
-            
+        self.delete = conditionalmethod (self.form.delete )
+        
+        self.on_toolbar_SAVE = self.save
+        self.on_toolbar_NEW = self.new
+        self.on_toolbar_RELOAD = self.reload
+        self.on_toolbar_DEL = self.delete
+        
         self.mainsizer = wx.BoxSizer (wx.VERTICAL)
         
         self.toolbarconfig = kwargs.get ( "toolbar", FormToolbar)

@@ -87,9 +87,9 @@ class TracedVariable(object):
         
     def set(self, value):
         try:
-            if not self.frozen_callbacks:
-                for t in self.tracers['w']: t( 'w', value, self )
             self.value = value
+            if not self.frozen_callbacks:
+                for t in self.tracers['w']: t( 'w', value, self )            
             ##Add tracers added while current tracers were iterated
             for t in self.pending_tracers: self._append_tracer(t, True)
             self.pending_tracers = []

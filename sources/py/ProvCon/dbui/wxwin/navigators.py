@@ -10,7 +10,6 @@ class Navigator(BaseNavigator, wx.Panel):
 
         button_opt = { 'style' : wx.BU_EXACTFIT }
         elements = []
-
         
         labels = {}
         for bname in [ "first", "prev", "next", "last"]:

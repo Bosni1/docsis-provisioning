@@ -100,6 +100,7 @@ class Form(eventemitter):
 
     def on_edit_handler (self, fieldname):        
         """The tkVariable was changed, propagate this value to the current record"""
+        print "edit", fieldname, self.tkvars[fieldname], self.tkvars[fieldname].get()
         self.current.setFieldStringValue ( fieldname, self.tkvars[fieldname].get() )
         if self.current._ismodified and not self.modification_notification:
             self.modification_notification = True

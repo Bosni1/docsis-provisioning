@@ -64,6 +64,8 @@ class Field(object):
         if self.isarray:
             #print "p2s", pyval, array_as_text (pyval)
             return array_as_text (pyval)
+        elif pyval is None:
+            return "NULL"
         elif isinstance(pyval, str):
             return str(pyval.encode('utf-8'))
         else:

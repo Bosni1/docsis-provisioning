@@ -23,9 +23,6 @@ class GenericForm(BaseForm, wx.Panel):
         #self.Bind ( wx.EVT_SIZE, self.resize )
 
     def resize(self, e):
-        print e.Size, self.Size
-        
-        #self.sizer.Layout()
         e.Skip()
         
         

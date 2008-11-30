@@ -15,7 +15,7 @@ class BaseFieldEditor(object):
             
     def update_variable(self):
         try:
-            self.vtrace.freeze()
+            self.vtrace.freeze()            
             self.variable.set ( self.get_current_editor_value() )
         finally:
             self.vtrace.thaw()        

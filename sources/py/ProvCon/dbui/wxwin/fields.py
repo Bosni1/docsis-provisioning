@@ -73,7 +73,7 @@ class Entry:
             self.Select ( self.obj_idx_hash[value] )
         
         def get_current_editor_value(self):
-            record = self.GetClientData ( self.GetSelection() )
+            record = self.GetClientData ( self.GetSelection() )            
             if record:
                 return record.objectid
             else:
@@ -81,7 +81,7 @@ class Entry:
         
         def _on_combo_box(self, event, *args):
             try:
-                self._on_combo_box.freeze()
+                self._on_combo_box.freeze()                
                 self.update_variable()
             finally:
                 self._on_combo_box.thaw()
@@ -144,11 +144,9 @@ class Entry:
             self.idx = idx
             wx.ComboBox.__init__ (self, parent, name=field.path + "_" + str(idx) )
             BaseArrayItemEditor.__init__ (self, field, parenteditor, idx, *args, **kwargs)  
-            
-            print "AIC", self.parenteditor, self.parenteditor.recordlist
+                        
             if self.parenteditor.recordlist is not None: self.mode = 'record'
-            else: self.mode = 'choice'
-            print self.mode
+            else: self.mode = 'choice'            
             self.obj_idx_hash = {}
             self.obj_idx_hash[None] = self.Append ( "<null>", None )
             self.obj_idx_hash[()] = self.Append ( "<missing>",  () )
@@ -158,7 +156,7 @@ class Entry:
             else:
                 for (val, disp) in self.parenteditor.choices:                
                     self.obj_idx_hash[val] = self.Append ( disp, val )
-            print self.obj_idx_hash
+            
             self._on_combo_box = conditionalmethod (self._on_combo_box)
             self.Bind ( wx.EVT_COMBOBOX, self._on_combo_box )
         
@@ -238,7 +236,7 @@ class Entry:
         def resize_editor (self, newsize):
             itemclass = self.get_item_editor_class()     
             bbclass = self.get_button_box_class()
-            print self.size, newsize
+            
             for idx in range(self.size):
                 item, sizeritem, bb = self.item_rows[idx]                
                 item.Hide()
@@ -246,7 +244,7 @@ class Entry:
             
             for idx in range( max(self.size, 0), newsize):
                 if idx < len(self.item_rows): continue
-                print "creation of", idx
+                
                 item = itemclass (self.field, self, idx, self)                
                 sizeritem = self.sizer.Add (item, flag=wx.EXPAND)               
 
@@ -266,8 +264,6 @@ class Entry:
             
             self.parent.Layout()
             self.parent.Fit()
-            print "my size", self.sizer.Size
-            print "parent size", self.parent.sizer.Size
             self.size = newsize
             
         def set_current_editor_item_value(self, idx, value):
