@@ -1,6 +1,7 @@
 from forms import GenericForm
 from navigators import Navigator
 from ProvCon.dbui import orm, meta
+from ProvCon.func import conditionalmethod
 import art
 import wx
 
@@ -14,6 +15,8 @@ class FormToolbar(wx.ToolBar):
         self.label = wx.StaticText ( self, label="toolbar" )
         self.AddControl ( self.label )        
         
+    def SetRecordLabel(self, label):
+        self.label.SetLabel ( label )
         
 
 class CompleteGenericForm(wx.Panel):
@@ -33,6 +36,10 @@ class CompleteGenericForm(wx.Panel):
         if self.form:
             self.table = self.form.table
             self.tablename = self.table.name
+
+        self.save = conditionalmethod ( self.form.save )
+        self.reload = conditionalmethod ( self.form.reload )
+        self.new = conditionalmethod ( self.form.new )
             
         self.mainsizer = wx.BoxSizer (wx.VERTICAL)
         
@@ -90,7 +97,7 @@ class CompleteGenericForm(wx.Panel):
     def navigate (self, objectid):
         self.form.setid ( objectid )        
         if self.toolbar:
-            self.toolbar.label.SetLabel ( str(self.form.current) )
+            self.toolbar.SetRecordLabel ( str(self.form.current) )
     
     def set_navigator(self, navigator):
         self.navigator = navigator
