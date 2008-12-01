@@ -8,7 +8,8 @@ class FormToolbar(wx.ToolBar):
     def __init__(self, form, **kkw):        
         wx.ToolBar.__init__ (self, form)
         self.form = form
-        self.tools = {}
+        
+        self.tools = {}        
         import art
         for b in [ "NEW", "DEL", "SAVE", "RELOAD" ]:
             if not kkw.get ( "no_" + b, False):

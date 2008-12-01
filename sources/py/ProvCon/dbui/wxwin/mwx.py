@@ -9,7 +9,7 @@ class mwxControl(object):
     def GetEditorFont(self, name):
         if mwxControl.Fonts is None:            
             mwxControl.Fonts = {
-                'Edit' : wx.Font ( 10, wx.FONTFAMILY_MODERN, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL ),
+                'Edit' : wx.Font ( 9, wx.FONTFAMILY_MODERN, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL ),
             }
         return mwxControl.Fonts[name]
     

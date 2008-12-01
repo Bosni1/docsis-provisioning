@@ -81,6 +81,8 @@ class Entry:
             finally:
                 self._on_checked.thaw()
         
+    ##choosers
+    
     ## reference editors
     class ComboReference(BaseReferenceEditor, mwx.ComboReference):
         def __init__(self, field, parent, *args, **kwargs):
