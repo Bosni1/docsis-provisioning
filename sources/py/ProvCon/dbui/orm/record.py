@@ -1,9 +1,11 @@
 from ProvCon.dbui.database import CFG
+from ProvCon.func import eventemitter
 from errors import ORMError
 from ProvCon.dbui.meta import Table
+import pg
 import cStringIO
 
-class Record(object):
+class Record(eventemitter):
     """==Record==
     Record objects are the heart of the database abstraction layer. A Record object is 
     capabable of manipulating a row of data in a table which fulfills the following
@@ -36,11 +38,57 @@ class Record(object):
     - special attributes PP_* can be used to get a nice textual representation of the record      
     - attributes named <field_name>_REF return the Record referenced by the field.
     """
-    class RecordNotFound(ORMError): pass
-
-    __default_reference_mode__ = "text"
+    class RecordIncomplete(ORMError):
+        def __repr__(self):
+            return """Object-Relation Mapper SQL Error 
+- not enough parameters to retrieve meta-data, not Table nor ObjectID specified,
+- read operation requested on an empty / new record (no objectid),
+- write operation requested but no table definition installed."""
+    class RecordNotFound(ORMError): 
+        def __init__(self, objectid, pgexception, **kkw):
+            ORMError.__init__ (self)
+            self.objectid = objectid
+            self.pgexception = pgexception
+        def __repr__(self):
+            return """Object-Relation Mapper
+Error retrieving object with objectid = {0.objectid}
+API Error: {1}""".format ( self, self.pgexception )
+            
+    class DataManipulationError(ORMError): 
+        def __init__(self, msg, query, pgexception, **kkw):
+            ORMError.__init__ (self)
+            self.msg = msg
+            self.query = query
+            self.pgexception = pgexception
+            
+        def __repr__(self):
+            return """Object-Relation Mapper SQL Error 
+Query    : {0.query}
+Message  : {0.msg}
+API Error: {0.pgexception}""".format ( self )     
+    class DataQueryError(ORMError): 
+        def __init__(self, msg, query, pgexception, **kkw):
+            ORMError.__init__ (self)
+            self.msg = msg
+            self.query = query
+            self.pgexception = pgexception
+            
+        def __repr__(self):
+            return """Object-Relation Mapper SQL Error 
+Query    : {0.query}
+Message  : {0.msg}
+API Error: {0.pgexception}""".format ( self )     
+        
+    
+    __default_reference_mode__ = "text"  # none | text | record
     
     def __init__(self, **kkw):
+        eventemitter.__init__(self, [ 
+            "record_loaded",
+            "record_saved",
+            "record_added",
+            "record_deleted"
+        ] )
         self._isnew = False
         self._hasdata = False        
         self._isinstalled = False
@@ -128,13 +176,14 @@ class Record(object):
         """
         if not self._table:
             if not self._objectid:
-                raise ValueError ( "_table and _objectid are void." )
+                raise Record.RecordIncomplete()
             else:
                 try:
                     row = CFG.CX.get ( CFG.DB.SCHEMA + ".object", { 'objectid' : self._objectid, 
                                                                     'objectscope' : CFG.RT.DATASCOPE } )
-                except pg.DatabaseError:
-                    return False
+                except pg.DatabaseError, e:
+                    raise Record.DataManipulationError ( "Error retrieving base object ID#{0}".format( self._objectid ),
+                                                         "get pv.object ({0})".format (self._objectid) )
 
                 self._table = Table.Get ( row['objecttype'] )
 
@@ -167,6 +216,7 @@ class Record(object):
             self._modified_values[fieldname] = fieldvalue
             self.__dict__[fieldname] = fieldvalue
             self._ismodified = True
+            
     def setFieldStringValue (self, fieldname, fieldstrvalue):
         """set field value parsed from a string"""
         if fieldname in self._table:
@@ -202,6 +252,11 @@ class Record(object):
                                                     {"objectid" : decoded} )['txt']
             except KeyError:
                 self._references[field.name] = "<null>"
+            except pg.DatabaseError, e:
+                raise Record.DataQueryError ( "Error retrieving text value for referenced row.", 
+                                              "OBJECT[{0._objectid}].{1} -> OBJECT[{2}".format (self, field.path, decoded),
+                                              e )
+                                              
         elif self._resolvereference == "record":
             self._references[field.name] = Record.ID (decoded)
 
@@ -237,29 +292,32 @@ class Record(object):
             except KeyError:
                 if self._reprfunc: self._astxt = self._reprfunc (self)
                 else: self._astxt = None
-        
+            except pg.DatabaseError, e:
+                raise Record.DataQueryError ( "Error retrieving text value current record.", 
+                                              "OBJECT[{0._objectid}].{1}".format (self, field.path),
+                                              e )
+                
             
         self._hasdata = True
         self._isnew = False
         self._ismodified = False
         self._modified_values.clear()
+            
         
-    
     def read(self):
         if not self._objectid:
-            raise ValueError ( "no _objectid" )
+            raise Record.RecordIncomplete()
 
         if not self._table :
             #prepare meta-data if not available
             if not self.setupRecord():
-                raise ValueError ( "no _table" )
+                raise Record.RecordIncomplete()
         try:
             row = CFG.CX.get ( CFG.DB.SCHEMA + "." + self._table.name, { 'objectid' : self._objectid, 
                                                                          'objectscope' : CFG.RT.DATASCOPE } )
             self.feedDataRow(row)
-        except pg.DatabaseError, e:            
-            print e
-            raise Record.RecordNotFound("#{0} in {1}".format(self._objectid, self._table.name))
+        except pg.DatabaseError, e:                        
+            raise Record.RecordNotFound(self._objectid, e)
             
         
     def write(self):
@@ -267,29 +325,51 @@ class Record(object):
         if self._isnew:           
             for m in self._modified_values:
                 self._modified_values[m] = self._table[m].val_py2sql(self._modified_values[m])
+            
+            try:
+                rec = CFG.CX.insert ( CFG.DB.SCHEMA + "." + self._table.name,
+                                      self._modified_values )
+                #this will automatically re-read the data from the db, to take all changes
+                #done by triggers and default values into account.
+                self._objectid = rec['objectid']
+
+                print "Record inserted into database, objectid = ", self._objectid
+                self.emit_event ( "record_added", self )
                 
-            rec = CFG.CX.insert ( CFG.DB.SCHEMA + "." + self._table.name,
-                            self._modified_values )
-            #this will automatically re-read the data from the db, to take all changes
-            #done by triggers and default values into account.
-            self._objectid = rec['objectid']
-            #self.read()
-            print "Record Written"
+            except pg.DatabaseError, e:
+                print "Error inserting record."
+                raise Record.DataManipulationError ( "Inserting a new record into '{0}'".format(self._table.name),
+                                                     str(self._modified_values),
+                                                     e)
         elif self._ismodified:
             for m in self._modified_values:
                 print "Modified field:", m
                 self._modified_values[m] = self._table[m].val_py2sql(self._modified_values[m])
             self._modified_values['objectid'] = self._objectid
-            rec = CFG.CX.update ( CFG.DB.SCHEMA + "." + self._table.name,
-                                  self._modified_values )
-            self.read()        
-            print "Record Updated"
+            try:
+                rec = CFG.CX.update ( CFG.DB.SCHEMA + "." + self._table.name,
+                                      self._modified_values )
+                self.read()
+                print "Record updated"
+                self.emit_event ( "record_saved", self )
+            except pg.DatabaseError, e:
+                print "Error updating record"
+                raise Record.DataManipulationError ( "Updating record {1} of '{0}'".format(self._table.name, self._objectid),
+                                                     str(self._modified_values),
+                                                     e)
+                
     
     def delete(self):
         if not self._isnew:
-            CFG.CX.delete ( CFG.DB.SCHEMA + ".object", { 'objectid' : self._objectid } )
-            self.clearRecord()
-            
+            try:
+                CFG.CX.delete ( CFG.DB.SCHEMA + ".object", { 'objectid' : self._objectid } )
+                self.clearRecord()
+                self.emit_event ( "record_deleted", self )
+            except pg.DatabaseError, e:
+                raise Record.DataManipulationError ( "Deleting record {1} of '{0}'".format(self._table.name, self._objectid),
+                                                     "",
+                                                     e)
+                                        
     def setObjectID(self, objectid):
         self._objectid = objectid
         

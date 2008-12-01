@@ -1,5 +1,4 @@
 from ProvCon.dbui.abstractui.navigators import BaseNavigator
-import art
 import wx
 
 class Navigator(BaseNavigator, wx.Panel):

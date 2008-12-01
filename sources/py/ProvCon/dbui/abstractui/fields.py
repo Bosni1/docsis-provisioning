@@ -10,6 +10,7 @@ class BaseFieldEditor(object):
             getattr(self, "set_editor_style")()
         except AttributeError:
             pass
+        
     def variable_changed(self, action, value, var=None, idx=None, *args):        
         self.set_current_editor_value(value)
             
@@ -24,7 +25,7 @@ class BaseFieldEditor(object):
         raise NotImplementedError()
     
     def get_current_editor_value(self):
-        raise NotImplementedError()
+        return self.variable.get()
     
     def __repr__(self):
         return "<Editor " + self.field.name  + ">"

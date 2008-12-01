@@ -11,12 +11,13 @@ class GenericForm(BaseForm, wx.Panel):
         wx.Panel.__init__( self, parent, style=wx.RAISED_BORDER )                
         
     def _build_ui(self):
-        self.sizer = wx.FlexGridSizer( self.form.table.fieldCount() + 1, 2, 1, 0 )                        
+        self.sizer = wx.FlexGridSizer( self.form.table.fieldCount() + 1, 3, 1, 0 )                                
         self.sizer.AddGrowableCol (1)
         for f in filter(lambda f: f.name not in Table.__special_columns__, self.form.table):
-            self.sizer.Add ( wx.StaticText ( self, label = f.name ) )
-            self.sizer.Add ( self._create_field_editor (f, self), 10, flag=wx.EXPAND)
-        
+            label = wx.StaticText ( self, label = f.label )                        
+            self.sizer.Add ( label, flag=wx.ALIGN_RIGHT | wx.ALIGN_CENTER_VERTICAL | wx.RIGHT, border=20 )
+            self.sizer.Add ( self._create_field_editor (f, self), 20, flag=wx.EXPAND)
+            self.sizer.AddSpacer ( 20 )
         self.SetSizer (self.sizer)
         self.SetAutoLayout(1)
         

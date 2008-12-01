@@ -2,14 +2,14 @@ from forms import GenericForm
 from navigators import Navigator
 from ProvCon.dbui import orm, meta
 from ProvCon.func import conditionalmethod
-import art
 import wx
 
 class FormToolbar(wx.ToolBar):
-    def __init__(self, form, **kkw):
+    def __init__(self, form, **kkw):        
         wx.ToolBar.__init__ (self, form)
         self.form = form
         self.tools = {}
+        import art
         for b in [ "NEW", "DEL", "SAVE", "RELOAD" ]:
             if not kkw.get ( "no_" + b, False):
                 wxid = wx.NewId()

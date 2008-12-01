@@ -55,18 +55,23 @@ class Field(object):
     def val_sql2py(self, sqlval):
         """convert the value returned by pg into a python variable"""
         if self.isarray:
-            #print "s2p", text_to_array (sqlval, self.arraysize-1)
             return text_to_array (sqlval, self.arraysize-1)
+        if self.type == 'bit': 
+            if sqlval == '1': return True
+            elif sqlval == '0': return False
+            else: return None
         return sqlval
     
     def val_py2sql(self, pyval):
         """convert a python variable into something we can insert into an pgSQL statement"""        
-        if self.isarray:
-            #print "p2s", pyval, array_as_text (pyval)
-            return array_as_text (pyval)
-        elif pyval is None:
+        if pyval is None:
             return "NULL"
-        elif isinstance(pyval, str):
+        elif self.isarray:
+            return array_as_text (pyval)
+        elif self.type == "bit":
+            if pyval: return 1
+            else: return 0
+        elif isinstance(pyval, (str, unicode) ):
             return str(pyval.encode('utf-8'))
         else:
             return str(pyval)
@@ -77,13 +82,12 @@ class Field(object):
         if pyval is None:
             return ''
         elif isinstance(pyval, str):
-            return str(pyval.encode('utf-8'))
+            return pyval.decode('utf-8')
         else:
             return str(pyval)
     
     def val_txt2py(self, txtval):
         if self.isarray:
-            #print "t2p", text_to_array ( txtval[6:], self.arraysize-1 )
             return text_to_array ( txtval[6:], self.arraysize-1 )
         return txtval
     
@@ -96,3 +100,4 @@ class Field(object):
     def is_special(self):
         from ProvCon.dbui.meta import Table
         return self.name in Table.__special_columns__
+    

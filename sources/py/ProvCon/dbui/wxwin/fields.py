@@ -1,34 +1,25 @@
 from ProvCon.dbui.abstractui.fields import *
 from ProvCon.func.classes import conditionalmethod
 import wx
+import mwx
 
 NoneType = type(None)
-a = wx.App()
-
-class STYLE:
-    INPUT_BG = wx.Color ( 0xdd, 0xdd, 0xff )
-    INPUT_FG = wx.Color ( 0x55, 0, 0 )
-
-def SSET (control, **kkw):
-    pass
-    
-
     
 class Entry:
     ## simple value editors
-    class Static(BaseFieldEditor, wx.StaticText):
+    class Static(BaseFieldEditor, mwx.StaticText):
         def __init__(self, field, parent, *args, **kwargs):
-            wx.StaticText.__init__ (self, parent, name=field.path)
+            mwx.StaticText.__init__ (self, parent, name=field.path)
             BaseFieldEditor.__init__(self, field, **kwargs)
             
 
         def set_current_editor_value(self, value):
             self.SetLabel ( str(value) )
-        
+                
     
-    class Text (BaseFieldEditor, wx.TextCtrl):
+    class Text (BaseFieldEditor, mwx.TextCtrl):
         def __init__(self, field, parent, *args, **kwargs):
-            wx.TextCtrl.__init__ (self, parent, name=field.path)
+            mwx.TextCtrl.__init__ (self, parent, name=field.path)
             BaseFieldEditor.__init__(self, field, **kwargs)
             self._on_text_changed = conditionalmethod (self._on_text_changed)
             self.Bind ( wx.EVT_TEXT, self._on_text_changed )
@@ -55,10 +46,45 @@ class Entry:
             finally:
                 self._on_text_changed.thaw()
     
-    ## reference editors
-    class ComboReference(BaseReferenceEditor, wx.ComboBox):
+    class Boolean(BaseFieldEditor, mwx.CheckBox):
         def __init__(self, field, parent, *args, **kwargs):
-            wx.ComboBox.__init__ (self, parent, 
+            mwx.CheckBox.__init__ (self, parent, 
+                                   style = wx.CHK_3STATE,
+                                   name=field.path)
+            BaseFieldEditor.__init__(self, field, **kwargs)
+            self._on_checked = conditionalmethod ( self._on_checked )
+            self.Bind ( wx.EVT_CHECKBOX, self._on_checked )
+            self.datatype = NoneType
+            
+        def set_current_editor_value(self, value):
+            self.datatype = type(value)
+            if self.datatype == NoneType:
+                self.Set3StateValue ( wx.CHK_UNDETERMINED )
+            elif value:
+                self.Set3StateValue ( wx.CHK_CHECKED )
+            else:
+                self.Set3StateValue ( wx.CHK_UNCHECKED )
+        
+        def get_current_editor_value(self):
+            value = self.Get3StateValue()
+            if value == wx.CHK_UNDETERMINED:
+                return None
+            elif value == wx.CHK_CHECKED:
+                return True
+            else:
+                return False
+            
+        def _on_checked(self, event, *args):
+            try:
+                self._on_checked.freeze()
+                self.update_variable()
+            finally:
+                self._on_checked.thaw()
+        
+    ## reference editors
+    class ComboReference(BaseReferenceEditor, mwx.ComboReference):
+        def __init__(self, field, parent, *args, **kwargs):
+            mwx.ComboBox.__init__ (self, parent, 
                                   style=wx.CB_READONLY,
                                   name=field.path)            
             BaseReferenceEditor.__init__(self, field, **kwargs)
@@ -85,12 +111,25 @@ class Entry:
                 self.update_variable()
             finally:
                 self._on_combo_box.thaw()
+    
+    class StaticReference(BaseReferenceEditor, mwx.StaticReference):
+        def __init__(self, field, parent, *args, **kwargs):
+            mwx.StaticText.__init__ (self, parent, 
+                                  style=wx.CB_READONLY,
+                                  name=field.path)            
+            BaseReferenceEditor.__init__(self, field, **kwargs)
+        
+        def set_current_editor_value(self, value):
+            if value is None:
+                self.SetLabel ( "<null>" )
+            else:
+                self.SetLabel ( self.reprfunc ( self.records.getid (value) ) )
                 
     ## array item editors
-    class ArrayItemText(BaseArrayItemEditor, wx.TextCtrl):
+    class ArrayItemText(BaseArrayItemEditor, mwx.TextCtrl):
         def __init__(self, field, parenteditor, idx, parent, *args, **kwargs):
             self.idx = idx
-            wx.TextCtrl.__init__ (self, parent, name=field.path + "_" + str(idx) )
+            mwx.TextCtrl.__init__ (self, parent, name=field.path + "_" + str(idx) )
             BaseArrayItemEditor.__init__ (self, field, parenteditor, idx, *args, **kwargs)  
             self._on_text_changed = conditionalmethod (self._on_text_changed)
             self.Bind ( wx.EVT_TEXT, self._on_text_changed )
@@ -125,10 +164,10 @@ class Entry:
             finally:
                 self._on_text_changed.thaw()
 
-    class ArrayItemStatic(BaseArrayItemEditor, wx.StaticText):
+    class ArrayItemStatic(BaseArrayItemEditor, mwx.StaticText):
         def __init__(self, field, parenteditor, idx, parent, *args, **kwargs):
             self.idx = idx
-            wx.StaticText.__init__ (self, parent, name=field.path + "_" + str(idx) )
+            mwx.StaticText.__init__ (self, parent, name=field.path + "_" + str(idx) )
             BaseArrayItemEditor.__init__ (self, field, parenteditor, idx, *args, **kwargs)  
 
         def set_current_editor_value(self, value):
@@ -139,10 +178,10 @@ class Entry:
 
         initialize_value = set_current_editor_value
     
-    class ArrayItemCombo(BaseArrayItemEditor, wx.ComboBox):
+    class ArrayItemCombo(BaseArrayItemEditor, mwx.ComboBox):
         def __init__(self, field, parenteditor, idx, parent, *args, **kwargs):
             self.idx = idx
-            wx.ComboBox.__init__ (self, parent, name=field.path + "_" + str(idx) )
+            mwx.ComboBox.__init__ (self, parent, name=field.path + "_" + str(idx) )
             BaseArrayItemEditor.__init__ (self, field, parenteditor, idx, *args, **kwargs)  
                         
             if self.parenteditor.recordlist is not None: self.mode = 'record'
@@ -169,6 +208,7 @@ class Entry:
         
         def get_current_editor_value(self):
             val = self.GetClientData ( self.GetSelection() )
+            print self, "get_current_ed_val", val
             if self.mode == 'record':                
                 if val: return val.objectid
             elif self.mode == 'choice':
