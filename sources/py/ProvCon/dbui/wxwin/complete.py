@@ -1,8 +1,13 @@
+# -*- coding: utf8 -*-
 from forms import GenericForm
 from navigators import Navigator
 from ProvCon.dbui import orm, meta
-from ProvCon.func import conditionalmethod
+from ProvCon.func import conditionalmethod, eventcancelled
 import wx
+
+class InfoPopup (wx.PopupWindow):
+    def __init__(self, form):
+        self.form = form        
 
 class FormToolbar(wx.ToolBar):
     def __init__(self, form, **kkw):        
@@ -36,7 +41,7 @@ class FormToolbar(wx.ToolBar):
 class CompleteGenericForm(wx.Panel):
     
     def __init__(self, parent, **kwargs):
-        wx.Panel.__init__ (self, parent, style=wx.SUNKEN_BORDER)
+        wx.Panel.__init__ (self, parent, style=wx.SUNKEN_BORDER | wx.TAB_TRAVERSAL)
         
         self.tablename = kwargs.get ( "tablename", None)
         self.table = kwargs.get ( "table", None)
@@ -53,8 +58,9 @@ class CompleteGenericForm(wx.Panel):
 
         self.save = conditionalmethod ( self.form.save )
         self.reload = conditionalmethod ( self.form.reload )
-        self.new = conditionalmethod ( self.form.new )
+        self.new = conditionalmethod ( self.new )
         self.delete = conditionalmethod (self.form.delete )
+    
         
         self.on_toolbar_SAVE = self.save
         self.on_toolbar_NEW = self.new
@@ -71,9 +77,15 @@ class CompleteGenericForm(wx.Panel):
             self.mainsizer.Add ( self.toolbar, flag=wx.EXPAND )
         else:
             self.toolbar = None
+
+        self.status = wx.StaticText ( self )
+        self.status.SetFont ( wx.Font ( 8, wx.FONTFAMILY_MAX, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_BOLD ) )        
+        self.status.ForegroundColour = (122,66,66)
+        self.status.SetThemeEnabled (False )
+        self.mainsizer.Add ( self.status, flag=wx.EXPAND | wx.ALL, border=5 )
             
         #editor
-        self.editor_scrolled_window = wx.ScrolledWindow ( self, style=wx.VSCROLL )            
+        self.editor_scrolled_window = wx.ScrolledWindow ( self, style=wx.VSCROLL | wx.TAB_TRAVERSAL )            
         self.editor = GenericForm ( self.form, self.editor_scrolled_window )  
         self.editor.create_widget()
         self.scrolledsizer = wx.BoxSizer()
@@ -102,7 +114,45 @@ class CompleteGenericForm(wx.Panel):
 
         if navigator:
             self.set_navigator ( navigator )
+            
+        self.form.register_event_hook ( "request_record_change", self.before_record_change )
+        self.form.register_event_hook ( "current_record_modified", self.current_record_modified )
+        self.form.register_event_hook ( "current_record_deleted", self.current_record_deleted )
+        self.form.register_event_hook ( "current_record_saved", self.current_record_saved )
+        self.form.register_event_hook ( "data_loaded", self.data_loaded )
 
+    def current_record_modified(self, record, *args):
+        self.status.SetLabel ( "wprowadzono zmiany do danych" )
+        
+    def current_record_deleted ( self, objectid, *args):
+        print "DELETED", objectid
+        self.status.SetLabel ( "Rekord usunięty." )
+        wx.CallLater ( 2000, lambda self=self: self.status.SetLabel ( "" ) )
+        self.navigator.reload(-1)
+    
+    def current_record_saved ( self, record, wasnew, *args):
+        self.status.SetLabel ( "Rekord zapisany." )
+        wx.CallLater ( 2000, lambda self=self: self.status.SetLabel ( "" ) )
+        if wasnew:
+            if self.navigator:
+                self.navigator.reload(record.objectid)
+        elif self.navigator:
+            self.navigator.reloadsingle ( record.objectid )
+
+    def data_loaded (self, record, *args):
+        self.status.SetLabel ( "" )
+    
+    def before_record_change(self, record, newid):
+        if record._ismodified:
+            ask = wx.MessageBox ( "W aktualnym rekordzie są niezapisane dane, czy chcesz je zapisać?", "Uwaga!", wx.YES_NO | wx.CANCEL )        
+            if ask == wx.YES:
+                self.save()
+            elif ask == wx.NO:
+                return
+            else:
+                raise eventcancelled()
+                
+        
     def on_editor_resize(self, event, *args):
         self.editor_scrolled_window.SetVirtualSize ( event.GetSize() )        
         event.Skip()
@@ -115,12 +165,21 @@ class CompleteGenericForm(wx.Panel):
         event.Skip()
     
     def navigate (self, objectid):
-        self.form.setid ( objectid )        
-        if self.toolbar:
-            self.toolbar.SetRecordLabel ( str(self.form.current) )
+        ##FIXME: ugly 'NEW_RECORD' hack!
+        if objectid == "NEW_RECORD" and self.toolbar:
+            self.toolbar.SetRecordLabel ( "NEW RECORD" )
+        else:
+            self.form.setid ( objectid )        
+            if self.toolbar:
+                self.toolbar.SetRecordLabel ( str(self.form.current) )
     
     def set_navigator(self, navigator):
         self.navigator = navigator
         self.navigator.register_event_hook ( "navigate", self.navigate )                
         self.navigate ( self.navigator.currentid() )
+    
+    def new(self):
+        self.form.new()
+        ##FIXME: ugly 'NEW_RECORD' hack!
+        self.navigator.navigate ( "NEW_RECORD" )
         

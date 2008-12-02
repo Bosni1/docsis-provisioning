@@ -240,11 +240,11 @@ class Entry:
             self.buttons = {}
             if 'insert' in self.commands:
                 self.buttons['insert'] = wx.Button (self, label="+",
-                                                    style=wx.BU_EXACTFIT)
+                                                    style=wx.BU_EXACTFIT|wx.TAB_TRAVERSAL)
                 self.sizer.Add ( self.buttons['insert'] )
             if 'delete' in self.commands:
                 self.buttons['delete'] = wx.Button (self, label="X",
-                                                    style=wx.BU_EXACTFIT)
+                                                    style=wx.BU_EXACTFIT|wx.TAB_TRAVERSAL)
                 self.sizer.Add ( self.buttons['delete'] )
             
             for b in self.buttons:                       

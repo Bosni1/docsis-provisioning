@@ -57,6 +57,8 @@ class Form(eventemitter):
             self.tkvars[f.name] = self.variableclass( name=self.table.name + "." + f.name)
             self.tkvars[f.name].trace ( 'w', partial (self.value_change_handler, f.name), name="form of " + self.table.name ) 
         
+        self.defaultvalues = kkw.get ( "defaults", {} )
+        
     def __getitem__(self, itemidx):
         return self.tkvars[itemidx]
     
@@ -75,9 +77,17 @@ class Form(eventemitter):
         self.modification_notification = False
 
     def new(self):        
+        try:
+            self.emit_event ( "request_record_change", self.current, None )
+        except eventcancelled:
+            return False
+        
         self.current.setObjectID ( None )
+        for fname in self.defaultvalues:
+            self.current[fname] = self.defaultvalues[fname]            
         self.on_record_changed_handler()
         self.emit_event ( "new_record", self.current )
+        self.emit_event ( "current_record_changed", self.current )
         self.emit_event ( "navigate", None )
 
     def setid(self, objectid):
@@ -86,12 +96,16 @@ class Form(eventemitter):
         ##   1. this function calls setObjectID on the current record
         ##   2. the record emits a 'record_changed' event
         ##   3. form's handler of this event fills in the values
-        if self.emit_event ( "request_record_change", self.current, objectid ) is not None:
+        try:
+            self.emit_event ( "request_record_change", self.current, objectid )
+        except eventcancelled:
             return False
         self.current.setObjectID ( objectid )
         self.on_record_changed_handler()
+        self.modification_notification = False
+        self.emit_event ( "data_loaded", self.current )
         self.emit_event ( "current_record_changed", self.current )
-        self.emit_event ( "navigate", self.current.objectid )
+        self.emit_event ( "navigate", self.current.objectid )        
         
     def delete(self):
         objid = self.current.objectid
@@ -99,8 +113,7 @@ class Form(eventemitter):
         self.emit_event ( "current_record_deleted", objid )
 
     def on_edit_handler (self, fieldname):        
-        """The tkVariable was changed, propagate this value to the current record"""
-        print "edit", fieldname, self.tkvars[fieldname], self.tkvars[fieldname].get()
+        """The tkVariable was changed, propagate this value to the current record"""        
         self.current.setFieldValue ( fieldname, self.tkvars[fieldname].get() )
         if self.current._ismodified and not self.modification_notification:
             self.modification_notification = True

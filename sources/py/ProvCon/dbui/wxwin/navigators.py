@@ -22,12 +22,19 @@ class Navigator(BaseNavigator, wx.Panel):
         txt.SetFont ( wx.Font(8, wx.FONTFAMILY_SWISS, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_BOLD) )
         txt.SetForegroundColour ( wx.NamedColor ( "blue" ) )
         txt.SetBackgroundColour ( wx.NamedColor ( "yellow") )
+        txt.SetEditable(False)
 
         self.infotext = txt
+
+        label = wx.StaticText (self)
+        label.SetFont ( wx.Font(11, wx.FONTFAMILY_SWISS, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_BOLD) )
+        label.ForegroundColour = (0,0,0)
+        self.label = label
         
         self.sizer.Add ( elements[0], 0 )
         self.sizer.Add ( elements[1], 0 )
         self.sizer.Add ( txt, 10, flag=wx.EXPAND )
+        self.sizer.Add ( label, 2, flag=wx.LEFT | wx.RIGHT | wx.ALIGN_CENTER, border = 4 ) 
         self.sizer.Add ( elements[2], 0 )
         self.sizer.Add ( elements[3], 0 )
         
@@ -35,5 +42,8 @@ class Navigator(BaseNavigator, wx.Panel):
     
     def update(self):
         self.infotext.SetValue ( self.currentdisplay() )
-        
+        if self.current_index != "NEW_RECORD":
+            self.label.SetLabel ( " %5d / %d " % (self.current_index+1, self.records_count) ) 
+        else:
+            self.label.SetLabel ( " %5d / %d " % (self.records_count+1, self.records_count) ) 
         

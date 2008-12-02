@@ -1,10 +1,18 @@
-from ProvCon.func.events import eventemitter
+from ProvCon.func.events import eventemitter, eventcancelled
 
 class BaseRecordList(eventemitter):
     def __init__(self, records, *args, **kwargs):
-        eventemitter.__init__ (self, [ "record_list_changed", "current_record_changed", "navigate" ] )
+        eventemitter.__init__ (self, [ "record_list_changed", 
+                                       "current_record_changed", 
+                                       "navigate" ] )
         self.__current_record = None
         self.set_records ( records )
+        
+        boundform = kwargs.get ( "boundform", None )        
+        boundfield = kwargs.get( "boundfield", None )        
+        self.parentform = None
+        if boundfield and boundform:
+            self.bind_to_form ( boundfield, boundform )
         
     def set_records(self, records):
         self.records = records
@@ -12,15 +20,45 @@ class BaseRecordList(eventemitter):
         self.current_record = None
         self.emit_event ( "record_list_changed", self.get_records )
 
-    def set_current_record (self, record):        
-        self.__current_record = record
-        self.emit_event ( "current_record_changed", self.__current_record )
+    def currentid(self):
+        if self.current_record:
+            return self.current_record._objectid
+        else:
+            return None
+
+    def currentdisplay(self):        
+        return str(self.current_record)
+        
+    def set_current_record (self, record):            
+        oldrecord = self.current_record
+        
+        try: 
+            self.__current_record = record
+            self.emit_event ( "navigate", self.currentid() )
+            self.emit_event ( "current_record_changed", self.__current_record )            
+        except eventcancelled:
+            self.__current_record = oldrecord
+        
     def get_current_record (self):
         return self.__current_record
     current_record = property (get_current_record, set_current_record)
         
     def get_records(self):
         return self.records
+
+    def bind_to_form (self, myfield, form):
+        self.parentform = (form, myfield)        
+        self.parenthook = form.register_event_hook ( "current_record_changed", self._on_parent_record_changed)        
+    
+    def _on_parent_record_changed(self, parentrecord):
+        if parentrecord and parentrecord._objectid:
+            (pform, myfield) = self.parentform        
+            self.records.filter = '"{0}" = \'{1}\''.format ( myfield, parentrecord.objectid )
+            self.records.reload()            
+        else:
+            self.records.clear()
+            self.records.filter = ' FALSE '
+        self.set_records ( self.records )
     
 class BasePager(BaseRecordList):
     def __init__(self, records, pagesize, **kkw):                

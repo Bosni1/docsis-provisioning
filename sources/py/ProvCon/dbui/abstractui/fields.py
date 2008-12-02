@@ -63,7 +63,10 @@ class BaseArrayEditor(BaseFieldEditor):
     def insert_item(self, atidx, itemvalue=None):
         array = self.variable.get()        
         #print array
-        array.insert (atidx, itemvalue)
+        if array is None:
+            array = [itemvalue]
+        else:
+            array.insert (atidx, itemvalue)
         #print "Insert at ", atidx
         #print array
         #print "---"

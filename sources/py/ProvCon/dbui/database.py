@@ -63,9 +63,20 @@ class CFG:
                     if f.arrayof:
                         f.arrayof = idmap[f.arrayof]                
             self.instance = self
-        
-    CX = None
-
+	def delete(self, cl, a):
+	    """Delete an existing row in a database table.
+	    
+	    This method deletes the row from a table.
+	    It deletes based on the objectid	    
+	    """
+	    qcl = pg._join_parts(self._split_schema(cl)) # build qualified name	    
+	    
+	    q = 'DELETE FROM %s WHERE objectid=%s' % (qcl, a['objectid'] )
+	    self._do_debug(q)
+	    self.db.query(q)
+	    
+	CX = None
+				
 def array_as_text(arr):
     """convert a python list to a textual representation of a postgres array"""
     if isinstance(arr, list):

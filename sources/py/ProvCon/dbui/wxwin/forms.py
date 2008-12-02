@@ -8,7 +8,7 @@ class GenericForm(BaseForm, wx.Panel):
     
     def __init__(self, form, parent, *args, **kwargs):
         BaseForm.__init__( self, form, *args, **kwargs )
-        wx.Panel.__init__( self, parent, style=wx.RAISED_BORDER )                
+        wx.Panel.__init__( self, parent, style=wx.RAISED_BORDER | wx.TAB_TRAVERSAL)                
         
     def _build_ui(self):
         self.sizer = wx.FlexGridSizer( self.form.table.fieldCount() + 1, 3, 1, 0 )                                

@@ -1,7 +1,7 @@
 import exceptions
 
 class eventexception(exceptions.Exception):
-    def __init__(self, retval):
+    def __init__(self, retval=None):
         exceptions.Exception.__init__ (self)
         self.ret = retval    
 
@@ -35,12 +35,8 @@ class eventemitter(object):
             return self[-1]
         
         def emit(self, *args, **kwargs):
-            try:
-                if not self.frozen:
-                    for h in self: h(*args, **kwargs)
-            except eventexception, e:
-                return e.ret
-            return None
+            if not self.frozen:
+                for h in self: h(*args, **kwargs)
         
         def freeze(self): self.frozen = True
         def thaw(self): self.frozen = False
