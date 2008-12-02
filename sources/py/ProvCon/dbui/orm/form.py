@@ -5,6 +5,7 @@ from ProvCon.func.variables import TracedVariable as StringVar
 from gettext import gettext as _
 from ProvCon.func import *
 
+
 class Form(eventemitter):
     """ ==class Form==
     Forms play a role similar to the one controllers play in the MVC model.
@@ -47,7 +48,12 @@ class Form(eventemitter):
         self.on_edit_handler = conditionalmethod(self.on_edit_handler)
 
         self.variableclass = kkw.get ( "variableclass" , StringVar )
+        
         from record import Record
+        from record import ORMError 
+        from ProvCon.dbui.database import RaiseDBException
+        self.ormerror = ORMError
+        self.ormerrorhandler = RaiseDBException
         self.table = table
         self.current = Record.EMPTY (table.name)
         self.tkvars = {}
@@ -63,18 +69,24 @@ class Form(eventemitter):
         return self.tkvars[itemidx]
     
     def save(self):
-        wasnew = self.current._isnew
-        self.current.write()        
-        self.on_record_changed_handler()
-        self.emit_event ( "current_record_saved", self.current, wasnew )
-        self.modification_notification = False
+        try:
+            wasnew = self.current._isnew
+            self.current.write()        
+            self.on_record_changed_handler()
+            self.emit_event ( "current_record_saved", self.current, wasnew )
+            self.modification_notification = False
+        except self.ormerror, e:
+            self.ormerrorhandler (e)
 
     def reload(self):
-        self.current.read()
-        self.on_record_changed_handler()        
-        self.emit_event ( "data_loaded", self.current )
-        self.emit_event ( "navigate", self.current.objectid )
-        self.modification_notification = False
+        try:
+            self.current.read()
+            self.on_record_changed_handler()        
+            self.emit_event ( "data_loaded", self.current )
+            self.emit_event ( "navigate", self.current.objectid )
+            self.modification_notification = False
+        except self.ormerror, e:
+            self.ormerrorhandler(e)
 
     def new(self):        
         try:
@@ -100,17 +112,23 @@ class Form(eventemitter):
             self.emit_event ( "request_record_change", self.current, objectid )
         except eventcancelled:
             return False
-        self.current.setObjectID ( objectid )
-        self.on_record_changed_handler()
-        self.modification_notification = False
-        self.emit_event ( "data_loaded", self.current )
-        self.emit_event ( "current_record_changed", self.current )
-        self.emit_event ( "navigate", self.current.objectid )        
-        
+        try:
+            self.current.setObjectID ( objectid )
+            self.on_record_changed_handler()
+            self.modification_notification = False
+            self.emit_event ( "data_loaded", self.current )
+            self.emit_event ( "current_record_changed", self.current )
+            self.emit_event ( "navigate", self.current.objectid )        
+        except self.ormerror, e:
+            self.ormerrorhandler (e)
+            
     def delete(self):
-        objid = self.current.objectid
-        self.current.delete()
-        self.emit_event ( "current_record_deleted", objid )
+        try:
+            objid = self.current.objectid
+            self.current.delete()
+            self.emit_event ( "current_record_deleted", objid )
+        except self.ormerror, e:
+            self.ormerrorhandler(e)
 
     def on_edit_handler (self, fieldname):        
         """The tkVariable was changed, propagate this value to the current record"""        

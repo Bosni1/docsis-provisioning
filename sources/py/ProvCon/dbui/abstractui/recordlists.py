@@ -59,6 +59,8 @@ class BaseRecordList(eventemitter):
             self.records.clear()
             self.records.filter = ' FALSE '
         self.set_records ( self.records )
+    def isonnew(self, *args):
+        return False
     
 class BasePager(BaseRecordList):
     def __init__(self, records, pagesize, **kkw):                

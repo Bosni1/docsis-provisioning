@@ -6,8 +6,24 @@ from ProvCon.func import conditionalmethod, eventcancelled
 import wx
 
 class InfoPopup (wx.PopupWindow):
-    def __init__(self, form):
-        self.form = form        
+    def __init__(self, form, *args, **kwargs):
+        wx.PopupWindow.__init__(self, form, *args, **kwargs)
+        self.form = form
+        self.SetBackgroundColour ( wx.NamedColor ( "yellow" ) )
+        self.SetForegroundColour ( wx.NamedColor ( "red" ) )
+        self.label = wx.StaticText ( self, label = "***", pos = (10,10) )
+        
+    def ShowMessage(self, msg, timeout):
+        self.label.Label = msg
+        sz = self.label.GetBestSize()
+        self.SetSize ( ( sz.width + 20, sz.height+20) )
+        ppos = self.form.ClientToScreen ( (0,0) )
+        psiz = self.form.Size        
+        print ppos, psiz
+        self.SetPosition ( ( ppos.x + psiz.x / 2 - sz.x / 2, ppos.y + psiz.y / 2 - sz.y / 2) )
+        print self.GetPosition()
+        self.Popup()
+        wx.CallLater ( timeout, lambda self=self: self.Hide() )
 
 class FormToolbar(wx.ToolBar):
     def __init__(self, form, **kkw):        
@@ -73,7 +89,7 @@ class CompleteGenericForm(wx.Panel):
         
         #tool bar
         if self.toolbarconfig:
-            self.toolbar = self.toolbarconfig(self)
+            self.toolbar = self.toolbarconfig(self, **kwargs)
             self.mainsizer.Add ( self.toolbar, flag=wx.EXPAND )
         else:
             self.toolbar = None
@@ -121,17 +137,18 @@ class CompleteGenericForm(wx.Panel):
         self.form.register_event_hook ( "current_record_saved", self.current_record_saved )
         self.form.register_event_hook ( "data_loaded", self.data_loaded )
 
+        self.infowindow = InfoPopup(self)
+        
     def current_record_modified(self, record, *args):
         self.status.SetLabel ( "wprowadzono zmiany do danych" )
         
-    def current_record_deleted ( self, objectid, *args):
-        print "DELETED", objectid
+    def current_record_deleted ( self, objectid, *args):        
         self.status.SetLabel ( "Rekord usunięty." )
         wx.CallLater ( 2000, lambda self=self: self.status.SetLabel ( "" ) )
         self.navigator.reload(-1)
     
     def current_record_saved ( self, record, wasnew, *args):
-        self.status.SetLabel ( "Rekord zapisany." )
+        self.status.SetLabel ( "Rekord zapisany." )        
         wx.CallLater ( 2000, lambda self=self: self.status.SetLabel ( "" ) )
         if wasnew:
             if self.navigator:
@@ -140,7 +157,7 @@ class CompleteGenericForm(wx.Panel):
             self.navigator.reloadsingle ( record.objectid )
 
     def data_loaded (self, record, *args):
-        self.status.SetLabel ( "" )
+        wx.CallLater ( 1000, lambda self=self: self.status.SetLabel ( "" ) )
     
     def before_record_change(self, record, newid):
         if record._ismodified:
@@ -164,14 +181,14 @@ class CompleteGenericForm(wx.Panel):
         self.editor_scrolled_window.SetVirtualSize ( (ew, eh) )
         event.Skip()
     
-    def navigate (self, objectid):
-        ##FIXME: ugly 'NEW_RECORD' hack!
-        if objectid == "NEW_RECORD" and self.toolbar:
-            self.toolbar.SetRecordLabel ( "NEW RECORD" )
+    def navigate (self, objectid):  
+        
+        if self.navigator and self.navigator.isonnew() and self.toolbar:
+            self.toolbar.SetRecordLabel ( self.form.table.title + " : ** NEW RECORD ** " )
         else:
             self.form.setid ( objectid )        
             if self.toolbar:
-                self.toolbar.SetRecordLabel ( str(self.form.current) )
+                self.toolbar.SetRecordLabel ( self.form.table.title + " : " + str(self.form.current) )
     
     def set_navigator(self, navigator):
         self.navigator = navigator
@@ -181,5 +198,5 @@ class CompleteGenericForm(wx.Panel):
     def new(self):
         self.form.new()
         ##FIXME: ugly 'NEW_RECORD' hack!
-        self.navigator.navigate ( "NEW_RECORD" )
+        self.navigator.navigate ( None )
         

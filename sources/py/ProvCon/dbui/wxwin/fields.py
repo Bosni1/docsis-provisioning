@@ -19,7 +19,8 @@ class Entry:
     
     class Text (BaseFieldEditor, mwx.TextCtrl):
         def __init__(self, field, parent, *args, **kwargs):
-            mwx.TextCtrl.__init__ (self, parent, name=field.path)
+            config = kwargs.get ( "config", {})            
+            mwx.TextCtrl.__init__ (self, parent, name=field.path, **config)
             BaseFieldEditor.__init__(self, field, **kwargs)
             self._on_text_changed = conditionalmethod (self._on_text_changed)
             self.Bind ( wx.EVT_TEXT, self._on_text_changed )
@@ -46,6 +47,13 @@ class Entry:
             finally:
                 self._on_text_changed.thaw()
     
+    class Memo(Text):
+        def __init__(self, *args, **kwargs):            
+            kwargs['config'] =  { 'style' : wx.TE_MULTILINE}
+            Entry.Text.__init__ (self, *args, **kwargs)
+            
+            self.SetMinSize ( (10, 100) )
+        
     class Boolean(BaseFieldEditor, mwx.CheckBox):
         def __init__(self, field, parent, *args, **kwargs):
             mwx.CheckBox.__init__ (self, parent, 

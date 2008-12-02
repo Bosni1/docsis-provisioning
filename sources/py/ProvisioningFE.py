@@ -1,10 +1,14 @@
 #!/bin/env python
 from ProvCon.dbui.database import CFG
+import ProvCon.dbui.database as db
 from ProvCon.dbui import meta, orm
 from ProvCon.dbui import wxwin as guitk
 
 import wx
-from wx.lib import scrolledpanel as scrolled
+
+import time, traceback
+
+db.RaiseDBException = guitk.DBErrorHandler
 
 class ProvisioningFE(wx.App):
     def OnInit(self):

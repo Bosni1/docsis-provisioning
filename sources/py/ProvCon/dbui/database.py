@@ -76,7 +76,8 @@ class CFG:
 	    self.db.query(q)
 	    
 	CX = None
-				
+RaiseDBException = lambda *a: a
+    
 def array_as_text(arr):
     """convert a python list to a textual representation of a postgres array"""
     if isinstance(arr, list):

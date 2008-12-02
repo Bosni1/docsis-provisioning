@@ -1,5 +1,5 @@
 from ProvCon.func import eventemitter, eventcancelled
-        
+from gettext import gettext as _        
 
 class BaseNavigator(eventemitter):
     def __init__(self, *args, **kwargs):
@@ -18,7 +18,7 @@ class BaseNavigator(eventemitter):
         self.displayname = kwargs.get ( "displayname", "_astxt" )
         self.current_index = kwargs.get ( "current_index", None )
         self.previous_index = None
-        
+        self.new_record = False
         #self.first()        
     
     def update(self):
@@ -28,21 +28,26 @@ class BaseNavigator(eventemitter):
         self.records = records
         self.records_count = len(self.records)
         self.current_index = None
+        self.new_record = False
         self.index_id_hash.clear()
         for idx, r in enumerate(self.records):
             self.index_id_hash[r[self.oidname]] = idx
         
     def currentid(self):
+        if self.isonnew(): return None
         try:
             return self.records[self.current_index][self.oidname]
         except TypeError:
             return None
         except IndexError:
             return None
+
+    def isonnew(self):
+        return self.new_record
     
     def currentdisplay(self):
-        if self.current_index == "NEW_RECORD":
-            return "NEW RECORD"
+        if self.isonnew():
+            return "** " + _("NEW RECORD") + " **"
         try:
             return self.records[self.current_index][self.displayname]
         except IndexError:        
@@ -69,12 +74,14 @@ class BaseNavigator(eventemitter):
         self.records.reloadsingle ( objectid )
         self.update ()
             
-    def navigate(self, new_idx):
-        if new_idx == "NEW_RECORD":
-            self.on_new_record ()            
+    def navigate(self, new_idx, newrecord=True):
         
         self.previous_index = self.current_index
         self.current_index = new_idx
+        if self.current_index is None and newrecord:
+            self.new_record = True
+        else:
+            self.new_record = False
         
         try:
             self.update()
@@ -88,17 +95,15 @@ class BaseNavigator(eventemitter):
         
     def navigate_relative (self, delta):        
         try:
-            return self.navigate ( (self.current_index + delta) % self.records_count )
+            if self.isonnew(): 
+                if self.previous_index:
+                    return self.navigate ( self.previous_index )                
+                else:
+                    return self.navigate ( self.records_count - 1)
+            else:
+                return self.navigate ( (self.current_index + delta) % self.records_count )
         except ZeroDivisionError:
             return self.navigate ( None )
-        except TypeError:
-            if self.current_index == "NEW_RECORD":                            
-                if self.previous_index:
-                    self.navigate ( self.previous_index )                
-                else:
-                    self.navigate ( self.records_count - 1)
-            else:
-                raise
             
     def next(self, *args): 
         return self.navigate_relative(1)

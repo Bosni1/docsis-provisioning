@@ -42,7 +42,7 @@ class Navigator(BaseNavigator, wx.Panel):
     
     def update(self):
         self.infotext.SetValue ( self.currentdisplay() )
-        if self.current_index != "NEW_RECORD":
+        if not self.isonnew():
             self.label.SetLabel ( " %5d / %d " % (self.current_index+1, self.records_count) ) 
         else:
             self.label.SetLabel ( " %5d / %d " % (self.records_count+1, self.records_count) ) 

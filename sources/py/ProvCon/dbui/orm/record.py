@@ -1,4 +1,5 @@
 from ProvCon.dbui.database import CFG
+import ProvCon.dbui.database as db
 from ProvCon.func import eventemitter
 from errors import ORMError
 from ProvCon.dbui.meta import Table
