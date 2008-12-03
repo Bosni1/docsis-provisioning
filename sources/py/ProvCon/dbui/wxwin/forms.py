@@ -50,8 +50,7 @@ class GenericForm(BaseForm, wx.Panel):
         except AttributeError:
             editor_class = EntryWidgets.Text        
         
-        editor = editor_class (field, parent, variable = self.form[field.name], **options )        
-        #editor.Bind ( wx.EVT_SIZE, self.resize )
+        editor = editor_class (field, parent, variable = self.form.getvar(field.name), **options )        
         return editor
 
         

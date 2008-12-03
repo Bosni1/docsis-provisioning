@@ -133,7 +133,7 @@ class Entry:
             if value is None:
                 self.SetLabel ( "<null>" )
             else:
-                self.SetLabel ( self.reprfunc ( self.records.getid (value) ) )
+                self.SetLabel ( self.reprfunc ( self.records.getbyid (value) ) )
                 
     ## array item editors
     class ArrayItemText(BaseArrayItemEditor, mwx.TextCtrl):
@@ -158,7 +158,7 @@ class Entry:
             if self.datatype == NoneType and len(value) == 0:
                 return None
             else:
-                return  value 
+                return value 
 
         def initialize_value(self, value):
             try:

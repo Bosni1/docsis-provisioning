@@ -73,7 +73,7 @@ class CompleteGenericForm(wx.Panel):
             self.tablename = self.table.name
 
         self.save = conditionalmethod ( self.form.save )
-        self.reload = conditionalmethod ( self.form.reload )
+        self.reload = conditionalmethod ( self.form.revert )
         self.new = conditionalmethod ( self.new )
         self.delete = conditionalmethod (self.form.delete )
     

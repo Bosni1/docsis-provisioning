@@ -1,38 +1,52 @@
 from ProvCon.func import eventemitter, eventcancelled
 from gettext import gettext as _        
+from ProvCon.dbui.API import *
 
+@Implements(INavigator)
 class BaseNavigator(eventemitter):
     def __init__(self, *args, **kwargs):
         """
-        required keyword args:
-         records : list of records (instance of RecordList)
-         oidname : name of the record field which serves 
-         displayname : name of the record field which holds the displayed value
+        BaseNavigator ( 
+   keywords: records : IRecordList (required), 
+             oidname : str = 'objectid',
+             displayname : str = '_astxt',
+             current_index : int = None,             
+         )           
         """
         eventemitter.__init__ (self, [ "navigate" ] )
-        self.index_id_hash = {}
+        
+        self.index_id_hash = {}        
         self.records_count = 0
-        self.records = []
-        self.set_records (kwargs.get ( "records", [] ), **kwargs)
+        self.__records = None
+        self.records =  kwargs.get ( "records", [] )
+        
         self.oidname = kwargs.get ( "oidname", "objectid" )
         self.displayname = kwargs.get ( "displayname", "_astxt" )
         self.current_index = kwargs.get ( "current_index", None )
         self.previous_index = None
         self.new_record = False
-        #self.first()        
     
     def update(self):
+        """
+        Called when items in the recordlist were changed. Refreshes anything that
+        needs to be refreshed.
+        """
         raise NotImplementedError()
     
     def set_records(self, records):
-        self.records = records
+        self.__records = records
         self.records_count = len(self.records)
         self.current_index = None
         self.new_record = False
         self.index_id_hash.clear()
         for idx, r in enumerate(self.records):
             self.index_id_hash[r[self.oidname]] = idx
-        
+            
+    def get_records(self):
+        return self.__records
+    records = property(get_records, set_records)
+    """ records : IRecordList """
+    
     def currentid(self):
         if self.isonnew(): return None
         try:
@@ -42,6 +56,14 @@ class BaseNavigator(eventemitter):
         except IndexError:
             return None
 
+    def currentrecord(self):
+        if self.currentid():
+            return self.records.getbyid (self.currentid())
+        return None
+    
+    def setid(self, objectid):
+        self.navigate ( self.indexof ( objectid ) )
+        
     def isonnew(self):
         return self.new_record
     
@@ -58,8 +80,8 @@ class BaseNavigator(eventemitter):
     def indexof (self, oid):
         return self.index_id_hash.get ( oid, None )
     
-    def on_new_record (self):
-        pass
+    #def on_new_record (self):
+        #pass
     
     def reload(self, movetoid=None):        
         self.set_records ( self.records.reload () )

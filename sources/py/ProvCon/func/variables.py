@@ -25,8 +25,10 @@ class TracedVariable(object):
         def __repr__(self):
             return "<Tracer '" + self.mode + "' of " + str(self.variable) + " '" + self.name + "' (%x)>" % id(self)
 
-        def __del__(self):
-            print "del", self
+        def untrace (self):
+            self.variable.untrace (self)
+        
+        def __del__(self):            
             self.variable.untrace (self)
             
         def __call__(self, action, value, var=None, idx=None):

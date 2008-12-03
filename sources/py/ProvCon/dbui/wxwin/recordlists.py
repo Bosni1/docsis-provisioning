@@ -17,7 +17,7 @@ class RecordList(BaseRecordList, wx.ListCtrl):
         self.SetOwnFont ( wx.Font ( 12, wx.FONTFAMILY_MAX, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_LIGHT) )
         
     def item_selected(self, event, *args):
-        self.current_record = self.records.getid(event.GetData())        
+        self.current_record = self.records.getbyid(event.GetData())        
                 
     def populate_list(self, *args):
         self.DeleteAllItems()

@@ -31,7 +31,7 @@ class RecordList(list):
     def getindex(self, objectid):
         return self.hash_index[objectid]
 
-    def getid(self, objectid):
+    def getbyid(self, objectid):
         return self.hash_id[objectid]
 
     

@@ -1,16 +1,40 @@
+"""
+=== Base classes for field-editing widgets ===
+
+These are the basic types of field-editing widgets:
+
+* simple editors : editors that hold one, easily editable value
+* reference editors : used for editing fields which reference other records
+* array editors : editing fields that hold arrays
+
+Array editors, are a container for a number of simple/reference editors, they
+act as a proxy for unpacking the array into simple values, and then packing them
+back into their traced variable.
+
+"""
 from ProvCon.dbui.orm import RecordList
 from ProvCon.func.variables import TracedVariable as tVar
 
 class BaseFieldEditor(object):
+    """Base class for all editor widgets"""
     def __init__(self, field, *args, **kwargs):        
-        self.variable = kwargs["variable"]  
+        self.__variable = None
+        self.__vtrace  = None
         self.field = field
-        self.vtrace = self.variable.trace ( 'w', self.variable_changed, name=str(self) )
-        try:
-            getattr(self, "set_editor_style")()
-        except AttributeError:
-            pass
-        
+        self.variable = kwargs["variable"]  
+                
+    def _get_variable(self):
+        return self.__variable    
+    def _set_variable(self, tvar):
+        if self.__vtrace:
+            self.__vtrace.untrace()            
+        self.__variable = tvar
+        self.__vtrace = self.variable.trace ( 'w', self.variable_changed, name=str(self) )
+    variable = property (_get_variable, _set_variable )
+
+    def _get_vtrace(self): return self.__vtrace
+    vtrace = property(_get_vtrace)
+    
     def variable_changed(self, action, value, var=None, idx=None, *args):        
         self.set_current_editor_value(value)
             

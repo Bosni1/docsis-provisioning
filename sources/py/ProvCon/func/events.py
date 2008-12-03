@@ -50,6 +50,7 @@ class eventemitter(object):
         
     def register_event_hook (self, evtname, cb):
         return self.__myevents[evtname].listen (cb)
+    add_listener = register_event_hook
     
     def emit_event (self, evtname, *args, **kwargs):
         self.__myevents[evtname].emit(*args, **kwargs)

@@ -6,6 +6,7 @@ from ProvCon.dbui import wxwin as guitk
 
 import wx
 
+
 import time, traceback
 
 db.RaiseDBException = guitk.DBErrorHandler
@@ -21,7 +22,7 @@ class ProvisioningFE(wx.App):
         self.subseditor = guitk.complete.CompleteGenericForm ( self.toplevel, tablename="class_of_service"
                                                                 )
         sizer.Add (self.subseditor, 4, flag=wx.EXPAND)
-
+        
         return True
     
         

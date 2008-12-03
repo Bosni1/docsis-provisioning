@@ -2,19 +2,28 @@
 # -*- coding: utf8 -*-
 #from orm import *
 from ProvCon.func.variables import TracedVariable as StringVar
+from ProvCon.dbui.API import *
 from gettext import gettext as _
 from ProvCon.func import *
 
-
+@Implements(IForm)
 class Form(eventemitter):
     """ ==class Form==
+
+    Implemented interfaces: IForm
+    
     Forms play a role similar to the one controllers play in the MVC model.
     They serve as an interface between Record objects (the model), and 
     GUI editors (the view).
-    Forms hold Table objects.
+    Each Form holds a reference to a Table object.
+    
     The heart of a Form is a list of TkVariables, which are used by the GUI
     as data storage of the editor widgets. Forms trace all changes to the variables
     and propagate them to the Record objects.
+    
+    As far as Forms are concerned the Record objects are dumb. The Form does not register
+    any handlers for Record's events, therefore all changes to the "current" record made
+    directly to the Record (not through the traced variable interface), may be lost.
     
     instance variables worth mentioning:
     Form.table   ->  reference to a Table object
@@ -25,9 +34,9 @@ class Form(eventemitter):
     save, reload, delete, new  ->   database operations on the current record
     setid (objectid)  ->  load a row identified by objectid into the current record
     
-    Forms are also eventemmiters.
-    events:
-    before_current_record_change - event handler may cancel record change
+    Events raised by form objects:
+    before_current_record_change - raised when a request to change the current record
+    
     current_record_changed
     new_record
     data_loaded
@@ -52,6 +61,7 @@ class Form(eventemitter):
         from record import Record
         from record import ORMError 
         from ProvCon.dbui.database import RaiseDBException
+
         self.ormerror = ORMError
         self.ormerrorhandler = RaiseDBException
         self.table = table
@@ -64,9 +74,15 @@ class Form(eventemitter):
             self.tkvars[f.name].trace ( 'w', partial (self.value_change_handler, f.name), name="form of " + self.table.name ) 
         
         self.defaultvalues = kkw.get ( "defaults", {} )
+
+    def get_current_record(self):
+        return self.__current
+    def set_current_record(self, r):
+        self.__current = r
+    current = property(get_current_record, set_current_record)
         
-    def __getitem__(self, itemidx):
-        return self.tkvars[itemidx]
+    def getvar(self, fieldname):
+        return self.tkvars[fieldname]
     
     def save(self):
         try:
@@ -78,7 +94,7 @@ class Form(eventemitter):
         except self.ormerror, e:
             self.ormerrorhandler (e)
 
-    def reload(self):
+    def revert(self):
         try:
             self.current.read()
             self.on_record_changed_handler()        
