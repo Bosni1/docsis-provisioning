@@ -179,70 +179,7 @@ def BaseSpecializedForm(table):
             Form.__init__(self, table)
     return _Form        
     
-#class Navigator(eventemitter):
-    #def __init__(self):
-        #eventemitter.__init__ (self, [
-            #"navigate" ,
-        #])
-                               
-        #self.records = []
-        #self.currentidx = 0
-        
-    #def navigate (self, relative):
-        #return self.navigateabsolute (self.currentidx + relative )        
-    
-    #def navigateabsolute (self, idx):
-        #if len(self) == 0: return None
-        #if idx > len(self): idx = idx - len(self)
-        #if idx <= 0: idx = len(self) + idx
-        #self.currentidx = idx
-        #self.emit_event ( "navigate", idx, self.records[idx] )        
-        #return self.current()
-    
-    #def setrecords (self, rl):
-        #self.records = rl
-        #if len(rl) > 0: self.navigateabsolute(1)
-        
-    #def current(self):
-        #return self.records[self.currentidx - 1]
-    
-    #def currentid(self):
-        #return self.current()['objectid']
-    
-    #def __len__(self):
-        #return len(self.records)
-
-    #def next(self):
-        #return self.navigate(1)
-    
-    #def prev(self):
-        #return self.navigate(-1)
-    
-    #def first(self):
-        #return self.navigateabsolute(1)
-
-    #def last(self):
-        #return self.navigateabsolute( len(self) )
-
-#class RecordPager(object):
-    #def __init__(self, *args, **kwargs):
-        ##kwargs: query, table, pagesize, idlist
-        #self.records = []
-        #self.records_hash = {}
-        #self.total_record_count = -1
-        #self.current_page = -1
-        
-    #def getrecordbyid(self, objectid): return self.records_hash[objectid]
-    #def setobjectids(self, objids): pass
-    #def setrecords(self, records): pass
-    #def setpage(self, idx): pass
-    #def moverel(self, moveby): pass
-    #def next(self): pass
-    #def prev(self): pass
-    #def first(self): pass
-    #def last(self): pass
-    #def refresh(self): pass
-    #def __iter__(self): pass    
+  
 
 
         

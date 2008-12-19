@@ -59,6 +59,8 @@ class MetaDataEditor(wx.App):
         
 app = MetaDataEditor()
 try:
+    #import cProfile
+    #cProfile.run( "app.MainLoop()", "/tmp/prov-prof" )
     app.MainLoop()
 except orm.ORMError, e:
     wx.MessageBox ( str(e) )

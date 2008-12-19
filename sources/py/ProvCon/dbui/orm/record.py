@@ -140,6 +140,7 @@ API Error: {0.pgexception}""".format ( self )
                 self.setFieldValue ( attrname, attrval )
                 
     def __getattr__(self, attrname):
+        #special PP_* attributes return a "pretty printed" representation of the record
         if attrname.startswith ("PP_"):
             sio = cStringIO.StringIO()
             rest = attrname[3:]
@@ -147,6 +148,8 @@ API Error: {0.pgexception}""".format ( self )
                 for f in self._table:                    
                     sio.write( "| {0:24} | {1:40} |\n".format (f.name, self.getFieldValue (f.name) )  )
             return sio.getvalue()
+        #special <fieldname>_REF attribute, returns value referenced by the field
+        #exactly what is returned is determined by the _resolvereference object attribute
         elif attrname.endswith("_REF"):
             fname = attrname[:-4]
             if fname in self._references: return self._references[fname]
