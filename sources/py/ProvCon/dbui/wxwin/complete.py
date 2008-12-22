@@ -1,9 +1,23 @@
+## $Id$
+"""
+This module implements a complete, user-ready generic form, capable of editing
+data in a table in a provisioning-compatible database.
+
+From the MVC point of view, a GenericForm is a View, a form object (IForm) is the Controller
+and a Record is the Model.
+
+A generic 
+"""
 # -*- coding: utf8 -*-
+
 from forms import GenericForm
 from navigators import Navigator
 from ProvCon.dbui import orm, meta
 from ProvCon.func import conditionalmethod, eventcancelled
 import wx
+
+__revision__ = "$Revision$"
+
 
 class InfoPopup (wx.PopupWindow):
     def __init__(self, form, *args, **kwargs):
