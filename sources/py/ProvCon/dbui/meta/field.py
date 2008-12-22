@@ -1,6 +1,7 @@
 from errors import MetaDataError
 from ProvCon.dbui.database import array_as_text, text_to_array
 
+__revision__ = "$Revision$"
 
 class Field(object):
     """ ==Field==
