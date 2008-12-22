@@ -28,7 +28,7 @@ class BaseNavigator(eventemitter):
     
     def update(self):
         """
-        Called when items in the recordlist were changed. Refreshes anything that
+        Called when items in the recordlist are changed. Refreshes anything that
         needs to be refreshed.
         """
         raise NotImplementedError()
@@ -79,10 +79,7 @@ class BaseNavigator(eventemitter):
 
     def indexof (self, oid):
         return self.index_id_hash.get ( oid, None )
-    
-    #def on_new_record (self):
-        #pass
-    
+        
     def reload(self, movetoid=None):        
         self.set_records ( self.records.reload () )
         if movetoid==-1:

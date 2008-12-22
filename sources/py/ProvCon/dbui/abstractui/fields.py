@@ -18,16 +18,17 @@ from ProvCon.func.variables import TracedVariable as tVar
 class BaseFieldEditor(object):
     """Base class for all editor widgets"""
     def __init__(self, field, *args, **kwargs):        
-        self.__variable = None
-        self.__vtrace  = None
+        self.__variable = None   #holder for the 'variable' property
+        self.__vtrace  = None    #holder for the 'vtrace' property
         self.field = field
         self.variable = kwargs["variable"]  
                 
     def _get_variable(self):
         return self.__variable    
     def _set_variable(self, tvar):
+        #When the traced variable changes, try to be nice and remove our tracer
         if self.__vtrace:
-            self.__vtrace.untrace()            
+            self.__vtrace.untrace()
         self.__variable = tvar
         self.__vtrace = self.variable.trace ( 'w', self.variable_changed, name=str(self) )
     variable = property (_get_variable, _set_variable )
@@ -35,26 +36,48 @@ class BaseFieldEditor(object):
     def _get_vtrace(self): return self.__vtrace
     vtrace = property(_get_vtrace)
     
-    def variable_changed(self, action, value, var=None, idx=None, *args):        
+    def variable_changed(self, action, value, var=None, idx=None, *args):
+        """Callback function that handles variable value changes."""
         self.set_current_editor_value(value)
             
     def update_variable(self):
+        """Function used to update traced variable to the currently edited value.
+        For example - TextBox widget's 'text' property will only be sent back to the
+        traced variable when this function is called"""
         try:
+            #freeze the callback to avoid infinite recursion
             self.vtrace.freeze()            
             self.variable.set ( self.get_current_editor_value() )
         finally:
             self.vtrace.thaw()        
 
     def set_current_editor_value(self, value):
+        """This function is responsible for setting the currently edited value to the traced
+        variable's value. (For example, when a record is reloaded or changed) A subclass 
+        implementation will propagate variable's value to the underlying widget (eg. by setting
+        TextBox's 'text' property'.
+        This function is called by the variable's trace function and should not be called directly.
+        """
         raise NotImplementedError()
     
     def get_current_editor_value(self):
+        """This function must return the value currently held by the editor (like TextBox's 'text'
+        property). It is called by the update_variable function to set the traced variable's value.
+        Using this function should be considered unrecommended, since it will usually access gui-toolkit
+        specific details. Use editor.variable.get() instead."""
         return self.variable.get()
     
     def __repr__(self):
         return "<Editor " + self.field.name  + ">"
     
 class BaseReferenceEditor(BaseFieldEditor):
+    """BaseReferenceEditor
+    Base class for editors of fields which reference other records. 
+    A reference field, by assumption, holds the 'objectid' of the record it references.
+    Since reference editors are usually widgets similar to combo boxes, the base reference editor
+    may retrieve a list of records from the referenced table, if the 'getrecords' keyword variable
+    is passed to the constructor.
+    """
     def __init__(self, field, getrecords=True, *args, **kwargs):
         BaseFieldEditor.__init__ (self, field, *args, **kwargs)
         self.reprfunc = kwargs.get ( "reprfunc", lambda r: r._astxt )
@@ -65,9 +88,11 @@ class BaseReferenceEditor(BaseFieldEditor):
             self.records = None
             
 class BaseArrayEditor(BaseFieldEditor):
-    """
-    Subclasses must implement following methods:
-    - resize_editor (self, newsize)
+    """BaseArrayEditor
+    A base class for widgets used to edit arrays.
+
+    Concrete implementations should not subclass this class, but rather use the
+    ConcreteBaseArrayEditor as their parent.    
     """
     def __init__(self, field, *args, **kwargs):
         BaseFieldEditor.__init__ (self, field, *args, **kwargs)
@@ -78,32 +103,29 @@ class BaseArrayEditor(BaseFieldEditor):
         self.size = -1
 
     def variable_changed(self, action, value, var=None, idx=None, *args):        
+        """Traced variables support indexed assignment and retrieval. When a variable changes
+        due to a change in one of its subitems the callback is passed the subitem's index, otherwise
+        the index is None. When the index is None, it means that the entire value changed, so we call
+        set_current_editor_value to update the widget."""        
         if idx is None:
             self.set_current_editor_value(value)
 
     def resize_editor(self, newsize):
+        """This function gets called when the number of edited elements changes, and it must
+        be reflected by the editor widget."""
         raise NotImplementedError()    
 
     def insert_item(self, atidx, itemvalue=None):
         array = self.variable.get()        
-        #print array
         if array is None:
             array = [itemvalue]
         else:
             array.insert (atidx, itemvalue)
-        #print "Insert at ", atidx
-        #print array
-        #print "---"
         self.variable.set ( array )
 
     def remove_item(self, atidx):
         array = self.variable.get()
-        #print array                
         del array[atidx]        
-        #print "Removal of ", atidx
-        #print array
-        #print "---"
-
         self.variable.set ( array )
 
     def swap_items(self, idx1, idx2):

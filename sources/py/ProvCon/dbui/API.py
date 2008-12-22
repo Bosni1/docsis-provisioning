@@ -6,17 +6,22 @@ def Implements(*interfaces):
         for i in interfaces:
             for method in dir(i):
                 if method.startswith ("__") and method.endswith("__"): continue
-                iattr = getattr(i, method)
+                iattr = getattr(i, method)                
                 try:
                     cattr = getattr(cls, method)
                 except AttributeError:
-                    print " + Warning! Incomplete implementation of '" + i.__name__ + "' in '" + cls.__name__ + "' method '" + method + "' is missing."               
+                    if isinstance(iattr, property):
+                        attrtype = 'property'
+                    else:
+                        attrtype = 'method'
+                    print " + Warning! Incomplete implementation of '" + i.__name__ + "' in '" + cls.__name__ + "' " + attrtype + "  '" + method + "' is missing."               
                     continue
               
         return cls
     return DoCheck
     
-class Interface: pass
+class Interface: 
+    __emits__ = []
 
 class IRecordList(Interface):
     """

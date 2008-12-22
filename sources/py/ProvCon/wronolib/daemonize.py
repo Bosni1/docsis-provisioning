@@ -19,7 +19,7 @@ References:
     Advanced Programming in the Unix Environment
         W. Richard Stevens, 1992, Addison-Wesley, ISBN 0-201-56317-7.
 
-$Id: daemonize.py 251 2008-05-05 21:51:11Z noah $
+$Id$
 '''
 
 def daemonize (stdin='/dev/null', stdout='/dev/null', stderr='/dev/null'):

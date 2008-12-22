@@ -1,11 +1,21 @@
+## $Id$
 from ProvCon.func.events import eventemitter, eventcancelled
+"""
+RecordList widgets hold a list of records.
+It is important to distinguish between record list widgets (which implement 
+the IRecordListHolder interface), and record lists ( IRecordList )
+"""
+from ProvCon.dbui.API import Implements, IRecordListHolder
 
+@Implements(IRecordListHolder)
 class BaseRecordList(eventemitter):
     def __init__(self, records, *args, **kwargs):
+        """ BaseRecordList ( records : IRecordList ) """
         eventemitter.__init__ (self, [ "record_list_changed", 
                                        "current_record_changed", 
                                        "navigate" ] )
         self.__current_record = None
+        self.__records = None
         self.set_records ( records )
         
         boundform = kwargs.get ( "boundform", None )        
@@ -15,10 +25,14 @@ class BaseRecordList(eventemitter):
             self.bind_to_form ( boundfield, boundform )
         
     def set_records(self, records):
-        self.records = records
-        self.records_count = len(records)
+        self.__records = records
+        self.records_count = len(self.__records)
         self.current_record = None
-        self.emit_event ( "record_list_changed", self.get_records )
+        self.emit_event ( "record_list_changed", self.get_records() )
+
+    def get_records(self):
+        return self.__records
+    records = property (get_records, set_records)
 
     def currentid(self):
         if self.current_record:
@@ -43,9 +57,6 @@ class BaseRecordList(eventemitter):
         return self.__current_record
     current_record = property (get_current_record, set_current_record)
         
-    def get_records(self):
-        return self.records
-
     def bind_to_form (self, myfield, form):
         self.parentform = (form, myfield)        
         self.parenthook = form.register_event_hook ( "current_record_changed", self._on_parent_record_changed)        
@@ -104,4 +115,5 @@ class BasePager(BaseRecordList):
     
     def pagefirst(self):
         self.page (0)    
-        
+
+## $Author$
