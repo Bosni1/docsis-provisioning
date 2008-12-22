@@ -5,6 +5,8 @@ from ProvCon.dbui import wxwin as guitk
 
 import wx
 #from wx.lib import scrolledpanel as scrolled
+
+__revision__ = "$Revision$"
     
 class MetaDataEditor(wx.App):
     def OnInit(self):

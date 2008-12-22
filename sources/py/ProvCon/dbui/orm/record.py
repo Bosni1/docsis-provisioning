@@ -6,6 +6,8 @@ from ProvCon.dbui.meta import Table
 import pg
 import cStringIO
 
+__revision__ = "$Revision$"
+
 class Record(eventemitter):
     """==Record==
     Record objects are the heart of the database abstraction layer. A Record object is 

@@ -6,6 +6,8 @@ from ProvCon.dbui.API import *
 from gettext import gettext as _
 from ProvCon.func import *
 
+__revision__ = "$Revision$"
+
 @Implements(IForm)
 class Form(eventemitter):
     """ ==class Form==

@@ -1,6 +1,8 @@
 from ProvCon.func import conditionalmethod
 import exceptions
 
+__revision__ = "$Revision$"
+
 class BaseForm(object):
     __defaultattrs__ = {        
     }

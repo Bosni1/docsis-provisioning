@@ -12,6 +12,9 @@ act as a proxy for unpacking the array into simple values, and then packing them
 back into their traced variable.
 
 """
+
+__revision__ = "$Revision$"
+
 from ProvCon.dbui.orm import RecordList
 from ProvCon.func.variables import TracedVariable as tVar
 

@@ -2,6 +2,8 @@ from ProvCon.func import eventemitter, eventcancelled
 from gettext import gettext as _        
 from ProvCon.dbui.API import *
 
+__revision__ = "$Revision$"
+
 @Implements(INavigator)
 class BaseNavigator(eventemitter):
     def __init__(self, *args, **kwargs):

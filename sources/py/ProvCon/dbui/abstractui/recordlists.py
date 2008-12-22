@@ -7,6 +7,8 @@ the IRecordListHolder interface), and record lists ( IRecordList )
 """
 from ProvCon.dbui.API import Implements, IRecordListHolder
 
+__revision__ = "$Revision$"
+ 
 @Implements(IRecordListHolder)
 class BaseRecordList(eventemitter):
     def __init__(self, records, *args, **kwargs):
