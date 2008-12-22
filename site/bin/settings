@@ -1,4 +1,4 @@
-#$Id:$
+#$Id$
 WORKING_ROOT_DIR=/home/kuba/src/
 PROVISIONING_DEV_PATH=$WORKING_ROOT_DIR/docsis-provisioning/
 PROVISIONING_PRO_PATH=$WORKING_ROOT_DIR/docsis-provisioning-run/
