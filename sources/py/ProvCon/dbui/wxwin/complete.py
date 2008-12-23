@@ -1,3 +1,4 @@
+# -*- coding: utf8 -*-
 ## $Id$
 """
 This module implements a complete, user-ready generic form, capable of editing
@@ -8,7 +9,7 @@ and a Record is the Model.
 
 A generic 
 """
-# -*- coding: utf8 -*-
+
 
 from forms import GenericForm
 from navigators import Navigator
