@@ -1,8 +1,11 @@
+##$Id$
 from ProvCon.dbui.abstractui.forms import BaseForm
 from ProvCon.dbui.orm import RecordList
 from ProvCon.dbui.meta import Table
 from fields import Entry as EntryWidgets
 import wx
+
+__revision__ = "$Revision$"
 
 class GenericForm(BaseForm, wx.Panel):
     

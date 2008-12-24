@@ -1,4 +1,4 @@
-
+##$Id$
 
 def Implements(*interfaces):
     def DoCheck(cls):
@@ -71,7 +71,7 @@ class IRecordController(IRecordHolder):
     EMITS: current_record_saved
     EMITS: current_record_deleted    
     """
-    def save(): pass    
+    def save(): pass        
     def delete(): pass
     def getvar(fieldname): pass
 

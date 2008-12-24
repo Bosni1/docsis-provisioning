@@ -1,4 +1,5 @@
 #!/bin/env python
+##$Id$
 from ProvCon.dbui.database import CFG
 import ProvCon.dbui.database as db
 from ProvCon.dbui import meta, orm

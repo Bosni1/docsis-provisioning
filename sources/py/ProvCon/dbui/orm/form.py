@@ -1,8 +1,9 @@
 #!/bin/env python
 # -*- coding: utf8 -*-
-#from orm import *
+##$Id$
+
 from ProvCon.func.variables import TracedVariable as StringVar
-from ProvCon.dbui.API import *
+from ProvCon.dbui.API import Implements, IForm
 from gettext import gettext as _
 from ProvCon.func import *
 

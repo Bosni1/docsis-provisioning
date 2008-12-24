@@ -1,4 +1,7 @@
+##$Id$
 import exceptions
+
+__revision__ = "$Revision$"
 
 class ReentryError(exceptions.BaseException):
     pass

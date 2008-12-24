@@ -1,4 +1,5 @@
 #!/bin/env python
+##$Id$
 from ProvCon.dbui.database import CFG
 from ProvCon.dbui import meta, orm
 from ProvCon.dbui import wxwin as guitk

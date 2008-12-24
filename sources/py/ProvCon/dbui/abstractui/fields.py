@@ -1,3 +1,4 @@
+##$Id$
 """
 === Base classes for field-editing widgets ===
 

@@ -1,3 +1,6 @@
+##$Id$
+
+__revision__ = "$Revision$"
 
 def partial (func, *args, **kwargs):
     def __fobj(*cargs, **kwcargs):

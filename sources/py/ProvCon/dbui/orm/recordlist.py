@@ -1,4 +1,9 @@
+##$Id$
+from ProvCon.dbui.API import Implements, IRecordList
 
+__revision__ = "$Revision$"
+
+@Implements(IRecordList)
 class RecordList(list):
     def __init__(self, table, _filter="TRUE", select=['0'], order="objectid", **kkw):
         list.__init__(self)
@@ -21,6 +26,7 @@ class RecordList(list):
         return self
     
     def reloadsingle(self, objectid):
+        """Refresh one record in the list"""
         rl = self.table.recordObjectList ( self.filter + " AND o.objectid = %d " % objectid, self.select, self.order)
         self[self.hash_index[objectid]] = rl[0]
             
@@ -29,9 +35,11 @@ class RecordList(list):
         self.hash_id.clear()
         
     def getindex(self, objectid):
+        """Get the index of an object in the list. Raise KeyError if not found."""
         return self.hash_index[objectid]
 
     def getbyid(self, objectid):
+        """Get an object from the list."""
         return self.hash_id[objectid]
 
     
