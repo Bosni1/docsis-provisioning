@@ -1,4 +1,4 @@
-##$Id$
+##$Id:$
 import os
 
 import pymssql, _mssql
