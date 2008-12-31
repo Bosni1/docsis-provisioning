@@ -203,7 +203,7 @@ CREATE TRIGGER ip_reservation_uniqueness_check BEFORE INSERT OR UPDATE ON pv.ip_
 ----------------------------------------------------------------------------------------------------
 create table pv.city (
   name varchar(64) not null unique,
-  handle varchar(16) not null
+  handle varchar(16) null
 ) inherits ( pv."object" );
 SELECT pv.setup_object_subtable ( 'city' );
 
