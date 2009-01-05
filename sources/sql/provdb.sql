@@ -144,10 +144,25 @@ SELECT pv.setup_object_subtable ( 'event' );
 
 create table pv.note (
   refobjectid int8 REFERENCES pv.objectids ON DELETE CASCADE ON UPDATE CASCADE NOT NULL,
-  username timestamp not null default current_timestamp,
+  timeadded timestamp not null default current_timestamp,
+  addedby varchar(64) null,
   content text  
 ) inherits ( pv."object" );
 SELECT pv.setup_object_subtable ( 'note' );
+
+create table pv.object_parameter (
+  refobjectid int8 REFERENCES pv.objectids ON DELETE CASCADE ON UPDATE CASCADE NOT NULL,
+  parametername varchar(16) not null,
+  content text null,
+) inherits ( pv."object" );
+SELECT pv.setup_object_subtable ( 'flag' );
+
+create table pv.object_flag (
+  refobjectid int8 REFERENCES pv.objectids ON DELETE CASCADE ON UPDATE CASCADE NOT NULL,
+  flagname varchar(16) not null,
+  unique (refobjectid, flagname)
+) inherits ( pv."object" );
+SELECT pv.setup_object_subtable ( 'flag' );
 
 ----------------------------------------------------------------------------------------------------
 --     IP ADDRESSING
@@ -203,7 +218,8 @@ CREATE TRIGGER ip_reservation_uniqueness_check BEFORE INSERT OR UPDATE ON pv.ip_
 ----------------------------------------------------------------------------------------------------
 create table pv.city (
   name varchar(64) not null unique,
-  handle varchar(16) null
+  handle varchar(16) null,
+  default_postal_code varchar(16) null
 ) inherits ( pv."object" );
 SELECT pv.setup_object_subtable ( 'city' );
 
@@ -211,14 +227,22 @@ create table pv.street (
   name varchar(64) not null,
   handle varchar(16) not null,
   cityid int8 REFERENCES pv.objectids ON DELETE CASCADE ON UPDATE CASCADE NOT NULL,
+  default_postal_code varchar(16) null,
   UNIQUE (name, cityid)
 ) inherits ( pv."object" );
 SELECT pv.setup_object_subtable ( 'street' );
 
+create table pv.street_aggregate (
+  name varchar(64) not null unique,
+  streetid int8 REFERENCES pv.objectids ON DELETE CASCADE ON UPDATE CASCADE NOT NULL
+) inherits (pv."object");
+SELECT pv.setup_object_subtable ( 'street_aggregate' );
+
 create table pv.building (
   number varchar(16) not null,
   handle varchar null,
-  streetid int8 REFERENCES pv.objectids ON DELETE CASCADE ON UPDATE CASCADE NOT NULL
+  streetid int8 REFERENCES pv.objectids ON DELETE CASCADE ON UPDATE CASCADE NOT NULL,
+  postal_code varchar(16) null
 ) inherits ( pv."object" );
 SELECT pv.setup_object_subtable ( 'building' );
 
@@ -237,7 +261,7 @@ SELECT pv.setup_object_subtable ( 'location' );
 create table pv.class_of_service (
   classid varchar(8) not null unique,
   name varchar(128) not null,
-  classparams varchar(64)[][] not null  
+  classparams varchar(256)[] not null  
 ) inherits (pv."object");
 SELECT pv.setup_object_subtable ( 'class_of_service' );
 

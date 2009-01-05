@@ -22,7 +22,7 @@ class ProvisioningFE(wx.App):
         self.windows.toplevel.Show()
         
         self.subseditor = guitk.complete.CompleteGenericForm ( self.windows.toplevel, 
-                                                               tablename="class_of_service"
+                                                               tablename="subscriber"
                                                                 )
         sizer.Add (self.subseditor, 4, flag=wx.EXPAND)
         
