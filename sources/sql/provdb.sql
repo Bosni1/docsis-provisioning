@@ -41,9 +41,9 @@ create table pv.object (
   objectscope smallint NOT NULL DEFAULT 0,
   objectcreation TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   objectmodification TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  objectdeletion TIMESTAMP NULL,
+  -- objectdeletion TIMESTAMP NULL,
   objecttype name NOT NULL DEFAULT 'object',
-  objecttypeid oid NULL,
+  -- objecttypeid oid NULL,
   PRIMARY KEY (objectid)
 );
 
@@ -55,7 +55,7 @@ create function pv.handle_object_lifespan_before() RETURNS trigger AS $handle_ob
     IF (TG_OP = 'INSERT') THEN
       INSERT INTO pv.objectids VALUES (NEW.objectid);
       NEW.objecttype := TG_TABLE_NAME;
-      NEW.objecttypeid := TG_RELID;
+      -- NEW.objecttypeid := TG_RELID;
       RETURN NEW;      
     END IF;
     
@@ -152,17 +152,42 @@ SELECT pv.setup_object_subtable ( 'note' );
 
 create table pv.object_parameter (
   refobjectid int8 REFERENCES pv.objectids ON DELETE CASCADE ON UPDATE CASCADE NOT NULL,
-  parametername varchar(16) not null,
-  content text null,
+  parametername varchar(64) not null,
+  content text not null
 ) inherits ( pv."object" );
-SELECT pv.setup_object_subtable ( 'flag' );
+SELECT pv.setup_object_subtable ( 'object_parameter' );
 
 create table pv.object_flag (
   refobjectid int8 REFERENCES pv.objectids ON DELETE CASCADE ON UPDATE CASCADE NOT NULL,
-  flagname varchar(16) not null,
+  flagname varchar(64) not null,
   unique (refobjectid, flagname)
 ) inherits ( pv."object" );
-SELECT pv.setup_object_subtable ( 'flag' );
+SELECT pv.setup_object_subtable ( 'object_flag' );
+
+create function pv.object_has_flag (objid int8, fname varchar) returns boolean AS $obj$
+  BEGIN
+    SELECT * FROM pv.object_flag WHERE refobjectid = objid AND upper(flagname) = upper(fname);
+    IF NOT FOUND THEN
+      RETURN FALSE;
+    ELSE
+      RETURN TRUE;
+    END IF;
+  END;
+$obj$ LANGUAGE plpgsql;
+
+create function pv.object_param (objid int8, pname varchar) returns varchar AS $obj$
+  DECLARE
+    cnt varchar;
+  BEGIN
+    SELECT content INTO cnt FROM pv.object_parameter WHERE refobjectid = objid AND upper(parametername) = upper(pname);
+    IF NOT FOUND THEN
+      RETURN NULL;
+    ELSE
+      RETURN cnt;
+    END IF;
+  END;
+$obj$ LANGUAGE plpgsql;
+
 
 ----------------------------------------------------------------------------------------------------
 --     IP ADDRESSING
@@ -279,6 +304,7 @@ create table pv.subscriber (
   subscriberid integer not null unique,
   name varchar(256) not null,  
   postaladdress varchar(512) null,
+  primarylocationid int8 REFERENCES pv.objectids ON DELETE SET NULL ON UPDATE CASCADE NULL,
   email varchar(128)[] null,
   telephone varchar(32)[] null
 ) inherits (pv."object");
@@ -415,6 +441,10 @@ CREATE TABLE pv.table_info (
   txtexpression text null,  
   recordlisttoolbox varchar(128)[] not null default '{}',
   recordlistpopup varchar(128)[] not null default '{}',
+  knownflags varchar(64)[] not null default '{}',
+  knownparams varchar(64)[] not null default '{}',
+  hasevents boolean not null default false,
+  hasnotes boolean not null default false,
   UNIQUE (schema, name)
 ) inherits (pv."object");
 SELECT pv.setup_object_subtable ( 'table_info' );
@@ -594,8 +624,15 @@ END;
 $$ language plpgsql;
 
 CREATE FUNCTION pv.set_reference ( field text, tbl text) returns int as $$
+DECLARE
+  idx_tbl varchar;
+  idx_col varchar;
 BEGIN
+  idx_tbl := substr(field, 0, strpos(field, '.')) ; 
+  idx_col := substr(field, strpos(field, '.')+1);
   UPDATE pv.field_info SET reference = pv.table_object_id ( tbl ) WHERE path = field;
+  EXECUTE 'CREATE INDEX idx_ref_' || tbl  || '_' || replace(field,'.','_') || ' ON pv.' || idx_tbl
+  || ' ( ' || idx_col || ' ) '; 
   RETURN 0;
 END;
 $$ LANGUAGE plpgsql;
@@ -637,9 +674,10 @@ BEGIN
  PERFORM pv.set_reference ( 'core_radio_link.interfaceid', 'object');
  PERFORM pv.set_reference ( 'core_radio_link.otherend', 'object');
  PERFORM pv.set_reference ( 'table_info.superclass', 'table_info');
- PERFORM pv.set_reference ( 'table_info.arrayof', 'table_info');
  PERFORM pv.set_reference ( 'event.refobjectid', 'object');
  PERFORM pv.set_reference ( 'note.refobjectid', 'object');
+ PERFORM pv.set_reference ( 'object_parameter.refobjectid', 'object');
+ PERFORM pv.set_reference ( 'object_flag.refobjectid', 'object');
  PERFORM pv.set_reference ( 'building.streetid', 'street');
  PERFORM pv.set_reference ( 'street.cityid', 'city');
  PERFORM pv.set_reference ( 'ip_reservation.ownerid', 'object');
@@ -659,6 +697,7 @@ BEGIN
  PERFORM pv.set_reference ( 'wireless.deviceid', 'device');
  PERFORM pv.set_reference ( 'sip_client.deviceid', 'device');
  PERFORM pv.set_reference ( 'device_role.deviceid', 'device');
+ PERFORM pv.set_reference ( 'subscriber.primarylocationid', 'location');
  PERFORM pv.set_reference ( 'service.subscriberid', 'subscriber');
  PERFORM pv.set_reference ( 'service.typeofservice', 'object');
  PERFORM pv.set_reference ( 'service.classofservice', 'object');

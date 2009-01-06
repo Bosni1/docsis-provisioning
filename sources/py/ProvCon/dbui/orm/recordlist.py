@@ -41,7 +41,3 @@ class RecordList(list):
     def getbyid(self, objectid):
         """Get an object from the list."""
         return self.hash_id[objectid]
-
-    
-
-    

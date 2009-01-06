@@ -328,7 +328,7 @@ API Error: {0.pgexception}""".format ( self )
         
     def write(self):
         if not self._table: raise ValueError ( "_table is Null" )
-        if self._isnew:           
+        if self._isnew:
             for m in self._modified_values:
                 self._modified_values[m] = self._table[m].val_py2sql(self._modified_values[m])
             
@@ -339,7 +339,7 @@ API Error: {0.pgexception}""".format ( self )
                 #done by triggers and default values into account.
                 self._objectid = rec['objectid']
 
-                print "Record inserted into database, objectid = ", self._objectid
+                print "Record # {0} inserted into {1}.".format(self._objectid, self._table.name)
                 self.emit_event ( "record_added", self )
                 
             except pg.DatabaseError, e:

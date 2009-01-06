@@ -84,7 +84,7 @@ class BaseReferenceEditor(BaseFieldEditor):
     """
     def __init__(self, field, getrecords=True, *args, **kwargs):
         BaseFieldEditor.__init__ (self, field, *args, **kwargs)
-        self.reprfunc = kwargs.get ( "reprfunc", lambda r: r._astxt )
+        self.reprfunc = kwargs.get ( "reprfunc", lambda r: r._astxt )        
         if getrecords:
             self.records = RecordList ( self.field.reference )
             self.records.reload()

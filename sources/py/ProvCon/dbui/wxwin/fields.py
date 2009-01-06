@@ -127,13 +127,16 @@ class Entry:
             mwx.StaticText.__init__ (self, parent, 
                                   style=wx.CB_READONLY,
                                   name=field.path)            
-            BaseReferenceEditor.__init__(self, field, **kwargs)
+            BaseReferenceEditor.__init__(self, field, getrecords=False, **kwargs)
+            from ProvCon.dbui.orm import Record
+            self.referenced_record = Record.EMPTY ( field.table.name )
         
         def set_current_editor_value(self, value):
             if value is None:
                 self.SetLabel ( "<null>" )
             else:
-                self.SetLabel ( self.reprfunc ( self.records.getbyid (value) ) )
+                self.referenced_record.setObjectID ( value ) 
+                self.SetLabel ( self.reprfunc ( self.referenced_record ) )
                 
     ## array item editors
     class ArrayItemText(BaseArrayItemEditor, mwx.TextCtrl):

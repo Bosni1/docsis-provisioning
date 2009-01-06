@@ -4,8 +4,8 @@ import os
 import pymssql, _mssql
 import getpass
 from ProvCon.dbui.database import CFG
-import ProvCon.dbui.database as db
-from ProvCon.dbui import meta, orm
+from ProvCon.dbui.di import rObject
+Record = rObject
 import atexit
 
 def dictresult ( cr ):
@@ -19,7 +19,33 @@ def dictresult ( cr ):
     return result
 
 def close(db):
-    db.close()
+    print "EXIT"
+    try:
+        db.close()
+    except:
+        pass
+
+def addObjectNote (obj, note, who=None):
+    if isinstance (obj, orm.Record):
+        objectid = obj.objectid
+    else:
+        objectid = obj
+    note = orm.Record.EMPTY ( "note" )
+    note.refobjectid = objectid
+    note.who = who
+    note.content = note
+    note.write()
+
+def setObjectFlag (obj, flagname):    
+    if isinstance (obj, orm.Record):
+        objectid = obj.objectid
+    else:
+        objectid = obj
+    flag = orm.Record.EMPTY ( "object_flag" )
+    flag.refobjectid = objectid
+    flag.flagname = flagname
+    flag.write()
+    
     
 if __name__=="__main__":
     #pw = getpass.getpass("Password for \\SQLEXPRESS\stansat:stansat@reklamy >")
@@ -27,8 +53,8 @@ if __name__=="__main__":
     stansatDB = pymssql.connect ( user = 'stansat', database = 'stansat', host = 'reklamy',
                                   password = pw )
     cr = stansatDB.cursor()
-
     atexit.register ( close, stansatDB )
+    
     
     cr.execute ( "SELECT * FROM Klient" )
     klient_all = dictresult ( cr )
@@ -38,9 +64,10 @@ if __name__=="__main__":
     dkt_all = dictresult ( cr )
 
     CFG.CX.query ( "DELETE FROM pv.subscriber" )
+    subscriber_oldIdxMap = {}
     
     for K in klient_all:        
-        subRec = orm.Record.EMPTY ( "subscriber" )
+        subRec = Record ( "subscriber" )
         subRec.subscriberid = K["Index"]        
         subRec.name = ( (K["Imie"] or "") + " " + (K["Nazwisko"] or "")).strip().decode ( "cp1250" )
         subRec.postaladdress = (K["AdresKorespondencji"] or "").decode("cp1250")        
@@ -48,16 +75,23 @@ if __name__=="__main__":
             subRec.email = [ K["EMail"].decode("cp1250").encode("utf8") ]
         subRec.telephone = []
         if K["TelefonStacjonarny"]: subRec.telephone.append ( K["TelefonStacjonarny"][:32].decode("cp1250").encode("utf8") )
-        if K["TelefonKomorkowy"]: subRec.telephone.append ( K["TelefonKomorkowy"][:32].decode("cp1250").encode("utf8") )        
-        subRec.write()
-    
+        if K["TelefonKomorkowy"]: subRec.telephone.append ( K["TelefonKomorkowy"][:32].decode("cp1250").encode("utf8") )                
+        subRec.write()        
+        if K["OdbiorFaktur"]: subRec.PARAM.ODBIOR_FAKTUR = K["OdbiorFaktur"]
+        if K["Wyszukiwanie"]: subRec.PARAM.WYSZUKIWANIE = K["Wyszukiwanie"].decode ( "cp1250" )
+        if K["wynajmuje"]: subRec.FLAGS.WYNAJMUJE = True
+        if K["Koperta"]: subRec.FLAGS.KOPERTA = True
+        if K["BrakZgodyNaPrzetwarzanieDanych"]: subRec.FLAGS.BRAK_ZGODY_PD = True
+        subRec.PARAM.SKROT = K["Skrot"].decode("cp1250")
+        subscriber_oldIdxMap[K["Index"]] = subRec
+            
     #Miejscowości    
     CFG.CX.query ( "DELETE FROM pv.city" )
     cr.execute ( "SELECT [Index], Nazwa FROM Miejscowosc" )
     city_onMap = {}
     city_nameMap = {}
-    for mIndex, mNazwa in cr.fetchall():
-        nRec = orm.Record.EMPTY ( "city" )
+    for mIndex, mNazwa in cr.fetchall():        
+        nRec = Record.EMPTY ( "city" )
         cityName = mNazwa.decode("cp1250")
 
         if cityName in city_nameMap:
@@ -68,7 +102,7 @@ if __name__=="__main__":
         nRec.handle = ""
         try:
             nRec.write()
-        except orm.record.Record.DataManipulationError, e:
+        except Record.DataManipulationError, e:
             print str(e)
         city_onMap[mIndex] = nRec
         city_nameMap[cityName] = nRec
@@ -89,7 +123,7 @@ if __name__=="__main__":
     
     for kIndex, kSkrot, uIndex, mIndex, kNrDomu, kNrMieszkania, kKodPocztowy in cr.fetchall():
         if not (mIndex, uIndex) in city_street_objMap:
-            uRec = orm.Record.EMPTY ( "street" )
+            uRec = Record.EMPTY ( "street" )
             try:
                 name, handle = ulica_idMap[uIndex]
             except KeyError:
@@ -107,7 +141,7 @@ if __name__=="__main__":
             building_objMap[uRec.objectid] = {}
         
         if not kNrDomu in building_objMap[uRec.objectid]:
-            bRec = orm.Record.EMPTY ( "building" )
+            bRec = Record.EMPTY ( "building" )
             if kNrDomu is None:
                 bRec.number = "<brak>"
             else:
@@ -123,7 +157,7 @@ if __name__=="__main__":
             location_objMap[bRec.objectid] = {}
             
         if not kNrMieszkania  in location_objMap[bRec.objectid]:
-            lRec = orm.Record.EMPTY ( "location" )
+            lRec = Record.EMPTY ( "location" )
             lRec.number = kNrMieszkania
             lRec.buildingid = bRec.objectid
             lRec.write()
@@ -133,6 +167,13 @@ if __name__=="__main__":
 
         klient_localizationMap[kIndex] = lRec
 
+    for kIndex in subscriber_oldIdxMap:
+        subRec = subscriber_oldIdxMap[kIndex]
+        try:
+            subRec.primarylocationid = klient_localizationMap[kIndex].objectid
+        except KeyError:
+            pass
+        subRec.write()
         
     stansatDB.close()
     
