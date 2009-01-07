@@ -129,7 +129,7 @@ class Entry:
                                   name=field.path)            
             BaseReferenceEditor.__init__(self, field, getrecords=False, **kwargs)
             from ProvCon.dbui.orm import Record
-            self.referenced_record = Record.EMPTY ( field.table.name )
+            self.referenced_record = Record.EMPTY ( field.reference.name )
         
         def set_current_editor_value(self, value):
             if value is None:

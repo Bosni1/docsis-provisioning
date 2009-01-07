@@ -54,6 +54,14 @@ class MetaDataEditor(wx.App):
         self.tableeditor.set_navigator ( tablenav )
         
         self.toplevel.SetSizer (sizer)
+
+        menu = wx.MenuBar()
+        menu_data = wx.Menu()
+        print "M ", menu_data.Append (wx.NewId(), "&Export", "Export meta-data to a text file." )
+        print "M ", menu_data.Append (wx.NewId(), "&Import", "Import meta-data to a text file." )
+        menu.Append ( menu_data, "&Data" )
+        self.toplevel.SetMenuBar ( menu )
+        
         self.toplevel.Show()
         
         return True

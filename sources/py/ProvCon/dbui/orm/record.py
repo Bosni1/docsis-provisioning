@@ -390,11 +390,16 @@ API Error: {0.pgexception}""".format ( self )
     def ofTable(tablename):
         return tablename == self._table.name
     
+    def getData(self):
+        data = {}
+        data.update ( self._original_values, self._modified_values )
+        return data
+    
     def __repr__(self):
         if self._table:
             return "<{1}> {2}".format (self._table.name, self._objectid,
                                                       self._astxt )
-        return "<record>"
+        return "<record>"    
     @staticmethod
     def ID(objectid, **kkw):
         """create a new record from objectid"""

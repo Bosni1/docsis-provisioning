@@ -4,7 +4,7 @@ from ProvCon.dbui.API import *
 
 __revision__ = "$Revision$"
 
-@Implements(INavigator)
+@Implements(INavigator, ISearchTarget)
 class BaseNavigator(eventemitter):
     def __init__(self, *args, **kwargs):
         """
@@ -21,6 +21,8 @@ class BaseNavigator(eventemitter):
         self.records_count = 0
         self.__records = None
         self.records =  kwargs.get ( "records", [] )
+
+        self.searchengine = kwargs.get ( "searchengine", None )        
         
         self.oidname = kwargs.get ( "oidname", "objectid" )
         self.displayname = kwargs.get ( "displayname", "_astxt" )
@@ -137,6 +139,9 @@ class BaseNavigator(eventemitter):
     
     def last(self,*args): 
         return self.navigate(self.records_count-1)
+
+    def processsearchresults(self, recordlist):
+        pass
     
     def __len__(self):
         return self.records_count

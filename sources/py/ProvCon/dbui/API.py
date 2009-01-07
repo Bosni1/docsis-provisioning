@@ -82,10 +82,9 @@ class IForm(IRecordController):
     def new(): pass
 
     
+class ISearchEngine(Interface):
+    def runsearch(query, ISearchTargetList): pass 
     
+class ISearchTarget(Interface):
+    def processsearchresults(IRecordList): pass
     
-    
-    
-        
-    
-        
