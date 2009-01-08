@@ -1,0 +1,248 @@
+<?xml version="1.0" encoding="ascii"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+          "DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+  <title>ProvCon.dbui.meta.field</title>
+  <link rel="stylesheet" href="epydoc.css" type="text/css" />
+  <script type="text/javascript" src="epydoc.js"></script>
+</head>
+
+<body bgcolor="white" text="black" link="blue" vlink="#204080"
+      alink="#204080">
+<!-- ==================== NAVIGATION BAR ==================== -->
+<table class="navbar" border="0" width="100%" cellpadding="0"
+       bgcolor="#a0c0ff" cellspacing="0">
+  <tr valign="middle">
+  <!-- Home link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="ProvCon-module.html">Home</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Tree link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="module-tree.html">Trees</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Index link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="identifier-index.html">Indices</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Help link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="help.html">Help</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Project homepage -->
+      <th class="navbar" align="right" width="100%">
+        <table border="0" cellpadding="0" cellspacing="0">
+          <tr><th class="navbar" align="center"
+            >docsis-provisioning</th>
+          </tr></table></th>
+  </tr>
+</table>
+<table width="100%" cellpadding="0" cellspacing="0">
+  <tr valign="top">
+    <td width="100%">
+      <span class="breadcrumbs">
+        <a href="ProvCon-module.html">Package&nbsp;ProvCon</a> ::
+        <a href="ProvCon.dbui-module.html">Package&nbsp;dbui</a> ::
+        <a href="ProvCon.dbui.meta-module.html">Package&nbsp;meta</a> ::
+        Module&nbsp;field
+      </span>
+    </td>
+    <td>
+      <table cellpadding="0" cellspacing="0">
+        <!-- hide/show private -->
+        <tr><td align="right"><span class="options">[<a href="javascript:void(0);" class="privatelink"
+    onclick="toggle_private();">hide&nbsp;private</a>]</span></td></tr>
+        <tr><td align="right"><span class="options"
+            >[<a href="frames.html" target="_top">frames</a
+            >]&nbsp;|&nbsp;<a href="ProvCon.dbui.meta.field-pysrc.html"
+            target="_top">no&nbsp;frames</a>]</span></td></tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<h1 class="epydoc">Source Code for <a href="ProvCon.dbui.meta.field-module.html">Module ProvCon.dbui.meta.field</a></h1>
+<pre class="py-src">
+<a name="L1"></a><tt class="py-lineno">  1</tt>  <tt class="py-line"><tt class="py-keyword">from</tt> <tt id="link-0" class="py-name" targets="Module ProvCon.dbui.meta.errors=ProvCon.dbui.meta.errors-module.html,Module ProvCon.dbui.orm.errors=ProvCon.dbui.orm.errors-module.html"><a title="ProvCon.dbui.meta.errors
+ProvCon.dbui.orm.errors" class="py-name" href="#" onclick="return doclink('link-0', 'errors', 'link-0');">errors</a></tt> <tt class="py-keyword">import</tt> <tt id="link-1" class="py-name" targets="Class ProvCon.dbui.meta.errors.MetaDataError=ProvCon.dbui.meta.errors.MetaDataError-class.html"><a title="ProvCon.dbui.meta.errors.MetaDataError" class="py-name" href="#" onclick="return doclink('link-1', 'MetaDataError', 'link-1');">MetaDataError</a></tt> </tt>
+<a name="L2"></a><tt class="py-lineno">  2</tt>  <tt class="py-line"><tt class="py-keyword">from</tt> <tt id="link-2" class="py-name" targets="Package ProvCon=ProvCon-module.html"><a title="ProvCon" class="py-name" href="#" onclick="return doclink('link-2', 'ProvCon', 'link-2');">ProvCon</a></tt><tt class="py-op">.</tt><tt id="link-3" class="py-name" targets="Package ProvCon.dbui=ProvCon.dbui-module.html"><a title="ProvCon.dbui" class="py-name" href="#" onclick="return doclink('link-3', 'dbui', 'link-3');">dbui</a></tt><tt class="py-op">.</tt><tt id="link-4" class="py-name" targets="Module ProvCon.dbui.database=ProvCon.dbui.database-module.html"><a title="ProvCon.dbui.database" class="py-name" href="#" onclick="return doclink('link-4', 'database', 'link-4');">database</a></tt> <tt class="py-keyword">import</tt> <tt id="link-5" class="py-name" targets="Function ProvCon.dbui.database.array_as_text()=ProvCon.dbui.database-module.html#array_as_text"><a title="ProvCon.dbui.database.array_as_text" class="py-name" href="#" onclick="return doclink('link-5', 'array_as_text', 'link-5');">array_as_text</a></tt><tt class="py-op">,</tt> <tt id="link-6" class="py-name" targets="Function ProvCon.dbui.database.text_to_array()=ProvCon.dbui.database-module.html#text_to_array"><a title="ProvCon.dbui.database.text_to_array" class="py-name" href="#" onclick="return doclink('link-6', 'text_to_array', 'link-6');">text_to_array</a></tt> </tt>
+<a name="L3"></a><tt class="py-lineno">  3</tt>  <tt class="py-line"> </tt>
+<a name="L4"></a><tt class="py-lineno">  4</tt>  <tt class="py-line"><tt id="link-7" class="py-name" targets="Variable ProvCon.dbui.abstractui.fields.__revision__=ProvCon.dbui.abstractui.fields-module.html#__revision__,Variable ProvCon.dbui.abstractui.forms.__revision__=ProvCon.dbui.abstractui.forms-module.html#__revision__,Variable ProvCon.dbui.abstractui.navigators.__revision__=ProvCon.dbui.abstractui.navigators-module.html#__revision__,Variable ProvCon.dbui.abstractui.recordlists.__revision__=ProvCon.dbui.abstractui.recordlists-module.html#__revision__,Variable ProvCon.dbui.meta.field.__revision__=ProvCon.dbui.meta.field-module.html#__revision__,Variable ProvCon.dbui.orm.form.__revision__=ProvCon.dbui.orm.form-module.html#__revision__,Variable ProvCon.dbui.orm.record.__revision__=ProvCon.dbui.orm.record-module.html#__revision__,Variable ProvCon.dbui.orm.recordlist.__revision__=ProvCon.dbui.orm.recordlist-module.html#__revision__,Variable ProvCon.dbui.wxwin.complete.__revision__=ProvCon.dbui.wxwin.complete-module.html#__revision__,Variable ProvCon.dbui.wxwin.forms.__revision__=ProvCon.dbui.wxwin.forms-module.html#__revision__,Variable ProvCon.func.decorators.__revision__=ProvCon.func.decorators-module.html#__revision__,Variable ProvCon.func.functions.__revision__=ProvCon.func.functions-module.html#__revision__,Variable ProvCon.func.variables.__revision__=ProvCon.func.variables-module.html#__revision__"><a title="ProvCon.dbui.abstractui.fields.__revision__
+ProvCon.dbui.abstractui.forms.__revision__
+ProvCon.dbui.abstractui.navigators.__revision__
+ProvCon.dbui.abstractui.recordlists.__revision__
+ProvCon.dbui.meta.field.__revision__
+ProvCon.dbui.orm.form.__revision__
+ProvCon.dbui.orm.record.__revision__
+ProvCon.dbui.orm.recordlist.__revision__
+ProvCon.dbui.wxwin.complete.__revision__
+ProvCon.dbui.wxwin.forms.__revision__
+ProvCon.func.decorators.__revision__
+ProvCon.func.functions.__revision__
+ProvCon.func.variables.__revision__" class="py-name" href="#" onclick="return doclink('link-7', '__revision__', 'link-7');">__revision__</a></tt> <tt class="py-op">=</tt> <tt class="py-string">"$Revision: 59 $"</tt> </tt>
+<a name="L5"></a><tt class="py-lineno">  5</tt>  <tt class="py-line"> </tt>
+<a name="Field"></a><div id="Field-def"><a name="L6"></a><tt class="py-lineno">  6</tt> <a class="py-toggle" href="#" id="Field-toggle" onclick="return toggle('Field');">-</a><tt class="py-line"><tt class="py-keyword">class</tt> <a class="py-def-name" href="ProvCon.dbui.meta.field.Field-class.html">Field</a><tt class="py-op">(</tt><tt class="py-base-class">object</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="Field-collapsed" style="display:none;" pad="+++" indent="++++"></div><div id="Field-expanded"><a name="L7"></a><tt class="py-lineno">  7</tt>  <tt class="py-line">    <tt class="py-docstring">""" ==Field==</tt> </tt>
+<a name="L8"></a><tt class="py-lineno">  8</tt>  <tt class="py-line"><tt class="py-docstring">    Field objects hold meta data about columns in the database.</tt> </tt>
+<a name="L9"></a><tt class="py-lineno">  9</tt>  <tt class="py-line"><tt class="py-docstring">    They also provide data-conversion services.</tt> </tt>
+<a name="L10"></a><tt class="py-lineno"> 10</tt>  <tt class="py-line"><tt class="py-docstring">    A Field object is created from a row of the 'field_info' table.</tt> </tt>
+<a name="L11"></a><tt class="py-lineno"> 11</tt>  <tt class="py-line"><tt class="py-docstring">    """</tt>     </tt>
+<a name="Field.IncompleteDefinition"></a><div id="Field.IncompleteDefinition-def"><a name="L12"></a><tt class="py-lineno"> 12</tt> <a class="py-toggle" href="#" id="Field.IncompleteDefinition-toggle" onclick="return toggle('Field.IncompleteDefinition');">-</a><tt class="py-line">    <tt class="py-keyword">class</tt> <a class="py-def-name" href="ProvCon.dbui.meta.field.Field.IncompleteDefinition-class.html">IncompleteDefinition</a><tt class="py-op">(</tt><tt class="py-base-class">MetaDataError</tt><tt class="py-op">)</tt><tt class="py-op">:</tt>  </tt>
+</div><a name="L13"></a><tt class="py-lineno"> 13</tt>  <tt class="py-line">        <tt class="py-docstring">"""raised when the Field constructor receives incomplete meta-data"""</tt> </tt>
+<a name="L14"></a><tt class="py-lineno"> 14</tt>  <tt class="py-line">        <tt class="py-keyword">pass</tt> </tt>
+</div><a name="L15"></a><tt class="py-lineno"> 15</tt>  <tt class="py-line">     </tt>
+<a name="L16"></a><tt class="py-lineno"> 16</tt>  <tt class="py-line">             </tt>
+<a name="Field.__init__"></a><div id="Field.__init__-def"><a name="L17"></a><tt class="py-lineno"> 17</tt> <a class="py-toggle" href="#" id="Field.__init__-toggle" onclick="return toggle('Field.__init__');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="ProvCon.dbui.meta.field.Field-class.html#__init__">__init__</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">,</tt> <tt class="py-param">name</tt><tt class="py-op">=</tt><tt class="py-name">None</tt><tt class="py-op">,</tt> <tt class="py-param">type</tt><tt class="py-op">=</tt><tt class="py-string">'text'</tt><tt class="py-op">,</tt> <tt class="py-param">size</tt><tt class="py-op">=</tt><tt class="py-op">-</tt><tt class="py-number">1</tt><tt class="py-op">,</tt> <tt class="py-param">ndims</tt><tt class="py-op">=</tt><tt class="py-number">0</tt><tt class="py-op">,</tt> <tt class="py-op">**</tt><tt class="py-param">kkw</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="Field.__init__-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="Field.__init__-expanded"><a name="L18"></a><tt class="py-lineno"> 18</tt>  <tt class="py-line">        <tt class="py-keyword">try</tt><tt class="py-op">:</tt>             </tt>
+<a name="L19"></a><tt class="py-lineno"> 19</tt>  <tt class="py-line">            <tt class="py-name">ndims</tt> <tt class="py-op">=</tt> <tt class="py-name">ndims</tt> <tt class="py-keyword">or</tt> <tt class="py-name">kkw</tt><tt class="py-op">.</tt><tt id="link-8" class="py-name" targets="Method ProvCon.dbui.orm.recordsearch.OIDSearchList.get()=ProvCon.dbui.orm.recordsearch.OIDSearchList-class.html#get,Method ProvCon.func.variables.TracedVariable.get()=ProvCon.func.variables.TracedVariable-class.html#get"><a title="ProvCon.dbui.orm.recordsearch.OIDSearchList.get
+ProvCon.func.variables.TracedVariable.get" class="py-name" href="#" onclick="return doclink('link-8', 'get', 'link-8');">get</a></tt><tt class="py-op">(</tt><tt class="py-string">'ndims'</tt><tt class="py-op">,</tt> <tt class="py-number">0</tt><tt class="py-op">)</tt> </tt>
+<a name="L20"></a><tt class="py-lineno"> 20</tt>  <tt class="py-line">            <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">name</tt> <tt class="py-op">=</tt> <tt class="py-name">name</tt> <tt class="py-keyword">or</tt> <tt class="py-name">kkw</tt><tt class="py-op">[</tt><tt class="py-string">'name'</tt><tt class="py-op">]</tt> </tt>
+<a name="L21"></a><tt class="py-lineno"> 21</tt>  <tt class="py-line">            <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">type</tt> <tt class="py-op">=</tt> <tt class="py-name">type</tt> <tt class="py-keyword">or</tt> <tt class="py-name">kkw</tt><tt class="py-op">[</tt><tt class="py-string">'type'</tt><tt class="py-op">]</tt> </tt>
+<a name="L22"></a><tt class="py-lineno"> 22</tt>  <tt class="py-line">            <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">size</tt> <tt class="py-op">=</tt> <tt class="py-name">size</tt> <tt class="py-keyword">or</tt> <tt class="py-name">kkw</tt><tt class="py-op">[</tt><tt class="py-string">'size'</tt><tt class="py-op">]</tt> </tt>
+<a name="L23"></a><tt class="py-lineno"> 23</tt>  <tt class="py-line">            <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">lp</tt> <tt class="py-op">=</tt> <tt class="py-name">kkw</tt><tt class="py-op">.</tt><tt id="link-9" class="py-name"><a title="ProvCon.dbui.orm.recordsearch.OIDSearchList.get
+ProvCon.func.variables.TracedVariable.get" class="py-name" href="#" onclick="return doclink('link-9', 'get', 'link-8');">get</a></tt> <tt class="py-op">(</tt> <tt class="py-string">"lp"</tt><tt class="py-op">,</tt> <tt class="py-op">-</tt><tt class="py-number">1</tt> <tt class="py-op">)</tt> </tt>
+<a name="L24"></a><tt class="py-lineno"> 24</tt>  <tt class="py-line">            <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">isarray</tt> <tt class="py-op">=</tt> <tt class="py-name">kkw</tt><tt class="py-op">.</tt><tt id="link-10" class="py-name"><a title="ProvCon.dbui.orm.recordsearch.OIDSearchList.get
+ProvCon.func.variables.TracedVariable.get" class="py-name" href="#" onclick="return doclink('link-10', 'get', 'link-8');">get</a></tt><tt class="py-op">(</tt><tt class="py-string">"isarray"</tt><tt class="py-op">,</tt> <tt class="py-name">ndims</tt> <tt class="py-op">&gt;</tt> <tt class="py-number">0</tt><tt class="py-op">)</tt> </tt>
+<a name="L25"></a><tt class="py-lineno"> 25</tt>  <tt class="py-line">            <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">arraysize</tt> <tt class="py-op">=</tt> <tt class="py-name">kkw</tt><tt class="py-op">.</tt><tt id="link-11" class="py-name"><a title="ProvCon.dbui.orm.recordsearch.OIDSearchList.get
+ProvCon.func.variables.TracedVariable.get" class="py-name" href="#" onclick="return doclink('link-11', 'get', 'link-8');">get</a></tt><tt class="py-op">(</tt><tt class="py-string">"arraysize"</tt><tt class="py-op">,</tt> <tt class="py-name">ndims</tt> <tt class="py-op">)</tt> </tt>
+<a name="L26"></a><tt class="py-lineno"> 26</tt>  <tt class="py-line">            <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">label</tt> <tt class="py-op">=</tt> <tt class="py-name">kkw</tt><tt class="py-op">.</tt><tt id="link-12" class="py-name"><a title="ProvCon.dbui.orm.recordsearch.OIDSearchList.get
+ProvCon.func.variables.TracedVariable.get" class="py-name" href="#" onclick="return doclink('link-12', 'get', 'link-8');">get</a></tt><tt class="py-op">(</tt><tt class="py-string">"label"</tt><tt class="py-op">,</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">name</tt><tt class="py-op">)</tt> </tt>
+<a name="L27"></a><tt class="py-lineno"> 27</tt>  <tt class="py-line">            <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">auto</tt> <tt class="py-op">=</tt> <tt class="py-name">kkw</tt><tt class="py-op">.</tt><tt id="link-13" class="py-name"><a title="ProvCon.dbui.orm.recordsearch.OIDSearchList.get
+ProvCon.func.variables.TracedVariable.get" class="py-name" href="#" onclick="return doclink('link-13', 'get', 'link-8');">get</a></tt><tt class="py-op">(</tt><tt class="py-string">"auto"</tt><tt class="py-op">,</tt> <tt class="py-name">False</tt><tt class="py-op">)</tt> </tt>
+<a name="L28"></a><tt class="py-lineno"> 28</tt>  <tt class="py-line">            <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">id</tt> <tt class="py-op">=</tt> <tt class="py-name">kkw</tt><tt class="py-op">.</tt><tt id="link-14" class="py-name"><a title="ProvCon.dbui.orm.recordsearch.OIDSearchList.get
+ProvCon.func.variables.TracedVariable.get" class="py-name" href="#" onclick="return doclink('link-14', 'get', 'link-8');">get</a></tt><tt class="py-op">(</tt><tt class="py-string">"objectid"</tt><tt class="py-op">,</tt> <tt class="py-name">None</tt><tt class="py-op">)</tt> </tt>
+<a name="L29"></a><tt class="py-lineno"> 29</tt>  <tt class="py-line">             </tt>
+<a name="L30"></a><tt class="py-lineno"> 30</tt>  <tt class="py-line">            <tt class="py-keyword">for</tt> <tt class="py-name">k</tt> <tt class="py-keyword">in</tt> <tt class="py-name">kkw</tt><tt class="py-op">:</tt> </tt>
+<a name="L31"></a><tt class="py-lineno"> 31</tt>  <tt class="py-line">                <tt class="py-keyword">if</tt> <tt class="py-name">k</tt> <tt class="py-keyword">not</tt> <tt class="py-keyword">in</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">__dict__</tt><tt class="py-op">:</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">__dict__</tt><tt class="py-op">[</tt><tt class="py-name">k</tt><tt class="py-op">]</tt> <tt class="py-op">=</tt> <tt class="py-name">kkw</tt><tt class="py-op">[</tt><tt class="py-name">k</tt><tt class="py-op">]</tt>                         </tt>
+<a name="L32"></a><tt class="py-lineno"> 32</tt>  <tt class="py-line">             </tt>
+<a name="L33"></a><tt class="py-lineno"> 33</tt>  <tt class="py-line">            <tt class="py-name">choices</tt> <tt class="py-op">=</tt> <tt id="link-15" class="py-name"><a title="ProvCon.dbui.database.text_to_array" class="py-name" href="#" onclick="return doclink('link-15', 'text_to_array', 'link-6');">text_to_array</a></tt> <tt class="py-op">(</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">choices</tt><tt class="py-op">,</tt> <tt class="py-number">0</tt> <tt class="py-op">)</tt> </tt>
+<a name="L34"></a><tt class="py-lineno"> 34</tt>  <tt class="py-line">            <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">choices</tt> <tt class="py-op">=</tt> <tt class="py-op">[</tt><tt class="py-op">]</tt> </tt>
+<a name="L35"></a><tt class="py-lineno"> 35</tt>  <tt class="py-line">            <tt class="py-keyword">for</tt> <tt class="py-name">c</tt> <tt class="py-keyword">in</tt> <tt class="py-name">choices</tt><tt class="py-op">:</tt> </tt>
+<a name="L36"></a><tt class="py-lineno"> 36</tt>  <tt class="py-line">                <tt class="py-keyword">if</tt> <tt class="py-name">c</tt><tt class="py-op">.</tt><tt class="py-name">startswith</tt><tt class="py-op">(</tt><tt class="py-string">"&lt;["</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+<a name="L37"></a><tt class="py-lineno"> 37</tt>  <tt class="py-line">                    <tt class="py-name">cv</tt><tt class="py-op">,</tt><tt class="py-name">cd</tt> <tt class="py-op">=</tt> <tt class="py-name">c</tt><tt class="py-op">[</tt><tt class="py-number">2</tt><tt class="py-op">:</tt><tt class="py-op">-</tt><tt class="py-number">2</tt><tt class="py-op">]</tt><tt class="py-op">.</tt><tt class="py-name">split</tt><tt class="py-op">(</tt><tt class="py-string">"::="</tt><tt class="py-op">)</tt><tt class="py-op">[</tt><tt class="py-op">:</tt><tt class="py-number">2</tt><tt class="py-op">]</tt> </tt>
+<a name="L38"></a><tt class="py-lineno"> 38</tt>  <tt class="py-line">                <tt class="py-keyword">else</tt><tt class="py-op">:</tt> </tt>
+<a name="L39"></a><tt class="py-lineno"> 39</tt>  <tt class="py-line">                    <tt class="py-name">cv</tt><tt class="py-op">,</tt><tt class="py-name">cd</tt> <tt class="py-op">=</tt> <tt class="py-name">c</tt><tt class="py-op">,</tt> <tt class="py-name">c</tt> </tt>
+<a name="L40"></a><tt class="py-lineno"> 40</tt>  <tt class="py-line">                <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">choices</tt><tt class="py-op">.</tt><tt id="link-16" class="py-name" targets="Method ProvCon.docsis.compiler.encoder.tlv_multipart.append()=ProvCon.docsis.compiler.encoder.tlv_multipart-class.html#append"><a title="ProvCon.docsis.compiler.encoder.tlv_multipart.append" class="py-name" href="#" onclick="return doclink('link-16', 'append', 'link-16');">append</a></tt> <tt class="py-op">(</tt> <tt class="py-op">(</tt><tt class="py-name">cv</tt><tt class="py-op">,</tt> <tt class="py-name">cd</tt><tt class="py-op">)</tt> <tt class="py-op">)</tt> </tt>
+<a name="L41"></a><tt class="py-lineno"> 41</tt>  <tt class="py-line">                 </tt>
+<a name="L42"></a><tt class="py-lineno"> 42</tt>  <tt class="py-line"> </tt>
+<a name="L43"></a><tt class="py-lineno"> 43</tt>  <tt class="py-line">            <tt class="py-name">params</tt> <tt class="py-op">=</tt> <tt id="link-17" class="py-name"><a title="ProvCon.dbui.database.text_to_array" class="py-name" href="#" onclick="return doclink('link-17', 'text_to_array', 'link-6');">text_to_array</a></tt> <tt class="py-op">(</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">editor_class_params</tt><tt class="py-op">,</tt> <tt class="py-number">0</tt> <tt class="py-op">)</tt> <tt class="py-keyword">or</tt> <tt class="py-op">[</tt><tt class="py-op">]</tt>             </tt>
+<a name="L44"></a><tt class="py-lineno"> 44</tt>  <tt class="py-line">            <tt class="py-name">params</tt> <tt class="py-op">=</tt> <tt class="py-name">map</tt> <tt class="py-op">(</tt> <tt class="py-keyword">lambda</tt> <tt class="py-name">x</tt><tt class="py-op">:</tt> <tt class="py-name">tuple</tt><tt class="py-op">(</tt><tt class="py-name">x</tt><tt class="py-op">.</tt><tt class="py-name">split</tt><tt class="py-op">(</tt><tt class="py-string">"::="</tt><tt class="py-op">)</tt><tt class="py-op">)</tt><tt class="py-op">,</tt> <tt class="py-name">params</tt> <tt class="py-op">)</tt> </tt>
+<a name="L45"></a><tt class="py-lineno"> 45</tt>  <tt class="py-line">            <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">editor_class_params</tt> <tt class="py-op">=</tt> <tt class="py-op">{</tt><tt class="py-op">}</tt> </tt>
+<a name="L46"></a><tt class="py-lineno"> 46</tt>  <tt class="py-line">            <tt class="py-keyword">for</tt> <tt class="py-op">(</tt><tt class="py-name">pname</tt><tt class="py-op">,</tt> <tt class="py-name">pvalue</tt><tt class="py-op">)</tt> <tt class="py-keyword">in</tt> <tt class="py-name">params</tt><tt class="py-op">:</tt> </tt>
+<a name="L47"></a><tt class="py-lineno"> 47</tt>  <tt class="py-line">                <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">editor_class_params</tt><tt class="py-op">[</tt><tt class="py-name">pname</tt><tt class="py-op">]</tt> <tt class="py-op">=</tt> <tt class="py-name">pvalue</tt> </tt>
+<a name="L48"></a><tt class="py-lineno"> 48</tt>  <tt class="py-line">        <tt class="py-keyword">except</tt> <tt class="py-name">KeyError</tt><tt class="py-op">,</tt> <tt class="py-name">e</tt><tt class="py-op">:</tt> </tt>
+<a name="L49"></a><tt class="py-lineno"> 49</tt>  <tt class="py-line">            <tt class="py-name">kwname</tt><tt class="py-op">,</tt> <tt class="py-op">=</tt> <tt class="py-name">e</tt><tt class="py-op">.</tt><tt class="py-name">args</tt> </tt>
+<a name="L50"></a><tt class="py-lineno"> 50</tt>  <tt class="py-line">            <tt class="py-keyword">raise</tt> <tt id="link-18" class="py-name" targets="Class ProvCon.dbui.meta.field.Field=ProvCon.dbui.meta.field.Field-class.html"><a title="ProvCon.dbui.meta.field.Field" class="py-name" href="#" onclick="return doclink('link-18', 'Field', 'link-18');">Field</a></tt><tt class="py-op">.</tt><tt id="link-19" class="py-name" targets="Class ProvCon.dbui.meta.field.Field.IncompleteDefinition=ProvCon.dbui.meta.field.Field.IncompleteDefinition-class.html"><a title="ProvCon.dbui.meta.field.Field.IncompleteDefinition" class="py-name" href="#" onclick="return doclink('link-19', 'IncompleteDefinition', 'link-19');">IncompleteDefinition</a></tt> <tt class="py-op">(</tt> <tt class="py-string">"missing: '%s' in field definition."</tt> <tt class="py-op">%</tt> <tt class="py-name">kwname</tt> <tt class="py-op">)</tt> </tt>
+</div><a name="L51"></a><tt class="py-lineno"> 51</tt>  <tt class="py-line">     </tt>
+<a name="Field.__repr__"></a><div id="Field.__repr__-def"><a name="L52"></a><tt class="py-lineno"> 52</tt> <a class="py-toggle" href="#" id="Field.__repr__-toggle" onclick="return toggle('Field.__repr__');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="ProvCon.dbui.meta.field.Field-class.html#__repr__">__repr__</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="Field.__repr__-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="Field.__repr__-expanded"><a name="L53"></a><tt class="py-lineno"> 53</tt>  <tt class="py-line">        <tt class="py-keyword">return</tt> <tt class="py-string">"{0} : {1}"</tt><tt class="py-op">.</tt><tt class="py-name">format</tt> <tt class="py-op">(</tt><tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">name</tt><tt class="py-op">,</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">type</tt><tt class="py-op">)</tt> </tt>
+</div><a name="L54"></a><tt class="py-lineno"> 54</tt>  <tt class="py-line"> </tt>
+<a name="L55"></a><tt class="py-lineno"> 55</tt>  <tt class="py-line">     </tt>
+<a name="Field.val_sql2py"></a><div id="Field.val_sql2py-def"><a name="L56"></a><tt class="py-lineno"> 56</tt> <a class="py-toggle" href="#" id="Field.val_sql2py-toggle" onclick="return toggle('Field.val_sql2py');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="ProvCon.dbui.meta.field.Field-class.html#val_sql2py">val_sql2py</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">,</tt> <tt class="py-param">sqlval</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="Field.val_sql2py-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="Field.val_sql2py-expanded"><a name="L57"></a><tt class="py-lineno"> 57</tt>  <tt class="py-line">        <tt class="py-docstring">"""convert the value returned by pg into a python variable"""</tt> </tt>
+<a name="L58"></a><tt class="py-lineno"> 58</tt>  <tt class="py-line">        <tt class="py-keyword">if</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">isarray</tt><tt class="py-op">:</tt> </tt>
+<a name="L59"></a><tt class="py-lineno"> 59</tt>  <tt class="py-line">            <tt class="py-keyword">return</tt> <tt id="link-20" class="py-name"><a title="ProvCon.dbui.database.text_to_array" class="py-name" href="#" onclick="return doclink('link-20', 'text_to_array', 'link-6');">text_to_array</a></tt> <tt class="py-op">(</tt><tt class="py-name">sqlval</tt><tt class="py-op">,</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">arraysize</tt><tt class="py-op">-</tt><tt class="py-number">1</tt><tt class="py-op">)</tt> </tt>
+<a name="L60"></a><tt class="py-lineno"> 60</tt>  <tt class="py-line">        <tt class="py-keyword">if</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">type</tt> <tt class="py-op">==</tt> <tt class="py-string">'bit'</tt><tt class="py-op">:</tt>  </tt>
+<a name="L61"></a><tt class="py-lineno"> 61</tt>  <tt class="py-line">            <tt class="py-keyword">if</tt> <tt class="py-name">sqlval</tt> <tt class="py-op">==</tt> <tt class="py-string">'1'</tt><tt class="py-op">:</tt> <tt class="py-keyword">return</tt> <tt class="py-name">True</tt> </tt>
+<a name="L62"></a><tt class="py-lineno"> 62</tt>  <tt class="py-line">            <tt class="py-keyword">elif</tt> <tt class="py-name">sqlval</tt> <tt class="py-op">==</tt> <tt class="py-string">'0'</tt><tt class="py-op">:</tt> <tt class="py-keyword">return</tt> <tt class="py-name">False</tt> </tt>
+<a name="L63"></a><tt class="py-lineno"> 63</tt>  <tt class="py-line">            <tt class="py-keyword">else</tt><tt class="py-op">:</tt> <tt class="py-keyword">return</tt> <tt class="py-name">None</tt> </tt>
+<a name="L64"></a><tt class="py-lineno"> 64</tt>  <tt class="py-line">        <tt class="py-keyword">return</tt> <tt class="py-name">sqlval</tt> </tt>
+</div><a name="L65"></a><tt class="py-lineno"> 65</tt>  <tt class="py-line">     </tt>
+<a name="Field.val_py2sql"></a><div id="Field.val_py2sql-def"><a name="L66"></a><tt class="py-lineno"> 66</tt> <a class="py-toggle" href="#" id="Field.val_py2sql-toggle" onclick="return toggle('Field.val_py2sql');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="ProvCon.dbui.meta.field.Field-class.html#val_py2sql">val_py2sql</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">,</tt> <tt class="py-param">pyval</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="Field.val_py2sql-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="Field.val_py2sql-expanded"><a name="L67"></a><tt class="py-lineno"> 67</tt>  <tt class="py-line">        <tt class="py-docstring">"""convert a python variable into something we can insert into an pgSQL statement"""</tt>         </tt>
+<a name="L68"></a><tt class="py-lineno"> 68</tt>  <tt class="py-line">        <tt class="py-keyword">if</tt> <tt class="py-name">pyval</tt> <tt class="py-keyword">is</tt> <tt class="py-name">None</tt><tt class="py-op">:</tt> </tt>
+<a name="L69"></a><tt class="py-lineno"> 69</tt>  <tt class="py-line">            <tt class="py-keyword">return</tt> <tt class="py-string">"NULL"</tt> </tt>
+<a name="L70"></a><tt class="py-lineno"> 70</tt>  <tt class="py-line">        <tt class="py-keyword">elif</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">isarray</tt><tt class="py-op">:</tt> </tt>
+<a name="L71"></a><tt class="py-lineno"> 71</tt>  <tt class="py-line">            <tt class="py-keyword">return</tt> <tt id="link-21" class="py-name"><a title="ProvCon.dbui.database.array_as_text" class="py-name" href="#" onclick="return doclink('link-21', 'array_as_text', 'link-5');">array_as_text</a></tt> <tt class="py-op">(</tt><tt class="py-name">pyval</tt><tt class="py-op">)</tt> </tt>
+<a name="L72"></a><tt class="py-lineno"> 72</tt>  <tt class="py-line">        <tt class="py-keyword">elif</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">type</tt> <tt class="py-op">==</tt> <tt class="py-string">"bit"</tt><tt class="py-op">:</tt> </tt>
+<a name="L73"></a><tt class="py-lineno"> 73</tt>  <tt class="py-line">            <tt class="py-keyword">if</tt> <tt class="py-name">pyval</tt><tt class="py-op">:</tt> <tt class="py-keyword">return</tt> <tt class="py-number">1</tt> </tt>
+<a name="L74"></a><tt class="py-lineno"> 74</tt>  <tt class="py-line">            <tt class="py-keyword">else</tt><tt class="py-op">:</tt> <tt class="py-keyword">return</tt> <tt class="py-number">0</tt> </tt>
+<a name="L75"></a><tt class="py-lineno"> 75</tt>  <tt class="py-line">        <tt class="py-keyword">elif</tt> <tt class="py-name">isinstance</tt><tt class="py-op">(</tt><tt class="py-name">pyval</tt><tt class="py-op">,</tt> <tt class="py-op">(</tt><tt class="py-name">str</tt><tt class="py-op">,</tt> <tt class="py-name">unicode</tt><tt class="py-op">)</tt> <tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+<a name="L76"></a><tt class="py-lineno"> 76</tt>  <tt class="py-line">            <tt class="py-keyword">return</tt> <tt class="py-name">str</tt><tt class="py-op">(</tt><tt class="py-name">pyval</tt><tt class="py-op">.</tt><tt id="link-22" class="py-name" targets="Method ProvCon.TFTP.Protocol.Packet.encode()=ProvCon.TFTP.Protocol.Packet-class.html#encode,Method ProvCon.dbui.meta.field.Field.encode()=ProvCon.dbui.meta.field.Field-class.html#encode"><a title="ProvCon.TFTP.Protocol.Packet.encode
+ProvCon.dbui.meta.field.Field.encode" class="py-name" href="#" onclick="return doclink('link-22', 'encode', 'link-22');">encode</a></tt><tt class="py-op">(</tt><tt class="py-string">'utf-8'</tt><tt class="py-op">)</tt><tt class="py-op">)</tt> </tt>
+<a name="L77"></a><tt class="py-lineno"> 77</tt>  <tt class="py-line">        <tt class="py-keyword">else</tt><tt class="py-op">:</tt> </tt>
+<a name="L78"></a><tt class="py-lineno"> 78</tt>  <tt class="py-line">            <tt class="py-keyword">return</tt> <tt class="py-name">str</tt><tt class="py-op">(</tt><tt class="py-name">pyval</tt><tt class="py-op">)</tt> </tt>
+</div><a name="L79"></a><tt class="py-lineno"> 79</tt>  <tt class="py-line">     </tt>
+<a name="Field.val_py2txt"></a><div id="Field.val_py2txt-def"><a name="L80"></a><tt class="py-lineno"> 80</tt> <a class="py-toggle" href="#" id="Field.val_py2txt-toggle" onclick="return toggle('Field.val_py2txt');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="ProvCon.dbui.meta.field.Field-class.html#val_py2txt">val_py2txt</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">,</tt> <tt class="py-param">pyval</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="Field.val_py2txt-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="Field.val_py2txt-expanded"><a name="L81"></a><tt class="py-lineno"> 81</tt>  <tt class="py-line">        <tt class="py-keyword">if</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">isarray</tt><tt class="py-op">:</tt> </tt>
+<a name="L82"></a><tt class="py-lineno"> 82</tt>  <tt class="py-line">            <tt class="py-keyword">return</tt> <tt class="py-string">"array:"</tt> <tt class="py-op">+</tt> <tt id="link-23" class="py-name"><a title="ProvCon.dbui.database.array_as_text" class="py-name" href="#" onclick="return doclink('link-23', 'array_as_text', 'link-5');">array_as_text</a></tt><tt class="py-op">(</tt><tt class="py-name">pyval</tt><tt class="py-op">)</tt> </tt>
+<a name="L83"></a><tt class="py-lineno"> 83</tt>  <tt class="py-line">        <tt class="py-keyword">if</tt> <tt class="py-name">pyval</tt> <tt class="py-keyword">is</tt> <tt class="py-name">None</tt><tt class="py-op">:</tt> </tt>
+<a name="L84"></a><tt class="py-lineno"> 84</tt>  <tt class="py-line">            <tt class="py-keyword">return</tt> <tt class="py-string">''</tt> </tt>
+<a name="L85"></a><tt class="py-lineno"> 85</tt>  <tt class="py-line">        <tt class="py-keyword">elif</tt> <tt class="py-name">isinstance</tt><tt class="py-op">(</tt><tt class="py-name">pyval</tt><tt class="py-op">,</tt> <tt class="py-name">str</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+<a name="L86"></a><tt class="py-lineno"> 86</tt>  <tt class="py-line">            <tt class="py-keyword">return</tt> <tt class="py-name">pyval</tt><tt class="py-op">.</tt><tt id="link-24" class="py-name" targets="Method ProvCon.TFTP.Protocol.Packet.decode()=ProvCon.TFTP.Protocol.Packet-class.html#decode,Method ProvCon.dbui.meta.field.Field.decode()=ProvCon.dbui.meta.field.Field-class.html#decode"><a title="ProvCon.TFTP.Protocol.Packet.decode
+ProvCon.dbui.meta.field.Field.decode" class="py-name" href="#" onclick="return doclink('link-24', 'decode', 'link-24');">decode</a></tt><tt class="py-op">(</tt><tt class="py-string">'utf-8'</tt><tt class="py-op">)</tt> </tt>
+<a name="L87"></a><tt class="py-lineno"> 87</tt>  <tt class="py-line">        <tt class="py-keyword">else</tt><tt class="py-op">:</tt> </tt>
+<a name="L88"></a><tt class="py-lineno"> 88</tt>  <tt class="py-line">            <tt class="py-keyword">return</tt> <tt class="py-name">str</tt><tt class="py-op">(</tt><tt class="py-name">pyval</tt><tt class="py-op">)</tt> </tt>
+</div><a name="L89"></a><tt class="py-lineno"> 89</tt>  <tt class="py-line">     </tt>
+<a name="Field.val_txt2py"></a><div id="Field.val_txt2py-def"><a name="L90"></a><tt class="py-lineno"> 90</tt> <a class="py-toggle" href="#" id="Field.val_txt2py-toggle" onclick="return toggle('Field.val_txt2py');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="ProvCon.dbui.meta.field.Field-class.html#val_txt2py">val_txt2py</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">,</tt> <tt class="py-param">txtval</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="Field.val_txt2py-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="Field.val_txt2py-expanded"><a name="L91"></a><tt class="py-lineno"> 91</tt>  <tt class="py-line">        <tt class="py-keyword">if</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">isarray</tt><tt class="py-op">:</tt> </tt>
+<a name="L92"></a><tt class="py-lineno"> 92</tt>  <tt class="py-line">            <tt class="py-keyword">return</tt> <tt id="link-25" class="py-name"><a title="ProvCon.dbui.database.text_to_array" class="py-name" href="#" onclick="return doclink('link-25', 'text_to_array', 'link-6');">text_to_array</a></tt> <tt class="py-op">(</tt> <tt class="py-name">txtval</tt><tt class="py-op">[</tt><tt class="py-number">6</tt><tt class="py-op">:</tt><tt class="py-op">]</tt><tt class="py-op">,</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">arraysize</tt><tt class="py-op">-</tt><tt class="py-number">1</tt> <tt class="py-op">)</tt> </tt>
+<a name="L93"></a><tt class="py-lineno"> 93</tt>  <tt class="py-line">        <tt class="py-keyword">return</tt> <tt class="py-name">txtval</tt> </tt>
+</div><a name="L94"></a><tt class="py-lineno"> 94</tt>  <tt class="py-line">     </tt>
+<a name="Field.encode"></a><div id="Field.encode-def"><a name="L95"></a><tt class="py-lineno"> 95</tt> <a class="py-toggle" href="#" id="Field.encode-toggle" onclick="return toggle('Field.encode');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="ProvCon.dbui.meta.field.Field-class.html#encode">encode</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">,</tt> <tt class="py-param">value</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="Field.encode-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="Field.encode-expanded"><a name="L96"></a><tt class="py-lineno"> 96</tt>  <tt class="py-line">        <tt class="py-keyword">raise</tt> <tt class="py-name">DeprecationWarning</tt> </tt>
+</div><a name="L97"></a><tt class="py-lineno"> 97</tt>  <tt class="py-line">     </tt>
+<a name="Field.decode"></a><div id="Field.decode-def"><a name="L98"></a><tt class="py-lineno"> 98</tt> <a class="py-toggle" href="#" id="Field.decode-toggle" onclick="return toggle('Field.decode');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="ProvCon.dbui.meta.field.Field-class.html#decode">decode</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">,</tt> <tt class="py-param">value</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="Field.decode-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="Field.decode-expanded"><a name="L99"></a><tt class="py-lineno"> 99</tt>  <tt class="py-line">        <tt class="py-keyword">raise</tt> <tt class="py-name">DeprecationWarning</tt> </tt>
+</div><a name="L100"></a><tt class="py-lineno">100</tt>  <tt class="py-line">     </tt>
+<a name="Field.is_special"></a><div id="Field.is_special-def"><a name="L101"></a><tt class="py-lineno">101</tt> <a class="py-toggle" href="#" id="Field.is_special-toggle" onclick="return toggle('Field.is_special');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="ProvCon.dbui.meta.field.Field-class.html#is_special">is_special</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="Field.is_special-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="Field.is_special-expanded"><a name="L102"></a><tt class="py-lineno">102</tt>  <tt class="py-line">        <tt class="py-keyword">from</tt> <tt id="link-26" class="py-name"><a title="ProvCon" class="py-name" href="#" onclick="return doclink('link-26', 'ProvCon', 'link-2');">ProvCon</a></tt><tt class="py-op">.</tt><tt id="link-27" class="py-name"><a title="ProvCon.dbui" class="py-name" href="#" onclick="return doclink('link-27', 'dbui', 'link-3');">dbui</a></tt><tt class="py-op">.</tt><tt id="link-28" class="py-name" targets="Package ProvCon.dbui.meta=ProvCon.dbui.meta-module.html"><a title="ProvCon.dbui.meta" class="py-name" href="#" onclick="return doclink('link-28', 'meta', 'link-28');">meta</a></tt> <tt class="py-keyword">import</tt> <tt id="link-29" class="py-name" targets="Class ProvCon.dbui.meta.table.Table=ProvCon.dbui.meta.table.Table-class.html"><a title="ProvCon.dbui.meta.table.Table" class="py-name" href="#" onclick="return doclink('link-29', 'Table', 'link-29');">Table</a></tt> </tt>
+<a name="L103"></a><tt class="py-lineno">103</tt>  <tt class="py-line">        <tt class="py-keyword">return</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">name</tt> <tt class="py-keyword">in</tt> <tt id="link-30" class="py-name"><a title="ProvCon.dbui.meta.table.Table" class="py-name" href="#" onclick="return doclink('link-30', 'Table', 'link-29');">Table</a></tt><tt class="py-op">.</tt><tt id="link-31" class="py-name" targets="Variable ProvCon.dbui.meta.table.Table.__special_columns__=ProvCon.dbui.meta.table.Table-class.html#__special_columns__"><a title="ProvCon.dbui.meta.table.Table.__special_columns__" class="py-name" href="#" onclick="return doclink('link-31', '__special_columns__', 'link-31');">__special_columns__</a></tt> </tt>
+</div></div><a name="L104"></a><tt class="py-lineno">104</tt>  <tt class="py-line"> </tt><script type="text/javascript">
+<!--
+expandto(location.href);
+// -->
+</script>
+</pre>
+<br />
+<!-- ==================== NAVIGATION BAR ==================== -->
+<table class="navbar" border="0" width="100%" cellpadding="0"
+       bgcolor="#a0c0ff" cellspacing="0">
+  <tr valign="middle">
+  <!-- Home link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="ProvCon-module.html">Home</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Tree link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="module-tree.html">Trees</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Index link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="identifier-index.html">Indices</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Help link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="help.html">Help</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Project homepage -->
+      <th class="navbar" align="right" width="100%">
+        <table border="0" cellpadding="0" cellspacing="0">
+          <tr><th class="navbar" align="center"
+            >docsis-provisioning</th>
+          </tr></table></th>
+  </tr>
+</table>
+<table border="0" cellpadding="0" cellspacing="0" width="100%%">
+  <tr>
+    <td align="left" class="footer">
+    Generated by Epydoc 3.0.1 on Thu Jan  8 14:48:54 2009
+    </td>
+    <td align="right" class="footer">
+      <a target="mainFrame" href="http://epydoc.sourceforge.net"
+        >http://epydoc.sourceforge.net</a>
+    </td>
+  </tr>
+</table>
+
+<script type="text/javascript">
+  <!--
+  // Private objects are initially displayed (because if
+  // javascript is turned off then we want them to be
+  // visible); but by default, we want to hide them.  So hide
+  // them unless we have a cookie that says to show them.
+  checkCookie();
+  // -->
+</script>
+</body>
+</html>

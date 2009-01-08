@@ -1,0 +1,901 @@
+<?xml version="1.0" encoding="ascii"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+          "DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+  <title>ProvCon.TFTP.ProvisioningTFTP</title>
+  <link rel="stylesheet" href="epydoc.css" type="text/css" />
+  <script type="text/javascript" src="epydoc.js"></script>
+</head>
+
+<body bgcolor="white" text="black" link="blue" vlink="#204080"
+      alink="#204080">
+<!-- ==================== NAVIGATION BAR ==================== -->
+<table class="navbar" border="0" width="100%" cellpadding="0"
+       bgcolor="#a0c0ff" cellspacing="0">
+  <tr valign="middle">
+  <!-- Home link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="ProvCon-module.html">Home</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Tree link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="module-tree.html">Trees</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Index link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="identifier-index.html">Indices</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Help link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="help.html">Help</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Project homepage -->
+      <th class="navbar" align="right" width="100%">
+        <table border="0" cellpadding="0" cellspacing="0">
+          <tr><th class="navbar" align="center"
+            >docsis-provisioning</th>
+          </tr></table></th>
+  </tr>
+</table>
+<table width="100%" cellpadding="0" cellspacing="0">
+  <tr valign="top">
+    <td width="100%">
+      <span class="breadcrumbs">
+        <a href="ProvCon-module.html">Package&nbsp;ProvCon</a> ::
+        <a href="ProvCon.TFTP-module.html">Package&nbsp;TFTP</a> ::
+        Module&nbsp;ProvisioningTFTP
+      </span>
+    </td>
+    <td>
+      <table cellpadding="0" cellspacing="0">
+        <!-- hide/show private -->
+        <tr><td align="right"><span class="options">[<a href="javascript:void(0);" class="privatelink"
+    onclick="toggle_private();">hide&nbsp;private</a>]</span></td></tr>
+        <tr><td align="right"><span class="options"
+            >[<a href="frames.html" target="_top">frames</a
+            >]&nbsp;|&nbsp;<a href="ProvCon.TFTP.ProvisioningTFTP-pysrc.html"
+            target="_top">no&nbsp;frames</a>]</span></td></tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<h1 class="epydoc">Source Code for <a href="ProvCon.TFTP.ProvisioningTFTP-module.html">Module ProvCon.TFTP.ProvisioningTFTP</a></h1>
+<pre class="py-src">
+<a name="L1"></a><tt class="py-lineno">  1</tt>  <tt class="py-line"><tt class="py-comment">#!/bin/env python</tt> </tt>
+<a name="L2"></a><tt class="py-lineno">  2</tt>  <tt class="py-line"><tt class="py-keyword">from</tt> <tt class="py-name">multiprocessing</tt> <tt class="py-keyword">import</tt> <tt class="py-name">Process</tt><tt class="py-op">,</tt> <tt class="py-name">Queue</tt> </tt>
+<a name="L3"></a><tt class="py-lineno">  3</tt>  <tt class="py-line"><tt class="py-keyword">from</tt> <tt class="py-name">multiprocessing</tt><tt class="py-op">.</tt><tt class="py-name">connection</tt> <tt class="py-keyword">import</tt> <tt id="link-0" class="py-name" targets="Module ProvCon.TFTP.Client=ProvCon.TFTP.Client-module.html"><a title="ProvCon.TFTP.Client" class="py-name" href="#" onclick="return doclink('link-0', 'Client', 'link-0');">Client</a></tt> </tt>
+<a name="L4"></a><tt class="py-lineno">  4</tt>  <tt class="py-line"><tt class="py-keyword">from</tt> <tt class="py-name">Queue</tt> <tt class="py-keyword">import</tt> <tt class="py-name">Queue</tt> <tt class="py-keyword">as</tt> <tt class="py-name">ThreadingQueue</tt> </tt>
+<a name="L5"></a><tt class="py-lineno">  5</tt>  <tt class="py-line"> </tt>
+<a name="L6"></a><tt class="py-lineno">  6</tt>  <tt class="py-line"><tt class="py-keyword">import</tt> <tt class="py-name">os</tt><tt class="py-op">,</tt> <tt class="py-name">time</tt><tt class="py-op">,</tt> <tt class="py-name">signal</tt><tt class="py-op">,</tt> <tt class="py-name">sys</tt> </tt>
+<a name="L7"></a><tt class="py-lineno">  7</tt>  <tt class="py-line"> </tt>
+<a name="L8"></a><tt class="py-lineno">  8</tt>  <tt class="py-line"><tt class="py-keyword">import</tt> <tt id="link-1" class="py-name" targets="Package ProvCon=ProvCon-module.html"><a title="ProvCon" class="py-name" href="#" onclick="return doclink('link-1', 'ProvCon', 'link-1');">ProvCon</a></tt> </tt>
+<a name="L9"></a><tt class="py-lineno">  9</tt>  <tt class="py-line"><tt class="py-keyword">from</tt> <tt id="link-2" class="py-name"><a title="ProvCon" class="py-name" href="#" onclick="return doclink('link-2', 'ProvCon', 'link-1');">ProvCon</a></tt><tt class="py-op">.</tt><tt id="link-3" class="py-name" targets="Package ProvCon.wronolib=ProvCon.wronolib-module.html"><a title="ProvCon.wronolib" class="py-name" href="#" onclick="return doclink('link-3', 'wronolib', 'link-3');">wronolib</a></tt><tt class="py-op">.</tt><tt id="link-4" class="py-name" targets="Module ProvCon.wronolib.procname=ProvCon.wronolib.procname-module.html"><a title="ProvCon.wronolib.procname" class="py-name" href="#" onclick="return doclink('link-4', 'procname', 'link-4');">procname</a></tt> <tt class="py-keyword">import</tt> <tt id="link-5" class="py-name" targets="Function ProvCon.wronolib.procname.set_process_name()=ProvCon.wronolib.procname-module.html#set_process_name"><a title="ProvCon.wronolib.procname.set_process_name" class="py-name" href="#" onclick="return doclink('link-5', 'set_process_name', 'link-5');">set_process_name</a></tt> </tt>
+<a name="L10"></a><tt class="py-lineno"> 10</tt>  <tt class="py-line"><tt class="py-keyword">import</tt> <tt id="link-6" class="py-name" targets="Module ProvCon.TFTP.Server=ProvCon.TFTP.Server-module.html"><a title="ProvCon.TFTP.Server" class="py-name" href="#" onclick="return doclink('link-6', 'Server', 'link-6');">Server</a></tt><tt class="py-op">,</tt> <tt id="link-7" class="py-name" targets="Module ProvCon.TFTP.Protocol=ProvCon.TFTP.Protocol-module.html"><a title="ProvCon.TFTP.Protocol" class="py-name" href="#" onclick="return doclink('link-7', 'Protocol', 'link-7');">Protocol</a></tt> </tt>
+<a name="L11"></a><tt class="py-lineno"> 11</tt>  <tt class="py-line"> </tt>
+<a name="L12"></a><tt class="py-lineno"> 12</tt>  <tt class="py-line"><tt class="py-comment">#The provisioning TFTP server is a multitasking application which</tt> </tt>
+<a name="L13"></a><tt class="py-lineno"> 13</tt>  <tt class="py-line"><tt class="py-comment">#not only serves file contents via TFTP, but also ensures that</tt> </tt>
+<a name="L14"></a><tt class="py-lineno"> 14</tt>  <tt class="py-line"><tt class="py-comment">#sent files are up to date with the provisioning database.</tt> </tt>
+<a name="L15"></a><tt class="py-lineno"> 15</tt>  <tt class="py-line"> </tt>
+<a name="L16"></a><tt class="py-lineno"> 16</tt>  <tt class="py-line"><tt class="py-comment">#The main process should create an instance of TFTPProvisioningServer</tt> </tt>
+<a name="L17"></a><tt class="py-lineno"> 17</tt>  <tt class="py-line"><tt class="py-comment">#and run the serve_forever method.</tt> </tt>
+<a name="L18"></a><tt class="py-lineno"> 18</tt>  <tt class="py-line"><tt class="py-comment">#The server starts the following processes:</tt> </tt>
+<a name="L19"></a><tt class="py-lineno"> 19</tt>  <tt class="py-line"><tt class="py-comment"># - TFTPDataSenders which communicate with clients,</tt> </tt>
+<a name="L20"></a><tt class="py-lineno"> 20</tt>  <tt class="py-line"><tt class="py-comment"># - File "cooks", which check permisions and update the requested files,</tt> </tt>
+<a name="L21"></a><tt class="py-lineno"> 21</tt>  <tt class="py-line"><tt class="py-comment">#Each "cook" is provided with an "oven" - an object that does the actual</tt> </tt>
+<a name="L22"></a><tt class="py-lineno"> 22</tt>  <tt class="py-line"><tt class="py-comment">#preparation and updating of files.</tt> </tt>
+<a name="L23"></a><tt class="py-lineno"> 23</tt>  <tt class="py-line"> </tt>
+<a name="L24"></a><tt class="py-lineno"> 24</tt>  <tt class="py-line"><tt class="py-comment">#TFTPDataSender : Process</tt> </tt>
+<a name="L25"></a><tt class="py-lineno"> 25</tt>  <tt class="py-line"><tt class="py-comment">#The TFTPProvisioningServer starts a conigured number o these processes. Their</tt> </tt>
+<a name="L26"></a><tt class="py-lineno"> 26</tt>  <tt class="py-line"><tt class="py-comment">#purpose is to wait or items to become available on the "Ready Files Queue"</tt> </tt>
+<a name="L27"></a><tt class="py-lineno"> 27</tt>  <tt class="py-line"><tt class="py-comment">#then connect to the client and send the file contents.</tt> </tt>
+<a name="TFTPDataSender"></a><div id="TFTPDataSender-def"><a name="L28"></a><tt class="py-lineno"> 28</tt> <a class="py-toggle" href="#" id="TFTPDataSender-toggle" onclick="return toggle('TFTPDataSender');">-</a><tt class="py-line"><tt class="py-keyword">class</tt> <a class="py-def-name" href="ProvCon.TFTP.ProvisioningTFTP.TFTPDataSender-class.html">TFTPDataSender</a><tt class="py-op">(</tt><tt class="py-base-class">Process</tt><tt class="py-op">)</tt><tt class="py-op">:</tt>        </tt>
+</div><a name="TFTPDataSender.__init__"></a><div id="TFTPDataSender.__init__-def"><a name="L29"></a><tt class="py-lineno"> 29</tt> <a class="py-toggle" href="#" id="TFTPDataSender.__init__-toggle" onclick="return toggle('TFTPDataSender.__init__');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="ProvCon.TFTP.ProvisioningTFTP.TFTPDataSender-class.html#__init__">__init__</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">,</tt> <tt class="py-param">rfQueue</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="TFTPDataSender.__init__-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="TFTPDataSender.__init__-expanded"><a name="L30"></a><tt class="py-lineno"> 30</tt>  <tt class="py-line">        <tt class="py-name">Process</tt><tt class="py-op">.</tt><tt id="link-8" class="py-name" targets="Method ProvCon.TFTP.Protocol.Packet.__init__()=ProvCon.TFTP.Protocol.Packet-class.html#__init__,Method ProvCon.TFTP.ProvisioningTFTP.BaseOven.__init__()=ProvCon.TFTP.ProvisioningTFTP.BaseOven-class.html#__init__,Method ProvCon.TFTP.ProvisioningTFTP.CableModemConfigCook.__init__()=ProvCon.TFTP.ProvisioningTFTP.CableModemConfigCook-class.html#__init__,Method ProvCon.TFTP.ProvisioningTFTP.FileCook.__init__()=ProvCon.TFTP.ProvisioningTFTP.FileCook-class.html#__init__,Method ProvCon.TFTP.ProvisioningTFTP.ProvisioningTFTPServer.__init__()=ProvCon.TFTP.ProvisioningTFTP.ProvisioningTFTPServer-class.html#__init__,Method ProvCon.TFTP.ProvisioningTFTP.TFTPDataSender.__init__()=ProvCon.TFTP.ProvisioningTFTP.TFTPDataSender-class.html#__init__,Method ProvCon.TFTP.ProvisioningTFTP.pcTFTPD.__init__()=ProvCon.TFTP.ProvisioningTFTP.pcTFTPD-class.html#__init__,Method ProvCon.TFTP.Server.BaseTFTPServer.__init__()=ProvCon.TFTP.Server.BaseTFTPServer-class.html#__init__,Method ProvCon.cli.CLIServer.__init__()=ProvCon.cli.CLIServer-class.html#__init__,Method ProvCon.cli.CLIWorker.__init__()=ProvCon.cli.CLIWorker-class.html#__init__,Method ProvCon.dbui.abstractui.fields.BaseArrayEditor.__init__()=ProvCon.dbui.abstractui.fields.BaseArrayEditor-class.html#__init__,Method ProvCon.dbui.abstractui.fields.BaseArrayItemButtonBox.__init__()=ProvCon.dbui.abstractui.fields.BaseArrayItemButtonBox-class.html#__init__,Method ProvCon.dbui.abstractui.fields.BaseArrayItemEditor.__init__()=ProvCon.dbui.abstractui.fields.BaseArrayItemEditor-class.html#__init__,Method ProvCon.dbui.abstractui.fields.BaseFieldEditor.__init__()=ProvCon.dbui.abstractui.fields.BaseFieldEditor-class.html#__init__,Method ProvCon.dbui.abstractui.fields.BaseReferenceEditor.__init__()=ProvCon.dbui.abstractui.fields.BaseReferenceEditor-class.html#__init__,Method ProvCon.dbui.abstractui.forms.BaseForm.__init__()=ProvCon.dbui.abstractui.forms.BaseForm-class.html#__init__,Method ProvCon.dbui.abstractui.navigators.BaseNavigator.__init__()=ProvCon.dbui.abstractui.navigators.BaseNavigator-class.html#__init__,Method ProvCon.dbui.abstractui.recordlists.BasePager.__init__()=ProvCon.dbui.abstractui.recordlists.BasePager-class.html#__init__,Method ProvCon.dbui.abstractui.recordlists.BaseRecordList.__init__()=ProvCon.dbui.abstractui.recordlists.BaseRecordList-class.html#__init__,Method ProvCon.dbui.database.CFG.tCX.__init__()=ProvCon.dbui.database.CFG.tCX-class.html#__init__,Method ProvCon.dbui.di.rObject'.ObjectFlags.__init__()=ProvCon.dbui.di.rObject%27.ObjectFlags-class.html#__init__,Method ProvCon.dbui.di.rObject'.ObjectParams.__init__()=ProvCon.dbui.di.rObject%27.ObjectParams-class.html#__init__,Method ProvCon.dbui.di.rObject'.rObject.__init__()=ProvCon.dbui.di.rObject%27.rObject-class.html#__init__,Method ProvCon.dbui.meta.field.Field.__init__()=ProvCon.dbui.meta.field.Field-class.html#__init__,Method ProvCon.dbui.meta.table.Table.__init__()=ProvCon.dbui.meta.table.Table-class.html#__init__,Method ProvCon.dbui.orm.form.Form.__init__()=ProvCon.dbui.orm.form.Form-class.html#__init__,Method ProvCon.dbui.orm.record.Record.DataManipulationError.__init__()=ProvCon.dbui.orm.record.Record.DataManipulationError-class.html#__init__,Method ProvCon.dbui.orm.record.Record.DataQueryError.__init__()=ProvCon.dbui.orm.record.Record.DataQueryError-class.html#__init__,Method ProvCon.dbui.orm.record.Record.RecordNotFound.__init__()=ProvCon.dbui.orm.record.Record.RecordNotFound-class.html#__init__,Method ProvCon.dbui.orm.record.Record.__init__()=ProvCon.dbui.orm.record.Record-class.html#__init__,Method ProvCon.dbui.orm.recordlist.RecordList.__init__()=ProvCon.dbui.orm.recordlist.RecordList-class.html#__init__,Method ProvCon.dbui.orm.recordsearch.OIDSearchList.__init__()=ProvCon.dbui.orm.recordsearch.OIDSearchList-class.html#__init__,Method ProvCon.dbui.wxwin.complete.CompleteGenericForm.__init__()=ProvCon.dbui.wxwin.complete.CompleteGenericForm-class.html#__init__,Method ProvCon.dbui.wxwin.complete.FormToolbar.__init__()=ProvCon.dbui.wxwin.complete.FormToolbar-class.html#__init__,Method ProvCon.dbui.wxwin.complete.InfoPopup.__init__()=ProvCon.dbui.wxwin.complete.InfoPopup-class.html#__init__,Method ProvCon.dbui.wxwin.fields.Entry.ArrayCombo.__init__()=ProvCon.dbui.wxwin.fields.Entry.ArrayCombo-class.html#__init__,Method ProvCon.dbui.wxwin.fields.Entry.ArrayItemCombo.__init__()=ProvCon.dbui.wxwin.fields.Entry.ArrayItemCombo-class.html#__init__,Method ProvCon.dbui.wxwin.fields.Entry.ArrayItemStatic.__init__()=ProvCon.dbui.wxwin.fields.Entry.ArrayItemStatic-class.html#__init__,Method ProvCon.dbui.wxwin.fields.Entry.ArrayItemText.__init__()=ProvCon.dbui.wxwin.fields.Entry.ArrayItemText-class.html#__init__,Method ProvCon.dbui.wxwin.fields.Entry.ArrayText.__init__()=ProvCon.dbui.wxwin.fields.Entry.ArrayText-class.html#__init__,Method ProvCon.dbui.wxwin.fields.Entry.BaseArray.__init__()=ProvCon.dbui.wxwin.fields.Entry.BaseArray-class.html#__init__,Method ProvCon.dbui.wxwin.fields.Entry.Boolean.__init__()=ProvCon.dbui.wxwin.fields.Entry.Boolean-class.html#__init__,Method ProvCon.dbui.wxwin.fields.Entry.ComboReference.__init__()=ProvCon.dbui.wxwin.fields.Entry.ComboReference-class.html#__init__,Method ProvCon.dbui.wxwin.fields.Entry.Memo.__init__()=ProvCon.dbui.wxwin.fields.Entry.Memo-class.html#__init__,Method ProvCon.dbui.wxwin.fields.Entry.StandardArrayItemButtonBox.__init__()=ProvCon.dbui.wxwin.fields.Entry.StandardArrayItemButtonBox-class.html#__init__,Method ProvCon.dbui.wxwin.fields.Entry.Static.__init__()=ProvCon.dbui.wxwin.fields.Entry.Static-class.html#__init__,Method ProvCon.dbui.wxwin.fields.Entry.StaticReference.__init__()=ProvCon.dbui.wxwin.fields.Entry.StaticReference-class.html#__init__,Method ProvCon.dbui.wxwin.fields.Entry.Text.__init__()=ProvCon.dbui.wxwin.fields.Entry.Text-class.html#__init__,Method ProvCon.dbui.wxwin.forms.GenericForm.__init__()=ProvCon.dbui.wxwin.forms.GenericForm-class.html#__init__,Method ProvCon.dbui.wxwin.mwx.CheckBox.__init__()=ProvCon.dbui.wxwin.mwx.CheckBox-class.html#__init__,Method ProvCon.dbui.wxwin.mwx.ComboBox.__init__()=ProvCon.dbui.wxwin.mwx.ComboBox-class.html#__init__,Method ProvCon.dbui.wxwin.mwx.StaticText.__init__()=ProvCon.dbui.wxwin.mwx.StaticText-class.html#__init__,Method ProvCon.dbui.wxwin.mwx.TextCtrl.__init__()=ProvCon.dbui.wxwin.mwx.TextCtrl-class.html#__init__,Method ProvCon.dbui.wxwin.mwx.mwxControl.__init__()=ProvCon.dbui.wxwin.mwx.mwxControl-class.html#__init__,Method ProvCon.dbui.wxwin.navigators.Navigator.__init__()=ProvCon.dbui.wxwin.navigators.Navigator-class.html#__init__,Method ProvCon.dbui.wxwin.recordlists.RecordList.__init__()=ProvCon.dbui.wxwin.recordlists.RecordList-class.html#__init__,Method ProvCon.docsis.cablemodem.cablemodem.__init__()=ProvCon.docsis.cablemodem.cablemodem-class.html#__init__,Method ProvCon.docsis.cablemodem.cablemodem._cos.__init__()=ProvCon.docsis.cablemodem.cablemodem._cos-class.html#__init__,Method ProvCon.docsis.cablemodem.cablemodem._cpe.__init__()=ProvCon.docsis.cablemodem.cablemodem._cpe-class.html#__init__,Method ProvCon.docsis.cablemodem.cablemodem._mac.__init__()=ProvCon.docsis.cablemodem.cablemodem._mac-class.html#__init__,Method ProvCon.docsis.compiler.config.config.__init__()=ProvCon.docsis.compiler.config.config-class.html#__init__,Method ProvCon.docsis.compiler.encoder.error.__init__()=ProvCon.docsis.compiler.encoder.error-class.html#__init__,Method ProvCon.docsis.compiler.encoder.tlv.__init__()=ProvCon.docsis.compiler.encoder.tlv-class.html#__init__,Method ProvCon.docsis.compiler.encoder.tlv_multipart.__init__()=ProvCon.docsis.compiler.encoder.tlv_multipart-class.html#__init__,Method ProvCon.docsis.compiler.encoder.tlv_multipart.append_proxy.__init__()=ProvCon.docsis.compiler.encoder.tlv_multipart.append_proxy-class.html#__init__,Method ProvCon.docsis.compiler.encoder.tlv_multipart.iterator.__init__()=ProvCon.docsis.compiler.encoder.tlv_multipart.iterator-class.html#__init__,Method ProvCon.docsis.compiler.encoder.tlv_multipart_subclass.__init__()=ProvCon.docsis.compiler.encoder.tlv_multipart_subclass-class.html#__init__,Method ProvCon.docsis.compiler.encoder.tlv_subclass.__init__()=ProvCon.docsis.compiler.encoder.tlv_subclass-class.html#__init__,Method ProvCon.func.classes.conditionalmethod.__init__()=ProvCon.func.classes.conditionalmethod-class.html#__init__,Method ProvCon.func.events.eventemitter.__init__()=ProvCon.func.events.eventemitter-class.html#__init__,Method ProvCon.func.events.eventemitter.evt.__init__()=ProvCon.func.events.eventemitter.evt-class.html#__init__,Method ProvCon.func.events.eventemitter.evthook.__init__()=ProvCon.func.events.eventemitter.evthook-class.html#__init__,Method ProvCon.func.events.eventexception.__init__()=ProvCon.func.events.eventexception-class.html#__init__,Method ProvCon.func.variables.TracedVariable.Tracer.__init__()=ProvCon.func.variables.TracedVariable.Tracer-class.html#__init__,Method ProvCon.func.variables.TracedVariable.__init__()=ProvCon.func.variables.TracedVariable-class.html#__init__,Method ProvCon.gui.FrontEndApp.FE.__init__()=ProvCon.gui.FrontEndApp.FE-class.html#__init__,Method ProvCon.gui.ProvisioningControl.GenericObjectEditor.__init__()=ProvCon.gui.ProvisioningControl.GenericObjectEditor-class.html#__init__,Method ProvCon.gui.ProvisioningControl.GridView.__init__()=ProvCon.gui.ProvisioningControl.GridView-class.html#__init__,Method ProvCon.gui.ProvisioningControl.MainTab.__init__()=ProvCon.gui.ProvisioningControl.MainTab-class.html#__init__,Method ProvCon.gui.ProvisioningControl.ObjectEditorModel.__init__()=ProvCon.gui.ProvisioningControl.ObjectEditorModel-class.html#__init__,Method ProvCon.gui.ProvisioningControl.TopLevelWindow.__init__()=ProvCon.gui.ProvisioningControl.TopLevelWindow-class.html#__init__,Method ProvCon.log.LoggingBackend.__init__()=ProvCon.log.LoggingBackend-class.html#__init__,Method ProvCon.log.LoggingClient.__init__()=ProvCon.log.LoggingClient-class.html#__init__,Method ProvCon.log.LoggingServer.__init__()=ProvCon.log.LoggingServer-class.html#__init__,Method ProvCon.ui.uierror.__init__()=ProvCon.ui.uierror-class.html#__init__,Method ProvCon.wronolib.ipaddr.ip4addr.__init__()=ProvCon.wronolib.ipaddr.ip4addr-class.html#__init__,Method ProvCon.wronolib.ipaddr.ip4prefix.__init__()=ProvCon.wronolib.ipaddr.ip4prefix-class.html#__init__"><a title="ProvCon.TFTP.Protocol.Packet.__init__
+ProvCon.TFTP.ProvisioningTFTP.BaseOven.__init__
+ProvCon.TFTP.ProvisioningTFTP.CableModemConfigCook.__init__
+ProvCon.TFTP.ProvisioningTFTP.FileCook.__init__
+ProvCon.TFTP.ProvisioningTFTP.ProvisioningTFTPServer.__init__
+ProvCon.TFTP.ProvisioningTFTP.TFTPDataSender.__init__
+ProvCon.TFTP.ProvisioningTFTP.pcTFTPD.__init__
+ProvCon.TFTP.Server.BaseTFTPServer.__init__
+ProvCon.cli.CLIServer.__init__
+ProvCon.cli.CLIWorker.__init__
+ProvCon.dbui.abstractui.fields.BaseArrayEditor.__init__
+ProvCon.dbui.abstractui.fields.BaseArrayItemButtonBox.__init__
+ProvCon.dbui.abstractui.fields.BaseArrayItemEditor.__init__
+ProvCon.dbui.abstractui.fields.BaseFieldEditor.__init__
+ProvCon.dbui.abstractui.fields.BaseReferenceEditor.__init__
+ProvCon.dbui.abstractui.forms.BaseForm.__init__
+ProvCon.dbui.abstractui.navigators.BaseNavigator.__init__
+ProvCon.dbui.abstractui.recordlists.BasePager.__init__
+ProvCon.dbui.abstractui.recordlists.BaseRecordList.__init__
+ProvCon.dbui.database.CFG.tCX.__init__
+ProvCon.dbui.di.rObject'.ObjectFlags.__init__
+ProvCon.dbui.di.rObject'.ObjectParams.__init__
+ProvCon.dbui.di.rObject'.rObject.__init__
+ProvCon.dbui.meta.field.Field.__init__
+ProvCon.dbui.meta.table.Table.__init__
+ProvCon.dbui.orm.form.Form.__init__
+ProvCon.dbui.orm.record.Record.DataManipulationError.__init__
+ProvCon.dbui.orm.record.Record.DataQueryError.__init__
+ProvCon.dbui.orm.record.Record.RecordNotFound.__init__
+ProvCon.dbui.orm.record.Record.__init__
+ProvCon.dbui.orm.recordlist.RecordList.__init__
+ProvCon.dbui.orm.recordsearch.OIDSearchList.__init__
+ProvCon.dbui.wxwin.complete.CompleteGenericForm.__init__
+ProvCon.dbui.wxwin.complete.FormToolbar.__init__
+ProvCon.dbui.wxwin.complete.InfoPopup.__init__
+ProvCon.dbui.wxwin.fields.Entry.ArrayCombo.__init__
+ProvCon.dbui.wxwin.fields.Entry.ArrayItemCombo.__init__
+ProvCon.dbui.wxwin.fields.Entry.ArrayItemStatic.__init__
+ProvCon.dbui.wxwin.fields.Entry.ArrayItemText.__init__
+ProvCon.dbui.wxwin.fields.Entry.ArrayText.__init__
+ProvCon.dbui.wxwin.fields.Entry.BaseArray.__init__
+ProvCon.dbui.wxwin.fields.Entry.Boolean.__init__
+ProvCon.dbui.wxwin.fields.Entry.ComboReference.__init__
+ProvCon.dbui.wxwin.fields.Entry.Memo.__init__
+ProvCon.dbui.wxwin.fields.Entry.StandardArrayItemButtonBox.__init__
+ProvCon.dbui.wxwin.fields.Entry.Static.__init__
+ProvCon.dbui.wxwin.fields.Entry.StaticReference.__init__
+ProvCon.dbui.wxwin.fields.Entry.Text.__init__
+ProvCon.dbui.wxwin.forms.GenericForm.__init__
+ProvCon.dbui.wxwin.mwx.CheckBox.__init__
+ProvCon.dbui.wxwin.mwx.ComboBox.__init__
+ProvCon.dbui.wxwin.mwx.StaticText.__init__
+ProvCon.dbui.wxwin.mwx.TextCtrl.__init__
+ProvCon.dbui.wxwin.mwx.mwxControl.__init__
+ProvCon.dbui.wxwin.navigators.Navigator.__init__
+ProvCon.dbui.wxwin.recordlists.RecordList.__init__
+ProvCon.docsis.cablemodem.cablemodem.__init__
+ProvCon.docsis.cablemodem.cablemodem._cos.__init__
+ProvCon.docsis.cablemodem.cablemodem._cpe.__init__
+ProvCon.docsis.cablemodem.cablemodem._mac.__init__
+ProvCon.docsis.compiler.config.config.__init__
+ProvCon.docsis.compiler.encoder.error.__init__
+ProvCon.docsis.compiler.encoder.tlv.__init__
+ProvCon.docsis.compiler.encoder.tlv_multipart.__init__
+ProvCon.docsis.compiler.encoder.tlv_multipart.append_proxy.__init__
+ProvCon.docsis.compiler.encoder.tlv_multipart.iterator.__init__
+ProvCon.docsis.compiler.encoder.tlv_multipart_subclass.__init__
+ProvCon.docsis.compiler.encoder.tlv_subclass.__init__
+ProvCon.func.classes.conditionalmethod.__init__
+ProvCon.func.events.eventemitter.__init__
+ProvCon.func.events.eventemitter.evt.__init__
+ProvCon.func.events.eventemitter.evthook.__init__
+ProvCon.func.events.eventexception.__init__
+ProvCon.func.variables.TracedVariable.Tracer.__init__
+ProvCon.func.variables.TracedVariable.__init__
+ProvCon.gui.FrontEndApp.FE.__init__
+ProvCon.gui.ProvisioningControl.GenericObjectEditor.__init__
+ProvCon.gui.ProvisioningControl.GridView.__init__
+ProvCon.gui.ProvisioningControl.MainTab.__init__
+ProvCon.gui.ProvisioningControl.ObjectEditorModel.__init__
+ProvCon.gui.ProvisioningControl.TopLevelWindow.__init__
+ProvCon.log.LoggingBackend.__init__
+ProvCon.log.LoggingClient.__init__
+ProvCon.log.LoggingServer.__init__
+ProvCon.ui.uierror.__init__
+ProvCon.wronolib.ipaddr.ip4addr.__init__
+ProvCon.wronolib.ipaddr.ip4prefix.__init__" class="py-name" href="#" onclick="return doclink('link-8', '__init__', 'link-8');">__init__</a></tt><tt class="py-op">(</tt><tt class="py-name">self</tt><tt class="py-op">,</tt> <tt class="py-name">None</tt><tt class="py-op">,</tt> <tt class="py-name">None</tt><tt class="py-op">,</tt> <tt class="py-string">"pcTFTP_DATA"</tt><tt class="py-op">)</tt> </tt>
+<a name="L31"></a><tt class="py-lineno"> 31</tt>  <tt class="py-line">        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">rfQueue</tt> <tt class="py-op">=</tt> <tt class="py-name">rfQueue</tt> </tt>
+</div><a name="L32"></a><tt class="py-lineno"> 32</tt>  <tt class="py-line">     </tt>
+<a name="L33"></a><tt class="py-lineno"> 33</tt>  <tt class="py-line">    <tt class="py-comment">#The loop stops until a "None" is the first element of</tt> </tt>
+<a name="L34"></a><tt class="py-lineno"> 34</tt>  <tt class="py-line">    <tt class="py-comment">#the tuple read from the queue</tt> </tt>
+<a name="TFTPDataSender.run"></a><div id="TFTPDataSender.run-def"><a name="L35"></a><tt class="py-lineno"> 35</tt> <a class="py-toggle" href="#" id="TFTPDataSender.run-toggle" onclick="return toggle('TFTPDataSender.run');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="ProvCon.TFTP.ProvisioningTFTP.TFTPDataSender-class.html#run">run</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="TFTPDataSender.run-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="TFTPDataSender.run-expanded"><a name="L36"></a><tt class="py-lineno"> 36</tt>  <tt class="py-line">        <tt id="link-9" class="py-name"><a title="ProvCon.wronolib.procname.set_process_name" class="py-name" href="#" onclick="return doclink('link-9', 'set_process_name', 'link-5');">set_process_name</a></tt> <tt class="py-op">(</tt> <tt class="py-string">"0@TFTPD_DATA"</tt> <tt class="py-op">)</tt> </tt>
+<a name="L37"></a><tt class="py-lineno"> 37</tt>  <tt class="py-line">        <tt class="py-name">logger</tt> <tt class="py-op">=</tt> <tt id="link-10" class="py-name"><a title="ProvCon" class="py-name" href="#" onclick="return doclink('link-10', 'ProvCon', 'link-1');">ProvCon</a></tt><tt class="py-op">.</tt><tt id="link-11" class="py-name" targets="Class ProvCon.log.LoggingClient=ProvCon.log.LoggingClient-class.html"><a title="ProvCon.log.LoggingClient" class="py-name" href="#" onclick="return doclink('link-11', 'LoggingClient', 'link-11');">LoggingClient</a></tt> <tt class="py-op">(</tt> <tt class="py-name">name</tt> <tt class="py-op">=</tt> <tt class="py-string">"TFTPD%05d"</tt> <tt class="py-op">%</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">pid</tt> <tt class="py-op">)</tt> </tt>
+<a name="L38"></a><tt class="py-lineno"> 38</tt>  <tt class="py-line">        <tt class="py-name">queue_errors</tt> <tt class="py-op">=</tt> <tt class="py-number">0</tt> </tt>
+<a name="L39"></a><tt class="py-lineno"> 39</tt>  <tt class="py-line">        <tt class="py-keyword">while</tt> <tt class="py-number">1</tt><tt class="py-op">:</tt> </tt>
+<a name="L40"></a><tt class="py-lineno"> 40</tt>  <tt class="py-line">            <tt class="py-keyword">try</tt><tt class="py-op">:</tt> </tt>
+<a name="L41"></a><tt class="py-lineno"> 41</tt>  <tt class="py-line">                <tt class="py-op">(</tt><tt class="py-name">client_address</tt><tt class="py-op">,</tt> <tt class="py-name">initiating_packet</tt><tt class="py-op">,</tt> <tt class="py-name">filename</tt><tt class="py-op">,</tt> <tt class="py-name">filesize</tt><tt class="py-op">)</tt> <tt class="py-op">=</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">rfQueue</tt><tt class="py-op">.</tt><tt id="link-12" class="py-name" targets="Method ProvCon.dbui.orm.recordsearch.OIDSearchList.get()=ProvCon.dbui.orm.recordsearch.OIDSearchList-class.html#get,Method ProvCon.func.variables.TracedVariable.get()=ProvCon.func.variables.TracedVariable-class.html#get"><a title="ProvCon.dbui.orm.recordsearch.OIDSearchList.get
+ProvCon.func.variables.TracedVariable.get" class="py-name" href="#" onclick="return doclink('link-12', 'get', 'link-12');">get</a></tt><tt class="py-op">(</tt><tt class="py-op">)</tt> </tt>
+<a name="L42"></a><tt class="py-lineno"> 42</tt>  <tt class="py-line">            <tt class="py-keyword">except</tt><tt class="py-op">:</tt> </tt>
+<a name="L43"></a><tt class="py-lineno"> 43</tt>  <tt class="py-line">                <tt class="py-name">queue_errors</tt> <tt class="py-op">+=</tt> <tt class="py-number">1</tt> </tt>
+<a name="L44"></a><tt class="py-lineno"> 44</tt>  <tt class="py-line">                <tt class="py-keyword">if</tt> <tt class="py-name">queue_errors</tt> <tt class="py-op">&gt;</tt> <tt class="py-number">2</tt><tt class="py-op">:</tt> </tt>
+<a name="L45"></a><tt class="py-lineno"> 45</tt>  <tt class="py-line">                    <tt class="py-name">logger</tt> <tt class="py-op">(</tt><tt class="py-string">"Too many errors reading rfqueue"</tt><tt class="py-op">)</tt> </tt>
+<a name="L46"></a><tt class="py-lineno"> 46</tt>  <tt class="py-line">                    <tt class="py-keyword">break</tt> </tt>
+<a name="L47"></a><tt class="py-lineno"> 47</tt>  <tt class="py-line">                <tt class="py-name">time</tt><tt class="py-op">.</tt><tt class="py-name">sleep</tt><tt class="py-op">(</tt><tt class="py-name">queue_errors</tt><tt class="py-op">)</tt> </tt>
+<a name="L48"></a><tt class="py-lineno"> 48</tt>  <tt class="py-line">             </tt>
+<a name="L49"></a><tt class="py-lineno"> 49</tt>  <tt class="py-line">            <tt class="py-name">queue_errors</tt> <tt class="py-op">=</tt> <tt class="py-number">0</tt> </tt>
+<a name="L50"></a><tt class="py-lineno"> 50</tt>  <tt class="py-line">            <tt class="py-keyword">if</tt> <tt class="py-name">client_address</tt> <tt class="py-keyword">is</tt> <tt class="py-name">None</tt><tt class="py-op">:</tt> <tt class="py-keyword">break</tt> </tt>
+<a name="L51"></a><tt class="py-lineno"> 51</tt>  <tt class="py-line">            <tt class="py-name">logger</tt> <tt class="py-op">(</tt><tt class="py-string">"Sending %s to %s"</tt> <tt class="py-op">%</tt> <tt class="py-op">(</tt><tt class="py-name">filename</tt><tt class="py-op">,</tt> <tt class="py-name">client_address</tt><tt class="py-op">)</tt><tt class="py-op">)</tt> </tt>
+<a name="L52"></a><tt class="py-lineno"> 52</tt>  <tt class="py-line">            <tt class="py-keyword">try</tt><tt class="py-op">:</tt> </tt>
+<a name="L53"></a><tt class="py-lineno"> 53</tt>  <tt class="py-line">                <tt class="py-keyword">with</tt> <tt class="py-name">open</tt><tt class="py-op">(</tt><tt class="py-name">filename</tt><tt class="py-op">,</tt> <tt class="py-string">'r'</tt><tt class="py-op">)</tt> <tt class="py-keyword">as</tt> <tt class="py-name">source</tt><tt class="py-op">:</tt> </tt>
+<a name="L54"></a><tt class="py-lineno"> 54</tt>  <tt class="py-line">                    <tt class="py-keyword">try</tt><tt class="py-op">:</tt> </tt>
+<a name="L55"></a><tt class="py-lineno"> 55</tt>  <tt class="py-line">                        <tt class="py-op">(</tt><tt class="py-name">bytes</tt><tt class="py-op">,</tt> <tt class="py-name">dt</tt><tt class="py-op">,</tt> <tt class="py-name">speed</tt><tt class="py-op">)</tt> <tt class="py-op">=</tt> <tt id="link-13" class="py-name"><a title="ProvCon.TFTP.Protocol" class="py-name" href="#" onclick="return doclink('link-13', 'Protocol', 'link-7');">Protocol</a></tt><tt class="py-op">.</tt><tt id="link-14" class="py-name" targets="Function ProvCon.TFTP.Protocol.Handle_RRQ()=ProvCon.TFTP.Protocol-module.html#Handle_RRQ"><a title="ProvCon.TFTP.Protocol.Handle_RRQ" class="py-name" href="#" onclick="return doclink('link-14', 'Handle_RRQ', 'link-14');">Handle_RRQ</a></tt> <tt class="py-op">(</tt><tt class="py-name">initiating_packet</tt><tt class="py-op">,</tt> <tt class="py-name">client_address</tt><tt class="py-op">,</tt> <tt class="py-name">source</tt><tt class="py-op">)</tt> </tt>
+<a name="L56"></a><tt class="py-lineno"> 56</tt>  <tt class="py-line">                        <tt class="py-name">logger</tt> <tt class="py-op">(</tt> <tt class="py-string">"Sent %d bytes to %s at %.1f kB/s"</tt> <tt class="py-op">%</tt> <tt class="py-op">(</tt><tt class="py-name">bytes</tt><tt class="py-op">,</tt> <tt class="py-name">client_address</tt><tt class="py-op">,</tt> <tt class="py-name">speed</tt><tt class="py-op">/</tt> <tt class="py-number">1024</tt><tt class="py-op">)</tt> <tt class="py-op">)</tt> </tt>
+<a name="L57"></a><tt class="py-lineno"> 57</tt>  <tt class="py-line">                    <tt class="py-keyword">except</tt> <tt id="link-15" class="py-name"><a title="ProvCon.TFTP.Protocol" class="py-name" href="#" onclick="return doclink('link-15', 'Protocol', 'link-7');">Protocol</a></tt><tt class="py-op">.</tt><tt id="link-16" class="py-name" targets="Class ProvCon.TFTP.Protocol.TFTPProtocolError=ProvCon.TFTP.Protocol.TFTPProtocolError-class.html"><a title="ProvCon.TFTP.Protocol.TFTPProtocolError" class="py-name" href="#" onclick="return doclink('link-16', 'TFTPProtocolError', 'link-16');">TFTPProtocolError</a></tt> <tt class="py-keyword">as</tt> <tt class="py-name">e</tt><tt class="py-op">:</tt> </tt>
+<a name="L58"></a><tt class="py-lineno"> 58</tt>  <tt class="py-line">                        <tt class="py-name">logger</tt> <tt class="py-op">(</tt> <tt class="py-string">"TFTP Protocol Error: %s"</tt> <tt class="py-op">%</tt>  <tt class="py-name">e</tt> <tt class="py-op">)</tt> </tt>
+<a name="L59"></a><tt class="py-lineno"> 59</tt>  <tt class="py-line">            <tt class="py-keyword">except</tt><tt class="py-op">:</tt> </tt>
+<a name="L60"></a><tt class="py-lineno"> 60</tt>  <tt class="py-line">                <tt id="link-17" class="py-name" targets="Method ProvCon.func.variables.TracedVariable.info()=ProvCon.func.variables.TracedVariable-class.html#info"><a title="ProvCon.func.variables.TracedVariable.info" class="py-name" href="#" onclick="return doclink('link-17', 'info', 'link-17');">info</a></tt> <tt class="py-op">=</tt> <tt class="py-name">sys</tt><tt class="py-op">.</tt><tt class="py-name">exc_info</tt><tt class="py-op">(</tt><tt class="py-op">)</tt><tt class="py-op">[</tt><tt class="py-op">:</tt><tt class="py-number">2</tt><tt class="py-op">]</tt> </tt>
+<a name="L61"></a><tt class="py-lineno"> 61</tt>  <tt class="py-line">                <tt class="py-name">logger</tt> <tt class="py-op">(</tt> <tt class="py-string">"TFTP error: %s, %s"</tt> <tt class="py-op">%</tt> <tt class="py-op">(</tt><tt id="link-18" class="py-name"><a title="ProvCon.func.variables.TracedVariable.info" class="py-name" href="#" onclick="return doclink('link-18', 'info', 'link-17');">info</a></tt><tt class="py-op">[</tt><tt class="py-number">0</tt><tt class="py-op">]</tt><tt class="py-op">,</tt> <tt id="link-19" class="py-name"><a title="ProvCon.func.variables.TracedVariable.info" class="py-name" href="#" onclick="return doclink('link-19', 'info', 'link-17');">info</a></tt><tt class="py-op">[</tt><tt class="py-number">1</tt><tt class="py-op">]</tt><tt class="py-op">)</tt><tt class="py-op">)</tt>                 </tt>
+<a name="L62"></a><tt class="py-lineno"> 62</tt>  <tt class="py-line"> </tt>
+<a name="L63"></a><tt class="py-lineno"> 63</tt>  <tt class="py-line">        <tt class="py-name">logger</tt> <tt class="py-op">(</tt> <tt class="py-string">"EXIT"</tt> <tt class="py-op">)</tt> </tt>
+</div></div><a name="L64"></a><tt class="py-lineno"> 64</tt>  <tt class="py-line">  </tt>
+<a name="CableModemConfigCook"></a><div id="CableModemConfigCook-def"><a name="L65"></a><tt class="py-lineno"> 65</tt> <a class="py-toggle" href="#" id="CableModemConfigCook-toggle" onclick="return toggle('CableModemConfigCook');">-</a><tt class="py-line"><tt class="py-keyword">class</tt> <a class="py-def-name" href="ProvCon.TFTP.ProvisioningTFTP.CableModemConfigCook-class.html">CableModemConfigCook</a><tt class="py-op">(</tt><tt class="py-base-class">Process</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="CableModemConfigCook-collapsed" style="display:none;" pad="+++" indent="++++"></div><div id="CableModemConfigCook-expanded"><a name="CableModemConfigCook.__init__"></a><div id="CableModemConfigCook.__init__-def"><a name="L66"></a><tt class="py-lineno"> 66</tt> <a class="py-toggle" href="#" id="CableModemConfigCook.__init__-toggle" onclick="return toggle('CableModemConfigCook.__init__');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="ProvCon.TFTP.ProvisioningTFTP.CableModemConfigCook-class.html#__init__">__init__</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">,</tt> <tt class="py-param">myQueue</tt><tt class="py-op">,</tt> <tt class="py-param">rfQueue</tt><tt class="py-op">,</tt> <tt class="py-param">oven</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="CableModemConfigCook.__init__-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="CableModemConfigCook.__init__-expanded"><a name="L67"></a><tt class="py-lineno"> 67</tt>  <tt class="py-line">        <tt class="py-name">Process</tt><tt class="py-op">.</tt><tt id="link-20" class="py-name"><a title="ProvCon.TFTP.Protocol.Packet.__init__
+ProvCon.TFTP.ProvisioningTFTP.BaseOven.__init__
+ProvCon.TFTP.ProvisioningTFTP.CableModemConfigCook.__init__
+ProvCon.TFTP.ProvisioningTFTP.FileCook.__init__
+ProvCon.TFTP.ProvisioningTFTP.ProvisioningTFTPServer.__init__
+ProvCon.TFTP.ProvisioningTFTP.TFTPDataSender.__init__
+ProvCon.TFTP.ProvisioningTFTP.pcTFTPD.__init__
+ProvCon.TFTP.Server.BaseTFTPServer.__init__
+ProvCon.cli.CLIServer.__init__
+ProvCon.cli.CLIWorker.__init__
+ProvCon.dbui.abstractui.fields.BaseArrayEditor.__init__
+ProvCon.dbui.abstractui.fields.BaseArrayItemButtonBox.__init__
+ProvCon.dbui.abstractui.fields.BaseArrayItemEditor.__init__
+ProvCon.dbui.abstractui.fields.BaseFieldEditor.__init__
+ProvCon.dbui.abstractui.fields.BaseReferenceEditor.__init__
+ProvCon.dbui.abstractui.forms.BaseForm.__init__
+ProvCon.dbui.abstractui.navigators.BaseNavigator.__init__
+ProvCon.dbui.abstractui.recordlists.BasePager.__init__
+ProvCon.dbui.abstractui.recordlists.BaseRecordList.__init__
+ProvCon.dbui.database.CFG.tCX.__init__
+ProvCon.dbui.di.rObject'.ObjectFlags.__init__
+ProvCon.dbui.di.rObject'.ObjectParams.__init__
+ProvCon.dbui.di.rObject'.rObject.__init__
+ProvCon.dbui.meta.field.Field.__init__
+ProvCon.dbui.meta.table.Table.__init__
+ProvCon.dbui.orm.form.Form.__init__
+ProvCon.dbui.orm.record.Record.DataManipulationError.__init__
+ProvCon.dbui.orm.record.Record.DataQueryError.__init__
+ProvCon.dbui.orm.record.Record.RecordNotFound.__init__
+ProvCon.dbui.orm.record.Record.__init__
+ProvCon.dbui.orm.recordlist.RecordList.__init__
+ProvCon.dbui.orm.recordsearch.OIDSearchList.__init__
+ProvCon.dbui.wxwin.complete.CompleteGenericForm.__init__
+ProvCon.dbui.wxwin.complete.FormToolbar.__init__
+ProvCon.dbui.wxwin.complete.InfoPopup.__init__
+ProvCon.dbui.wxwin.fields.Entry.ArrayCombo.__init__
+ProvCon.dbui.wxwin.fields.Entry.ArrayItemCombo.__init__
+ProvCon.dbui.wxwin.fields.Entry.ArrayItemStatic.__init__
+ProvCon.dbui.wxwin.fields.Entry.ArrayItemText.__init__
+ProvCon.dbui.wxwin.fields.Entry.ArrayText.__init__
+ProvCon.dbui.wxwin.fields.Entry.BaseArray.__init__
+ProvCon.dbui.wxwin.fields.Entry.Boolean.__init__
+ProvCon.dbui.wxwin.fields.Entry.ComboReference.__init__
+ProvCon.dbui.wxwin.fields.Entry.Memo.__init__
+ProvCon.dbui.wxwin.fields.Entry.StandardArrayItemButtonBox.__init__
+ProvCon.dbui.wxwin.fields.Entry.Static.__init__
+ProvCon.dbui.wxwin.fields.Entry.StaticReference.__init__
+ProvCon.dbui.wxwin.fields.Entry.Text.__init__
+ProvCon.dbui.wxwin.forms.GenericForm.__init__
+ProvCon.dbui.wxwin.mwx.CheckBox.__init__
+ProvCon.dbui.wxwin.mwx.ComboBox.__init__
+ProvCon.dbui.wxwin.mwx.StaticText.__init__
+ProvCon.dbui.wxwin.mwx.TextCtrl.__init__
+ProvCon.dbui.wxwin.mwx.mwxControl.__init__
+ProvCon.dbui.wxwin.navigators.Navigator.__init__
+ProvCon.dbui.wxwin.recordlists.RecordList.__init__
+ProvCon.docsis.cablemodem.cablemodem.__init__
+ProvCon.docsis.cablemodem.cablemodem._cos.__init__
+ProvCon.docsis.cablemodem.cablemodem._cpe.__init__
+ProvCon.docsis.cablemodem.cablemodem._mac.__init__
+ProvCon.docsis.compiler.config.config.__init__
+ProvCon.docsis.compiler.encoder.error.__init__
+ProvCon.docsis.compiler.encoder.tlv.__init__
+ProvCon.docsis.compiler.encoder.tlv_multipart.__init__
+ProvCon.docsis.compiler.encoder.tlv_multipart.append_proxy.__init__
+ProvCon.docsis.compiler.encoder.tlv_multipart.iterator.__init__
+ProvCon.docsis.compiler.encoder.tlv_multipart_subclass.__init__
+ProvCon.docsis.compiler.encoder.tlv_subclass.__init__
+ProvCon.func.classes.conditionalmethod.__init__
+ProvCon.func.events.eventemitter.__init__
+ProvCon.func.events.eventemitter.evt.__init__
+ProvCon.func.events.eventemitter.evthook.__init__
+ProvCon.func.events.eventexception.__init__
+ProvCon.func.variables.TracedVariable.Tracer.__init__
+ProvCon.func.variables.TracedVariable.__init__
+ProvCon.gui.FrontEndApp.FE.__init__
+ProvCon.gui.ProvisioningControl.GenericObjectEditor.__init__
+ProvCon.gui.ProvisioningControl.GridView.__init__
+ProvCon.gui.ProvisioningControl.MainTab.__init__
+ProvCon.gui.ProvisioningControl.ObjectEditorModel.__init__
+ProvCon.gui.ProvisioningControl.TopLevelWindow.__init__
+ProvCon.log.LoggingBackend.__init__
+ProvCon.log.LoggingClient.__init__
+ProvCon.log.LoggingServer.__init__
+ProvCon.ui.uierror.__init__
+ProvCon.wronolib.ipaddr.ip4addr.__init__
+ProvCon.wronolib.ipaddr.ip4prefix.__init__" class="py-name" href="#" onclick="return doclink('link-20', '__init__', 'link-8');">__init__</a></tt><tt class="py-op">(</tt><tt class="py-name">self</tt><tt class="py-op">,</tt> <tt class="py-name">None</tt><tt class="py-op">,</tt> <tt class="py-name">None</tt><tt class="py-op">,</tt> <tt class="py-string">"pcCMCFG_COOK"</tt><tt class="py-op">)</tt> </tt>
+<a name="L68"></a><tt class="py-lineno"> 68</tt>  <tt class="py-line">        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">myQueue</tt> <tt class="py-op">=</tt> <tt class="py-name">myQueue</tt> </tt>
+<a name="L69"></a><tt class="py-lineno"> 69</tt>  <tt class="py-line">        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">rfQueue</tt> <tt class="py-op">=</tt> <tt class="py-name">rfQueue</tt> </tt>
+<a name="L70"></a><tt class="py-lineno"> 70</tt>  <tt class="py-line">        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">oven</tt> <tt class="py-op">=</tt> <tt class="py-name">oven</tt> </tt>
+</div><a name="L71"></a><tt class="py-lineno"> 71</tt>  <tt class="py-line">     </tt>
+<a name="CableModemConfigCook.run"></a><div id="CableModemConfigCook.run-def"><a name="L72"></a><tt class="py-lineno"> 72</tt> <a class="py-toggle" href="#" id="CableModemConfigCook.run-toggle" onclick="return toggle('CableModemConfigCook.run');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="ProvCon.TFTP.ProvisioningTFTP.CableModemConfigCook-class.html#run">run</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="CableModemConfigCook.run-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="CableModemConfigCook.run-expanded"><a name="L73"></a><tt class="py-lineno"> 73</tt>  <tt class="py-line">        <tt id="link-21" class="py-name"><a title="ProvCon.wronolib.procname.set_process_name" class="py-name" href="#" onclick="return doclink('link-21', 'set_process_name', 'link-5');">set_process_name</a></tt> <tt class="py-op">(</tt> <tt class="py-string">"0@TFTPD_CMCFG"</tt> <tt class="py-op">)</tt> </tt>
+<a name="L74"></a><tt class="py-lineno"> 74</tt>  <tt class="py-line">        <tt class="py-keyword">pass</tt> </tt>
+</div></div><a name="L75"></a><tt class="py-lineno"> 75</tt>  <tt class="py-line">         </tt>
+<a name="FileCook"></a><div id="FileCook-def"><a name="L76"></a><tt class="py-lineno"> 76</tt> <a class="py-toggle" href="#" id="FileCook-toggle" onclick="return toggle('FileCook');">-</a><tt class="py-line"><tt class="py-keyword">class</tt> <a class="py-def-name" href="ProvCon.TFTP.ProvisioningTFTP.FileCook-class.html">FileCook</a><tt class="py-op">(</tt><tt class="py-base-class">Process</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="FileCook-collapsed" style="display:none;" pad="+++" indent="++++"></div><div id="FileCook-expanded"><a name="FileCook.__init__"></a><div id="FileCook.__init__-def"><a name="L77"></a><tt class="py-lineno"> 77</tt> <a class="py-toggle" href="#" id="FileCook.__init__-toggle" onclick="return toggle('FileCook.__init__');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="ProvCon.TFTP.ProvisioningTFTP.FileCook-class.html#__init__">__init__</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">,</tt> <tt class="py-param">myQueue</tt><tt class="py-op">,</tt> <tt class="py-param">rfQueue</tt><tt class="py-op">,</tt> <tt class="py-param">fileOven</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="FileCook.__init__-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="FileCook.__init__-expanded"><a name="L78"></a><tt class="py-lineno"> 78</tt>  <tt class="py-line">        <tt class="py-name">Process</tt><tt class="py-op">.</tt><tt id="link-22" class="py-name"><a title="ProvCon.TFTP.Protocol.Packet.__init__
+ProvCon.TFTP.ProvisioningTFTP.BaseOven.__init__
+ProvCon.TFTP.ProvisioningTFTP.CableModemConfigCook.__init__
+ProvCon.TFTP.ProvisioningTFTP.FileCook.__init__
+ProvCon.TFTP.ProvisioningTFTP.ProvisioningTFTPServer.__init__
+ProvCon.TFTP.ProvisioningTFTP.TFTPDataSender.__init__
+ProvCon.TFTP.ProvisioningTFTP.pcTFTPD.__init__
+ProvCon.TFTP.Server.BaseTFTPServer.__init__
+ProvCon.cli.CLIServer.__init__
+ProvCon.cli.CLIWorker.__init__
+ProvCon.dbui.abstractui.fields.BaseArrayEditor.__init__
+ProvCon.dbui.abstractui.fields.BaseArrayItemButtonBox.__init__
+ProvCon.dbui.abstractui.fields.BaseArrayItemEditor.__init__
+ProvCon.dbui.abstractui.fields.BaseFieldEditor.__init__
+ProvCon.dbui.abstractui.fields.BaseReferenceEditor.__init__
+ProvCon.dbui.abstractui.forms.BaseForm.__init__
+ProvCon.dbui.abstractui.navigators.BaseNavigator.__init__
+ProvCon.dbui.abstractui.recordlists.BasePager.__init__
+ProvCon.dbui.abstractui.recordlists.BaseRecordList.__init__
+ProvCon.dbui.database.CFG.tCX.__init__
+ProvCon.dbui.di.rObject'.ObjectFlags.__init__
+ProvCon.dbui.di.rObject'.ObjectParams.__init__
+ProvCon.dbui.di.rObject'.rObject.__init__
+ProvCon.dbui.meta.field.Field.__init__
+ProvCon.dbui.meta.table.Table.__init__
+ProvCon.dbui.orm.form.Form.__init__
+ProvCon.dbui.orm.record.Record.DataManipulationError.__init__
+ProvCon.dbui.orm.record.Record.DataQueryError.__init__
+ProvCon.dbui.orm.record.Record.RecordNotFound.__init__
+ProvCon.dbui.orm.record.Record.__init__
+ProvCon.dbui.orm.recordlist.RecordList.__init__
+ProvCon.dbui.orm.recordsearch.OIDSearchList.__init__
+ProvCon.dbui.wxwin.complete.CompleteGenericForm.__init__
+ProvCon.dbui.wxwin.complete.FormToolbar.__init__
+ProvCon.dbui.wxwin.complete.InfoPopup.__init__
+ProvCon.dbui.wxwin.fields.Entry.ArrayCombo.__init__
+ProvCon.dbui.wxwin.fields.Entry.ArrayItemCombo.__init__
+ProvCon.dbui.wxwin.fields.Entry.ArrayItemStatic.__init__
+ProvCon.dbui.wxwin.fields.Entry.ArrayItemText.__init__
+ProvCon.dbui.wxwin.fields.Entry.ArrayText.__init__
+ProvCon.dbui.wxwin.fields.Entry.BaseArray.__init__
+ProvCon.dbui.wxwin.fields.Entry.Boolean.__init__
+ProvCon.dbui.wxwin.fields.Entry.ComboReference.__init__
+ProvCon.dbui.wxwin.fields.Entry.Memo.__init__
+ProvCon.dbui.wxwin.fields.Entry.StandardArrayItemButtonBox.__init__
+ProvCon.dbui.wxwin.fields.Entry.Static.__init__
+ProvCon.dbui.wxwin.fields.Entry.StaticReference.__init__
+ProvCon.dbui.wxwin.fields.Entry.Text.__init__
+ProvCon.dbui.wxwin.forms.GenericForm.__init__
+ProvCon.dbui.wxwin.mwx.CheckBox.__init__
+ProvCon.dbui.wxwin.mwx.ComboBox.__init__
+ProvCon.dbui.wxwin.mwx.StaticText.__init__
+ProvCon.dbui.wxwin.mwx.TextCtrl.__init__
+ProvCon.dbui.wxwin.mwx.mwxControl.__init__
+ProvCon.dbui.wxwin.navigators.Navigator.__init__
+ProvCon.dbui.wxwin.recordlists.RecordList.__init__
+ProvCon.docsis.cablemodem.cablemodem.__init__
+ProvCon.docsis.cablemodem.cablemodem._cos.__init__
+ProvCon.docsis.cablemodem.cablemodem._cpe.__init__
+ProvCon.docsis.cablemodem.cablemodem._mac.__init__
+ProvCon.docsis.compiler.config.config.__init__
+ProvCon.docsis.compiler.encoder.error.__init__
+ProvCon.docsis.compiler.encoder.tlv.__init__
+ProvCon.docsis.compiler.encoder.tlv_multipart.__init__
+ProvCon.docsis.compiler.encoder.tlv_multipart.append_proxy.__init__
+ProvCon.docsis.compiler.encoder.tlv_multipart.iterator.__init__
+ProvCon.docsis.compiler.encoder.tlv_multipart_subclass.__init__
+ProvCon.docsis.compiler.encoder.tlv_subclass.__init__
+ProvCon.func.classes.conditionalmethod.__init__
+ProvCon.func.events.eventemitter.__init__
+ProvCon.func.events.eventemitter.evt.__init__
+ProvCon.func.events.eventemitter.evthook.__init__
+ProvCon.func.events.eventexception.__init__
+ProvCon.func.variables.TracedVariable.Tracer.__init__
+ProvCon.func.variables.TracedVariable.__init__
+ProvCon.gui.FrontEndApp.FE.__init__
+ProvCon.gui.ProvisioningControl.GenericObjectEditor.__init__
+ProvCon.gui.ProvisioningControl.GridView.__init__
+ProvCon.gui.ProvisioningControl.MainTab.__init__
+ProvCon.gui.ProvisioningControl.ObjectEditorModel.__init__
+ProvCon.gui.ProvisioningControl.TopLevelWindow.__init__
+ProvCon.log.LoggingBackend.__init__
+ProvCon.log.LoggingClient.__init__
+ProvCon.log.LoggingServer.__init__
+ProvCon.ui.uierror.__init__
+ProvCon.wronolib.ipaddr.ip4addr.__init__
+ProvCon.wronolib.ipaddr.ip4prefix.__init__" class="py-name" href="#" onclick="return doclink('link-22', '__init__', 'link-8');">__init__</a></tt><tt class="py-op">(</tt><tt class="py-name">self</tt><tt class="py-op">,</tt> <tt class="py-name">None</tt><tt class="py-op">,</tt> <tt class="py-name">None</tt><tt class="py-op">,</tt> <tt class="py-string">"pcTFTP_COOK"</tt><tt class="py-op">)</tt> </tt>
+<a name="L79"></a><tt class="py-lineno"> 79</tt>  <tt class="py-line">        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">myQueue</tt> <tt class="py-op">=</tt> <tt class="py-name">myQueue</tt> </tt>
+<a name="L80"></a><tt class="py-lineno"> 80</tt>  <tt class="py-line">        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">rfQueue</tt> <tt class="py-op">=</tt> <tt class="py-name">rfQueue</tt> </tt>
+<a name="L81"></a><tt class="py-lineno"> 81</tt>  <tt class="py-line">        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">oven</tt> <tt class="py-op">=</tt> <tt class="py-name">fileOven</tt> </tt>
+</div><a name="L82"></a><tt class="py-lineno"> 82</tt>  <tt class="py-line">         </tt>
+<a name="FileCook.run"></a><div id="FileCook.run-def"><a name="L83"></a><tt class="py-lineno"> 83</tt> <a class="py-toggle" href="#" id="FileCook.run-toggle" onclick="return toggle('FileCook.run');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="ProvCon.TFTP.ProvisioningTFTP.FileCook-class.html#run">run</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="FileCook.run-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="FileCook.run-expanded"><a name="L84"></a><tt class="py-lineno"> 84</tt>  <tt class="py-line">        <tt id="link-23" class="py-name"><a title="ProvCon.wronolib.procname.set_process_name" class="py-name" href="#" onclick="return doclink('link-23', 'set_process_name', 'link-5');">set_process_name</a></tt> <tt class="py-op">(</tt> <tt class="py-string">"0@TFTPD_FILE"</tt> <tt class="py-op">)</tt> </tt>
+<a name="L85"></a><tt class="py-lineno"> 85</tt>  <tt class="py-line">        <tt class="py-name">logger</tt> <tt class="py-op">=</tt> <tt id="link-24" class="py-name"><a title="ProvCon" class="py-name" href="#" onclick="return doclink('link-24', 'ProvCon', 'link-1');">ProvCon</a></tt><tt class="py-op">.</tt><tt id="link-25" class="py-name"><a title="ProvCon.log.LoggingClient" class="py-name" href="#" onclick="return doclink('link-25', 'LoggingClient', 'link-11');">LoggingClient</a></tt> <tt class="py-op">(</tt> <tt class="py-name">name</tt><tt class="py-op">=</tt><tt class="py-string">"TFTP_FILE"</tt> <tt class="py-op">)</tt> </tt>
+<a name="L86"></a><tt class="py-lineno"> 86</tt>  <tt class="py-line">        <tt class="py-keyword">while</tt> <tt class="py-name">True</tt><tt class="py-op">:</tt> </tt>
+<a name="L87"></a><tt class="py-lineno"> 87</tt>  <tt class="py-line">            <tt class="py-op">(</tt><tt class="py-name">initiating_packet</tt><tt class="py-op">,</tt> <tt class="py-name">client_address</tt><tt class="py-op">)</tt> <tt class="py-op">=</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">myQueue</tt><tt class="py-op">.</tt><tt id="link-26" class="py-name"><a title="ProvCon.dbui.orm.recordsearch.OIDSearchList.get
+ProvCon.func.variables.TracedVariable.get" class="py-name" href="#" onclick="return doclink('link-26', 'get', 'link-12');">get</a></tt><tt class="py-op">(</tt><tt class="py-op">)</tt> </tt>
+<a name="L88"></a><tt class="py-lineno"> 88</tt>  <tt class="py-line">            <tt class="py-keyword">if</tt> <tt class="py-name">initiating_packet</tt> <tt class="py-keyword">is</tt> <tt class="py-name">None</tt><tt class="py-op">:</tt> <tt class="py-keyword">break</tt> </tt>
+<a name="L89"></a><tt class="py-lineno"> 89</tt>  <tt class="py-line">            <tt class="py-keyword">print</tt> <tt class="py-string">"cooking %s"</tt> <tt class="py-op">%</tt> <tt class="py-name">initiating_packet</tt> </tt>
+<a name="L90"></a><tt class="py-lineno"> 90</tt>  <tt class="py-line">            <tt class="py-op">(</tt><tt class="py-name">filename</tt><tt class="py-op">,</tt> <tt class="py-name">filesize</tt><tt class="py-op">)</tt> <tt class="py-op">=</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">oven</tt><tt class="py-op">.</tt><tt id="link-27" class="py-name" targets="Method ProvCon.TFTP.ProvisioningTFTP.BaseOven.prepare()=ProvCon.TFTP.ProvisioningTFTP.BaseOven-class.html#prepare,Method ProvCon.TFTP.ProvisioningTFTP.FileOven.prepare()=ProvCon.TFTP.ProvisioningTFTP.FileOven-class.html#prepare"><a title="ProvCon.TFTP.ProvisioningTFTP.BaseOven.prepare
+ProvCon.TFTP.ProvisioningTFTP.FileOven.prepare" class="py-name" href="#" onclick="return doclink('link-27', 'prepare', 'link-27');">prepare</a></tt> <tt class="py-op">(</tt><tt class="py-name">initiating_packet</tt><tt class="py-op">.</tt><tt class="py-name">filename</tt><tt class="py-op">,</tt> <tt class="py-name">client_address</tt><tt class="py-op">[</tt><tt class="py-number">0</tt><tt class="py-op">]</tt><tt class="py-op">)</tt> </tt>
+<a name="L91"></a><tt class="py-lineno"> 91</tt>  <tt class="py-line">            <tt class="py-keyword">if</tt> <tt class="py-name">filesize</tt> <tt class="py-op">&lt;</tt> <tt class="py-number">0</tt><tt class="py-op">:</tt> </tt>
+<a name="L92"></a><tt class="py-lineno"> 92</tt>  <tt class="py-line">                <tt class="py-name">logger</tt> <tt class="py-op">(</tt> <tt class="py-string">"%s, ERROR, %s"</tt> <tt class="py-op">%</tt> <tt class="py-op">(</tt><tt class="py-name">client_address</tt><tt class="py-op">[</tt><tt class="py-number">0</tt><tt class="py-op">]</tt><tt class="py-op">,</tt> <tt class="py-name">filename</tt><tt class="py-op">)</tt> <tt class="py-op">)</tt> </tt>
+<a name="L93"></a><tt class="py-lineno"> 93</tt>  <tt class="py-line">                <tt id="link-28" class="py-name"><a title="ProvCon.TFTP.Protocol" class="py-name" href="#" onclick="return doclink('link-28', 'Protocol', 'link-7');">Protocol</a></tt><tt class="py-op">.</tt><tt id="link-29" class="py-name" targets="Function ProvCon.TFTP.Protocol.Send_ERROR()=ProvCon.TFTP.Protocol-module.html#Send_ERROR"><a title="ProvCon.TFTP.Protocol.Send_ERROR" class="py-name" href="#" onclick="return doclink('link-29', 'Send_ERROR', 'link-29');">Send_ERROR</a></tt> <tt class="py-op">(</tt><tt class="py-name">client_address</tt><tt class="py-op">,</tt> <tt class="py-number">0</tt><tt class="py-op">,</tt> <tt class="py-name">filename</tt><tt class="py-op">)</tt> </tt>
+<a name="L94"></a><tt class="py-lineno"> 94</tt>  <tt class="py-line">            <tt class="py-keyword">else</tt><tt class="py-op">:</tt> </tt>
+<a name="L95"></a><tt class="py-lineno"> 95</tt>  <tt class="py-line">                <tt class="py-keyword">try</tt><tt class="py-op">:</tt> </tt>
+<a name="L96"></a><tt class="py-lineno"> 96</tt>  <tt class="py-line">                    <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">rfQueue</tt><tt class="py-op">.</tt><tt class="py-name">put</tt> <tt class="py-op">(</tt> <tt class="py-op">(</tt><tt class="py-name">client_address</tt><tt class="py-op">,</tt> <tt class="py-name">initiating_packet</tt><tt class="py-op">,</tt> <tt class="py-name">filename</tt><tt class="py-op">,</tt> <tt class="py-name">filesize</tt><tt class="py-op">)</tt> <tt class="py-op">)</tt> </tt>
+<a name="L97"></a><tt class="py-lineno"> 97</tt>  <tt class="py-line">                <tt class="py-keyword">except</tt> <tt class="py-name">ThreadingQueue</tt><tt class="py-op">.</tt><tt class="py-name">full</tt><tt class="py-op">:</tt> </tt>
+<a name="L98"></a><tt class="py-lineno"> 98</tt>  <tt class="py-line">                    <tt class="py-name">logger</tt> <tt class="py-op">(</tt> <tt class="py-string">"%s, ERROR, rf queue full"</tt> <tt class="py-op">%</tt> <tt class="py-op">(</tt><tt class="py-name">client_address</tt><tt class="py-op">[</tt><tt class="py-number">0</tt><tt class="py-op">]</tt><tt class="py-op">,</tt><tt class="py-op">)</tt> <tt class="py-op">)</tt> </tt>
+<a name="L99"></a><tt class="py-lineno"> 99</tt>  <tt class="py-line">                    <tt id="link-30" class="py-name"><a title="ProvCon.TFTP.Protocol" class="py-name" href="#" onclick="return doclink('link-30', 'Protocol', 'link-7');">Protocol</a></tt><tt class="py-op">.</tt><tt id="link-31" class="py-name"><a title="ProvCon.TFTP.Protocol.Send_ERROR" class="py-name" href="#" onclick="return doclink('link-31', 'Send_ERROR', 'link-29');">Send_ERROR</a></tt> <tt class="py-op">(</tt><tt class="py-name">client_address</tt><tt class="py-op">,</tt> <tt class="py-number">0</tt><tt class="py-op">,</tt> <tt class="py-string">'rf queue full'</tt> <tt class="py-op">)</tt> </tt>
+</div></div><a name="L100"></a><tt class="py-lineno">100</tt>  <tt class="py-line"> </tt>
+<a name="L101"></a><tt class="py-lineno">101</tt>  <tt class="py-line"><tt class="py-comment">#An "oven" is an object that prepares files to be sent to clients.</tt> </tt>
+<a name="L102"></a><tt class="py-lineno">102</tt>  <tt class="py-line"><tt class="py-comment">#An oven operates in a specified directory, and limits the files</tt> </tt>
+<a name="L103"></a><tt class="py-lineno">103</tt>  <tt class="py-line"><tt class="py-comment">#served to the ones matching a specified umask.</tt> </tt>
+<a name="L104"></a><tt class="py-lineno">104</tt>  <tt class="py-line"><tt class="py-comment">#The ovens also support a simple permisions mechanism - there are two</tt> </tt>
+<a name="L105"></a><tt class="py-lineno">105</tt>  <tt class="py-line"><tt class="py-comment">#lists of access controls - denylist and allowlist, all requests matching an</tt> </tt>
+<a name="L106"></a><tt class="py-lineno">106</tt>  <tt class="py-line"><tt class="py-comment">#entry in the allowlist are ... allowed, ones matching the denylist are</tt> </tt>
+<a name="L107"></a><tt class="py-lineno">107</tt>  <tt class="py-line"><tt class="py-comment">#rejected. The order in which these lists are processed is defined by the</tt> </tt>
+<a name="L108"></a><tt class="py-lineno">108</tt>  <tt class="py-line"><tt class="py-comment">#'order' field.</tt> </tt>
+<a name="L109"></a><tt class="py-lineno">109</tt>  <tt class="py-line"><tt class="py-comment">#The format of the access controls is (type_of_acl, value).</tt> </tt>
+<a name="L110"></a><tt class="py-lineno">110</tt>  <tt class="py-line"><tt class="py-comment">#There are 2 types of acl suported - filename and ip:</tt> </tt>
+<a name="L111"></a><tt class="py-lineno">111</tt>  <tt class="py-line"><tt class="py-comment">#  e.g.   ( 'file', 'cm-.*\.cfg' )</tt> </tt>
+<a name="L112"></a><tt class="py-lineno">112</tt>  <tt class="py-line"><tt class="py-comment">#         ( 'ip', '10.1.0.0/16' )</tt> </tt>
+<a name="L113"></a><tt class="py-lineno">113</tt>  <tt class="py-line"><tt class="py-comment">#         ( 'file', 'cm-%(IP)s\.cfg' )  (the pattern uses the client ip address)</tt> </tt>
+<a name="L114"></a><tt class="py-lineno">114</tt>  <tt class="py-line"><tt class="py-comment">#         ( 0, 0)                    match everything</tt> </tt>
+<a name="BaseOven"></a><div id="BaseOven-def"><a name="L115"></a><tt class="py-lineno">115</tt> <a class="py-toggle" href="#" id="BaseOven-toggle" onclick="return toggle('BaseOven');">-</a><tt class="py-line"><tt class="py-keyword">class</tt> <a class="py-def-name" href="ProvCon.TFTP.ProvisioningTFTP.BaseOven-class.html">BaseOven</a><tt class="py-op">:</tt> </tt>
+</div><div id="BaseOven-collapsed" style="display:none;" pad="+++" indent="++++"></div><div id="BaseOven-expanded"><a name="BaseOven.__init__"></a><div id="BaseOven.__init__-def"><a name="L116"></a><tt class="py-lineno">116</tt> <a class="py-toggle" href="#" id="BaseOven.__init__-toggle" onclick="return toggle('BaseOven.__init__');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="ProvCon.TFTP.ProvisioningTFTP.BaseOven-class.html#__init__">__init__</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">,</tt> <tt class="py-op">**</tt><tt class="py-param">kkw</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="BaseOven.__init__-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="BaseOven.__init__-expanded"><a name="L117"></a><tt class="py-lineno">117</tt>  <tt class="py-line">        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">root</tt> <tt class="py-op">=</tt> <tt class="py-name">os</tt><tt class="py-op">.</tt><tt class="py-name">path</tt><tt class="py-op">.</tt><tt class="py-name">abspath</tt><tt class="py-op">(</tt><tt class="py-name">os</tt><tt class="py-op">.</tt><tt class="py-name">path</tt><tt class="py-op">.</tt><tt class="py-name">dirname</tt><tt class="py-op">(</tt><tt class="py-name">kkw</tt><tt class="py-op">[</tt><tt class="py-string">'root'</tt><tt class="py-op">]</tt><tt class="py-op">)</tt><tt class="py-op">)</tt> </tt>
+<a name="L118"></a><tt class="py-lineno">118</tt>  <tt class="py-line">        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">umask</tt> <tt class="py-op">=</tt> <tt class="py-name">kkw</tt><tt class="py-op">.</tt><tt id="link-32" class="py-name"><a title="ProvCon.dbui.orm.recordsearch.OIDSearchList.get
+ProvCon.func.variables.TracedVariable.get" class="py-name" href="#" onclick="return doclink('link-32', 'get', 'link-12');">get</a></tt><tt class="py-op">(</tt><tt class="py-string">'umask'</tt><tt class="py-op">,</tt> <tt class="py-number">0644</tt> <tt class="py-op">)</tt> </tt>
+<a name="L119"></a><tt class="py-lineno">119</tt>  <tt class="py-line">        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">denylist</tt> <tt class="py-op">=</tt> <tt class="py-op">[</tt><tt class="py-op">]</tt> </tt>
+<a name="L120"></a><tt class="py-lineno">120</tt>  <tt class="py-line">        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">allowlist</tt> <tt class="py-op">=</tt> <tt class="py-op">[</tt><tt class="py-op">]</tt> </tt>
+<a name="L121"></a><tt class="py-lineno">121</tt>  <tt class="py-line">        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">order</tt> <tt class="py-op">=</tt> <tt class="py-name">kkw</tt><tt class="py-op">.</tt><tt id="link-33" class="py-name"><a title="ProvCon.dbui.orm.recordsearch.OIDSearchList.get
+ProvCon.func.variables.TracedVariable.get" class="py-name" href="#" onclick="return doclink('link-33', 'get', 'link-12');">get</a></tt> <tt class="py-op">(</tt><tt class="py-string">'order'</tt><tt class="py-op">,</tt> <tt class="py-string">"allow"</tt><tt class="py-op">)</tt> </tt>
+<a name="L122"></a><tt class="py-lineno">122</tt>  <tt class="py-line">        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">name</tt> <tt class="py-op">=</tt> <tt class="py-name">kkw</tt><tt class="py-op">.</tt><tt id="link-34" class="py-name"><a title="ProvCon.dbui.orm.recordsearch.OIDSearchList.get
+ProvCon.func.variables.TracedVariable.get" class="py-name" href="#" onclick="return doclink('link-34', 'get', 'link-12');">get</a></tt> <tt class="py-op">(</tt><tt class="py-string">'name'</tt><tt class="py-op">,</tt> <tt class="py-name">str</tt><tt class="py-op">(</tt><tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">__class__</tt><tt class="py-op">)</tt><tt class="py-op">)</tt> </tt>
+</div><a name="L123"></a><tt class="py-lineno">123</tt>  <tt class="py-line">     </tt>
+<a name="BaseOven.deny"></a><div id="BaseOven.deny-def"><a name="L124"></a><tt class="py-lineno">124</tt> <a class="py-toggle" href="#" id="BaseOven.deny-toggle" onclick="return toggle('BaseOven.deny');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="ProvCon.TFTP.ProvisioningTFTP.BaseOven-class.html#deny">deny</a> <tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">,</tt> <tt class="py-param">expression</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="BaseOven.deny-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="BaseOven.deny-expanded"><a name="L125"></a><tt class="py-lineno">125</tt>  <tt class="py-line">        <tt class="py-op">(</tt><tt class="py-name">expr_type</tt><tt class="py-op">,</tt> <tt class="py-name">expr</tt><tt class="py-op">)</tt> <tt class="py-op">=</tt> <tt class="py-name">expression</tt> </tt>
+<a name="L126"></a><tt class="py-lineno">126</tt>  <tt class="py-line">        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">denylist</tt><tt class="py-op">.</tt><tt id="link-35" class="py-name" targets="Method ProvCon.docsis.compiler.encoder.tlv_multipart.append()=ProvCon.docsis.compiler.encoder.tlv_multipart-class.html#append"><a title="ProvCon.docsis.compiler.encoder.tlv_multipart.append" class="py-name" href="#" onclick="return doclink('link-35', 'append', 'link-35');">append</a></tt> <tt class="py-op">(</tt> <tt class="py-name">expression</tt> <tt class="py-op">)</tt> </tt>
+</div><a name="L127"></a><tt class="py-lineno">127</tt>  <tt class="py-line"> </tt>
+<a name="BaseOven.allow"></a><div id="BaseOven.allow-def"><a name="L128"></a><tt class="py-lineno">128</tt> <a class="py-toggle" href="#" id="BaseOven.allow-toggle" onclick="return toggle('BaseOven.allow');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="ProvCon.TFTP.ProvisioningTFTP.BaseOven-class.html#allow">allow</a> <tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">,</tt> <tt class="py-param">expression</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="BaseOven.allow-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="BaseOven.allow-expanded"><a name="L129"></a><tt class="py-lineno">129</tt>  <tt class="py-line">        <tt class="py-op">(</tt><tt class="py-name">expr_type</tt><tt class="py-op">,</tt> <tt class="py-name">expr</tt><tt class="py-op">)</tt> <tt class="py-op">=</tt> <tt class="py-name">expression</tt> </tt>
+<a name="L130"></a><tt class="py-lineno">130</tt>  <tt class="py-line">        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">allowlist</tt><tt class="py-op">.</tt><tt id="link-36" class="py-name"><a title="ProvCon.docsis.compiler.encoder.tlv_multipart.append" class="py-name" href="#" onclick="return doclink('link-36', 'append', 'link-35');">append</a></tt> <tt class="py-op">(</tt> <tt class="py-name">expression</tt> <tt class="py-op">)</tt> </tt>
+</div><a name="L131"></a><tt class="py-lineno">131</tt>  <tt class="py-line">     </tt>
+<a name="BaseOven.check_access_list"></a><div id="BaseOven.check_access_list-def"><a name="L132"></a><tt class="py-lineno">132</tt> <a class="py-toggle" href="#" id="BaseOven.check_access_list-toggle" onclick="return toggle('BaseOven.check_access_list');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="ProvCon.TFTP.ProvisioningTFTP.BaseOven-class.html#check_access_list">check_access_list</a> <tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">,</tt> <tt class="py-param">filename</tt><tt class="py-op">,</tt> <tt class="py-param">remote_address</tt><tt class="py-op">,</tt> <tt class="py-param">acl</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="BaseOven.check_access_list-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="BaseOven.check_access_list-expanded"><a name="L133"></a><tt class="py-lineno">133</tt>  <tt class="py-line">        <tt class="py-keyword">for</tt> <tt class="py-op">(</tt><tt class="py-name">aclt</tt><tt class="py-op">,</tt> <tt class="py-name">aclv</tt><tt class="py-op">)</tt> <tt class="py-keyword">in</tt> <tt class="py-name">acl</tt><tt class="py-op">:</tt> </tt>
+<a name="L134"></a><tt class="py-lineno">134</tt>  <tt class="py-line">            <tt class="py-keyword">if</tt> <tt class="py-name">aclt</tt> <tt class="py-op">==</tt> <tt class="py-number">0</tt><tt class="py-op">:</tt> <tt class="py-keyword">return</tt> <tt class="py-name">True</tt> </tt>
+<a name="L135"></a><tt class="py-lineno">135</tt>  <tt class="py-line">        <tt class="py-keyword">return</tt> <tt class="py-name">False</tt> </tt>
+</div><a name="L136"></a><tt class="py-lineno">136</tt>  <tt class="py-line"> </tt>
+<a name="L137"></a><tt class="py-lineno">137</tt>  <tt class="py-line"> </tt>
+<a name="BaseOven.check_access"></a><div id="BaseOven.check_access-def"><a name="L138"></a><tt class="py-lineno">138</tt> <a class="py-toggle" href="#" id="BaseOven.check_access-toggle" onclick="return toggle('BaseOven.check_access');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="ProvCon.TFTP.ProvisioningTFTP.BaseOven-class.html#check_access">check_access</a> <tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">,</tt> <tt class="py-param">filename</tt><tt class="py-op">,</tt> <tt class="py-param">remote_address</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="BaseOven.check_access-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="BaseOven.check_access-expanded"><a name="L139"></a><tt class="py-lineno">139</tt>  <tt class="py-line">        <tt class="py-keyword">if</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">order</tt> <tt class="py-op">==</tt> <tt class="py-string">"allow"</tt><tt class="py-op">:</tt> </tt>
+<a name="L140"></a><tt class="py-lineno">140</tt>  <tt class="py-line">            <tt class="py-keyword">if</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-37" class="py-name" targets="Method ProvCon.TFTP.ProvisioningTFTP.BaseOven.check_access_list()=ProvCon.TFTP.ProvisioningTFTP.BaseOven-class.html#check_access_list"><a title="ProvCon.TFTP.ProvisioningTFTP.BaseOven.check_access_list" class="py-name" href="#" onclick="return doclink('link-37', 'check_access_list', 'link-37');">check_access_list</a></tt><tt class="py-op">(</tt><tt class="py-name">filename</tt><tt class="py-op">,</tt> <tt class="py-name">remote_address</tt><tt class="py-op">,</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">allowlist</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+<a name="L141"></a><tt class="py-lineno">141</tt>  <tt class="py-line">                <tt class="py-keyword">return</tt> <tt class="py-name">True</tt> </tt>
+<a name="L142"></a><tt class="py-lineno">142</tt>  <tt class="py-line">            <tt class="py-keyword">elif</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-38" class="py-name"><a title="ProvCon.TFTP.ProvisioningTFTP.BaseOven.check_access_list" class="py-name" href="#" onclick="return doclink('link-38', 'check_access_list', 'link-37');">check_access_list</a></tt><tt class="py-op">(</tt><tt class="py-name">filename</tt><tt class="py-op">,</tt> <tt class="py-name">remote_address</tt><tt class="py-op">,</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">denylist</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+<a name="L143"></a><tt class="py-lineno">143</tt>  <tt class="py-line">                <tt class="py-keyword">return</tt> <tt class="py-name">False</tt> </tt>
+<a name="L144"></a><tt class="py-lineno">144</tt>  <tt class="py-line">            <tt class="py-keyword">return</tt> <tt class="py-name">True</tt> </tt>
+<a name="L145"></a><tt class="py-lineno">145</tt>  <tt class="py-line">        <tt class="py-keyword">elif</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">order</tt> <tt class="py-op">==</tt> <tt class="py-string">"deny"</tt><tt class="py-op">:</tt> </tt>
+<a name="L146"></a><tt class="py-lineno">146</tt>  <tt class="py-line">            <tt class="py-keyword">if</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-39" class="py-name"><a title="ProvCon.TFTP.ProvisioningTFTP.BaseOven.check_access_list" class="py-name" href="#" onclick="return doclink('link-39', 'check_access_list', 'link-37');">check_access_list</a></tt><tt class="py-op">(</tt><tt class="py-name">filename</tt><tt class="py-op">,</tt> <tt class="py-name">remote_address</tt><tt class="py-op">,</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">denylist</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+<a name="L147"></a><tt class="py-lineno">147</tt>  <tt class="py-line">                <tt class="py-keyword">return</tt> <tt class="py-name">False</tt> </tt>
+<a name="L148"></a><tt class="py-lineno">148</tt>  <tt class="py-line">            <tt class="py-keyword">elif</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-40" class="py-name"><a title="ProvCon.TFTP.ProvisioningTFTP.BaseOven.check_access_list" class="py-name" href="#" onclick="return doclink('link-40', 'check_access_list', 'link-37');">check_access_list</a></tt><tt class="py-op">(</tt><tt class="py-name">filename</tt><tt class="py-op">,</tt> <tt class="py-name">remote_address</tt><tt class="py-op">,</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">allowlist</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+<a name="L149"></a><tt class="py-lineno">149</tt>  <tt class="py-line">                <tt class="py-keyword">return</tt> <tt class="py-name">True</tt> </tt>
+<a name="L150"></a><tt class="py-lineno">150</tt>  <tt class="py-line">            <tt class="py-keyword">return</tt> <tt class="py-name">True</tt> </tt>
+<a name="L151"></a><tt class="py-lineno">151</tt>  <tt class="py-line">        <tt class="py-keyword">else</tt><tt class="py-op">:</tt> </tt>
+<a name="L152"></a><tt class="py-lineno">152</tt>  <tt class="py-line">            <tt class="py-keyword">return</tt> <tt class="py-name">False</tt> </tt>
+</div><a name="L153"></a><tt class="py-lineno">153</tt>  <tt class="py-line">         </tt>
+<a name="BaseOven.prepare"></a><div id="BaseOven.prepare-def"><a name="L154"></a><tt class="py-lineno">154</tt> <a class="py-toggle" href="#" id="BaseOven.prepare-toggle" onclick="return toggle('BaseOven.prepare');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="ProvCon.TFTP.ProvisioningTFTP.BaseOven-class.html#prepare">prepare</a> <tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">,</tt> <tt class="py-param">filename</tt><tt class="py-op">,</tt> <tt class="py-param">remote_address</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="BaseOven.prepare-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="BaseOven.prepare-expanded"><a name="L155"></a><tt class="py-lineno">155</tt>  <tt class="py-line">        <tt class="py-keyword">if</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-41" class="py-name" targets="Method ProvCon.TFTP.ProvisioningTFTP.BaseOven.check_access()=ProvCon.TFTP.ProvisioningTFTP.BaseOven-class.html#check_access"><a title="ProvCon.TFTP.ProvisioningTFTP.BaseOven.check_access" class="py-name" href="#" onclick="return doclink('link-41', 'check_access', 'link-41');">check_access</a></tt><tt class="py-op">(</tt><tt class="py-name">filename</tt><tt class="py-op">,</tt> <tt class="py-name">remote_address</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+<a name="L156"></a><tt class="py-lineno">156</tt>  <tt class="py-line">            <tt class="py-keyword">return</tt> <tt class="py-op">(</tt><tt class="py-string">"/dev/null"</tt><tt class="py-op">,</tt> <tt class="py-number">0</tt><tt class="py-op">)</tt> </tt>
+<a name="L157"></a><tt class="py-lineno">157</tt>  <tt class="py-line">        <tt class="py-keyword">else</tt><tt class="py-op">:</tt> </tt>
+<a name="L158"></a><tt class="py-lineno">158</tt>  <tt class="py-line">            <tt class="py-keyword">return</tt> <tt class="py-op">(</tt><tt class="py-string">"Access denied"</tt><tt class="py-op">,</tt> <tt class="py-op">-</tt><tt class="py-number">1</tt><tt class="py-op">)</tt> </tt>
+</div><a name="L159"></a><tt class="py-lineno">159</tt>  <tt class="py-line">         </tt>
+<a name="BaseOven.__repr__"></a><div id="BaseOven.__repr__-def"><a name="L160"></a><tt class="py-lineno">160</tt> <a class="py-toggle" href="#" id="BaseOven.__repr__-toggle" onclick="return toggle('BaseOven.__repr__');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="ProvCon.TFTP.ProvisioningTFTP.BaseOven-class.html#__repr__">__repr__</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="BaseOven.__repr__-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="BaseOven.__repr__-expanded"><a name="L161"></a><tt class="py-lineno">161</tt>  <tt class="py-line">        <tt class="py-keyword">return</tt> <tt class="py-string">"&lt;Oven&gt; %s"</tt> <tt class="py-op">%</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">name</tt> </tt>
+</div></div><a name="L162"></a><tt class="py-lineno">162</tt>  <tt class="py-line">     </tt>
+<a name="L163"></a><tt class="py-lineno">163</tt>  <tt class="py-line"><tt class="py-comment">#A simple oven, serving files from its root directory as they are</tt> </tt>
+<a name="FileOven"></a><div id="FileOven-def"><a name="L164"></a><tt class="py-lineno">164</tt> <a class="py-toggle" href="#" id="FileOven-toggle" onclick="return toggle('FileOven');">-</a><tt class="py-line"><tt class="py-keyword">class</tt> <a class="py-def-name" href="ProvCon.TFTP.ProvisioningTFTP.FileOven-class.html">FileOven</a> <tt class="py-op">(</tt><tt class="py-base-class">BaseOven</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="FileOven-collapsed" style="display:none;" pad="+++" indent="++++"></div><div id="FileOven-expanded"><a name="L165"></a><tt class="py-lineno">165</tt>  <tt class="py-line">         </tt>
+<a name="FileOven.prepare"></a><div id="FileOven.prepare-def"><a name="L166"></a><tt class="py-lineno">166</tt> <a class="py-toggle" href="#" id="FileOven.prepare-toggle" onclick="return toggle('FileOven.prepare');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="ProvCon.TFTP.ProvisioningTFTP.FileOven-class.html#prepare">prepare</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">,</tt> <tt class="py-param">filename</tt><tt class="py-op">,</tt> <tt class="py-param">remote_address</tt><tt class="py-op">)</tt><tt class="py-op">:</tt>         </tt>
+</div><a name="L167"></a><tt class="py-lineno">167</tt>  <tt class="py-line">        <tt class="py-keyword">if</tt> <tt class="py-keyword">not</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-42" class="py-name"><a title="ProvCon.TFTP.ProvisioningTFTP.BaseOven.check_access" class="py-name" href="#" onclick="return doclink('link-42', 'check_access', 'link-41');">check_access</a></tt><tt class="py-op">(</tt><tt class="py-name">filename</tt><tt class="py-op">,</tt> <tt class="py-name">remote_address</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> <tt class="py-keyword">return</tt> <tt class="py-op">(</tt><tt class="py-string">"Access denied"</tt><tt class="py-op">,</tt> <tt class="py-op">-</tt><tt class="py-number">1</tt><tt class="py-op">)</tt> </tt>
+<a name="L168"></a><tt class="py-lineno">168</tt>  <tt class="py-line">        <tt class="py-name">filename</tt> <tt class="py-op">=</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">root</tt> <tt class="py-op">+</tt> <tt class="py-string">"/"</tt> <tt class="py-op">+</tt> <tt class="py-name">filename</tt>         </tt>
+<a name="L169"></a><tt class="py-lineno">169</tt>  <tt class="py-line">        <tt class="py-keyword">print</tt> <tt class="py-name">filename</tt>         </tt>
+<a name="L170"></a><tt class="py-lineno">170</tt>  <tt class="py-line">        <tt class="py-name">filepath</tt> <tt class="py-op">=</tt> <tt class="py-name">os</tt><tt class="py-op">.</tt><tt class="py-name">path</tt><tt class="py-op">.</tt><tt class="py-name">dirname</tt> <tt class="py-op">(</tt><tt class="py-name">filename</tt><tt class="py-op">)</tt> </tt>
+<a name="L171"></a><tt class="py-lineno">171</tt>  <tt class="py-line">        <tt class="py-keyword">print</tt> <tt class="py-name">filepath</tt> </tt>
+<a name="L172"></a><tt class="py-lineno">172</tt>  <tt class="py-line">        <tt class="py-keyword">if</tt> <tt class="py-name">filepath</tt> <tt class="py-op">!=</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">root</tt><tt class="py-op">:</tt> <tt class="py-keyword">return</tt> <tt class="py-op">(</tt><tt class="py-string">"Access denied (DIR)"</tt><tt class="py-op">,</tt> <tt class="py-op">-</tt><tt class="py-number">1</tt><tt class="py-op">)</tt> </tt>
+<a name="L173"></a><tt class="py-lineno">173</tt>  <tt class="py-line">        <tt class="py-keyword">if</tt> <tt class="py-keyword">not</tt> <tt class="py-name">os</tt><tt class="py-op">.</tt><tt class="py-name">path</tt><tt class="py-op">.</tt><tt class="py-name">isfile</tt><tt class="py-op">(</tt><tt class="py-name">filename</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> <tt class="py-keyword">return</tt> <tt class="py-op">(</tt><tt class="py-string">"ENOEXIST"</tt><tt class="py-op">,</tt> <tt class="py-op">-</tt><tt class="py-number">1</tt><tt class="py-op">)</tt> </tt>
+<a name="L174"></a><tt class="py-lineno">174</tt>  <tt class="py-line">        <tt class="py-name">stats</tt> <tt class="py-op">=</tt> <tt class="py-name">os</tt><tt class="py-op">.</tt><tt class="py-name">stat</tt> <tt class="py-op">(</tt> <tt class="py-name">filename</tt> <tt class="py-op">)</tt> </tt>
+<a name="L175"></a><tt class="py-lineno">175</tt>  <tt class="py-line">        <tt class="py-keyword">if</tt> <tt class="py-name">stats</tt><tt class="py-op">.</tt><tt class="py-name">st_mode</tt> <tt class="py-op">&amp;</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">umask</tt> <tt class="py-op">!=</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">umask</tt><tt class="py-op">:</tt> </tt>
+<a name="L176"></a><tt class="py-lineno">176</tt>  <tt class="py-line">            <tt class="py-keyword">return</tt> <tt class="py-op">(</tt><tt class="py-string">"Access denied (mode)"</tt><tt class="py-op">,</tt> <tt class="py-op">-</tt><tt class="py-number">1</tt><tt class="py-op">)</tt> </tt>
+<a name="L177"></a><tt class="py-lineno">177</tt>  <tt class="py-line">        <tt class="py-keyword">return</tt> <tt class="py-op">(</tt><tt class="py-name">filename</tt><tt class="py-op">,</tt> <tt class="py-name">stats</tt><tt class="py-op">.</tt><tt class="py-name">st_size</tt><tt class="py-op">)</tt> </tt>
+</div></div><a name="L178"></a><tt class="py-lineno">178</tt>  <tt class="py-line">                 </tt>
+<a name="L179"></a><tt class="py-lineno">179</tt>  <tt class="py-line">     </tt>
+<a name="CableModemConfigOven"></a><div id="CableModemConfigOven-def"><a name="L180"></a><tt class="py-lineno">180</tt> <a class="py-toggle" href="#" id="CableModemConfigOven-toggle" onclick="return toggle('CableModemConfigOven');">-</a><tt class="py-line"><tt class="py-keyword">class</tt> <a class="py-def-name" href="ProvCon.TFTP.ProvisioningTFTP.CableModemConfigOven-class.html">CableModemConfigOven</a><tt class="py-op">(</tt><tt class="py-base-class">BaseOven</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="CableModemConfigOven-collapsed" style="display:none;" pad="+++" indent="++++"></div><div id="CableModemConfigOven-expanded"><a name="L181"></a><tt class="py-lineno">181</tt>  <tt class="py-line">    <tt class="py-keyword">pass</tt> </tt>
+</div><a name="L182"></a><tt class="py-lineno">182</tt>  <tt class="py-line"> </tt>
+<a name="L183"></a><tt class="py-lineno">183</tt>  <tt class="py-line"> </tt>
+<a name="ProvisioningTFTPServer"></a><div id="ProvisioningTFTPServer-def"><a name="L184"></a><tt class="py-lineno">184</tt> <a class="py-toggle" href="#" id="ProvisioningTFTPServer-toggle" onclick="return toggle('ProvisioningTFTPServer');">-</a><tt class="py-line"><tt class="py-keyword">class</tt> <a class="py-def-name" href="ProvCon.TFTP.ProvisioningTFTP.ProvisioningTFTPServer-class.html">ProvisioningTFTPServer</a><tt class="py-op">(</tt><tt class="py-base-class">Server</tt><tt class="py-op">.</tt><tt class="py-base-class">BaseTFTPServer</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="ProvisioningTFTPServer-collapsed" style="display:none;" pad="+++" indent="++++"></div><div id="ProvisioningTFTPServer-expanded"><a name="ProvisioningTFTPServer.__init__"></a><div id="ProvisioningTFTPServer.__init__-def"><a name="L185"></a><tt class="py-lineno">185</tt> <a class="py-toggle" href="#" id="ProvisioningTFTPServer.__init__-toggle" onclick="return toggle('ProvisioningTFTPServer.__init__');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="ProvCon.TFTP.ProvisioningTFTP.ProvisioningTFTPServer-class.html#__init__">__init__</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="ProvisioningTFTPServer.__init__-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="ProvisioningTFTPServer.__init__-expanded"><a name="L186"></a><tt class="py-lineno">186</tt>  <tt class="py-line">        <tt id="link-43" class="py-name"><a title="ProvCon.TFTP.Server" class="py-name" href="#" onclick="return doclink('link-43', 'Server', 'link-6');">Server</a></tt><tt class="py-op">.</tt><tt id="link-44" class="py-name" targets="Class ProvCon.TFTP.Server.BaseTFTPServer=ProvCon.TFTP.Server.BaseTFTPServer-class.html"><a title="ProvCon.TFTP.Server.BaseTFTPServer" class="py-name" href="#" onclick="return doclink('link-44', 'BaseTFTPServer', 'link-44');">BaseTFTPServer</a></tt><tt class="py-op">.</tt><tt id="link-45" class="py-name"><a title="ProvCon.TFTP.Protocol.Packet.__init__
+ProvCon.TFTP.ProvisioningTFTP.BaseOven.__init__
+ProvCon.TFTP.ProvisioningTFTP.CableModemConfigCook.__init__
+ProvCon.TFTP.ProvisioningTFTP.FileCook.__init__
+ProvCon.TFTP.ProvisioningTFTP.ProvisioningTFTPServer.__init__
+ProvCon.TFTP.ProvisioningTFTP.TFTPDataSender.__init__
+ProvCon.TFTP.ProvisioningTFTP.pcTFTPD.__init__
+ProvCon.TFTP.Server.BaseTFTPServer.__init__
+ProvCon.cli.CLIServer.__init__
+ProvCon.cli.CLIWorker.__init__
+ProvCon.dbui.abstractui.fields.BaseArrayEditor.__init__
+ProvCon.dbui.abstractui.fields.BaseArrayItemButtonBox.__init__
+ProvCon.dbui.abstractui.fields.BaseArrayItemEditor.__init__
+ProvCon.dbui.abstractui.fields.BaseFieldEditor.__init__
+ProvCon.dbui.abstractui.fields.BaseReferenceEditor.__init__
+ProvCon.dbui.abstractui.forms.BaseForm.__init__
+ProvCon.dbui.abstractui.navigators.BaseNavigator.__init__
+ProvCon.dbui.abstractui.recordlists.BasePager.__init__
+ProvCon.dbui.abstractui.recordlists.BaseRecordList.__init__
+ProvCon.dbui.database.CFG.tCX.__init__
+ProvCon.dbui.di.rObject'.ObjectFlags.__init__
+ProvCon.dbui.di.rObject'.ObjectParams.__init__
+ProvCon.dbui.di.rObject'.rObject.__init__
+ProvCon.dbui.meta.field.Field.__init__
+ProvCon.dbui.meta.table.Table.__init__
+ProvCon.dbui.orm.form.Form.__init__
+ProvCon.dbui.orm.record.Record.DataManipulationError.__init__
+ProvCon.dbui.orm.record.Record.DataQueryError.__init__
+ProvCon.dbui.orm.record.Record.RecordNotFound.__init__
+ProvCon.dbui.orm.record.Record.__init__
+ProvCon.dbui.orm.recordlist.RecordList.__init__
+ProvCon.dbui.orm.recordsearch.OIDSearchList.__init__
+ProvCon.dbui.wxwin.complete.CompleteGenericForm.__init__
+ProvCon.dbui.wxwin.complete.FormToolbar.__init__
+ProvCon.dbui.wxwin.complete.InfoPopup.__init__
+ProvCon.dbui.wxwin.fields.Entry.ArrayCombo.__init__
+ProvCon.dbui.wxwin.fields.Entry.ArrayItemCombo.__init__
+ProvCon.dbui.wxwin.fields.Entry.ArrayItemStatic.__init__
+ProvCon.dbui.wxwin.fields.Entry.ArrayItemText.__init__
+ProvCon.dbui.wxwin.fields.Entry.ArrayText.__init__
+ProvCon.dbui.wxwin.fields.Entry.BaseArray.__init__
+ProvCon.dbui.wxwin.fields.Entry.Boolean.__init__
+ProvCon.dbui.wxwin.fields.Entry.ComboReference.__init__
+ProvCon.dbui.wxwin.fields.Entry.Memo.__init__
+ProvCon.dbui.wxwin.fields.Entry.StandardArrayItemButtonBox.__init__
+ProvCon.dbui.wxwin.fields.Entry.Static.__init__
+ProvCon.dbui.wxwin.fields.Entry.StaticReference.__init__
+ProvCon.dbui.wxwin.fields.Entry.Text.__init__
+ProvCon.dbui.wxwin.forms.GenericForm.__init__
+ProvCon.dbui.wxwin.mwx.CheckBox.__init__
+ProvCon.dbui.wxwin.mwx.ComboBox.__init__
+ProvCon.dbui.wxwin.mwx.StaticText.__init__
+ProvCon.dbui.wxwin.mwx.TextCtrl.__init__
+ProvCon.dbui.wxwin.mwx.mwxControl.__init__
+ProvCon.dbui.wxwin.navigators.Navigator.__init__
+ProvCon.dbui.wxwin.recordlists.RecordList.__init__
+ProvCon.docsis.cablemodem.cablemodem.__init__
+ProvCon.docsis.cablemodem.cablemodem._cos.__init__
+ProvCon.docsis.cablemodem.cablemodem._cpe.__init__
+ProvCon.docsis.cablemodem.cablemodem._mac.__init__
+ProvCon.docsis.compiler.config.config.__init__
+ProvCon.docsis.compiler.encoder.error.__init__
+ProvCon.docsis.compiler.encoder.tlv.__init__
+ProvCon.docsis.compiler.encoder.tlv_multipart.__init__
+ProvCon.docsis.compiler.encoder.tlv_multipart.append_proxy.__init__
+ProvCon.docsis.compiler.encoder.tlv_multipart.iterator.__init__
+ProvCon.docsis.compiler.encoder.tlv_multipart_subclass.__init__
+ProvCon.docsis.compiler.encoder.tlv_subclass.__init__
+ProvCon.func.classes.conditionalmethod.__init__
+ProvCon.func.events.eventemitter.__init__
+ProvCon.func.events.eventemitter.evt.__init__
+ProvCon.func.events.eventemitter.evthook.__init__
+ProvCon.func.events.eventexception.__init__
+ProvCon.func.variables.TracedVariable.Tracer.__init__
+ProvCon.func.variables.TracedVariable.__init__
+ProvCon.gui.FrontEndApp.FE.__init__
+ProvCon.gui.ProvisioningControl.GenericObjectEditor.__init__
+ProvCon.gui.ProvisioningControl.GridView.__init__
+ProvCon.gui.ProvisioningControl.MainTab.__init__
+ProvCon.gui.ProvisioningControl.ObjectEditorModel.__init__
+ProvCon.gui.ProvisioningControl.TopLevelWindow.__init__
+ProvCon.log.LoggingBackend.__init__
+ProvCon.log.LoggingClient.__init__
+ProvCon.log.LoggingServer.__init__
+ProvCon.ui.uierror.__init__
+ProvCon.wronolib.ipaddr.ip4addr.__init__
+ProvCon.wronolib.ipaddr.ip4prefix.__init__" class="py-name" href="#" onclick="return doclink('link-45', '__init__', 'link-8');">__init__</a></tt><tt class="py-op">(</tt><tt class="py-name">self</tt><tt class="py-op">)</tt> </tt>
+<a name="L187"></a><tt class="py-lineno">187</tt>  <tt class="py-line">        <tt id="link-46" class="py-name"><a title="ProvCon.wronolib.procname.set_process_name" class="py-name" href="#" onclick="return doclink('link-46', 'set_process_name', 'link-5');">set_process_name</a></tt> <tt class="py-op">(</tt> <tt class="py-string">"0@TFTPD_LISTEN"</tt> <tt class="py-op">)</tt> </tt>
+<a name="L188"></a><tt class="py-lineno">188</tt>  <tt class="py-line">        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-47" class="py-name" targets="Module ProvCon.dbui.config=ProvCon.dbui.config-module.html,Variable ProvCon.dbui.config.config=ProvCon.dbui.config-module.html#config,Module ProvCon.docsis.compiler.config=ProvCon.docsis.compiler.config-module.html,Class ProvCon.docsis.compiler.config.config=ProvCon.docsis.compiler.config.config-class.html"><a title="ProvCon.dbui.config
+ProvCon.dbui.config.config
+ProvCon.docsis.compiler.config
+ProvCon.docsis.compiler.config.config" class="py-name" href="#" onclick="return doclink('link-47', 'config', 'link-47');">config</a></tt> <tt class="py-op">=</tt> <tt id="link-48" class="py-name"><a title="ProvCon" class="py-name" href="#" onclick="return doclink('link-48', 'ProvCon', 'link-1');">ProvCon</a></tt><tt class="py-op">.</tt><tt id="link-49" class="py-name" targets="Function ProvCon.Configuration()=ProvCon-module.html#Configuration"><a title="ProvCon.Configuration" class="py-name" href="#" onclick="return doclink('link-49', 'Configuration', 'link-49');">Configuration</a></tt><tt class="py-op">(</tt><tt class="py-op">)</tt> </tt>
+<a name="L189"></a><tt class="py-lineno">189</tt>  <tt class="py-line">        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">logger</tt> <tt class="py-op">=</tt> <tt id="link-50" class="py-name"><a title="ProvCon" class="py-name" href="#" onclick="return doclink('link-50', 'ProvCon', 'link-1');">ProvCon</a></tt><tt class="py-op">.</tt><tt id="link-51" class="py-name"><a title="ProvCon.log.LoggingClient" class="py-name" href="#" onclick="return doclink('link-51', 'LoggingClient', 'link-11');">LoggingClient</a></tt> <tt class="py-op">(</tt> <tt class="py-name">name</tt><tt class="py-op">=</tt><tt class="py-string">"TFTPD_SRV"</tt> <tt class="py-op">)</tt> </tt>
+<a name="L190"></a><tt class="py-lineno">190</tt>  <tt class="py-line">        <tt class="py-comment">#The queue for "ready-to-be-sent" files</tt> </tt>
+<a name="L191"></a><tt class="py-lineno">191</tt>  <tt class="py-line">        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">rfQueue</tt> <tt class="py-op">=</tt> <tt class="py-name">Queue</tt><tt class="py-op">(</tt><tt class="py-number">2048</tt><tt class="py-op">)</tt> </tt>
+<a name="L192"></a><tt class="py-lineno">192</tt>  <tt class="py-line">         </tt>
+<a name="L193"></a><tt class="py-lineno">193</tt>  <tt class="py-line">        <tt class="py-comment">#The base oven &amp; cook - simple TFTP</tt> </tt>
+<a name="L194"></a><tt class="py-lineno">194</tt>  <tt class="py-line">        <tt class="py-name">base_oven</tt> <tt class="py-op">=</tt> <tt id="link-52" class="py-name" targets="Class ProvCon.TFTP.ProvisioningTFTP.FileOven=ProvCon.TFTP.ProvisioningTFTP.FileOven-class.html"><a title="ProvCon.TFTP.ProvisioningTFTP.FileOven" class="py-name" href="#" onclick="return doclink('link-52', 'FileOven', 'link-52');">FileOven</a></tt> <tt class="py-op">(</tt> <tt class="py-name">root</tt> <tt class="py-op">=</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-53" class="py-name"><a title="ProvCon.dbui.config
+ProvCon.dbui.config.config
+ProvCon.docsis.compiler.config
+ProvCon.docsis.compiler.config.config" class="py-name" href="#" onclick="return doclink('link-53', 'config', 'link-47');">config</a></tt><tt class="py-op">.</tt><tt id="link-54" class="py-name"><a title="ProvCon.dbui.orm.recordsearch.OIDSearchList.get
+ProvCon.func.variables.TracedVariable.get" class="py-name" href="#" onclick="return doclink('link-54', 'get', 'link-12');">get</a></tt> <tt class="py-op">(</tt> <tt class="py-string">"TFTP"</tt><tt class="py-op">,</tt> <tt class="py-string">"dir"</tt> <tt class="py-op">)</tt><tt class="py-op">,</tt> <tt class="py-name">name</tt><tt class="py-op">=</tt><tt class="py-string">"FILES"</tt> <tt class="py-op">)</tt> </tt>
+<a name="L195"></a><tt class="py-lineno">195</tt>  <tt class="py-line">        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">logger</tt> <tt class="py-op">(</tt> <tt class="py-string">"Setting up %s."</tt> <tt class="py-op">%</tt> <tt class="py-name">base_oven</tt> <tt class="py-op">)</tt> </tt>
+<a name="L196"></a><tt class="py-lineno">196</tt>  <tt class="py-line">        <tt class="py-name">base_queue_size</tt> <tt class="py-op">=</tt>  <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-55" class="py-name"><a title="ProvCon.dbui.config
+ProvCon.dbui.config.config
+ProvCon.docsis.compiler.config
+ProvCon.docsis.compiler.config.config" class="py-name" href="#" onclick="return doclink('link-55', 'config', 'link-47');">config</a></tt><tt class="py-op">.</tt><tt class="py-name">getint</tt> <tt class="py-op">(</tt><tt class="py-string">"TFTP"</tt><tt class="py-op">,</tt> <tt class="py-string">"queue_size"</tt><tt class="py-op">)</tt> </tt>
+<a name="L197"></a><tt class="py-lineno">197</tt>  <tt class="py-line">        <tt class="py-name">base_cook_queue</tt> <tt class="py-op">=</tt> <tt class="py-name">Queue</tt><tt class="py-op">(</tt><tt class="py-name">base_queue_size</tt><tt class="py-op">)</tt> </tt>
+<a name="L198"></a><tt class="py-lineno">198</tt>  <tt class="py-line">         </tt>
+<a name="L199"></a><tt class="py-lineno">199</tt>  <tt class="py-line">        <tt class="py-comment">#The cook for cm firmware files</tt> </tt>
+<a name="L200"></a><tt class="py-lineno">200</tt>  <tt class="py-line">        <tt class="py-name">cm_fw_oven</tt> <tt class="py-op">=</tt> <tt id="link-56" class="py-name"><a title="ProvCon.TFTP.ProvisioningTFTP.FileOven" class="py-name" href="#" onclick="return doclink('link-56', 'FileOven', 'link-52');">FileOven</a></tt> <tt class="py-op">(</tt> <tt class="py-name">root</tt> <tt class="py-op">=</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-57" class="py-name"><a title="ProvCon.dbui.config
+ProvCon.dbui.config.config
+ProvCon.docsis.compiler.config
+ProvCon.docsis.compiler.config.config" class="py-name" href="#" onclick="return doclink('link-57', 'config', 'link-47');">config</a></tt><tt class="py-op">.</tt><tt id="link-58" class="py-name"><a title="ProvCon.dbui.orm.recordsearch.OIDSearchList.get
+ProvCon.func.variables.TracedVariable.get" class="py-name" href="#" onclick="return doclink('link-58', 'get', 'link-12');">get</a></tt> <tt class="py-op">(</tt><tt class="py-string">"DOCSIS"</tt><tt class="py-op">,</tt> <tt class="py-string">"fwdir"</tt><tt class="py-op">)</tt><tt class="py-op">,</tt> <tt class="py-name">name</tt><tt class="py-op">=</tt><tt class="py-string">"CM FW"</tt> <tt class="py-op">)</tt> </tt>
+<a name="L201"></a><tt class="py-lineno">201</tt>  <tt class="py-line">        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">logger</tt> <tt class="py-op">(</tt> <tt class="py-string">"Setting up %s."</tt> <tt class="py-op">%</tt> <tt class="py-name">cm_fw_oven</tt> <tt class="py-op">)</tt> </tt>
+<a name="L202"></a><tt class="py-lineno">202</tt>  <tt class="py-line">        <tt class="py-name">cm_fw_oven</tt><tt class="py-op">.</tt><tt id="link-59" class="py-name" targets="Method ProvCon.TFTP.ProvisioningTFTP.BaseOven.deny()=ProvCon.TFTP.ProvisioningTFTP.BaseOven-class.html#deny"><a title="ProvCon.TFTP.ProvisioningTFTP.BaseOven.deny" class="py-name" href="#" onclick="return doclink('link-59', 'deny', 'link-59');">deny</a></tt> <tt class="py-op">(</tt> <tt class="py-op">(</tt><tt class="py-number">0</tt><tt class="py-op">,</tt><tt class="py-number">0</tt><tt class="py-op">)</tt> <tt class="py-op">)</tt> </tt>
+<a name="L203"></a><tt class="py-lineno">203</tt>  <tt class="py-line">        <tt class="py-name">cm_fw_queue</tt> <tt class="py-op">=</tt> <tt class="py-name">Queue</tt><tt class="py-op">(</tt><tt class="py-number">16</tt><tt class="py-op">)</tt> </tt>
+<a name="L204"></a><tt class="py-lineno">204</tt>  <tt class="py-line">         </tt>
+<a name="L205"></a><tt class="py-lineno">205</tt>  <tt class="py-line">        <tt class="py-comment">#The cook for cm config files</tt> </tt>
+<a name="L206"></a><tt class="py-lineno">206</tt>  <tt class="py-line">        <tt class="py-name">cm_cfg_oven</tt> <tt class="py-op">=</tt> <tt id="link-60" class="py-name" targets="Class ProvCon.TFTP.ProvisioningTFTP.CableModemConfigOven=ProvCon.TFTP.ProvisioningTFTP.CableModemConfigOven-class.html"><a title="ProvCon.TFTP.ProvisioningTFTP.CableModemConfigOven" class="py-name" href="#" onclick="return doclink('link-60', 'CableModemConfigOven', 'link-60');">CableModemConfigOven</a></tt> <tt class="py-op">(</tt> <tt class="py-name">root</tt> <tt class="py-op">=</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-61" class="py-name"><a title="ProvCon.dbui.config
+ProvCon.dbui.config.config
+ProvCon.docsis.compiler.config
+ProvCon.docsis.compiler.config.config" class="py-name" href="#" onclick="return doclink('link-61', 'config', 'link-47');">config</a></tt><tt class="py-op">.</tt><tt id="link-62" class="py-name"><a title="ProvCon.dbui.orm.recordsearch.OIDSearchList.get
+ProvCon.func.variables.TracedVariable.get" class="py-name" href="#" onclick="return doclink('link-62', 'get', 'link-12');">get</a></tt> <tt class="py-op">(</tt><tt class="py-string">"DOCSIS"</tt><tt class="py-op">,</tt> <tt class="py-string">"dir"</tt><tt class="py-op">)</tt><tt class="py-op">,</tt> <tt class="py-name">name</tt><tt class="py-op">=</tt><tt class="py-string">"CM CONFIG"</tt> <tt class="py-op">)</tt> </tt>
+<a name="L207"></a><tt class="py-lineno">207</tt>  <tt class="py-line">        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">logger</tt> <tt class="py-op">(</tt> <tt class="py-string">"Setting up %s."</tt> <tt class="py-op">%</tt> <tt class="py-name">cm_cfg_oven</tt> <tt class="py-op">)</tt>         </tt>
+<a name="L208"></a><tt class="py-lineno">208</tt>  <tt class="py-line">        <tt class="py-name">cm_cfg_oven</tt><tt class="py-op">.</tt><tt id="link-63" class="py-name"><a title="ProvCon.TFTP.ProvisioningTFTP.BaseOven.deny" class="py-name" href="#" onclick="return doclink('link-63', 'deny', 'link-59');">deny</a></tt> <tt class="py-op">(</tt> <tt class="py-op">(</tt><tt class="py-number">0</tt><tt class="py-op">,</tt><tt class="py-number">0</tt><tt class="py-op">)</tt> <tt class="py-op">)</tt> </tt>
+<a name="L209"></a><tt class="py-lineno">209</tt>  <tt class="py-line">        <tt class="py-name">cm_cfg_queue_size</tt> <tt class="py-op">=</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-64" class="py-name"><a title="ProvCon.dbui.config
+ProvCon.dbui.config.config
+ProvCon.docsis.compiler.config
+ProvCon.docsis.compiler.config.config" class="py-name" href="#" onclick="return doclink('link-64', 'config', 'link-47');">config</a></tt><tt class="py-op">.</tt><tt class="py-name">getint</tt> <tt class="py-op">(</tt> <tt class="py-string">"DOCSIS"</tt><tt class="py-op">,</tt> <tt class="py-string">"tftp_queue_size"</tt> <tt class="py-op">)</tt> </tt>
+<a name="L210"></a><tt class="py-lineno">210</tt>  <tt class="py-line">        <tt class="py-name">cm_cfg_queue</tt> <tt class="py-op">=</tt> <tt class="py-name">Queue</tt> <tt class="py-op">(</tt><tt class="py-name">cm_cfg_queue_size</tt><tt class="py-op">)</tt> </tt>
+<a name="L211"></a><tt class="py-lineno">211</tt>  <tt class="py-line">         </tt>
+<a name="L212"></a><tt class="py-lineno">212</tt>  <tt class="py-line">        <tt class="py-comment">#The sub-processes count</tt> </tt>
+<a name="L213"></a><tt class="py-lineno">213</tt>  <tt class="py-line">        <tt class="py-name">base_cooks_count</tt> <tt class="py-op">=</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-65" class="py-name"><a title="ProvCon.dbui.config
+ProvCon.dbui.config.config
+ProvCon.docsis.compiler.config
+ProvCon.docsis.compiler.config.config" class="py-name" href="#" onclick="return doclink('link-65', 'config', 'link-47');">config</a></tt><tt class="py-op">.</tt><tt class="py-name">getint</tt> <tt class="py-op">(</tt><tt class="py-string">"TFTP"</tt><tt class="py-op">,</tt> <tt class="py-string">"cooks"</tt><tt class="py-op">)</tt> </tt>
+<a name="L214"></a><tt class="py-lineno">214</tt>  <tt class="py-line">        <tt class="py-name">cm_fw_cooks_count</tt> <tt class="py-op">=</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-66" class="py-name"><a title="ProvCon.dbui.config
+ProvCon.dbui.config.config
+ProvCon.docsis.compiler.config
+ProvCon.docsis.compiler.config.config" class="py-name" href="#" onclick="return doclink('link-66', 'config', 'link-47');">config</a></tt><tt class="py-op">.</tt><tt class="py-name">getint</tt> <tt class="py-op">(</tt><tt class="py-string">"DOCSIS"</tt><tt class="py-op">,</tt> <tt class="py-string">"tftp_cm_fw_cooks"</tt><tt class="py-op">)</tt> </tt>
+<a name="L215"></a><tt class="py-lineno">215</tt>  <tt class="py-line">        <tt class="py-name">cm_cfg_cooks_count</tt> <tt class="py-op">=</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-67" class="py-name"><a title="ProvCon.dbui.config
+ProvCon.dbui.config.config
+ProvCon.docsis.compiler.config
+ProvCon.docsis.compiler.config.config" class="py-name" href="#" onclick="return doclink('link-67', 'config', 'link-47');">config</a></tt><tt class="py-op">.</tt><tt class="py-name">getint</tt> <tt class="py-op">(</tt><tt class="py-string">"DOCSIS"</tt><tt class="py-op">,</tt> <tt class="py-string">"tftp_cm_cfg_cooks"</tt><tt class="py-op">)</tt>         </tt>
+<a name="L216"></a><tt class="py-lineno">216</tt>  <tt class="py-line">         </tt>
+<a name="L217"></a><tt class="py-lineno">217</tt>  <tt class="py-line">        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">cooks</tt> <tt class="py-op">=</tt> <tt class="py-op">[</tt>  </tt>
+<a name="L218"></a><tt class="py-lineno">218</tt>  <tt class="py-line">            <tt class="py-op">(</tt><tt class="py-name">cm_cfg_oven</tt><tt class="py-op">,</tt> <tt class="py-name">cm_cfg_queue</tt><tt class="py-op">,</tt> <tt class="py-op">[</tt><tt id="link-68" class="py-name" targets="Class ProvCon.TFTP.ProvisioningTFTP.CableModemConfigCook=ProvCon.TFTP.ProvisioningTFTP.CableModemConfigCook-class.html"><a title="ProvCon.TFTP.ProvisioningTFTP.CableModemConfigCook" class="py-name" href="#" onclick="return doclink('link-68', 'CableModemConfigCook', 'link-68');">CableModemConfigCook</a></tt><tt class="py-op">(</tt><tt class="py-name">cm_cfg_queue</tt><tt class="py-op">,</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">rfQueue</tt><tt class="py-op">,</tt> <tt class="py-name">cm_cfg_oven</tt><tt class="py-op">)</tt> <tt class="py-keyword">for</tt> <tt class="py-name">i</tt> <tt class="py-keyword">in</tt> <tt class="py-name">range</tt><tt class="py-op">(</tt><tt class="py-number">0</tt><tt class="py-op">,</tt><tt class="py-name">cm_cfg_cooks_count</tt><tt class="py-op">)</tt><tt class="py-op">]</tt><tt class="py-op">)</tt><tt class="py-op">,</tt> </tt>
+<a name="L219"></a><tt class="py-lineno">219</tt>  <tt class="py-line">            <tt class="py-op">(</tt><tt class="py-name">cm_fw_oven</tt><tt class="py-op">,</tt> <tt class="py-name">cm_fw_queue</tt><tt class="py-op">,</tt> <tt class="py-op">[</tt><tt id="link-69" class="py-name" targets="Class ProvCon.TFTP.ProvisioningTFTP.FileCook=ProvCon.TFTP.ProvisioningTFTP.FileCook-class.html"><a title="ProvCon.TFTP.ProvisioningTFTP.FileCook" class="py-name" href="#" onclick="return doclink('link-69', 'FileCook', 'link-69');">FileCook</a></tt><tt class="py-op">(</tt><tt class="py-name">cm_fw_queue</tt><tt class="py-op">,</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">rfQueue</tt><tt class="py-op">,</tt> <tt class="py-name">cm_fw_oven</tt><tt class="py-op">)</tt> <tt class="py-keyword">for</tt> <tt class="py-name">i</tt> <tt class="py-keyword">in</tt> <tt class="py-name">range</tt><tt class="py-op">(</tt><tt class="py-number">0</tt><tt class="py-op">,</tt><tt class="py-name">cm_fw_cooks_count</tt><tt class="py-op">)</tt><tt class="py-op">]</tt> <tt class="py-op">)</tt><tt class="py-op">,</tt> </tt>
+<a name="L220"></a><tt class="py-lineno">220</tt>  <tt class="py-line">            <tt class="py-op">(</tt><tt class="py-name">base_oven</tt><tt class="py-op">,</tt> <tt class="py-name">base_cook_queue</tt><tt class="py-op">,</tt> <tt class="py-op">[</tt><tt id="link-70" class="py-name"><a title="ProvCon.TFTP.ProvisioningTFTP.FileCook" class="py-name" href="#" onclick="return doclink('link-70', 'FileCook', 'link-69');">FileCook</a></tt><tt class="py-op">(</tt><tt class="py-name">base_cook_queue</tt><tt class="py-op">,</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">rfQueue</tt><tt class="py-op">,</tt> <tt class="py-name">base_oven</tt><tt class="py-op">)</tt> <tt class="py-keyword">for</tt> <tt class="py-name">i</tt> <tt class="py-keyword">in</tt> <tt class="py-name">range</tt><tt class="py-op">(</tt><tt class="py-number">0</tt><tt class="py-op">,</tt><tt class="py-name">base_cooks_count</tt><tt class="py-op">)</tt><tt class="py-op">]</tt><tt class="py-op">)</tt><tt class="py-op">,</tt>              </tt>
+<a name="L221"></a><tt class="py-lineno">221</tt>  <tt class="py-line">                     <tt class="py-op">]</tt> </tt>
+<a name="L222"></a><tt class="py-lineno">222</tt>  <tt class="py-line">        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">logger</tt> <tt class="py-op">(</tt> <tt class="py-string">"Starting the cooks."</tt> <tt class="py-op">)</tt> </tt>
+<a name="L223"></a><tt class="py-lineno">223</tt>  <tt class="py-line">        <tt class="py-comment">#run cooks, run!</tt> </tt>
+<a name="L224"></a><tt class="py-lineno">224</tt>  <tt class="py-line">        <tt class="py-keyword">for</tt> <tt class="py-op">(</tt><tt id="link-71" class="py-name" targets="Variable ProvCon.gui.ProvisioningControl._=ProvCon.gui.ProvisioningControl-module.html#_"><a title="ProvCon.gui.ProvisioningControl._" class="py-name" href="#" onclick="return doclink('link-71', '_', 'link-71');">_</a></tt><tt class="py-op">,</tt><tt id="link-72" class="py-name"><a title="ProvCon.gui.ProvisioningControl._" class="py-name" href="#" onclick="return doclink('link-72', '_', 'link-71');">_</a></tt><tt class="py-op">,</tt><tt class="py-name">cooklist</tt><tt class="py-op">)</tt> <tt class="py-keyword">in</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">cooks</tt><tt class="py-op">:</tt> </tt>
+<a name="L225"></a><tt class="py-lineno">225</tt>  <tt class="py-line">            <tt class="py-keyword">for</tt> <tt class="py-name">cook</tt> <tt class="py-keyword">in</tt> <tt class="py-name">cooklist</tt><tt class="py-op">:</tt> <tt class="py-name">cook</tt><tt class="py-op">.</tt><tt class="py-name">start</tt><tt class="py-op">(</tt><tt class="py-op">)</tt> </tt>
+<a name="L226"></a><tt class="py-lineno">226</tt>  <tt class="py-line">         </tt>
+<a name="L227"></a><tt class="py-lineno">227</tt>  <tt class="py-line">        <tt class="py-name">data_senders_count</tt> <tt class="py-op">=</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-73" class="py-name"><a title="ProvCon.dbui.config
+ProvCon.dbui.config.config
+ProvCon.docsis.compiler.config
+ProvCon.docsis.compiler.config.config" class="py-name" href="#" onclick="return doclink('link-73', 'config', 'link-47');">config</a></tt><tt class="py-op">.</tt><tt class="py-name">getint</tt> <tt class="py-op">(</tt> <tt class="py-string">"TFTP"</tt><tt class="py-op">,</tt> <tt class="py-string">"senders"</tt> <tt class="py-op">)</tt> </tt>
+<a name="L228"></a><tt class="py-lineno">228</tt>  <tt class="py-line">        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">data_senders</tt> <tt class="py-op">=</tt> <tt class="py-op">[</tt> <tt id="link-74" class="py-name" targets="Class ProvCon.TFTP.ProvisioningTFTP.TFTPDataSender=ProvCon.TFTP.ProvisioningTFTP.TFTPDataSender-class.html"><a title="ProvCon.TFTP.ProvisioningTFTP.TFTPDataSender" class="py-name" href="#" onclick="return doclink('link-74', 'TFTPDataSender', 'link-74');">TFTPDataSender</a></tt> <tt class="py-op">(</tt><tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">rfQueue</tt><tt class="py-op">)</tt>  <tt class="py-keyword">for</tt> <tt class="py-name">i</tt> <tt class="py-keyword">in</tt> <tt class="py-name">range</tt><tt class="py-op">(</tt><tt class="py-number">0</tt><tt class="py-op">,</tt><tt class="py-name">data_senders_count</tt><tt class="py-op">)</tt> <tt class="py-op">]</tt> </tt>
+<a name="L229"></a><tt class="py-lineno">229</tt>  <tt class="py-line">        <tt class="py-keyword">for</tt> <tt class="py-name">sender</tt> <tt class="py-keyword">in</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">data_senders</tt><tt class="py-op">:</tt> <tt class="py-name">sender</tt><tt class="py-op">.</tt><tt class="py-name">start</tt><tt class="py-op">(</tt><tt class="py-op">)</tt> </tt>
+<a name="L230"></a><tt class="py-lineno">230</tt>  <tt class="py-line">         </tt>
+<a name="L231"></a><tt class="py-lineno">231</tt>  <tt class="py-line">        <tt class="py-name">signal</tt><tt class="py-op">.</tt><tt class="py-name">signal</tt> <tt class="py-op">(</tt> <tt class="py-name">signal</tt><tt class="py-op">.</tt><tt class="py-name">SIGHUP</tt><tt class="py-op">,</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-75" class="py-name" targets="Method ProvCon.TFTP.ProvisioningTFTP.ProvisioningTFTPServer.shutdown()=ProvCon.TFTP.ProvisioningTFTP.ProvisioningTFTPServer-class.html#shutdown,Method ProvCon.gui.ProvisioningControl.TopLevelWindow.shutdown()=ProvCon.gui.ProvisioningControl.TopLevelWindow-class.html#shutdown"><a title="ProvCon.TFTP.ProvisioningTFTP.ProvisioningTFTPServer.shutdown
+ProvCon.gui.ProvisioningControl.TopLevelWindow.shutdown" class="py-name" href="#" onclick="return doclink('link-75', 'shutdown', 'link-75');">shutdown</a></tt> <tt class="py-op">)</tt>         </tt>
+<a name="L232"></a><tt class="py-lineno">232</tt>  <tt class="py-line">        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">on</tt> <tt class="py-op">=</tt> <tt class="py-name">True</tt> </tt>
+<a name="L233"></a><tt class="py-lineno">233</tt>  <tt class="py-line">        <tt class="py-comment">#self.timeout = 4</tt> </tt>
+<a name="L234"></a><tt class="py-lineno">234</tt>  <tt class="py-line">        <tt class="py-name">error_count</tt> <tt class="py-op">=</tt> <tt class="py-number">0</tt> </tt>
+<a name="L235"></a><tt class="py-lineno">235</tt>  <tt class="py-line">        <tt class="py-keyword">while</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">on</tt><tt class="py-op">:</tt>    </tt>
+<a name="L236"></a><tt class="py-lineno">236</tt>  <tt class="py-line">            <tt class="py-keyword">try</tt><tt class="py-op">:</tt> </tt>
+<a name="L237"></a><tt class="py-lineno">237</tt>  <tt class="py-line">                <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">handle_request</tt><tt class="py-op">(</tt><tt class="py-op">)</tt> </tt>
+<a name="L238"></a><tt class="py-lineno">238</tt>  <tt class="py-line">            <tt class="py-keyword">except</tt> <tt class="py-name">Exception</tt> <tt class="py-keyword">as</tt> <tt class="py-name">e</tt><tt class="py-op">:</tt>                 </tt>
+<a name="L239"></a><tt class="py-lineno">239</tt>  <tt class="py-line">                <tt class="py-name">error_count</tt> <tt class="py-op">+=</tt> <tt class="py-number">1</tt> </tt>
+<a name="L240"></a><tt class="py-lineno">240</tt>  <tt class="py-line">                <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">logger</tt> <tt class="py-op">(</tt> <tt class="py-string">"error#%d in handle_request (%s)"</tt> <tt class="py-op">%</tt> <tt class="py-op">(</tt><tt class="py-name">error_count</tt><tt class="py-op">,</tt> <tt class="py-name">e</tt><tt class="py-op">)</tt> <tt class="py-op">)</tt> </tt>
+<a name="L241"></a><tt class="py-lineno">241</tt>  <tt class="py-line">                <tt class="py-keyword">if</tt> <tt class="py-name">error_count</tt> <tt class="py-op">&gt;</tt> <tt class="py-number">10</tt><tt class="py-op">:</tt> <tt class="py-keyword">break</tt> </tt>
+<a name="L242"></a><tt class="py-lineno">242</tt>  <tt class="py-line">        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">logger</tt> <tt class="py-op">(</tt> <tt class="py-string">"TFTP service no longer active."</tt> <tt class="py-op">)</tt> </tt>
+</div><a name="L243"></a><tt class="py-lineno">243</tt>  <tt class="py-line">         </tt>
+<a name="ProvisioningTFTPServer.handle_RRQ"></a><div id="ProvisioningTFTPServer.handle_RRQ-def"><a name="L244"></a><tt class="py-lineno">244</tt> <a class="py-toggle" href="#" id="ProvisioningTFTPServer.handle_RRQ-toggle" onclick="return toggle('ProvisioningTFTPServer.handle_RRQ');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="ProvCon.TFTP.ProvisioningTFTP.ProvisioningTFTPServer-class.html#handle_RRQ">handle_RRQ</a> <tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">,</tt> <tt class="py-param">ipacket</tt><tt class="py-op">,</tt> <tt class="py-param">client_address</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="ProvisioningTFTPServer.handle_RRQ-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="ProvisioningTFTPServer.handle_RRQ-expanded"><a name="L245"></a><tt class="py-lineno">245</tt>  <tt class="py-line">        <tt class="py-keyword">for</tt> <tt class="py-name">cook</tt> <tt class="py-keyword">in</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">cooks</tt><tt class="py-op">:</tt> </tt>
+<a name="L246"></a><tt class="py-lineno">246</tt>  <tt class="py-line">            <tt class="py-op">(</tt><tt class="py-name">oven</tt><tt class="py-op">,</tt><tt class="py-name">queue</tt><tt class="py-op">,</tt><tt class="py-name">plist</tt><tt class="py-op">)</tt> <tt class="py-op">=</tt> <tt class="py-name">cook</tt> </tt>
+<a name="L247"></a><tt class="py-lineno">247</tt>  <tt class="py-line">            <tt class="py-keyword">if</tt> <tt class="py-name">oven</tt><tt class="py-op">.</tt><tt id="link-76" class="py-name"><a title="ProvCon.TFTP.ProvisioningTFTP.BaseOven.check_access" class="py-name" href="#" onclick="return doclink('link-76', 'check_access', 'link-41');">check_access</a></tt> <tt class="py-op">(</tt><tt class="py-name">ipacket</tt><tt class="py-op">.</tt><tt class="py-name">filename</tt><tt class="py-op">,</tt> <tt class="py-name">client_address</tt><tt class="py-op">[</tt><tt class="py-number">0</tt><tt class="py-op">]</tt><tt class="py-op">)</tt><tt class="py-op">:</tt>                     </tt>
+<a name="L248"></a><tt class="py-lineno">248</tt>  <tt class="py-line">                <tt class="py-keyword">try</tt><tt class="py-op">:</tt> </tt>
+<a name="L249"></a><tt class="py-lineno">249</tt>  <tt class="py-line">                    <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">logger</tt> <tt class="py-op">(</tt> <tt class="py-string">"RRQ from %s filename=%s"</tt> <tt class="py-op">%</tt> <tt class="py-op">(</tt><tt class="py-name">client_address</tt><tt class="py-op">[</tt><tt class="py-number">0</tt><tt class="py-op">]</tt><tt class="py-op">,</tt> <tt class="py-name">ipacket</tt><tt class="py-op">.</tt><tt class="py-name">filename</tt><tt class="py-op">)</tt> <tt class="py-op">)</tt> </tt>
+<a name="L250"></a><tt class="py-lineno">250</tt>  <tt class="py-line">                    <tt class="py-name">queue</tt><tt class="py-op">.</tt><tt class="py-name">put_nowait</tt> <tt class="py-op">(</tt> <tt class="py-op">(</tt><tt class="py-name">ipacket</tt><tt class="py-op">,</tt> <tt class="py-name">client_address</tt><tt class="py-op">)</tt> <tt class="py-op">)</tt> </tt>
+<a name="L251"></a><tt class="py-lineno">251</tt>  <tt class="py-line">                    <tt class="py-keyword">return</tt> <tt class="py-name">True</tt> </tt>
+<a name="L252"></a><tt class="py-lineno">252</tt>  <tt class="py-line">                <tt class="py-keyword">except</tt> <tt class="py-name">ThreadingQueue</tt><tt class="py-op">.</tt><tt class="py-name">full</tt><tt class="py-op">:</tt> </tt>
+<a name="L253"></a><tt class="py-lineno">253</tt>  <tt class="py-line">                    <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">logger</tt> <tt class="py-op">(</tt> <tt class="py-string">"RRQ from %s FAILED (QUEUE FULL)"</tt> <tt class="py-op">%</tt> <tt class="py-op">(</tt><tt class="py-name">client_address</tt><tt class="py-op">[</tt><tt class="py-number">0</tt><tt class="py-op">]</tt><tt class="py-op">,</tt><tt class="py-op">)</tt> <tt class="py-op">)</tt> </tt>
+<a name="L254"></a><tt class="py-lineno">254</tt>  <tt class="py-line">                    <tt id="link-77" class="py-name"><a title="ProvCon.TFTP.Protocol" class="py-name" href="#" onclick="return doclink('link-77', 'Protocol', 'link-7');">Protocol</a></tt><tt class="py-op">.</tt><tt id="link-78" class="py-name"><a title="ProvCon.TFTP.Protocol.Send_ERROR" class="py-name" href="#" onclick="return doclink('link-78', 'Send_ERROR', 'link-29');">Send_ERROR</a></tt> <tt class="py-op">(</tt> <tt class="py-name">client_address</tt><tt class="py-op">,</tt> <tt class="py-number">0</tt><tt class="py-op">,</tt> <tt class="py-string">"cook queue full"</tt> <tt class="py-op">)</tt> </tt>
+<a name="L255"></a><tt class="py-lineno">255</tt>  <tt class="py-line">            <tt class="py-comment">#else:</tt> </tt>
+<a name="L256"></a><tt class="py-lineno">256</tt>  <tt class="py-line">            <tt class="py-comment">#    print "access denied in oven: ", oven</tt> </tt>
+<a name="L257"></a><tt class="py-lineno">257</tt>  <tt class="py-line">        <tt class="py-keyword">return</tt> <tt class="py-name">False</tt> </tt>
+</div><a name="L258"></a><tt class="py-lineno">258</tt>  <tt class="py-line">     </tt>
+<a name="ProvisioningTFTPServer.shutdown"></a><div id="ProvisioningTFTPServer.shutdown-def"><a name="L259"></a><tt class="py-lineno">259</tt> <a class="py-toggle" href="#" id="ProvisioningTFTPServer.shutdown-toggle" onclick="return toggle('ProvisioningTFTPServer.shutdown');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="ProvCon.TFTP.ProvisioningTFTP.ProvisioningTFTPServer-class.html#shutdown">shutdown</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">,</tt> <tt class="py-op">*</tt><tt class="py-param">kw</tt><tt class="py-op">)</tt><tt class="py-op">:</tt>         </tt>
+</div><a name="L260"></a><tt class="py-lineno">260</tt>  <tt class="py-line">        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">logger</tt> <tt class="py-op">(</tt> <tt class="py-string">"Server shutdown in progress."</tt> <tt class="py-op">)</tt>         </tt>
+<a name="L261"></a><tt class="py-lineno">261</tt>  <tt class="py-line">        <tt class="py-keyword">for</tt> <tt class="py-op">(</tt><tt id="link-79" class="py-name"><a title="ProvCon.gui.ProvisioningControl._" class="py-name" href="#" onclick="return doclink('link-79', '_', 'link-71');">_</a></tt><tt class="py-op">,</tt><tt class="py-name">queue</tt><tt class="py-op">,</tt><tt class="py-name">cooks</tt><tt class="py-op">)</tt> <tt class="py-keyword">in</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">cooks</tt><tt class="py-op">:</tt>                         </tt>
+<a name="L262"></a><tt class="py-lineno">262</tt>  <tt class="py-line">            <tt class="py-keyword">for</tt> <tt class="py-name">cook</tt> <tt class="py-keyword">in</tt> <tt class="py-name">cooks</tt><tt class="py-op">:</tt>                 </tt>
+<a name="L263"></a><tt class="py-lineno">263</tt>  <tt class="py-line">                <tt class="py-name">queue</tt><tt class="py-op">.</tt><tt class="py-name">put</tt> <tt class="py-op">(</tt> <tt class="py-op">(</tt><tt class="py-name">None</tt><tt class="py-op">,</tt> <tt class="py-name">None</tt><tt class="py-op">)</tt> <tt class="py-op">)</tt> </tt>
+<a name="L264"></a><tt class="py-lineno">264</tt>  <tt class="py-line">        <tt class="py-keyword">for</tt> <tt class="py-name">sender</tt> <tt class="py-keyword">in</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">data_senders</tt><tt class="py-op">:</tt>             </tt>
+<a name="L265"></a><tt class="py-lineno">265</tt>  <tt class="py-line">            <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">rfQueue</tt><tt class="py-op">.</tt><tt class="py-name">put</tt> <tt class="py-op">(</tt> <tt class="py-op">(</tt><tt class="py-name">None</tt><tt class="py-op">,</tt><tt class="py-name">None</tt><tt class="py-op">,</tt><tt class="py-name">None</tt><tt class="py-op">,</tt><tt class="py-name">None</tt><tt class="py-op">)</tt> <tt class="py-op">)</tt> </tt>
+<a name="L266"></a><tt class="py-lineno">266</tt>  <tt class="py-line">        <tt class="py-keyword">for</tt> <tt class="py-name">sender</tt> <tt class="py-keyword">in</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">data_senders</tt><tt class="py-op">:</tt>             </tt>
+<a name="L267"></a><tt class="py-lineno">267</tt>  <tt class="py-line">            <tt class="py-name">sender</tt><tt class="py-op">.</tt><tt class="py-name">join</tt><tt class="py-op">(</tt><tt class="py-op">)</tt> </tt>
+<a name="L268"></a><tt class="py-lineno">268</tt>  <tt class="py-line">        <tt class="py-keyword">for</tt> <tt class="py-op">(</tt><tt id="link-80" class="py-name"><a title="ProvCon.gui.ProvisioningControl._" class="py-name" href="#" onclick="return doclink('link-80', '_', 'link-71');">_</a></tt><tt class="py-op">,</tt><tt class="py-name">queue</tt><tt class="py-op">,</tt><tt class="py-name">cooks</tt><tt class="py-op">)</tt> <tt class="py-keyword">in</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">cooks</tt><tt class="py-op">:</tt>             </tt>
+<a name="L269"></a><tt class="py-lineno">269</tt>  <tt class="py-line">            <tt class="py-keyword">for</tt> <tt class="py-name">cook</tt> <tt class="py-keyword">in</tt> <tt class="py-name">cooks</tt><tt class="py-op">:</tt> <tt class="py-name">cook</tt><tt class="py-op">.</tt><tt class="py-name">join</tt><tt class="py-op">(</tt><tt class="py-op">)</tt>         </tt>
+<a name="L270"></a><tt class="py-lineno">270</tt>  <tt class="py-line">        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">on</tt> <tt class="py-op">=</tt> <tt class="py-name">False</tt> </tt>
+</div></div><a name="L271"></a><tt class="py-lineno">271</tt>  <tt class="py-line">             </tt>
+<a name="pcTFTPD"></a><div id="pcTFTPD-def"><a name="L272"></a><tt class="py-lineno">272</tt> <a class="py-toggle" href="#" id="pcTFTPD-toggle" onclick="return toggle('pcTFTPD');">-</a><tt class="py-line"><tt class="py-keyword">class</tt> <a class="py-def-name" href="ProvCon.TFTP.ProvisioningTFTP.pcTFTPD-class.html">pcTFTPD</a><tt class="py-op">(</tt><tt class="py-base-class">Process</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="pcTFTPD-collapsed" style="display:none;" pad="+++" indent="++++"></div><div id="pcTFTPD-expanded"><a name="pcTFTPD.__init__"></a><div id="pcTFTPD.__init__-def"><a name="L273"></a><tt class="py-lineno">273</tt> <a class="py-toggle" href="#" id="pcTFTPD.__init__-toggle" onclick="return toggle('pcTFTPD.__init__');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="ProvCon.TFTP.ProvisioningTFTP.pcTFTPD-class.html#__init__">__init__</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="pcTFTPD.__init__-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="pcTFTPD.__init__-expanded"><a name="L274"></a><tt class="py-lineno">274</tt>  <tt class="py-line">        <tt class="py-name">Process</tt><tt class="py-op">.</tt><tt id="link-81" class="py-name"><a title="ProvCon.TFTP.Protocol.Packet.__init__
+ProvCon.TFTP.ProvisioningTFTP.BaseOven.__init__
+ProvCon.TFTP.ProvisioningTFTP.CableModemConfigCook.__init__
+ProvCon.TFTP.ProvisioningTFTP.FileCook.__init__
+ProvCon.TFTP.ProvisioningTFTP.ProvisioningTFTPServer.__init__
+ProvCon.TFTP.ProvisioningTFTP.TFTPDataSender.__init__
+ProvCon.TFTP.ProvisioningTFTP.pcTFTPD.__init__
+ProvCon.TFTP.Server.BaseTFTPServer.__init__
+ProvCon.cli.CLIServer.__init__
+ProvCon.cli.CLIWorker.__init__
+ProvCon.dbui.abstractui.fields.BaseArrayEditor.__init__
+ProvCon.dbui.abstractui.fields.BaseArrayItemButtonBox.__init__
+ProvCon.dbui.abstractui.fields.BaseArrayItemEditor.__init__
+ProvCon.dbui.abstractui.fields.BaseFieldEditor.__init__
+ProvCon.dbui.abstractui.fields.BaseReferenceEditor.__init__
+ProvCon.dbui.abstractui.forms.BaseForm.__init__
+ProvCon.dbui.abstractui.navigators.BaseNavigator.__init__
+ProvCon.dbui.abstractui.recordlists.BasePager.__init__
+ProvCon.dbui.abstractui.recordlists.BaseRecordList.__init__
+ProvCon.dbui.database.CFG.tCX.__init__
+ProvCon.dbui.di.rObject'.ObjectFlags.__init__
+ProvCon.dbui.di.rObject'.ObjectParams.__init__
+ProvCon.dbui.di.rObject'.rObject.__init__
+ProvCon.dbui.meta.field.Field.__init__
+ProvCon.dbui.meta.table.Table.__init__
+ProvCon.dbui.orm.form.Form.__init__
+ProvCon.dbui.orm.record.Record.DataManipulationError.__init__
+ProvCon.dbui.orm.record.Record.DataQueryError.__init__
+ProvCon.dbui.orm.record.Record.RecordNotFound.__init__
+ProvCon.dbui.orm.record.Record.__init__
+ProvCon.dbui.orm.recordlist.RecordList.__init__
+ProvCon.dbui.orm.recordsearch.OIDSearchList.__init__
+ProvCon.dbui.wxwin.complete.CompleteGenericForm.__init__
+ProvCon.dbui.wxwin.complete.FormToolbar.__init__
+ProvCon.dbui.wxwin.complete.InfoPopup.__init__
+ProvCon.dbui.wxwin.fields.Entry.ArrayCombo.__init__
+ProvCon.dbui.wxwin.fields.Entry.ArrayItemCombo.__init__
+ProvCon.dbui.wxwin.fields.Entry.ArrayItemStatic.__init__
+ProvCon.dbui.wxwin.fields.Entry.ArrayItemText.__init__
+ProvCon.dbui.wxwin.fields.Entry.ArrayText.__init__
+ProvCon.dbui.wxwin.fields.Entry.BaseArray.__init__
+ProvCon.dbui.wxwin.fields.Entry.Boolean.__init__
+ProvCon.dbui.wxwin.fields.Entry.ComboReference.__init__
+ProvCon.dbui.wxwin.fields.Entry.Memo.__init__
+ProvCon.dbui.wxwin.fields.Entry.StandardArrayItemButtonBox.__init__
+ProvCon.dbui.wxwin.fields.Entry.Static.__init__
+ProvCon.dbui.wxwin.fields.Entry.StaticReference.__init__
+ProvCon.dbui.wxwin.fields.Entry.Text.__init__
+ProvCon.dbui.wxwin.forms.GenericForm.__init__
+ProvCon.dbui.wxwin.mwx.CheckBox.__init__
+ProvCon.dbui.wxwin.mwx.ComboBox.__init__
+ProvCon.dbui.wxwin.mwx.StaticText.__init__
+ProvCon.dbui.wxwin.mwx.TextCtrl.__init__
+ProvCon.dbui.wxwin.mwx.mwxControl.__init__
+ProvCon.dbui.wxwin.navigators.Navigator.__init__
+ProvCon.dbui.wxwin.recordlists.RecordList.__init__
+ProvCon.docsis.cablemodem.cablemodem.__init__
+ProvCon.docsis.cablemodem.cablemodem._cos.__init__
+ProvCon.docsis.cablemodem.cablemodem._cpe.__init__
+ProvCon.docsis.cablemodem.cablemodem._mac.__init__
+ProvCon.docsis.compiler.config.config.__init__
+ProvCon.docsis.compiler.encoder.error.__init__
+ProvCon.docsis.compiler.encoder.tlv.__init__
+ProvCon.docsis.compiler.encoder.tlv_multipart.__init__
+ProvCon.docsis.compiler.encoder.tlv_multipart.append_proxy.__init__
+ProvCon.docsis.compiler.encoder.tlv_multipart.iterator.__init__
+ProvCon.docsis.compiler.encoder.tlv_multipart_subclass.__init__
+ProvCon.docsis.compiler.encoder.tlv_subclass.__init__
+ProvCon.func.classes.conditionalmethod.__init__
+ProvCon.func.events.eventemitter.__init__
+ProvCon.func.events.eventemitter.evt.__init__
+ProvCon.func.events.eventemitter.evthook.__init__
+ProvCon.func.events.eventexception.__init__
+ProvCon.func.variables.TracedVariable.Tracer.__init__
+ProvCon.func.variables.TracedVariable.__init__
+ProvCon.gui.FrontEndApp.FE.__init__
+ProvCon.gui.ProvisioningControl.GenericObjectEditor.__init__
+ProvCon.gui.ProvisioningControl.GridView.__init__
+ProvCon.gui.ProvisioningControl.MainTab.__init__
+ProvCon.gui.ProvisioningControl.ObjectEditorModel.__init__
+ProvCon.gui.ProvisioningControl.TopLevelWindow.__init__
+ProvCon.log.LoggingBackend.__init__
+ProvCon.log.LoggingClient.__init__
+ProvCon.log.LoggingServer.__init__
+ProvCon.ui.uierror.__init__
+ProvCon.wronolib.ipaddr.ip4addr.__init__
+ProvCon.wronolib.ipaddr.ip4prefix.__init__" class="py-name" href="#" onclick="return doclink('link-81', '__init__', 'link-8');">__init__</a></tt><tt class="py-op">(</tt><tt class="py-name">self</tt><tt class="py-op">,</tt> <tt class="py-name">None</tt><tt class="py-op">,</tt> <tt class="py-name">None</tt><tt class="py-op">,</tt> <tt class="py-string">"pcTFTPD"</tt> <tt class="py-op">)</tt> </tt>
+<a name="L275"></a><tt class="py-lineno">275</tt>  <tt class="py-line">        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">start</tt><tt class="py-op">(</tt><tt class="py-op">)</tt> </tt>
+</div><a name="L276"></a><tt class="py-lineno">276</tt>  <tt class="py-line">         </tt>
+<a name="pcTFTPD.run"></a><div id="pcTFTPD.run-def"><a name="L277"></a><tt class="py-lineno">277</tt> <a class="py-toggle" href="#" id="pcTFTPD.run-toggle" onclick="return toggle('pcTFTPD.run');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="ProvCon.TFTP.ProvisioningTFTP.pcTFTPD-class.html#run">run</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="pcTFTPD.run-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="pcTFTPD.run-expanded"><a name="L278"></a><tt class="py-lineno">278</tt>  <tt class="py-line">        <tt id="link-82" class="py-name"><a title="ProvCon.wronolib.procname.set_process_name" class="py-name" href="#" onclick="return doclink('link-82', 'set_process_name', 'link-5');">set_process_name</a></tt> <tt class="py-op">(</tt> <tt class="py-string">"0@TFTPD"</tt> <tt class="py-op">)</tt> </tt>
+<a name="L279"></a><tt class="py-lineno">279</tt>  <tt class="py-line">        <tt id="link-83" class="py-name"><a title="ProvCon.dbui.config
+ProvCon.dbui.config.config
+ProvCon.docsis.compiler.config
+ProvCon.docsis.compiler.config.config" class="py-name" href="#" onclick="return doclink('link-83', 'config', 'link-47');">config</a></tt> <tt class="py-op">=</tt> <tt id="link-84" class="py-name"><a title="ProvCon" class="py-name" href="#" onclick="return doclink('link-84', 'ProvCon', 'link-1');">ProvCon</a></tt><tt class="py-op">.</tt><tt id="link-85" class="py-name"><a title="ProvCon.Configuration" class="py-name" href="#" onclick="return doclink('link-85', 'Configuration', 'link-49');">Configuration</a></tt><tt class="py-op">(</tt><tt class="py-op">)</tt> </tt>
+<a name="L280"></a><tt class="py-lineno">280</tt>  <tt class="py-line">        <tt class="py-name">logger</tt> <tt class="py-op">=</tt> <tt id="link-86" class="py-name"><a title="ProvCon" class="py-name" href="#" onclick="return doclink('link-86', 'ProvCon', 'link-1');">ProvCon</a></tt><tt class="py-op">.</tt><tt id="link-87" class="py-name"><a title="ProvCon.log.LoggingClient" class="py-name" href="#" onclick="return doclink('link-87', 'LoggingClient', 'link-11');">LoggingClient</a></tt> <tt class="py-op">(</tt> <tt class="py-name">name</tt><tt class="py-op">=</tt><tt class="py-string">"TFTPD"</tt> <tt class="py-op">)</tt> </tt>
+<a name="L281"></a><tt class="py-lineno">281</tt>  <tt class="py-line">         </tt>
+<a name="L282"></a><tt class="py-lineno">282</tt>  <tt class="py-line">        <tt class="py-name">controller</tt> <tt class="py-op">=</tt> <tt id="link-88" class="py-name"><a title="ProvCon" class="py-name" href="#" onclick="return doclink('link-88', 'ProvCon', 'link-1');">ProvCon</a></tt><tt class="py-op">.</tt><tt id="link-89" class="py-name" targets="Function ProvCon.Controller()=ProvCon-module.html#Controller"><a title="ProvCon.Controller" class="py-name" href="#" onclick="return doclink('link-89', 'Controller', 'link-89');">Controller</a></tt><tt class="py-op">(</tt> <tt id="link-90" class="py-name"><a title="ProvCon.dbui.config
+ProvCon.dbui.config.config
+ProvCon.docsis.compiler.config
+ProvCon.docsis.compiler.config.config" class="py-name" href="#" onclick="return doclink('link-90', 'config', 'link-47');">config</a></tt><tt class="py-op">.</tt><tt id="link-91" class="py-name"><a title="ProvCon.dbui.orm.recordsearch.OIDSearchList.get
+ProvCon.func.variables.TracedVariable.get" class="py-name" href="#" onclick="return doclink('link-91', 'get', 'link-12');">get</a></tt> <tt class="py-op">(</tt> <tt class="py-string">"CONTROLLER"</tt><tt class="py-op">,</tt> <tt class="py-string">"tftpd"</tt><tt class="py-op">)</tt> <tt class="py-op">)</tt> </tt>
+<a name="L283"></a><tt class="py-lineno">283</tt>  <tt class="py-line">         </tt>
+<a name="L284"></a><tt class="py-lineno">284</tt>  <tt class="py-line">        <tt class="py-name">logger</tt> <tt class="py-op">(</tt> <tt class="py-string">"Initializing the server."</tt> <tt class="py-op">)</tt> </tt>
+<a name="L285"></a><tt class="py-lineno">285</tt>  <tt class="py-line">        <tt class="py-name">server_process</tt> <tt class="py-op">=</tt> <tt class="py-name">Process</tt> <tt class="py-op">(</tt> <tt class="py-name">name</tt><tt class="py-op">=</tt><tt class="py-string">"TFTPD_LISTEN"</tt><tt class="py-op">,</tt> <tt class="py-name">target</tt><tt class="py-op">=</tt><tt id="link-92" class="py-name" targets="Class ProvCon.TFTP.ProvisioningTFTP.ProvisioningTFTPServer=ProvCon.TFTP.ProvisioningTFTP.ProvisioningTFTPServer-class.html"><a title="ProvCon.TFTP.ProvisioningTFTP.ProvisioningTFTPServer" class="py-name" href="#" onclick="return doclink('link-92', 'ProvisioningTFTPServer', 'link-92');">ProvisioningTFTPServer</a></tt> <tt class="py-op">)</tt> </tt>
+<a name="L286"></a><tt class="py-lineno">286</tt>  <tt class="py-line">        <tt class="py-name">server_process</tt><tt class="py-op">.</tt><tt class="py-name">start</tt><tt class="py-op">(</tt><tt class="py-op">)</tt> </tt>
+<a name="L287"></a><tt class="py-lineno">287</tt>  <tt class="py-line">         </tt>
+<a name="L288"></a><tt class="py-lineno">288</tt>  <tt class="py-line">        <tt class="py-keyword">while</tt> <tt class="py-name">True</tt><tt class="py-op">:</tt> </tt>
+<a name="L289"></a><tt class="py-lineno">289</tt>  <tt class="py-line">            <tt id="link-93" class="py-name" targets="Function ProvCon.ui.action()=ProvCon.ui-module.html#action"><a title="ProvCon.ui.action" class="py-name" href="#" onclick="return doclink('link-93', 'action', 'link-93');">action</a></tt> <tt class="py-op">=</tt> <tt id="link-94" class="py-name"><a title="ProvCon" class="py-name" href="#" onclick="return doclink('link-94', 'ProvCon', 'link-1');">ProvCon</a></tt><tt class="py-op">.</tt><tt id="link-95" class="py-name" targets="Function ProvCon.ControllerWait()=ProvCon-module.html#ControllerWait"><a title="ProvCon.ControllerWait" class="py-name" href="#" onclick="return doclink('link-95', 'ControllerWait', 'link-95');">ControllerWait</a></tt> <tt class="py-op">(</tt> <tt class="py-name">controller</tt> <tt class="py-op">)</tt> </tt>
+<a name="L290"></a><tt class="py-lineno">290</tt>  <tt class="py-line">            <tt class="py-keyword">if</tt> <tt id="link-96" class="py-name"><a title="ProvCon.ui.action" class="py-name" href="#" onclick="return doclink('link-96', 'action', 'link-93');">action</a></tt> <tt class="py-op">==</tt> <tt class="py-string">"STOP"</tt><tt class="py-op">:</tt> <tt class="py-keyword">break</tt> </tt>
+<a name="L291"></a><tt class="py-lineno">291</tt>  <tt class="py-line">         </tt>
+<a name="L292"></a><tt class="py-lineno">292</tt>  <tt class="py-line">        <tt class="py-name">logger</tt> <tt class="py-op">(</tt><tt class="py-string">"Terminating the server."</tt><tt class="py-op">)</tt> </tt>
+<a name="L293"></a><tt class="py-lineno">293</tt>  <tt class="py-line">        <tt class="py-name">os</tt><tt class="py-op">.</tt><tt class="py-name">kill</tt> <tt class="py-op">(</tt> <tt class="py-name">server_process</tt><tt class="py-op">.</tt><tt class="py-name">pid</tt><tt class="py-op">,</tt> <tt class="py-name">signal</tt><tt class="py-op">.</tt><tt class="py-name">SIGHUP</tt> <tt class="py-op">)</tt>         </tt>
+<a name="L294"></a><tt class="py-lineno">294</tt>  <tt class="py-line">        <tt class="py-name">logger</tt> <tt class="py-op">(</tt><tt class="py-string">"Waiting for all children to exit."</tt><tt class="py-op">)</tt>                 </tt>
+<a name="L295"></a><tt class="py-lineno">295</tt>  <tt class="py-line">        <tt class="py-name">server_process</tt><tt class="py-op">.</tt><tt class="py-name">join</tt><tt class="py-op">(</tt><tt class="py-op">)</tt> </tt>
+<a name="L296"></a><tt class="py-lineno">296</tt>  <tt class="py-line">        <tt class="py-name">logger</tt> <tt class="py-op">(</tt> <tt class="py-string">"Finished."</tt> <tt class="py-op">)</tt> </tt>
+</div></div><a name="L297"></a><tt class="py-lineno">297</tt>  <tt class="py-line">             </tt>
+<a name="L298"></a><tt class="py-lineno">298</tt>  <tt class="py-line"><tt class="py-comment">#config = ProvCon.Configuration()</tt> </tt>
+<a name="L299"></a><tt class="py-lineno">299</tt>  <tt class="py-line"><tt class="py-comment">#TFTPD = pcTFTPD()</tt> </tt>
+<a name="L300"></a><tt class="py-lineno">300</tt>  <tt class="py-line"><tt class="py-comment">#time.sleep(2)</tt> </tt>
+<a name="L301"></a><tt class="py-lineno">301</tt>  <tt class="py-line"><tt class="py-comment">#ProvCon.ControllerAction ( config.get ( "CONTROLLER", "tftpd"), "STOP" )</tt> </tt>
+<a name="L302"></a><tt class="py-lineno">302</tt>  <tt class="py-line"><tt class="py-comment">#TFTPD.join()</tt> </tt>
+<a name="L303"></a><tt class="py-lineno">303</tt>  <tt class="py-line"> </tt><script type="text/javascript">
+<!--
+expandto(location.href);
+// -->
+</script>
+</pre>
+<br />
+<!-- ==================== NAVIGATION BAR ==================== -->
+<table class="navbar" border="0" width="100%" cellpadding="0"
+       bgcolor="#a0c0ff" cellspacing="0">
+  <tr valign="middle">
+  <!-- Home link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="ProvCon-module.html">Home</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Tree link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="module-tree.html">Trees</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Index link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="identifier-index.html">Indices</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Help link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="help.html">Help</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Project homepage -->
+      <th class="navbar" align="right" width="100%">
+        <table border="0" cellpadding="0" cellspacing="0">
+          <tr><th class="navbar" align="center"
+            >docsis-provisioning</th>
+          </tr></table></th>
+  </tr>
+</table>
+<table border="0" cellpadding="0" cellspacing="0" width="100%%">
+  <tr>
+    <td align="left" class="footer">
+    Generated by Epydoc 3.0.1 on Thu Jan  8 14:48:53 2009
+    </td>
+    <td align="right" class="footer">
+      <a target="mainFrame" href="http://epydoc.sourceforge.net"
+        >http://epydoc.sourceforge.net</a>
+    </td>
+  </tr>
+</table>
+
+<script type="text/javascript">
+  <!--
+  // Private objects are initially displayed (because if
+  // javascript is turned off then we want them to be
+  // visible); but by default, we want to hide them.  So hide
+  // them unless we have a cookie that says to show them.
+  checkCookie();
+  // -->
+</script>
+</body>
+</html>

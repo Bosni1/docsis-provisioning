@@ -1,0 +1,684 @@
+<?xml version="1.0" encoding="ascii"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+          "DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+  <title>ProvCon.dbui.abstractui.fields</title>
+  <link rel="stylesheet" href="epydoc.css" type="text/css" />
+  <script type="text/javascript" src="epydoc.js"></script>
+</head>
+
+<body bgcolor="white" text="black" link="blue" vlink="#204080"
+      alink="#204080">
+<!-- ==================== NAVIGATION BAR ==================== -->
+<table class="navbar" border="0" width="100%" cellpadding="0"
+       bgcolor="#a0c0ff" cellspacing="0">
+  <tr valign="middle">
+  <!-- Home link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="ProvCon-module.html">Home</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Tree link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="module-tree.html">Trees</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Index link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="identifier-index.html">Indices</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Help link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="help.html">Help</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Project homepage -->
+      <th class="navbar" align="right" width="100%">
+        <table border="0" cellpadding="0" cellspacing="0">
+          <tr><th class="navbar" align="center"
+            >docsis-provisioning</th>
+          </tr></table></th>
+  </tr>
+</table>
+<table width="100%" cellpadding="0" cellspacing="0">
+  <tr valign="top">
+    <td width="100%">
+      <span class="breadcrumbs">
+        <a href="ProvCon-module.html">Package&nbsp;ProvCon</a> ::
+        <a href="ProvCon.dbui-module.html">Package&nbsp;dbui</a> ::
+        <a href="ProvCon.dbui.abstractui-module.html">Package&nbsp;abstractui</a> ::
+        Module&nbsp;fields
+      </span>
+    </td>
+    <td>
+      <table cellpadding="0" cellspacing="0">
+        <!-- hide/show private -->
+        <tr><td align="right"><span class="options">[<a href="javascript:void(0);" class="privatelink"
+    onclick="toggle_private();">hide&nbsp;private</a>]</span></td></tr>
+        <tr><td align="right"><span class="options"
+            >[<a href="frames.html" target="_top">frames</a
+            >]&nbsp;|&nbsp;<a href="ProvCon.dbui.abstractui.fields-pysrc.html"
+            target="_top">no&nbsp;frames</a>]</span></td></tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<h1 class="epydoc">Source Code for <a href="ProvCon.dbui.abstractui.fields-module.html">Module ProvCon.dbui.abstractui.fields</a></h1>
+<pre class="py-src">
+<a name="L1"></a><tt class="py-lineno">  1</tt>  <tt class="py-line"><tt class="py-comment">##$Id: fields.py 67 2009-01-06 17:16:59Z wroniasty $</tt> </tt>
+<a name="L2"></a><tt class="py-lineno">  2</tt>  <tt class="py-line"><tt class="py-docstring">"""</tt> </tt>
+<a name="L3"></a><tt class="py-lineno">  3</tt>  <tt class="py-line"><tt class="py-docstring">=== Base classes for field-editing widgets ===</tt> </tt>
+<a name="L4"></a><tt class="py-lineno">  4</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
+<a name="L5"></a><tt class="py-lineno">  5</tt>  <tt class="py-line"><tt class="py-docstring">These are the basic types of field-editing widgets:</tt> </tt>
+<a name="L6"></a><tt class="py-lineno">  6</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
+<a name="L7"></a><tt class="py-lineno">  7</tt>  <tt class="py-line"><tt class="py-docstring">* simple editors : editors that hold one, easily editable value</tt> </tt>
+<a name="L8"></a><tt class="py-lineno">  8</tt>  <tt class="py-line"><tt class="py-docstring">* reference editors : used for editing fields which reference other records</tt> </tt>
+<a name="L9"></a><tt class="py-lineno">  9</tt>  <tt class="py-line"><tt class="py-docstring">* array editors : editing fields that hold arrays</tt> </tt>
+<a name="L10"></a><tt class="py-lineno"> 10</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
+<a name="L11"></a><tt class="py-lineno"> 11</tt>  <tt class="py-line"><tt class="py-docstring">Array editors, are a container for a number of simple/reference editors, they</tt> </tt>
+<a name="L12"></a><tt class="py-lineno"> 12</tt>  <tt class="py-line"><tt class="py-docstring">act as a proxy for unpacking the array into simple values, and then packing them</tt> </tt>
+<a name="L13"></a><tt class="py-lineno"> 13</tt>  <tt class="py-line"><tt class="py-docstring">back into their traced variable.</tt> </tt>
+<a name="L14"></a><tt class="py-lineno"> 14</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
+<a name="L15"></a><tt class="py-lineno"> 15</tt>  <tt class="py-line"><tt class="py-docstring">"""</tt> </tt>
+<a name="L16"></a><tt class="py-lineno"> 16</tt>  <tt class="py-line"> </tt>
+<a name="L17"></a><tt class="py-lineno"> 17</tt>  <tt class="py-line"><tt id="link-0" class="py-name" targets="Variable ProvCon.dbui.abstractui.fields.__revision__=ProvCon.dbui.abstractui.fields-module.html#__revision__,Variable ProvCon.dbui.abstractui.forms.__revision__=ProvCon.dbui.abstractui.forms-module.html#__revision__,Variable ProvCon.dbui.abstractui.navigators.__revision__=ProvCon.dbui.abstractui.navigators-module.html#__revision__,Variable ProvCon.dbui.abstractui.recordlists.__revision__=ProvCon.dbui.abstractui.recordlists-module.html#__revision__,Variable ProvCon.dbui.meta.field.__revision__=ProvCon.dbui.meta.field-module.html#__revision__,Variable ProvCon.dbui.orm.form.__revision__=ProvCon.dbui.orm.form-module.html#__revision__,Variable ProvCon.dbui.orm.record.__revision__=ProvCon.dbui.orm.record-module.html#__revision__,Variable ProvCon.dbui.orm.recordlist.__revision__=ProvCon.dbui.orm.recordlist-module.html#__revision__,Variable ProvCon.dbui.wxwin.complete.__revision__=ProvCon.dbui.wxwin.complete-module.html#__revision__,Variable ProvCon.dbui.wxwin.forms.__revision__=ProvCon.dbui.wxwin.forms-module.html#__revision__,Variable ProvCon.func.decorators.__revision__=ProvCon.func.decorators-module.html#__revision__,Variable ProvCon.func.functions.__revision__=ProvCon.func.functions-module.html#__revision__,Variable ProvCon.func.variables.__revision__=ProvCon.func.variables-module.html#__revision__"><a title="ProvCon.dbui.abstractui.fields.__revision__
+ProvCon.dbui.abstractui.forms.__revision__
+ProvCon.dbui.abstractui.navigators.__revision__
+ProvCon.dbui.abstractui.recordlists.__revision__
+ProvCon.dbui.meta.field.__revision__
+ProvCon.dbui.orm.form.__revision__
+ProvCon.dbui.orm.record.__revision__
+ProvCon.dbui.orm.recordlist.__revision__
+ProvCon.dbui.wxwin.complete.__revision__
+ProvCon.dbui.wxwin.forms.__revision__
+ProvCon.func.decorators.__revision__
+ProvCon.func.functions.__revision__
+ProvCon.func.variables.__revision__" class="py-name" href="#" onclick="return doclink('link-0', '__revision__', 'link-0');">__revision__</a></tt> <tt class="py-op">=</tt> <tt class="py-string">"$Revision: 67 $"</tt> </tt>
+<a name="L18"></a><tt class="py-lineno"> 18</tt>  <tt class="py-line"> </tt>
+<a name="L19"></a><tt class="py-lineno"> 19</tt>  <tt class="py-line"><tt class="py-keyword">from</tt> <tt id="link-1" class="py-name" targets="Package ProvCon=ProvCon-module.html"><a title="ProvCon" class="py-name" href="#" onclick="return doclink('link-1', 'ProvCon', 'link-1');">ProvCon</a></tt><tt class="py-op">.</tt><tt id="link-2" class="py-name" targets="Package ProvCon.dbui=ProvCon.dbui-module.html"><a title="ProvCon.dbui" class="py-name" href="#" onclick="return doclink('link-2', 'dbui', 'link-2');">dbui</a></tt><tt class="py-op">.</tt><tt id="link-3" class="py-name" targets="Package ProvCon.dbui.orm=ProvCon.dbui.orm-module.html"><a title="ProvCon.dbui.orm" class="py-name" href="#" onclick="return doclink('link-3', 'orm', 'link-3');">orm</a></tt> <tt class="py-keyword">import</tt> <tt id="link-4" class="py-name" targets="Class ProvCon.dbui.orm.recordlist.RecordList=ProvCon.dbui.orm.recordlist.RecordList-class.html,Class ProvCon.dbui.wxwin.recordlists.RecordList=ProvCon.dbui.wxwin.recordlists.RecordList-class.html"><a title="ProvCon.dbui.orm.recordlist.RecordList
+ProvCon.dbui.wxwin.recordlists.RecordList" class="py-name" href="#" onclick="return doclink('link-4', 'RecordList', 'link-4');">RecordList</a></tt> </tt>
+<a name="L20"></a><tt class="py-lineno"> 20</tt>  <tt class="py-line"><tt class="py-keyword">from</tt> <tt id="link-5" class="py-name"><a title="ProvCon" class="py-name" href="#" onclick="return doclink('link-5', 'ProvCon', 'link-1');">ProvCon</a></tt><tt class="py-op">.</tt><tt id="link-6" class="py-name" targets="Package ProvCon.func=ProvCon.func-module.html"><a title="ProvCon.func" class="py-name" href="#" onclick="return doclink('link-6', 'func', 'link-6');">func</a></tt><tt class="py-op">.</tt><tt id="link-7" class="py-name" targets="Module ProvCon.func.variables=ProvCon.func.variables-module.html"><a title="ProvCon.func.variables" class="py-name" href="#" onclick="return doclink('link-7', 'variables', 'link-7');">variables</a></tt> <tt class="py-keyword">import</tt> <tt id="link-8" class="py-name" targets="Class ProvCon.func.variables.TracedVariable=ProvCon.func.variables.TracedVariable-class.html"><a title="ProvCon.func.variables.TracedVariable" class="py-name" href="#" onclick="return doclink('link-8', 'TracedVariable', 'link-8');">TracedVariable</a></tt> <tt class="py-keyword">as</tt> <tt class="py-name">tVar</tt> </tt>
+<a name="BaseFieldEditor"></a><div id="BaseFieldEditor-def"><a name="L21"></a><tt class="py-lineno"> 21</tt>  <tt class="py-line"> </tt>
+<a name="L22"></a><tt class="py-lineno"> 22</tt> <a class="py-toggle" href="#" id="BaseFieldEditor-toggle" onclick="return toggle('BaseFieldEditor');">-</a><tt class="py-line"><tt class="py-keyword">class</tt> <a class="py-def-name" href="ProvCon.dbui.abstractui.fields.BaseFieldEditor-class.html">BaseFieldEditor</a><tt class="py-op">(</tt><tt class="py-base-class">object</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="BaseFieldEditor-collapsed" style="display:none;" pad="+++" indent="++++"></div><div id="BaseFieldEditor-expanded"><a name="L23"></a><tt class="py-lineno"> 23</tt>  <tt class="py-line">    <tt class="py-docstring">"""Base class for all editor widgets"""</tt> </tt>
+<a name="BaseFieldEditor.__init__"></a><div id="BaseFieldEditor.__init__-def"><a name="L24"></a><tt class="py-lineno"> 24</tt> <a class="py-toggle" href="#" id="BaseFieldEditor.__init__-toggle" onclick="return toggle('BaseFieldEditor.__init__');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="ProvCon.dbui.abstractui.fields.BaseFieldEditor-class.html#__init__">__init__</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">,</tt> <tt class="py-param">field</tt><tt class="py-op">,</tt> <tt class="py-op">*</tt><tt class="py-param">args</tt><tt class="py-op">,</tt> <tt class="py-op">**</tt><tt class="py-param">kwargs</tt><tt class="py-op">)</tt><tt class="py-op">:</tt>         </tt>
+</div><a name="L25"></a><tt class="py-lineno"> 25</tt>  <tt class="py-line">        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">__variable</tt> <tt class="py-op">=</tt> <tt class="py-name">None</tt>   <tt class="py-comment">#holder for the 'variable' property</tt> </tt>
+<a name="L26"></a><tt class="py-lineno"> 26</tt>  <tt class="py-line">        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">__vtrace</tt>  <tt class="py-op">=</tt> <tt class="py-name">None</tt>    <tt class="py-comment">#holder for the 'vtrace' property</tt> </tt>
+<a name="L27"></a><tt class="py-lineno"> 27</tt>  <tt class="py-line">        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-9" class="py-name" targets="Module ProvCon.dbui.meta.field=ProvCon.dbui.meta.field-module.html"><a title="ProvCon.dbui.meta.field" class="py-name" href="#" onclick="return doclink('link-9', 'field', 'link-9');">field</a></tt> <tt class="py-op">=</tt> <tt id="link-10" class="py-name"><a title="ProvCon.dbui.meta.field" class="py-name" href="#" onclick="return doclink('link-10', 'field', 'link-9');">field</a></tt> </tt>
+<a name="L28"></a><tt class="py-lineno"> 28</tt>  <tt class="py-line">        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-11" class="py-name" targets="Variable ProvCon.dbui.abstractui.fields.BaseFieldEditor.variable=ProvCon.dbui.abstractui.fields.BaseFieldEditor-class.html#variable"><a title="ProvCon.dbui.abstractui.fields.BaseFieldEditor.variable" class="py-name" href="#" onclick="return doclink('link-11', 'variable', 'link-11');">variable</a></tt> <tt class="py-op">=</tt> <tt class="py-name">kwargs</tt><tt class="py-op">[</tt><tt class="py-string">"variable"</tt><tt class="py-op">]</tt>   </tt>
+</div><a name="L29"></a><tt class="py-lineno"> 29</tt>  <tt class="py-line">                 </tt>
+<a name="BaseFieldEditor._get_variable"></a><div id="BaseFieldEditor._get_variable-def"><a name="L30"></a><tt class="py-lineno"> 30</tt> <a class="py-toggle" href="#" id="BaseFieldEditor._get_variable-toggle" onclick="return toggle('BaseFieldEditor._get_variable');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="ProvCon.dbui.abstractui.fields.BaseFieldEditor-class.html#_get_variable">_get_variable</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="BaseFieldEditor._get_variable-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="BaseFieldEditor._get_variable-expanded"><a name="L31"></a><tt class="py-lineno"> 31</tt>  <tt class="py-line">        <tt class="py-keyword">return</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">__variable</tt>     </tt>
+</div><a name="BaseFieldEditor._set_variable"></a><div id="BaseFieldEditor._set_variable-def"><a name="L32"></a><tt class="py-lineno"> 32</tt> <a class="py-toggle" href="#" id="BaseFieldEditor._set_variable-toggle" onclick="return toggle('BaseFieldEditor._set_variable');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="ProvCon.dbui.abstractui.fields.BaseFieldEditor-class.html#_set_variable">_set_variable</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">,</tt> <tt class="py-param">tvar</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="BaseFieldEditor._set_variable-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="BaseFieldEditor._set_variable-expanded"><a name="L33"></a><tt class="py-lineno"> 33</tt>  <tt class="py-line">        <tt class="py-comment">#When the traced variable changes, try to be nice and remove our tracer</tt> </tt>
+<a name="L34"></a><tt class="py-lineno"> 34</tt>  <tt class="py-line">        <tt class="py-keyword">if</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">__vtrace</tt><tt class="py-op">:</tt> </tt>
+<a name="L35"></a><tt class="py-lineno"> 35</tt>  <tt class="py-line">            <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">__vtrace</tt><tt class="py-op">.</tt><tt id="link-12" class="py-name" targets="Method ProvCon.func.variables.TracedVariable.Tracer.untrace()=ProvCon.func.variables.TracedVariable.Tracer-class.html#untrace,Method ProvCon.func.variables.TracedVariable.untrace()=ProvCon.func.variables.TracedVariable-class.html#untrace"><a title="ProvCon.func.variables.TracedVariable.Tracer.untrace
+ProvCon.func.variables.TracedVariable.untrace" class="py-name" href="#" onclick="return doclink('link-12', 'untrace', 'link-12');">untrace</a></tt><tt class="py-op">(</tt><tt class="py-op">)</tt> </tt>
+<a name="L36"></a><tt class="py-lineno"> 36</tt>  <tt class="py-line">        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">__variable</tt> <tt class="py-op">=</tt> <tt class="py-name">tvar</tt> </tt>
+<a name="L37"></a><tt class="py-lineno"> 37</tt>  <tt class="py-line">        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">__vtrace</tt> <tt class="py-op">=</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-13" class="py-name"><a title="ProvCon.dbui.abstractui.fields.BaseFieldEditor.variable" class="py-name" href="#" onclick="return doclink('link-13', 'variable', 'link-11');">variable</a></tt><tt class="py-op">.</tt><tt id="link-14" class="py-name" targets="Method ProvCon.func.variables.TracedVariable.trace()=ProvCon.func.variables.TracedVariable-class.html#trace"><a title="ProvCon.func.variables.TracedVariable.trace" class="py-name" href="#" onclick="return doclink('link-14', 'trace', 'link-14');">trace</a></tt> <tt class="py-op">(</tt> <tt class="py-string">'w'</tt><tt class="py-op">,</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-15" class="py-name" targets="Method ProvCon.dbui.abstractui.fields.BaseArrayEditor.variable_changed()=ProvCon.dbui.abstractui.fields.BaseArrayEditor-class.html#variable_changed,Method ProvCon.dbui.abstractui.fields.BaseArrayItemEditor.variable_changed()=ProvCon.dbui.abstractui.fields.BaseArrayItemEditor-class.html#variable_changed,Method ProvCon.dbui.abstractui.fields.BaseFieldEditor.variable_changed()=ProvCon.dbui.abstractui.fields.BaseFieldEditor-class.html#variable_changed"><a title="ProvCon.dbui.abstractui.fields.BaseArrayEditor.variable_changed
+ProvCon.dbui.abstractui.fields.BaseArrayItemEditor.variable_changed
+ProvCon.dbui.abstractui.fields.BaseFieldEditor.variable_changed" class="py-name" href="#" onclick="return doclink('link-15', 'variable_changed', 'link-15');">variable_changed</a></tt><tt class="py-op">,</tt> <tt class="py-name">name</tt><tt class="py-op">=</tt><tt class="py-name">str</tt><tt class="py-op">(</tt><tt class="py-name">self</tt><tt class="py-op">)</tt> <tt class="py-op">)</tt> </tt>
+</div><a name="L38"></a><tt class="py-lineno"> 38</tt>  <tt class="py-line">    <tt id="link-16" class="py-name"><a title="ProvCon.dbui.abstractui.fields.BaseFieldEditor.variable" class="py-name" href="#" onclick="return doclink('link-16', 'variable', 'link-11');">variable</a></tt> <tt class="py-op">=</tt> <tt class="py-name">property</tt> <tt class="py-op">(</tt><tt id="link-17" class="py-name" targets="Method ProvCon.dbui.abstractui.fields.BaseFieldEditor._get_variable()=ProvCon.dbui.abstractui.fields.BaseFieldEditor-class.html#_get_variable"><a title="ProvCon.dbui.abstractui.fields.BaseFieldEditor._get_variable" class="py-name" href="#" onclick="return doclink('link-17', '_get_variable', 'link-17');">_get_variable</a></tt><tt class="py-op">,</tt> <tt id="link-18" class="py-name" targets="Method ProvCon.dbui.abstractui.fields.BaseFieldEditor._set_variable()=ProvCon.dbui.abstractui.fields.BaseFieldEditor-class.html#_set_variable"><a title="ProvCon.dbui.abstractui.fields.BaseFieldEditor._set_variable" class="py-name" href="#" onclick="return doclink('link-18', '_set_variable', 'link-18');">_set_variable</a></tt> <tt class="py-op">)</tt> </tt>
+<a name="L39"></a><tt class="py-lineno"> 39</tt>  <tt class="py-line"> </tt>
+<a name="BaseFieldEditor._get_vtrace"></a><div id="BaseFieldEditor._get_vtrace-def"><a name="L40"></a><tt class="py-lineno"> 40</tt> <a class="py-toggle" href="#" id="BaseFieldEditor._get_vtrace-toggle" onclick="return toggle('BaseFieldEditor._get_vtrace');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="ProvCon.dbui.abstractui.fields.BaseFieldEditor-class.html#_get_vtrace">_get_vtrace</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> <tt class="py-keyword">return</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">__vtrace</tt> </tt>
+</div><a name="L41"></a><tt class="py-lineno"> 41</tt>  <tt class="py-line">    <tt id="link-19" class="py-name" targets="Variable ProvCon.dbui.abstractui.fields.BaseFieldEditor.vtrace=ProvCon.dbui.abstractui.fields.BaseFieldEditor-class.html#vtrace"><a title="ProvCon.dbui.abstractui.fields.BaseFieldEditor.vtrace" class="py-name" href="#" onclick="return doclink('link-19', 'vtrace', 'link-19');">vtrace</a></tt> <tt class="py-op">=</tt> <tt class="py-name">property</tt><tt class="py-op">(</tt><tt id="link-20" class="py-name" targets="Method ProvCon.dbui.abstractui.fields.BaseFieldEditor._get_vtrace()=ProvCon.dbui.abstractui.fields.BaseFieldEditor-class.html#_get_vtrace"><a title="ProvCon.dbui.abstractui.fields.BaseFieldEditor._get_vtrace" class="py-name" href="#" onclick="return doclink('link-20', '_get_vtrace', 'link-20');">_get_vtrace</a></tt><tt class="py-op">)</tt> </tt>
+<a name="L42"></a><tt class="py-lineno"> 42</tt>  <tt class="py-line">     </tt>
+<a name="BaseFieldEditor.variable_changed"></a><div id="BaseFieldEditor.variable_changed-def"><a name="L43"></a><tt class="py-lineno"> 43</tt> <a class="py-toggle" href="#" id="BaseFieldEditor.variable_changed-toggle" onclick="return toggle('BaseFieldEditor.variable_changed');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="ProvCon.dbui.abstractui.fields.BaseFieldEditor-class.html#variable_changed">variable_changed</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">,</tt> <tt class="py-param">action</tt><tt class="py-op">,</tt> <tt class="py-param">value</tt><tt class="py-op">,</tt> <tt class="py-param">var</tt><tt class="py-op">=</tt><tt class="py-name">None</tt><tt class="py-op">,</tt> <tt class="py-param">idx</tt><tt class="py-op">=</tt><tt class="py-name">None</tt><tt class="py-op">,</tt> <tt class="py-op">*</tt><tt class="py-param">args</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="BaseFieldEditor.variable_changed-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="BaseFieldEditor.variable_changed-expanded"><a name="L44"></a><tt class="py-lineno"> 44</tt>  <tt class="py-line">        <tt class="py-docstring">"""Callback function that handles variable value changes."""</tt> </tt>
+<a name="L45"></a><tt class="py-lineno"> 45</tt>  <tt class="py-line">        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-21" class="py-name" targets="Method ProvCon.dbui.abstractui.fields.BaseArrayEditor.set_current_editor_value()=ProvCon.dbui.abstractui.fields.BaseArrayEditor-class.html#set_current_editor_value,Method ProvCon.dbui.abstractui.fields.BaseFieldEditor.set_current_editor_value()=ProvCon.dbui.abstractui.fields.BaseFieldEditor-class.html#set_current_editor_value,Method ProvCon.dbui.wxwin.fields.Entry.ArrayItemCombo.set_current_editor_value()=ProvCon.dbui.wxwin.fields.Entry.ArrayItemCombo-class.html#set_current_editor_value,Method ProvCon.dbui.wxwin.fields.Entry.ArrayItemStatic.set_current_editor_value()=ProvCon.dbui.wxwin.fields.Entry.ArrayItemStatic-class.html#set_current_editor_value,Method ProvCon.dbui.wxwin.fields.Entry.ArrayItemText.set_current_editor_value()=ProvCon.dbui.wxwin.fields.Entry.ArrayItemText-class.html#set_current_editor_value,Method ProvCon.dbui.wxwin.fields.Entry.Boolean.set_current_editor_value()=ProvCon.dbui.wxwin.fields.Entry.Boolean-class.html#set_current_editor_value,Method ProvCon.dbui.wxwin.fields.Entry.ComboReference.set_current_editor_value()=ProvCon.dbui.wxwin.fields.Entry.ComboReference-class.html#set_current_editor_value,Method ProvCon.dbui.wxwin.fields.Entry.Static.set_current_editor_value()=ProvCon.dbui.wxwin.fields.Entry.Static-class.html#set_current_editor_value,Method ProvCon.dbui.wxwin.fields.Entry.StaticReference.set_current_editor_value()=ProvCon.dbui.wxwin.fields.Entry.StaticReference-class.html#set_current_editor_value,Method ProvCon.dbui.wxwin.fields.Entry.Text.set_current_editor_value()=ProvCon.dbui.wxwin.fields.Entry.Text-class.html#set_current_editor_value"><a title="ProvCon.dbui.abstractui.fields.BaseArrayEditor.set_current_editor_value
+ProvCon.dbui.abstractui.fields.BaseFieldEditor.set_current_editor_value
+ProvCon.dbui.wxwin.fields.Entry.ArrayItemCombo.set_current_editor_value
+ProvCon.dbui.wxwin.fields.Entry.ArrayItemStatic.set_current_editor_value
+ProvCon.dbui.wxwin.fields.Entry.ArrayItemText.set_current_editor_value
+ProvCon.dbui.wxwin.fields.Entry.Boolean.set_current_editor_value
+ProvCon.dbui.wxwin.fields.Entry.ComboReference.set_current_editor_value
+ProvCon.dbui.wxwin.fields.Entry.Static.set_current_editor_value
+ProvCon.dbui.wxwin.fields.Entry.StaticReference.set_current_editor_value
+ProvCon.dbui.wxwin.fields.Entry.Text.set_current_editor_value" class="py-name" href="#" onclick="return doclink('link-21', 'set_current_editor_value', 'link-21');">set_current_editor_value</a></tt><tt class="py-op">(</tt><tt id="link-22" class="py-name" targets="Variable ProvCon.docsis.compiler.encoder.tlv.value=ProvCon.docsis.compiler.encoder.tlv-class.html#value,Method ProvCon.docsis.compiler.encoder.tlv_multipart.value()=ProvCon.docsis.compiler.encoder.tlv_multipart-class.html#value"><a title="ProvCon.docsis.compiler.encoder.tlv.value
+ProvCon.docsis.compiler.encoder.tlv_multipart.value" class="py-name" href="#" onclick="return doclink('link-22', 'value', 'link-22');">value</a></tt><tt class="py-op">)</tt> </tt>
+</div><a name="L46"></a><tt class="py-lineno"> 46</tt>  <tt class="py-line">             </tt>
+<a name="BaseFieldEditor.update_variable"></a><div id="BaseFieldEditor.update_variable-def"><a name="L47"></a><tt class="py-lineno"> 47</tt> <a class="py-toggle" href="#" id="BaseFieldEditor.update_variable-toggle" onclick="return toggle('BaseFieldEditor.update_variable');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="ProvCon.dbui.abstractui.fields.BaseFieldEditor-class.html#update_variable">update_variable</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="BaseFieldEditor.update_variable-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="BaseFieldEditor.update_variable-expanded"><a name="L48"></a><tt class="py-lineno"> 48</tt>  <tt class="py-line">        <tt class="py-docstring">"""Function used to update traced variable to the currently edited value.</tt> </tt>
+<a name="L49"></a><tt class="py-lineno"> 49</tt>  <tt class="py-line"><tt class="py-docstring">        For example - TextBox widget's 'text' property will only be sent back to the</tt> </tt>
+<a name="L50"></a><tt class="py-lineno"> 50</tt>  <tt class="py-line"><tt class="py-docstring">        traced variable when this function is called"""</tt> </tt>
+<a name="L51"></a><tt class="py-lineno"> 51</tt>  <tt class="py-line">        <tt class="py-keyword">try</tt><tt class="py-op">:</tt> </tt>
+<a name="L52"></a><tt class="py-lineno"> 52</tt>  <tt class="py-line">            <tt class="py-comment">#freeze the callback to avoid infinite recursion</tt> </tt>
+<a name="L53"></a><tt class="py-lineno"> 53</tt>  <tt class="py-line">            <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-23" class="py-name"><a title="ProvCon.dbui.abstractui.fields.BaseFieldEditor.vtrace" class="py-name" href="#" onclick="return doclink('link-23', 'vtrace', 'link-19');">vtrace</a></tt><tt class="py-op">.</tt><tt id="link-24" class="py-name" targets="Method ProvCon.func.classes.conditionalmethod.freeze()=ProvCon.func.classes.conditionalmethod-class.html#freeze,Method ProvCon.func.events.eventemitter.evt.freeze()=ProvCon.func.events.eventemitter.evt-class.html#freeze,Method ProvCon.func.events.eventemitter.evthook.freeze()=ProvCon.func.events.eventemitter.evthook-class.html#freeze,Method ProvCon.func.variables.TracedVariable.Tracer.freeze()=ProvCon.func.variables.TracedVariable.Tracer-class.html#freeze,Method ProvCon.func.variables.TracedVariable.freeze()=ProvCon.func.variables.TracedVariable-class.html#freeze"><a title="ProvCon.func.classes.conditionalmethod.freeze
+ProvCon.func.events.eventemitter.evt.freeze
+ProvCon.func.events.eventemitter.evthook.freeze
+ProvCon.func.variables.TracedVariable.Tracer.freeze
+ProvCon.func.variables.TracedVariable.freeze" class="py-name" href="#" onclick="return doclink('link-24', 'freeze', 'link-24');">freeze</a></tt><tt class="py-op">(</tt><tt class="py-op">)</tt>             </tt>
+<a name="L54"></a><tt class="py-lineno"> 54</tt>  <tt class="py-line">            <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-25" class="py-name"><a title="ProvCon.dbui.abstractui.fields.BaseFieldEditor.variable" class="py-name" href="#" onclick="return doclink('link-25', 'variable', 'link-11');">variable</a></tt><tt class="py-op">.</tt><tt id="link-26" class="py-name" targets="Method ProvCon.func.variables.TracedVariable.set()=ProvCon.func.variables.TracedVariable-class.html#set"><a title="ProvCon.func.variables.TracedVariable.set" class="py-name" href="#" onclick="return doclink('link-26', 'set', 'link-26');">set</a></tt> <tt class="py-op">(</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-27" class="py-name" targets="Method ProvCon.dbui.abstractui.fields.BaseArrayEditor.get_current_editor_value()=ProvCon.dbui.abstractui.fields.BaseArrayEditor-class.html#get_current_editor_value,Method ProvCon.dbui.abstractui.fields.BaseFieldEditor.get_current_editor_value()=ProvCon.dbui.abstractui.fields.BaseFieldEditor-class.html#get_current_editor_value,Method ProvCon.dbui.wxwin.fields.Entry.ArrayItemCombo.get_current_editor_value()=ProvCon.dbui.wxwin.fields.Entry.ArrayItemCombo-class.html#get_current_editor_value,Method ProvCon.dbui.wxwin.fields.Entry.ArrayItemStatic.get_current_editor_value()=ProvCon.dbui.wxwin.fields.Entry.ArrayItemStatic-class.html#get_current_editor_value,Method ProvCon.dbui.wxwin.fields.Entry.ArrayItemText.get_current_editor_value()=ProvCon.dbui.wxwin.fields.Entry.ArrayItemText-class.html#get_current_editor_value,Method ProvCon.dbui.wxwin.fields.Entry.BaseArray.get_current_editor_value()=ProvCon.dbui.wxwin.fields.Entry.BaseArray-class.html#get_current_editor_value,Method ProvCon.dbui.wxwin.fields.Entry.Boolean.get_current_editor_value()=ProvCon.dbui.wxwin.fields.Entry.Boolean-class.html#get_current_editor_value,Method ProvCon.dbui.wxwin.fields.Entry.ComboReference.get_current_editor_value()=ProvCon.dbui.wxwin.fields.Entry.ComboReference-class.html#get_current_editor_value,Method ProvCon.dbui.wxwin.fields.Entry.Text.get_current_editor_value()=ProvCon.dbui.wxwin.fields.Entry.Text-class.html#get_current_editor_value"><a title="ProvCon.dbui.abstractui.fields.BaseArrayEditor.get_current_editor_value
+ProvCon.dbui.abstractui.fields.BaseFieldEditor.get_current_editor_value
+ProvCon.dbui.wxwin.fields.Entry.ArrayItemCombo.get_current_editor_value
+ProvCon.dbui.wxwin.fields.Entry.ArrayItemStatic.get_current_editor_value
+ProvCon.dbui.wxwin.fields.Entry.ArrayItemText.get_current_editor_value
+ProvCon.dbui.wxwin.fields.Entry.BaseArray.get_current_editor_value
+ProvCon.dbui.wxwin.fields.Entry.Boolean.get_current_editor_value
+ProvCon.dbui.wxwin.fields.Entry.ComboReference.get_current_editor_value
+ProvCon.dbui.wxwin.fields.Entry.Text.get_current_editor_value" class="py-name" href="#" onclick="return doclink('link-27', 'get_current_editor_value', 'link-27');">get_current_editor_value</a></tt><tt class="py-op">(</tt><tt class="py-op">)</tt> <tt class="py-op">)</tt> </tt>
+<a name="L55"></a><tt class="py-lineno"> 55</tt>  <tt class="py-line">        <tt class="py-keyword">finally</tt><tt class="py-op">:</tt> </tt>
+<a name="L56"></a><tt class="py-lineno"> 56</tt>  <tt class="py-line">            <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-28" class="py-name"><a title="ProvCon.dbui.abstractui.fields.BaseFieldEditor.vtrace" class="py-name" href="#" onclick="return doclink('link-28', 'vtrace', 'link-19');">vtrace</a></tt><tt class="py-op">.</tt><tt id="link-29" class="py-name" targets="Method ProvCon.func.classes.conditionalmethod.thaw()=ProvCon.func.classes.conditionalmethod-class.html#thaw,Method ProvCon.func.events.eventemitter.evt.thaw()=ProvCon.func.events.eventemitter.evt-class.html#thaw,Method ProvCon.func.events.eventemitter.evthook.thaw()=ProvCon.func.events.eventemitter.evthook-class.html#thaw,Method ProvCon.func.variables.TracedVariable.Tracer.thaw()=ProvCon.func.variables.TracedVariable.Tracer-class.html#thaw,Method ProvCon.func.variables.TracedVariable.thaw()=ProvCon.func.variables.TracedVariable-class.html#thaw"><a title="ProvCon.func.classes.conditionalmethod.thaw
+ProvCon.func.events.eventemitter.evt.thaw
+ProvCon.func.events.eventemitter.evthook.thaw
+ProvCon.func.variables.TracedVariable.Tracer.thaw
+ProvCon.func.variables.TracedVariable.thaw" class="py-name" href="#" onclick="return doclink('link-29', 'thaw', 'link-29');">thaw</a></tt><tt class="py-op">(</tt><tt class="py-op">)</tt>         </tt>
+</div><a name="L57"></a><tt class="py-lineno"> 57</tt>  <tt class="py-line"> </tt>
+<a name="BaseFieldEditor.set_current_editor_value"></a><div id="BaseFieldEditor.set_current_editor_value-def"><a name="L58"></a><tt class="py-lineno"> 58</tt> <a class="py-toggle" href="#" id="BaseFieldEditor.set_current_editor_value-toggle" onclick="return toggle('BaseFieldEditor.set_current_editor_value');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="ProvCon.dbui.abstractui.fields.BaseFieldEditor-class.html#set_current_editor_value">set_current_editor_value</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">,</tt> <tt class="py-param">value</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="BaseFieldEditor.set_current_editor_value-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="BaseFieldEditor.set_current_editor_value-expanded"><a name="L59"></a><tt class="py-lineno"> 59</tt>  <tt class="py-line">        <tt class="py-docstring">"""This function is responsible for setting the currently edited value to the traced</tt> </tt>
+<a name="L60"></a><tt class="py-lineno"> 60</tt>  <tt class="py-line"><tt class="py-docstring">        variable's value. (For example, when a record is reloaded or changed) A subclass </tt> </tt>
+<a name="L61"></a><tt class="py-lineno"> 61</tt>  <tt class="py-line"><tt class="py-docstring">        implementation will propagate variable's value to the underlying widget (eg. by setting</tt> </tt>
+<a name="L62"></a><tt class="py-lineno"> 62</tt>  <tt class="py-line"><tt class="py-docstring">        TextBox's 'text' property'.</tt> </tt>
+<a name="L63"></a><tt class="py-lineno"> 63</tt>  <tt class="py-line"><tt class="py-docstring">        This function is called by the variable's trace function and should not be called directly.</tt> </tt>
+<a name="L64"></a><tt class="py-lineno"> 64</tt>  <tt class="py-line"><tt class="py-docstring">        """</tt> </tt>
+<a name="L65"></a><tt class="py-lineno"> 65</tt>  <tt class="py-line">        <tt class="py-keyword">raise</tt> <tt class="py-name">NotImplementedError</tt><tt class="py-op">(</tt><tt class="py-op">)</tt> </tt>
+</div><a name="L66"></a><tt class="py-lineno"> 66</tt>  <tt class="py-line">     </tt>
+<a name="BaseFieldEditor.get_current_editor_value"></a><div id="BaseFieldEditor.get_current_editor_value-def"><a name="L67"></a><tt class="py-lineno"> 67</tt> <a class="py-toggle" href="#" id="BaseFieldEditor.get_current_editor_value-toggle" onclick="return toggle('BaseFieldEditor.get_current_editor_value');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="ProvCon.dbui.abstractui.fields.BaseFieldEditor-class.html#get_current_editor_value">get_current_editor_value</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="BaseFieldEditor.get_current_editor_value-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="BaseFieldEditor.get_current_editor_value-expanded"><a name="L68"></a><tt class="py-lineno"> 68</tt>  <tt class="py-line">        <tt class="py-docstring">"""This function must return the value currently held by the editor (like TextBox's 'text'</tt> </tt>
+<a name="L69"></a><tt class="py-lineno"> 69</tt>  <tt class="py-line"><tt class="py-docstring">        property). It is called by the update_variable function to set the traced variable's value.</tt> </tt>
+<a name="L70"></a><tt class="py-lineno"> 70</tt>  <tt class="py-line"><tt class="py-docstring">        Using this function should be considered unrecommended, since it will usually access gui-toolkit</tt> </tt>
+<a name="L71"></a><tt class="py-lineno"> 71</tt>  <tt class="py-line"><tt class="py-docstring">        specific details. Use editor.variable.get() instead."""</tt> </tt>
+<a name="L72"></a><tt class="py-lineno"> 72</tt>  <tt class="py-line">        <tt class="py-keyword">return</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-30" class="py-name"><a title="ProvCon.dbui.abstractui.fields.BaseFieldEditor.variable" class="py-name" href="#" onclick="return doclink('link-30', 'variable', 'link-11');">variable</a></tt><tt class="py-op">.</tt><tt id="link-31" class="py-name" targets="Method ProvCon.dbui.orm.recordsearch.OIDSearchList.get()=ProvCon.dbui.orm.recordsearch.OIDSearchList-class.html#get,Method ProvCon.func.variables.TracedVariable.get()=ProvCon.func.variables.TracedVariable-class.html#get"><a title="ProvCon.dbui.orm.recordsearch.OIDSearchList.get
+ProvCon.func.variables.TracedVariable.get" class="py-name" href="#" onclick="return doclink('link-31', 'get', 'link-31');">get</a></tt><tt class="py-op">(</tt><tt class="py-op">)</tt> </tt>
+</div><a name="L73"></a><tt class="py-lineno"> 73</tt>  <tt class="py-line">     </tt>
+<a name="BaseFieldEditor.__repr__"></a><div id="BaseFieldEditor.__repr__-def"><a name="L74"></a><tt class="py-lineno"> 74</tt> <a class="py-toggle" href="#" id="BaseFieldEditor.__repr__-toggle" onclick="return toggle('BaseFieldEditor.__repr__');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="ProvCon.dbui.abstractui.fields.BaseFieldEditor-class.html#__repr__">__repr__</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="BaseFieldEditor.__repr__-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="BaseFieldEditor.__repr__-expanded"><a name="L75"></a><tt class="py-lineno"> 75</tt>  <tt class="py-line">        <tt class="py-keyword">return</tt> <tt class="py-string">"&lt;Editor "</tt> <tt class="py-op">+</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-32" class="py-name"><a title="ProvCon.dbui.meta.field" class="py-name" href="#" onclick="return doclink('link-32', 'field', 'link-9');">field</a></tt><tt class="py-op">.</tt><tt class="py-name">name</tt>  <tt class="py-op">+</tt> <tt class="py-string">"&gt;"</tt> </tt>
+</div></div><a name="L76"></a><tt class="py-lineno"> 76</tt>  <tt class="py-line">     </tt>
+<a name="BaseReferenceEditor"></a><div id="BaseReferenceEditor-def"><a name="L77"></a><tt class="py-lineno"> 77</tt> <a class="py-toggle" href="#" id="BaseReferenceEditor-toggle" onclick="return toggle('BaseReferenceEditor');">-</a><tt class="py-line"><tt class="py-keyword">class</tt> <a class="py-def-name" href="ProvCon.dbui.abstractui.fields.BaseReferenceEditor-class.html">BaseReferenceEditor</a><tt class="py-op">(</tt><tt class="py-base-class">BaseFieldEditor</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="BaseReferenceEditor-collapsed" style="display:none;" pad="+++" indent="++++"></div><div id="BaseReferenceEditor-expanded"><a name="L78"></a><tt class="py-lineno"> 78</tt>  <tt class="py-line">    <tt class="py-docstring">"""BaseReferenceEditor</tt> </tt>
+<a name="L79"></a><tt class="py-lineno"> 79</tt>  <tt class="py-line"><tt class="py-docstring">    Base class for editors of fields which reference other records. </tt> </tt>
+<a name="L80"></a><tt class="py-lineno"> 80</tt>  <tt class="py-line"><tt class="py-docstring">    A reference field, by assumption, holds the 'objectid' of the record it references.</tt> </tt>
+<a name="L81"></a><tt class="py-lineno"> 81</tt>  <tt class="py-line"><tt class="py-docstring">    Since reference editors are usually widgets similar to combo boxes, the base reference editor</tt> </tt>
+<a name="L82"></a><tt class="py-lineno"> 82</tt>  <tt class="py-line"><tt class="py-docstring">    may retrieve a list of records from the referenced table, if the 'getrecords' keyword variable</tt> </tt>
+<a name="L83"></a><tt class="py-lineno"> 83</tt>  <tt class="py-line"><tt class="py-docstring">    is passed to the constructor.</tt> </tt>
+<a name="L84"></a><tt class="py-lineno"> 84</tt>  <tt class="py-line"><tt class="py-docstring">    """</tt> </tt>
+<a name="BaseReferenceEditor.__init__"></a><div id="BaseReferenceEditor.__init__-def"><a name="L85"></a><tt class="py-lineno"> 85</tt> <a class="py-toggle" href="#" id="BaseReferenceEditor.__init__-toggle" onclick="return toggle('BaseReferenceEditor.__init__');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="ProvCon.dbui.abstractui.fields.BaseReferenceEditor-class.html#__init__">__init__</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">,</tt> <tt class="py-param">field</tt><tt class="py-op">,</tt> <tt class="py-param">getrecords</tt><tt class="py-op">=</tt><tt class="py-name">True</tt><tt class="py-op">,</tt> <tt class="py-op">*</tt><tt class="py-param">args</tt><tt class="py-op">,</tt> <tt class="py-op">**</tt><tt class="py-param">kwargs</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="BaseReferenceEditor.__init__-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="BaseReferenceEditor.__init__-expanded"><a name="L86"></a><tt class="py-lineno"> 86</tt>  <tt class="py-line">        <tt id="link-33" class="py-name" targets="Class ProvCon.dbui.abstractui.fields.BaseFieldEditor=ProvCon.dbui.abstractui.fields.BaseFieldEditor-class.html"><a title="ProvCon.dbui.abstractui.fields.BaseFieldEditor" class="py-name" href="#" onclick="return doclink('link-33', 'BaseFieldEditor', 'link-33');">BaseFieldEditor</a></tt><tt class="py-op">.</tt><tt id="link-34" class="py-name" targets="Method ProvCon.TFTP.Protocol.Packet.__init__()=ProvCon.TFTP.Protocol.Packet-class.html#__init__,Method ProvCon.TFTP.ProvisioningTFTP.BaseOven.__init__()=ProvCon.TFTP.ProvisioningTFTP.BaseOven-class.html#__init__,Method ProvCon.TFTP.ProvisioningTFTP.CableModemConfigCook.__init__()=ProvCon.TFTP.ProvisioningTFTP.CableModemConfigCook-class.html#__init__,Method ProvCon.TFTP.ProvisioningTFTP.FileCook.__init__()=ProvCon.TFTP.ProvisioningTFTP.FileCook-class.html#__init__,Method ProvCon.TFTP.ProvisioningTFTP.ProvisioningTFTPServer.__init__()=ProvCon.TFTP.ProvisioningTFTP.ProvisioningTFTPServer-class.html#__init__,Method ProvCon.TFTP.ProvisioningTFTP.TFTPDataSender.__init__()=ProvCon.TFTP.ProvisioningTFTP.TFTPDataSender-class.html#__init__,Method ProvCon.TFTP.ProvisioningTFTP.pcTFTPD.__init__()=ProvCon.TFTP.ProvisioningTFTP.pcTFTPD-class.html#__init__,Method ProvCon.TFTP.Server.BaseTFTPServer.__init__()=ProvCon.TFTP.Server.BaseTFTPServer-class.html#__init__,Method ProvCon.cli.CLIServer.__init__()=ProvCon.cli.CLIServer-class.html#__init__,Method ProvCon.cli.CLIWorker.__init__()=ProvCon.cli.CLIWorker-class.html#__init__,Method ProvCon.dbui.abstractui.fields.BaseArrayEditor.__init__()=ProvCon.dbui.abstractui.fields.BaseArrayEditor-class.html#__init__,Method ProvCon.dbui.abstractui.fields.BaseArrayItemButtonBox.__init__()=ProvCon.dbui.abstractui.fields.BaseArrayItemButtonBox-class.html#__init__,Method ProvCon.dbui.abstractui.fields.BaseArrayItemEditor.__init__()=ProvCon.dbui.abstractui.fields.BaseArrayItemEditor-class.html#__init__,Method ProvCon.dbui.abstractui.fields.BaseFieldEditor.__init__()=ProvCon.dbui.abstractui.fields.BaseFieldEditor-class.html#__init__,Method ProvCon.dbui.abstractui.fields.BaseReferenceEditor.__init__()=ProvCon.dbui.abstractui.fields.BaseReferenceEditor-class.html#__init__,Method ProvCon.dbui.abstractui.forms.BaseForm.__init__()=ProvCon.dbui.abstractui.forms.BaseForm-class.html#__init__,Method ProvCon.dbui.abstractui.navigators.BaseNavigator.__init__()=ProvCon.dbui.abstractui.navigators.BaseNavigator-class.html#__init__,Method ProvCon.dbui.abstractui.recordlists.BasePager.__init__()=ProvCon.dbui.abstractui.recordlists.BasePager-class.html#__init__,Method ProvCon.dbui.abstractui.recordlists.BaseRecordList.__init__()=ProvCon.dbui.abstractui.recordlists.BaseRecordList-class.html#__init__,Method ProvCon.dbui.database.CFG.tCX.__init__()=ProvCon.dbui.database.CFG.tCX-class.html#__init__,Method ProvCon.dbui.di.rObject'.ObjectFlags.__init__()=ProvCon.dbui.di.rObject%27.ObjectFlags-class.html#__init__,Method ProvCon.dbui.di.rObject'.ObjectParams.__init__()=ProvCon.dbui.di.rObject%27.ObjectParams-class.html#__init__,Method ProvCon.dbui.di.rObject'.rObject.__init__()=ProvCon.dbui.di.rObject%27.rObject-class.html#__init__,Method ProvCon.dbui.meta.field.Field.__init__()=ProvCon.dbui.meta.field.Field-class.html#__init__,Method ProvCon.dbui.meta.table.Table.__init__()=ProvCon.dbui.meta.table.Table-class.html#__init__,Method ProvCon.dbui.orm.form.Form.__init__()=ProvCon.dbui.orm.form.Form-class.html#__init__,Method ProvCon.dbui.orm.record.Record.DataManipulationError.__init__()=ProvCon.dbui.orm.record.Record.DataManipulationError-class.html#__init__,Method ProvCon.dbui.orm.record.Record.DataQueryError.__init__()=ProvCon.dbui.orm.record.Record.DataQueryError-class.html#__init__,Method ProvCon.dbui.orm.record.Record.RecordNotFound.__init__()=ProvCon.dbui.orm.record.Record.RecordNotFound-class.html#__init__,Method ProvCon.dbui.orm.record.Record.__init__()=ProvCon.dbui.orm.record.Record-class.html#__init__,Method ProvCon.dbui.orm.recordlist.RecordList.__init__()=ProvCon.dbui.orm.recordlist.RecordList-class.html#__init__,Method ProvCon.dbui.orm.recordsearch.OIDSearchList.__init__()=ProvCon.dbui.orm.recordsearch.OIDSearchList-class.html#__init__,Method ProvCon.dbui.wxwin.complete.CompleteGenericForm.__init__()=ProvCon.dbui.wxwin.complete.CompleteGenericForm-class.html#__init__,Method ProvCon.dbui.wxwin.complete.FormToolbar.__init__()=ProvCon.dbui.wxwin.complete.FormToolbar-class.html#__init__,Method ProvCon.dbui.wxwin.complete.InfoPopup.__init__()=ProvCon.dbui.wxwin.complete.InfoPopup-class.html#__init__,Method ProvCon.dbui.wxwin.fields.Entry.ArrayCombo.__init__()=ProvCon.dbui.wxwin.fields.Entry.ArrayCombo-class.html#__init__,Method ProvCon.dbui.wxwin.fields.Entry.ArrayItemCombo.__init__()=ProvCon.dbui.wxwin.fields.Entry.ArrayItemCombo-class.html#__init__,Method ProvCon.dbui.wxwin.fields.Entry.ArrayItemStatic.__init__()=ProvCon.dbui.wxwin.fields.Entry.ArrayItemStatic-class.html#__init__,Method ProvCon.dbui.wxwin.fields.Entry.ArrayItemText.__init__()=ProvCon.dbui.wxwin.fields.Entry.ArrayItemText-class.html#__init__,Method ProvCon.dbui.wxwin.fields.Entry.ArrayText.__init__()=ProvCon.dbui.wxwin.fields.Entry.ArrayText-class.html#__init__,Method ProvCon.dbui.wxwin.fields.Entry.BaseArray.__init__()=ProvCon.dbui.wxwin.fields.Entry.BaseArray-class.html#__init__,Method ProvCon.dbui.wxwin.fields.Entry.Boolean.__init__()=ProvCon.dbui.wxwin.fields.Entry.Boolean-class.html#__init__,Method ProvCon.dbui.wxwin.fields.Entry.ComboReference.__init__()=ProvCon.dbui.wxwin.fields.Entry.ComboReference-class.html#__init__,Method ProvCon.dbui.wxwin.fields.Entry.Memo.__init__()=ProvCon.dbui.wxwin.fields.Entry.Memo-class.html#__init__,Method ProvCon.dbui.wxwin.fields.Entry.StandardArrayItemButtonBox.__init__()=ProvCon.dbui.wxwin.fields.Entry.StandardArrayItemButtonBox-class.html#__init__,Method ProvCon.dbui.wxwin.fields.Entry.Static.__init__()=ProvCon.dbui.wxwin.fields.Entry.Static-class.html#__init__,Method ProvCon.dbui.wxwin.fields.Entry.StaticReference.__init__()=ProvCon.dbui.wxwin.fields.Entry.StaticReference-class.html#__init__,Method ProvCon.dbui.wxwin.fields.Entry.Text.__init__()=ProvCon.dbui.wxwin.fields.Entry.Text-class.html#__init__,Method ProvCon.dbui.wxwin.forms.GenericForm.__init__()=ProvCon.dbui.wxwin.forms.GenericForm-class.html#__init__,Method ProvCon.dbui.wxwin.mwx.CheckBox.__init__()=ProvCon.dbui.wxwin.mwx.CheckBox-class.html#__init__,Method ProvCon.dbui.wxwin.mwx.ComboBox.__init__()=ProvCon.dbui.wxwin.mwx.ComboBox-class.html#__init__,Method ProvCon.dbui.wxwin.mwx.StaticText.__init__()=ProvCon.dbui.wxwin.mwx.StaticText-class.html#__init__,Method ProvCon.dbui.wxwin.mwx.TextCtrl.__init__()=ProvCon.dbui.wxwin.mwx.TextCtrl-class.html#__init__,Method ProvCon.dbui.wxwin.mwx.mwxControl.__init__()=ProvCon.dbui.wxwin.mwx.mwxControl-class.html#__init__,Method ProvCon.dbui.wxwin.navigators.Navigator.__init__()=ProvCon.dbui.wxwin.navigators.Navigator-class.html#__init__,Method ProvCon.dbui.wxwin.recordlists.RecordList.__init__()=ProvCon.dbui.wxwin.recordlists.RecordList-class.html#__init__,Method ProvCon.docsis.cablemodem.cablemodem.__init__()=ProvCon.docsis.cablemodem.cablemodem-class.html#__init__,Method ProvCon.docsis.cablemodem.cablemodem._cos.__init__()=ProvCon.docsis.cablemodem.cablemodem._cos-class.html#__init__,Method ProvCon.docsis.cablemodem.cablemodem._cpe.__init__()=ProvCon.docsis.cablemodem.cablemodem._cpe-class.html#__init__,Method ProvCon.docsis.cablemodem.cablemodem._mac.__init__()=ProvCon.docsis.cablemodem.cablemodem._mac-class.html#__init__,Method ProvCon.docsis.compiler.config.config.__init__()=ProvCon.docsis.compiler.config.config-class.html#__init__,Method ProvCon.docsis.compiler.encoder.error.__init__()=ProvCon.docsis.compiler.encoder.error-class.html#__init__,Method ProvCon.docsis.compiler.encoder.tlv.__init__()=ProvCon.docsis.compiler.encoder.tlv-class.html#__init__,Method ProvCon.docsis.compiler.encoder.tlv_multipart.__init__()=ProvCon.docsis.compiler.encoder.tlv_multipart-class.html#__init__,Method ProvCon.docsis.compiler.encoder.tlv_multipart.append_proxy.__init__()=ProvCon.docsis.compiler.encoder.tlv_multipart.append_proxy-class.html#__init__,Method ProvCon.docsis.compiler.encoder.tlv_multipart.iterator.__init__()=ProvCon.docsis.compiler.encoder.tlv_multipart.iterator-class.html#__init__,Method ProvCon.docsis.compiler.encoder.tlv_multipart_subclass.__init__()=ProvCon.docsis.compiler.encoder.tlv_multipart_subclass-class.html#__init__,Method ProvCon.docsis.compiler.encoder.tlv_subclass.__init__()=ProvCon.docsis.compiler.encoder.tlv_subclass-class.html#__init__,Method ProvCon.func.classes.conditionalmethod.__init__()=ProvCon.func.classes.conditionalmethod-class.html#__init__,Method ProvCon.func.events.eventemitter.__init__()=ProvCon.func.events.eventemitter-class.html#__init__,Method ProvCon.func.events.eventemitter.evt.__init__()=ProvCon.func.events.eventemitter.evt-class.html#__init__,Method ProvCon.func.events.eventemitter.evthook.__init__()=ProvCon.func.events.eventemitter.evthook-class.html#__init__,Method ProvCon.func.events.eventexception.__init__()=ProvCon.func.events.eventexception-class.html#__init__,Method ProvCon.func.variables.TracedVariable.Tracer.__init__()=ProvCon.func.variables.TracedVariable.Tracer-class.html#__init__,Method ProvCon.func.variables.TracedVariable.__init__()=ProvCon.func.variables.TracedVariable-class.html#__init__,Method ProvCon.gui.FrontEndApp.FE.__init__()=ProvCon.gui.FrontEndApp.FE-class.html#__init__,Method ProvCon.gui.ProvisioningControl.GenericObjectEditor.__init__()=ProvCon.gui.ProvisioningControl.GenericObjectEditor-class.html#__init__,Method ProvCon.gui.ProvisioningControl.GridView.__init__()=ProvCon.gui.ProvisioningControl.GridView-class.html#__init__,Method ProvCon.gui.ProvisioningControl.MainTab.__init__()=ProvCon.gui.ProvisioningControl.MainTab-class.html#__init__,Method ProvCon.gui.ProvisioningControl.ObjectEditorModel.__init__()=ProvCon.gui.ProvisioningControl.ObjectEditorModel-class.html#__init__,Method ProvCon.gui.ProvisioningControl.TopLevelWindow.__init__()=ProvCon.gui.ProvisioningControl.TopLevelWindow-class.html#__init__,Method ProvCon.log.LoggingBackend.__init__()=ProvCon.log.LoggingBackend-class.html#__init__,Method ProvCon.log.LoggingClient.__init__()=ProvCon.log.LoggingClient-class.html#__init__,Method ProvCon.log.LoggingServer.__init__()=ProvCon.log.LoggingServer-class.html#__init__,Method ProvCon.ui.uierror.__init__()=ProvCon.ui.uierror-class.html#__init__,Method ProvCon.wronolib.ipaddr.ip4addr.__init__()=ProvCon.wronolib.ipaddr.ip4addr-class.html#__init__,Method ProvCon.wronolib.ipaddr.ip4prefix.__init__()=ProvCon.wronolib.ipaddr.ip4prefix-class.html#__init__"><a title="ProvCon.TFTP.Protocol.Packet.__init__
+ProvCon.TFTP.ProvisioningTFTP.BaseOven.__init__
+ProvCon.TFTP.ProvisioningTFTP.CableModemConfigCook.__init__
+ProvCon.TFTP.ProvisioningTFTP.FileCook.__init__
+ProvCon.TFTP.ProvisioningTFTP.ProvisioningTFTPServer.__init__
+ProvCon.TFTP.ProvisioningTFTP.TFTPDataSender.__init__
+ProvCon.TFTP.ProvisioningTFTP.pcTFTPD.__init__
+ProvCon.TFTP.Server.BaseTFTPServer.__init__
+ProvCon.cli.CLIServer.__init__
+ProvCon.cli.CLIWorker.__init__
+ProvCon.dbui.abstractui.fields.BaseArrayEditor.__init__
+ProvCon.dbui.abstractui.fields.BaseArrayItemButtonBox.__init__
+ProvCon.dbui.abstractui.fields.BaseArrayItemEditor.__init__
+ProvCon.dbui.abstractui.fields.BaseFieldEditor.__init__
+ProvCon.dbui.abstractui.fields.BaseReferenceEditor.__init__
+ProvCon.dbui.abstractui.forms.BaseForm.__init__
+ProvCon.dbui.abstractui.navigators.BaseNavigator.__init__
+ProvCon.dbui.abstractui.recordlists.BasePager.__init__
+ProvCon.dbui.abstractui.recordlists.BaseRecordList.__init__
+ProvCon.dbui.database.CFG.tCX.__init__
+ProvCon.dbui.di.rObject'.ObjectFlags.__init__
+ProvCon.dbui.di.rObject'.ObjectParams.__init__
+ProvCon.dbui.di.rObject'.rObject.__init__
+ProvCon.dbui.meta.field.Field.__init__
+ProvCon.dbui.meta.table.Table.__init__
+ProvCon.dbui.orm.form.Form.__init__
+ProvCon.dbui.orm.record.Record.DataManipulationError.__init__
+ProvCon.dbui.orm.record.Record.DataQueryError.__init__
+ProvCon.dbui.orm.record.Record.RecordNotFound.__init__
+ProvCon.dbui.orm.record.Record.__init__
+ProvCon.dbui.orm.recordlist.RecordList.__init__
+ProvCon.dbui.orm.recordsearch.OIDSearchList.__init__
+ProvCon.dbui.wxwin.complete.CompleteGenericForm.__init__
+ProvCon.dbui.wxwin.complete.FormToolbar.__init__
+ProvCon.dbui.wxwin.complete.InfoPopup.__init__
+ProvCon.dbui.wxwin.fields.Entry.ArrayCombo.__init__
+ProvCon.dbui.wxwin.fields.Entry.ArrayItemCombo.__init__
+ProvCon.dbui.wxwin.fields.Entry.ArrayItemStatic.__init__
+ProvCon.dbui.wxwin.fields.Entry.ArrayItemText.__init__
+ProvCon.dbui.wxwin.fields.Entry.ArrayText.__init__
+ProvCon.dbui.wxwin.fields.Entry.BaseArray.__init__
+ProvCon.dbui.wxwin.fields.Entry.Boolean.__init__
+ProvCon.dbui.wxwin.fields.Entry.ComboReference.__init__
+ProvCon.dbui.wxwin.fields.Entry.Memo.__init__
+ProvCon.dbui.wxwin.fields.Entry.StandardArrayItemButtonBox.__init__
+ProvCon.dbui.wxwin.fields.Entry.Static.__init__
+ProvCon.dbui.wxwin.fields.Entry.StaticReference.__init__
+ProvCon.dbui.wxwin.fields.Entry.Text.__init__
+ProvCon.dbui.wxwin.forms.GenericForm.__init__
+ProvCon.dbui.wxwin.mwx.CheckBox.__init__
+ProvCon.dbui.wxwin.mwx.ComboBox.__init__
+ProvCon.dbui.wxwin.mwx.StaticText.__init__
+ProvCon.dbui.wxwin.mwx.TextCtrl.__init__
+ProvCon.dbui.wxwin.mwx.mwxControl.__init__
+ProvCon.dbui.wxwin.navigators.Navigator.__init__
+ProvCon.dbui.wxwin.recordlists.RecordList.__init__
+ProvCon.docsis.cablemodem.cablemodem.__init__
+ProvCon.docsis.cablemodem.cablemodem._cos.__init__
+ProvCon.docsis.cablemodem.cablemodem._cpe.__init__
+ProvCon.docsis.cablemodem.cablemodem._mac.__init__
+ProvCon.docsis.compiler.config.config.__init__
+ProvCon.docsis.compiler.encoder.error.__init__
+ProvCon.docsis.compiler.encoder.tlv.__init__
+ProvCon.docsis.compiler.encoder.tlv_multipart.__init__
+ProvCon.docsis.compiler.encoder.tlv_multipart.append_proxy.__init__
+ProvCon.docsis.compiler.encoder.tlv_multipart.iterator.__init__
+ProvCon.docsis.compiler.encoder.tlv_multipart_subclass.__init__
+ProvCon.docsis.compiler.encoder.tlv_subclass.__init__
+ProvCon.func.classes.conditionalmethod.__init__
+ProvCon.func.events.eventemitter.__init__
+ProvCon.func.events.eventemitter.evt.__init__
+ProvCon.func.events.eventemitter.evthook.__init__
+ProvCon.func.events.eventexception.__init__
+ProvCon.func.variables.TracedVariable.Tracer.__init__
+ProvCon.func.variables.TracedVariable.__init__
+ProvCon.gui.FrontEndApp.FE.__init__
+ProvCon.gui.ProvisioningControl.GenericObjectEditor.__init__
+ProvCon.gui.ProvisioningControl.GridView.__init__
+ProvCon.gui.ProvisioningControl.MainTab.__init__
+ProvCon.gui.ProvisioningControl.ObjectEditorModel.__init__
+ProvCon.gui.ProvisioningControl.TopLevelWindow.__init__
+ProvCon.log.LoggingBackend.__init__
+ProvCon.log.LoggingClient.__init__
+ProvCon.log.LoggingServer.__init__
+ProvCon.ui.uierror.__init__
+ProvCon.wronolib.ipaddr.ip4addr.__init__
+ProvCon.wronolib.ipaddr.ip4prefix.__init__" class="py-name" href="#" onclick="return doclink('link-34', '__init__', 'link-34');">__init__</a></tt> <tt class="py-op">(</tt><tt class="py-name">self</tt><tt class="py-op">,</tt> <tt id="link-35" class="py-name"><a title="ProvCon.dbui.meta.field" class="py-name" href="#" onclick="return doclink('link-35', 'field', 'link-9');">field</a></tt><tt class="py-op">,</tt> <tt class="py-op">*</tt><tt class="py-name">args</tt><tt class="py-op">,</tt> <tt class="py-op">**</tt><tt class="py-name">kwargs</tt><tt class="py-op">)</tt> </tt>
+<a name="L87"></a><tt class="py-lineno"> 87</tt>  <tt class="py-line">        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">reprfunc</tt> <tt class="py-op">=</tt> <tt class="py-name">kwargs</tt><tt class="py-op">.</tt><tt id="link-36" class="py-name"><a title="ProvCon.dbui.orm.recordsearch.OIDSearchList.get
+ProvCon.func.variables.TracedVariable.get" class="py-name" href="#" onclick="return doclink('link-36', 'get', 'link-31');">get</a></tt> <tt class="py-op">(</tt> <tt class="py-string">"reprfunc"</tt><tt class="py-op">,</tt> <tt class="py-keyword">lambda</tt> <tt class="py-name">r</tt><tt class="py-op">:</tt> <tt class="py-name">r</tt><tt class="py-op">.</tt><tt class="py-name">_astxt</tt> <tt class="py-op">)</tt>         </tt>
+<a name="L88"></a><tt class="py-lineno"> 88</tt>  <tt class="py-line">        <tt class="py-keyword">if</tt> <tt class="py-name">getrecords</tt><tt class="py-op">:</tt> </tt>
+<a name="L89"></a><tt class="py-lineno"> 89</tt>  <tt class="py-line">            <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-37" class="py-name" targets="Variable ProvCon.dbui.API.IRecordListHolder.records=ProvCon.dbui.API.IRecordListHolder-class.html#records,Variable ProvCon.dbui.abstractui.navigators.BaseNavigator.records=ProvCon.dbui.abstractui.navigators.BaseNavigator-class.html#records,Variable ProvCon.dbui.abstractui.recordlists.BaseRecordList.records=ProvCon.dbui.abstractui.recordlists.BaseRecordList-class.html#records"><a title="ProvCon.dbui.API.IRecordListHolder.records
+ProvCon.dbui.abstractui.navigators.BaseNavigator.records
+ProvCon.dbui.abstractui.recordlists.BaseRecordList.records" class="py-name" href="#" onclick="return doclink('link-37', 'records', 'link-37');">records</a></tt> <tt class="py-op">=</tt> <tt id="link-38" class="py-name"><a title="ProvCon.dbui.orm.recordlist.RecordList
+ProvCon.dbui.wxwin.recordlists.RecordList" class="py-name" href="#" onclick="return doclink('link-38', 'RecordList', 'link-4');">RecordList</a></tt> <tt class="py-op">(</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-39" class="py-name"><a title="ProvCon.dbui.meta.field" class="py-name" href="#" onclick="return doclink('link-39', 'field', 'link-9');">field</a></tt><tt class="py-op">.</tt><tt class="py-name">reference</tt> <tt class="py-op">)</tt> </tt>
+<a name="L90"></a><tt class="py-lineno"> 90</tt>  <tt class="py-line">            <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-40" class="py-name"><a title="ProvCon.dbui.API.IRecordListHolder.records
+ProvCon.dbui.abstractui.navigators.BaseNavigator.records
+ProvCon.dbui.abstractui.recordlists.BaseRecordList.records" class="py-name" href="#" onclick="return doclink('link-40', 'records', 'link-37');">records</a></tt><tt class="py-op">.</tt><tt id="link-41" class="py-name" targets="Method ProvCon.dbui.API.IRecordList.reload()=ProvCon.dbui.API.IRecordList-class.html#reload,Method ProvCon.dbui.abstractui.navigators.BaseNavigator.reload()=ProvCon.dbui.abstractui.navigators.BaseNavigator-class.html#reload,Method ProvCon.dbui.orm.recordlist.RecordList.reload()=ProvCon.dbui.orm.recordlist.RecordList-class.html#reload"><a title="ProvCon.dbui.API.IRecordList.reload
+ProvCon.dbui.abstractui.navigators.BaseNavigator.reload
+ProvCon.dbui.orm.recordlist.RecordList.reload" class="py-name" href="#" onclick="return doclink('link-41', 'reload', 'link-41');">reload</a></tt><tt class="py-op">(</tt><tt class="py-op">)</tt> </tt>
+<a name="L91"></a><tt class="py-lineno"> 91</tt>  <tt class="py-line">        <tt class="py-keyword">else</tt><tt class="py-op">:</tt> </tt>
+<a name="L92"></a><tt class="py-lineno"> 92</tt>  <tt class="py-line">            <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-42" class="py-name"><a title="ProvCon.dbui.API.IRecordListHolder.records
+ProvCon.dbui.abstractui.navigators.BaseNavigator.records
+ProvCon.dbui.abstractui.recordlists.BaseRecordList.records" class="py-name" href="#" onclick="return doclink('link-42', 'records', 'link-37');">records</a></tt> <tt class="py-op">=</tt> <tt class="py-name">None</tt> </tt>
+</div></div><a name="L93"></a><tt class="py-lineno"> 93</tt>  <tt class="py-line">             </tt>
+<a name="BaseArrayEditor"></a><div id="BaseArrayEditor-def"><a name="L94"></a><tt class="py-lineno"> 94</tt> <a class="py-toggle" href="#" id="BaseArrayEditor-toggle" onclick="return toggle('BaseArrayEditor');">-</a><tt class="py-line"><tt class="py-keyword">class</tt> <a class="py-def-name" href="ProvCon.dbui.abstractui.fields.BaseArrayEditor-class.html">BaseArrayEditor</a><tt class="py-op">(</tt><tt class="py-base-class">BaseFieldEditor</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="BaseArrayEditor-collapsed" style="display:none;" pad="+++" indent="++++"></div><div id="BaseArrayEditor-expanded"><a name="L95"></a><tt class="py-lineno"> 95</tt>  <tt class="py-line">    <tt class="py-docstring">"""BaseArrayEditor</tt> </tt>
+<a name="L96"></a><tt class="py-lineno"> 96</tt>  <tt class="py-line"><tt class="py-docstring">    A base class for widgets used to edit arrays.</tt> </tt>
+<a name="L97"></a><tt class="py-lineno"> 97</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
+<a name="L98"></a><tt class="py-lineno"> 98</tt>  <tt class="py-line"><tt class="py-docstring">    Concrete implementations should not subclass this class, but rather use the</tt> </tt>
+<a name="L99"></a><tt class="py-lineno"> 99</tt>  <tt class="py-line"><tt class="py-docstring">    ConcreteBaseArrayEditor as their parent.    </tt> </tt>
+<a name="L100"></a><tt class="py-lineno">100</tt>  <tt class="py-line"><tt class="py-docstring">    """</tt> </tt>
+<a name="BaseArrayEditor.__init__"></a><div id="BaseArrayEditor.__init__-def"><a name="L101"></a><tt class="py-lineno">101</tt> <a class="py-toggle" href="#" id="BaseArrayEditor.__init__-toggle" onclick="return toggle('BaseArrayEditor.__init__');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="ProvCon.dbui.abstractui.fields.BaseArrayEditor-class.html#__init__">__init__</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">,</tt> <tt class="py-param">field</tt><tt class="py-op">,</tt> <tt class="py-op">*</tt><tt class="py-param">args</tt><tt class="py-op">,</tt> <tt class="py-op">**</tt><tt class="py-param">kwargs</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="BaseArrayEditor.__init__-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="BaseArrayEditor.__init__-expanded"><a name="L102"></a><tt class="py-lineno">102</tt>  <tt class="py-line">        <tt id="link-43" class="py-name"><a title="ProvCon.dbui.abstractui.fields.BaseFieldEditor" class="py-name" href="#" onclick="return doclink('link-43', 'BaseFieldEditor', 'link-33');">BaseFieldEditor</a></tt><tt class="py-op">.</tt><tt id="link-44" class="py-name"><a title="ProvCon.TFTP.Protocol.Packet.__init__
+ProvCon.TFTP.ProvisioningTFTP.BaseOven.__init__
+ProvCon.TFTP.ProvisioningTFTP.CableModemConfigCook.__init__
+ProvCon.TFTP.ProvisioningTFTP.FileCook.__init__
+ProvCon.TFTP.ProvisioningTFTP.ProvisioningTFTPServer.__init__
+ProvCon.TFTP.ProvisioningTFTP.TFTPDataSender.__init__
+ProvCon.TFTP.ProvisioningTFTP.pcTFTPD.__init__
+ProvCon.TFTP.Server.BaseTFTPServer.__init__
+ProvCon.cli.CLIServer.__init__
+ProvCon.cli.CLIWorker.__init__
+ProvCon.dbui.abstractui.fields.BaseArrayEditor.__init__
+ProvCon.dbui.abstractui.fields.BaseArrayItemButtonBox.__init__
+ProvCon.dbui.abstractui.fields.BaseArrayItemEditor.__init__
+ProvCon.dbui.abstractui.fields.BaseFieldEditor.__init__
+ProvCon.dbui.abstractui.fields.BaseReferenceEditor.__init__
+ProvCon.dbui.abstractui.forms.BaseForm.__init__
+ProvCon.dbui.abstractui.navigators.BaseNavigator.__init__
+ProvCon.dbui.abstractui.recordlists.BasePager.__init__
+ProvCon.dbui.abstractui.recordlists.BaseRecordList.__init__
+ProvCon.dbui.database.CFG.tCX.__init__
+ProvCon.dbui.di.rObject'.ObjectFlags.__init__
+ProvCon.dbui.di.rObject'.ObjectParams.__init__
+ProvCon.dbui.di.rObject'.rObject.__init__
+ProvCon.dbui.meta.field.Field.__init__
+ProvCon.dbui.meta.table.Table.__init__
+ProvCon.dbui.orm.form.Form.__init__
+ProvCon.dbui.orm.record.Record.DataManipulationError.__init__
+ProvCon.dbui.orm.record.Record.DataQueryError.__init__
+ProvCon.dbui.orm.record.Record.RecordNotFound.__init__
+ProvCon.dbui.orm.record.Record.__init__
+ProvCon.dbui.orm.recordlist.RecordList.__init__
+ProvCon.dbui.orm.recordsearch.OIDSearchList.__init__
+ProvCon.dbui.wxwin.complete.CompleteGenericForm.__init__
+ProvCon.dbui.wxwin.complete.FormToolbar.__init__
+ProvCon.dbui.wxwin.complete.InfoPopup.__init__
+ProvCon.dbui.wxwin.fields.Entry.ArrayCombo.__init__
+ProvCon.dbui.wxwin.fields.Entry.ArrayItemCombo.__init__
+ProvCon.dbui.wxwin.fields.Entry.ArrayItemStatic.__init__
+ProvCon.dbui.wxwin.fields.Entry.ArrayItemText.__init__
+ProvCon.dbui.wxwin.fields.Entry.ArrayText.__init__
+ProvCon.dbui.wxwin.fields.Entry.BaseArray.__init__
+ProvCon.dbui.wxwin.fields.Entry.Boolean.__init__
+ProvCon.dbui.wxwin.fields.Entry.ComboReference.__init__
+ProvCon.dbui.wxwin.fields.Entry.Memo.__init__
+ProvCon.dbui.wxwin.fields.Entry.StandardArrayItemButtonBox.__init__
+ProvCon.dbui.wxwin.fields.Entry.Static.__init__
+ProvCon.dbui.wxwin.fields.Entry.StaticReference.__init__
+ProvCon.dbui.wxwin.fields.Entry.Text.__init__
+ProvCon.dbui.wxwin.forms.GenericForm.__init__
+ProvCon.dbui.wxwin.mwx.CheckBox.__init__
+ProvCon.dbui.wxwin.mwx.ComboBox.__init__
+ProvCon.dbui.wxwin.mwx.StaticText.__init__
+ProvCon.dbui.wxwin.mwx.TextCtrl.__init__
+ProvCon.dbui.wxwin.mwx.mwxControl.__init__
+ProvCon.dbui.wxwin.navigators.Navigator.__init__
+ProvCon.dbui.wxwin.recordlists.RecordList.__init__
+ProvCon.docsis.cablemodem.cablemodem.__init__
+ProvCon.docsis.cablemodem.cablemodem._cos.__init__
+ProvCon.docsis.cablemodem.cablemodem._cpe.__init__
+ProvCon.docsis.cablemodem.cablemodem._mac.__init__
+ProvCon.docsis.compiler.config.config.__init__
+ProvCon.docsis.compiler.encoder.error.__init__
+ProvCon.docsis.compiler.encoder.tlv.__init__
+ProvCon.docsis.compiler.encoder.tlv_multipart.__init__
+ProvCon.docsis.compiler.encoder.tlv_multipart.append_proxy.__init__
+ProvCon.docsis.compiler.encoder.tlv_multipart.iterator.__init__
+ProvCon.docsis.compiler.encoder.tlv_multipart_subclass.__init__
+ProvCon.docsis.compiler.encoder.tlv_subclass.__init__
+ProvCon.func.classes.conditionalmethod.__init__
+ProvCon.func.events.eventemitter.__init__
+ProvCon.func.events.eventemitter.evt.__init__
+ProvCon.func.events.eventemitter.evthook.__init__
+ProvCon.func.events.eventexception.__init__
+ProvCon.func.variables.TracedVariable.Tracer.__init__
+ProvCon.func.variables.TracedVariable.__init__
+ProvCon.gui.FrontEndApp.FE.__init__
+ProvCon.gui.ProvisioningControl.GenericObjectEditor.__init__
+ProvCon.gui.ProvisioningControl.GridView.__init__
+ProvCon.gui.ProvisioningControl.MainTab.__init__
+ProvCon.gui.ProvisioningControl.ObjectEditorModel.__init__
+ProvCon.gui.ProvisioningControl.TopLevelWindow.__init__
+ProvCon.log.LoggingBackend.__init__
+ProvCon.log.LoggingClient.__init__
+ProvCon.log.LoggingServer.__init__
+ProvCon.ui.uierror.__init__
+ProvCon.wronolib.ipaddr.ip4addr.__init__
+ProvCon.wronolib.ipaddr.ip4prefix.__init__" class="py-name" href="#" onclick="return doclink('link-44', '__init__', 'link-34');">__init__</a></tt> <tt class="py-op">(</tt><tt class="py-name">self</tt><tt class="py-op">,</tt> <tt id="link-45" class="py-name"><a title="ProvCon.dbui.meta.field" class="py-name" href="#" onclick="return doclink('link-45', 'field', 'link-9');">field</a></tt><tt class="py-op">,</tt> <tt class="py-op">*</tt><tt class="py-name">args</tt><tt class="py-op">,</tt> <tt class="py-op">**</tt><tt class="py-name">kwargs</tt><tt class="py-op">)</tt> </tt>
+<a name="L103"></a><tt class="py-lineno">103</tt>  <tt class="py-line">        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-46" class="py-name" targets="Module ProvCon.dbui.orm.recordlist=ProvCon.dbui.orm.recordlist-module.html"><a title="ProvCon.dbui.orm.recordlist" class="py-name" href="#" onclick="return doclink('link-46', 'recordlist', 'link-46');">recordlist</a></tt> <tt class="py-op">=</tt> <tt class="py-name">kwargs</tt><tt class="py-op">.</tt><tt id="link-47" class="py-name"><a title="ProvCon.dbui.orm.recordsearch.OIDSearchList.get
+ProvCon.func.variables.TracedVariable.get" class="py-name" href="#" onclick="return doclink('link-47', 'get', 'link-31');">get</a></tt> <tt class="py-op">(</tt> <tt class="py-string">"recordlist"</tt><tt class="py-op">,</tt> <tt class="py-name">None</tt> <tt class="py-op">)</tt> </tt>
+<a name="L104"></a><tt class="py-lineno">104</tt>  <tt class="py-line">        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">choices</tt> <tt class="py-op">=</tt> <tt class="py-name">kwargs</tt><tt class="py-op">.</tt><tt id="link-48" class="py-name"><a title="ProvCon.dbui.orm.recordsearch.OIDSearchList.get
+ProvCon.func.variables.TracedVariable.get" class="py-name" href="#" onclick="return doclink('link-48', 'get', 'link-31');">get</a></tt> <tt class="py-op">(</tt> <tt class="py-string">"choices"</tt><tt class="py-op">,</tt> <tt class="py-op">[</tt><tt class="py-op">]</tt> <tt class="py-op">)</tt> </tt>
+<a name="L105"></a><tt class="py-lineno">105</tt>  <tt class="py-line">        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">reprfunc</tt> <tt class="py-op">=</tt> <tt class="py-name">kwargs</tt><tt class="py-op">.</tt><tt id="link-49" class="py-name"><a title="ProvCon.dbui.orm.recordsearch.OIDSearchList.get
+ProvCon.func.variables.TracedVariable.get" class="py-name" href="#" onclick="return doclink('link-49', 'get', 'link-31');">get</a></tt> <tt class="py-op">(</tt> <tt class="py-string">"reprfunc"</tt><tt class="py-op">,</tt> <tt class="py-keyword">lambda</tt> <tt class="py-name">r</tt><tt class="py-op">:</tt> <tt class="py-name">r</tt><tt class="py-op">.</tt><tt class="py-name">_astxt</tt> <tt class="py-op">)</tt> </tt>
+<a name="L106"></a><tt class="py-lineno">106</tt>  <tt class="py-line">        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">array</tt> <tt class="py-op">=</tt> <tt class="py-op">[</tt><tt class="py-op">]</tt>    </tt>
+<a name="L107"></a><tt class="py-lineno">107</tt>  <tt class="py-line">        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">size</tt> <tt class="py-op">=</tt> <tt class="py-op">-</tt><tt class="py-number">1</tt> </tt>
+</div><a name="L108"></a><tt class="py-lineno">108</tt>  <tt class="py-line"> </tt>
+<a name="BaseArrayEditor.variable_changed"></a><div id="BaseArrayEditor.variable_changed-def"><a name="L109"></a><tt class="py-lineno">109</tt> <a class="py-toggle" href="#" id="BaseArrayEditor.variable_changed-toggle" onclick="return toggle('BaseArrayEditor.variable_changed');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="ProvCon.dbui.abstractui.fields.BaseArrayEditor-class.html#variable_changed">variable_changed</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">,</tt> <tt class="py-param">action</tt><tt class="py-op">,</tt> <tt class="py-param">value</tt><tt class="py-op">,</tt> <tt class="py-param">var</tt><tt class="py-op">=</tt><tt class="py-name">None</tt><tt class="py-op">,</tt> <tt class="py-param">idx</tt><tt class="py-op">=</tt><tt class="py-name">None</tt><tt class="py-op">,</tt> <tt class="py-op">*</tt><tt class="py-param">args</tt><tt class="py-op">)</tt><tt class="py-op">:</tt>         </tt>
+</div><a name="L110"></a><tt class="py-lineno">110</tt>  <tt class="py-line">        <tt class="py-docstring">"""Traced variables support indexed assignment and retrieval. When a variable changes</tt> </tt>
+<a name="L111"></a><tt class="py-lineno">111</tt>  <tt class="py-line"><tt class="py-docstring">        due to a change in one of its subitems the callback is passed the subitem's index, otherwise</tt> </tt>
+<a name="L112"></a><tt class="py-lineno">112</tt>  <tt class="py-line"><tt class="py-docstring">        the index is None. When the index is None, it means that the entire value changed, so we call</tt> </tt>
+<a name="L113"></a><tt class="py-lineno">113</tt>  <tt class="py-line"><tt class="py-docstring">        set_current_editor_value to update the widget."""</tt>         </tt>
+<a name="L114"></a><tt class="py-lineno">114</tt>  <tt class="py-line">        <tt class="py-keyword">if</tt> <tt class="py-name">idx</tt> <tt class="py-keyword">is</tt> <tt class="py-name">None</tt><tt class="py-op">:</tt> </tt>
+<a name="L115"></a><tt class="py-lineno">115</tt>  <tt class="py-line">            <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-50" class="py-name"><a title="ProvCon.dbui.abstractui.fields.BaseArrayEditor.set_current_editor_value
+ProvCon.dbui.abstractui.fields.BaseFieldEditor.set_current_editor_value
+ProvCon.dbui.wxwin.fields.Entry.ArrayItemCombo.set_current_editor_value
+ProvCon.dbui.wxwin.fields.Entry.ArrayItemStatic.set_current_editor_value
+ProvCon.dbui.wxwin.fields.Entry.ArrayItemText.set_current_editor_value
+ProvCon.dbui.wxwin.fields.Entry.Boolean.set_current_editor_value
+ProvCon.dbui.wxwin.fields.Entry.ComboReference.set_current_editor_value
+ProvCon.dbui.wxwin.fields.Entry.Static.set_current_editor_value
+ProvCon.dbui.wxwin.fields.Entry.StaticReference.set_current_editor_value
+ProvCon.dbui.wxwin.fields.Entry.Text.set_current_editor_value" class="py-name" href="#" onclick="return doclink('link-50', 'set_current_editor_value', 'link-21');">set_current_editor_value</a></tt><tt class="py-op">(</tt><tt id="link-51" class="py-name"><a title="ProvCon.docsis.compiler.encoder.tlv.value
+ProvCon.docsis.compiler.encoder.tlv_multipart.value" class="py-name" href="#" onclick="return doclink('link-51', 'value', 'link-22');">value</a></tt><tt class="py-op">)</tt> </tt>
+</div><a name="L116"></a><tt class="py-lineno">116</tt>  <tt class="py-line"> </tt>
+<a name="BaseArrayEditor.resize_editor"></a><div id="BaseArrayEditor.resize_editor-def"><a name="L117"></a><tt class="py-lineno">117</tt> <a class="py-toggle" href="#" id="BaseArrayEditor.resize_editor-toggle" onclick="return toggle('BaseArrayEditor.resize_editor');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="ProvCon.dbui.abstractui.fields.BaseArrayEditor-class.html#resize_editor">resize_editor</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">,</tt> <tt class="py-param">newsize</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="BaseArrayEditor.resize_editor-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="BaseArrayEditor.resize_editor-expanded"><a name="L118"></a><tt class="py-lineno">118</tt>  <tt class="py-line">        <tt class="py-docstring">"""This function gets called when the number of edited elements changes, and it must</tt> </tt>
+<a name="L119"></a><tt class="py-lineno">119</tt>  <tt class="py-line"><tt class="py-docstring">        be reflected by the editor widget."""</tt> </tt>
+<a name="L120"></a><tt class="py-lineno">120</tt>  <tt class="py-line">        <tt class="py-keyword">raise</tt> <tt class="py-name">NotImplementedError</tt><tt class="py-op">(</tt><tt class="py-op">)</tt>     </tt>
+</div><a name="L121"></a><tt class="py-lineno">121</tt>  <tt class="py-line"> </tt>
+<a name="BaseArrayEditor.insert_item"></a><div id="BaseArrayEditor.insert_item-def"><a name="L122"></a><tt class="py-lineno">122</tt> <a class="py-toggle" href="#" id="BaseArrayEditor.insert_item-toggle" onclick="return toggle('BaseArrayEditor.insert_item');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="ProvCon.dbui.abstractui.fields.BaseArrayEditor-class.html#insert_item">insert_item</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">,</tt> <tt class="py-param">atidx</tt><tt class="py-op">,</tt> <tt class="py-param">itemvalue</tt><tt class="py-op">=</tt><tt class="py-name">None</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="BaseArrayEditor.insert_item-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="BaseArrayEditor.insert_item-expanded"><a name="L123"></a><tt class="py-lineno">123</tt>  <tt class="py-line">        <tt class="py-name">array</tt> <tt class="py-op">=</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-52" class="py-name"><a title="ProvCon.dbui.abstractui.fields.BaseFieldEditor.variable" class="py-name" href="#" onclick="return doclink('link-52', 'variable', 'link-11');">variable</a></tt><tt class="py-op">.</tt><tt id="link-53" class="py-name"><a title="ProvCon.dbui.orm.recordsearch.OIDSearchList.get
+ProvCon.func.variables.TracedVariable.get" class="py-name" href="#" onclick="return doclink('link-53', 'get', 'link-31');">get</a></tt><tt class="py-op">(</tt><tt class="py-op">)</tt>         </tt>
+<a name="L124"></a><tt class="py-lineno">124</tt>  <tt class="py-line">        <tt class="py-keyword">if</tt> <tt class="py-name">array</tt> <tt class="py-keyword">is</tt> <tt class="py-name">None</tt><tt class="py-op">:</tt> </tt>
+<a name="L125"></a><tt class="py-lineno">125</tt>  <tt class="py-line">            <tt class="py-name">array</tt> <tt class="py-op">=</tt> <tt class="py-op">[</tt><tt class="py-name">itemvalue</tt><tt class="py-op">]</tt> </tt>
+<a name="L126"></a><tt class="py-lineno">126</tt>  <tt class="py-line">        <tt class="py-keyword">else</tt><tt class="py-op">:</tt> </tt>
+<a name="L127"></a><tt class="py-lineno">127</tt>  <tt class="py-line">            <tt class="py-name">array</tt><tt class="py-op">.</tt><tt class="py-name">insert</tt> <tt class="py-op">(</tt><tt class="py-name">atidx</tt><tt class="py-op">,</tt> <tt class="py-name">itemvalue</tt><tt class="py-op">)</tt> </tt>
+<a name="L128"></a><tt class="py-lineno">128</tt>  <tt class="py-line">        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-54" class="py-name"><a title="ProvCon.dbui.abstractui.fields.BaseFieldEditor.variable" class="py-name" href="#" onclick="return doclink('link-54', 'variable', 'link-11');">variable</a></tt><tt class="py-op">.</tt><tt id="link-55" class="py-name"><a title="ProvCon.func.variables.TracedVariable.set" class="py-name" href="#" onclick="return doclink('link-55', 'set', 'link-26');">set</a></tt> <tt class="py-op">(</tt> <tt class="py-name">array</tt> <tt class="py-op">)</tt> </tt>
+</div><a name="L129"></a><tt class="py-lineno">129</tt>  <tt class="py-line"> </tt>
+<a name="BaseArrayEditor.remove_item"></a><div id="BaseArrayEditor.remove_item-def"><a name="L130"></a><tt class="py-lineno">130</tt> <a class="py-toggle" href="#" id="BaseArrayEditor.remove_item-toggle" onclick="return toggle('BaseArrayEditor.remove_item');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="ProvCon.dbui.abstractui.fields.BaseArrayEditor-class.html#remove_item">remove_item</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">,</tt> <tt class="py-param">atidx</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="BaseArrayEditor.remove_item-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="BaseArrayEditor.remove_item-expanded"><a name="L131"></a><tt class="py-lineno">131</tt>  <tt class="py-line">        <tt class="py-name">array</tt> <tt class="py-op">=</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-56" class="py-name"><a title="ProvCon.dbui.abstractui.fields.BaseFieldEditor.variable" class="py-name" href="#" onclick="return doclink('link-56', 'variable', 'link-11');">variable</a></tt><tt class="py-op">.</tt><tt id="link-57" class="py-name"><a title="ProvCon.dbui.orm.recordsearch.OIDSearchList.get
+ProvCon.func.variables.TracedVariable.get" class="py-name" href="#" onclick="return doclink('link-57', 'get', 'link-31');">get</a></tt><tt class="py-op">(</tt><tt class="py-op">)</tt> </tt>
+<a name="L132"></a><tt class="py-lineno">132</tt>  <tt class="py-line">        <tt class="py-keyword">del</tt> <tt class="py-name">array</tt><tt class="py-op">[</tt><tt class="py-name">atidx</tt><tt class="py-op">]</tt>         </tt>
+<a name="L133"></a><tt class="py-lineno">133</tt>  <tt class="py-line">        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-58" class="py-name"><a title="ProvCon.dbui.abstractui.fields.BaseFieldEditor.variable" class="py-name" href="#" onclick="return doclink('link-58', 'variable', 'link-11');">variable</a></tt><tt class="py-op">.</tt><tt id="link-59" class="py-name"><a title="ProvCon.func.variables.TracedVariable.set" class="py-name" href="#" onclick="return doclink('link-59', 'set', 'link-26');">set</a></tt> <tt class="py-op">(</tt> <tt class="py-name">array</tt> <tt class="py-op">)</tt> </tt>
+</div><a name="L134"></a><tt class="py-lineno">134</tt>  <tt class="py-line"> </tt>
+<a name="BaseArrayEditor.swap_items"></a><div id="BaseArrayEditor.swap_items-def"><a name="L135"></a><tt class="py-lineno">135</tt> <a class="py-toggle" href="#" id="BaseArrayEditor.swap_items-toggle" onclick="return toggle('BaseArrayEditor.swap_items');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="ProvCon.dbui.abstractui.fields.BaseArrayEditor-class.html#swap_items">swap_items</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">,</tt> <tt class="py-param">idx1</tt><tt class="py-op">,</tt> <tt class="py-param">idx2</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="BaseArrayEditor.swap_items-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="BaseArrayEditor.swap_items-expanded"><a name="L136"></a><tt class="py-lineno">136</tt>  <tt class="py-line">        <tt class="py-name">array</tt> <tt class="py-op">=</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-60" class="py-name"><a title="ProvCon.dbui.abstractui.fields.BaseFieldEditor.variable" class="py-name" href="#" onclick="return doclink('link-60', 'variable', 'link-11');">variable</a></tt><tt class="py-op">.</tt><tt id="link-61" class="py-name"><a title="ProvCon.dbui.orm.recordsearch.OIDSearchList.get
+ProvCon.func.variables.TracedVariable.get" class="py-name" href="#" onclick="return doclink('link-61', 'get', 'link-31');">get</a></tt><tt class="py-op">(</tt><tt class="py-op">)</tt> </tt>
+<a name="L137"></a><tt class="py-lineno">137</tt>  <tt class="py-line">        <tt class="py-name">a1</tt> <tt class="py-op">=</tt> <tt class="py-name">array</tt><tt class="py-op">[</tt><tt class="py-name">idx1</tt><tt class="py-op">]</tt> </tt>
+<a name="L138"></a><tt class="py-lineno">138</tt>  <tt class="py-line">        <tt class="py-name">a2</tt> <tt class="py-op">=</tt> <tt class="py-name">array</tt><tt class="py-op">[</tt><tt class="py-name">idx2</tt><tt class="py-op">]</tt> </tt>
+<a name="L139"></a><tt class="py-lineno">139</tt>  <tt class="py-line">        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-62" class="py-name"><a title="ProvCon.dbui.abstractui.fields.BaseFieldEditor.variable" class="py-name" href="#" onclick="return doclink('link-62', 'variable', 'link-11');">variable</a></tt><tt class="py-op">[</tt><tt class="py-name">idx1</tt><tt class="py-op">]</tt> <tt class="py-op">=</tt> <tt class="py-name">a2</tt> </tt>
+<a name="L140"></a><tt class="py-lineno">140</tt>  <tt class="py-line">        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-63" class="py-name"><a title="ProvCon.dbui.abstractui.fields.BaseFieldEditor.variable" class="py-name" href="#" onclick="return doclink('link-63', 'variable', 'link-11');">variable</a></tt><tt class="py-op">[</tt><tt class="py-name">idx2</tt><tt class="py-op">]</tt> <tt class="py-op">=</tt> <tt class="py-name">a1</tt> </tt>
+</div><a name="L141"></a><tt class="py-lineno">141</tt>  <tt class="py-line">                 </tt>
+<a name="BaseArrayEditor.set_current_editor_value"></a><div id="BaseArrayEditor.set_current_editor_value-def"><a name="L142"></a><tt class="py-lineno">142</tt> <a class="py-toggle" href="#" id="BaseArrayEditor.set_current_editor_value-toggle" onclick="return toggle('BaseArrayEditor.set_current_editor_value');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="ProvCon.dbui.abstractui.fields.BaseArrayEditor-class.html#set_current_editor_value">set_current_editor_value</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">,</tt> <tt class="py-param">value</tt><tt class="py-op">)</tt><tt class="py-op">:</tt>          </tt>
+</div><a name="L143"></a><tt class="py-lineno">143</tt>  <tt class="py-line">        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">array</tt> <tt class="py-op">=</tt> <tt id="link-64" class="py-name"><a title="ProvCon.docsis.compiler.encoder.tlv.value
+ProvCon.docsis.compiler.encoder.tlv_multipart.value" class="py-name" href="#" onclick="return doclink('link-64', 'value', 'link-22');">value</a></tt> </tt>
+<a name="L144"></a><tt class="py-lineno">144</tt>  <tt class="py-line">        <tt class="py-keyword">if</tt> <tt id="link-65" class="py-name"><a title="ProvCon.docsis.compiler.encoder.tlv.value
+ProvCon.docsis.compiler.encoder.tlv_multipart.value" class="py-name" href="#" onclick="return doclink('link-65', 'value', 'link-22');">value</a></tt> <tt class="py-keyword">is</tt> <tt class="py-name">None</tt><tt class="py-op">:</tt> </tt>
+<a name="L145"></a><tt class="py-lineno">145</tt>  <tt class="py-line">            <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-66" class="py-name" targets="Method ProvCon.dbui.abstractui.fields.BaseArrayEditor.resize_editor()=ProvCon.dbui.abstractui.fields.BaseArrayEditor-class.html#resize_editor,Method ProvCon.dbui.wxwin.fields.Entry.BaseArray.resize_editor()=ProvCon.dbui.wxwin.fields.Entry.BaseArray-class.html#resize_editor"><a title="ProvCon.dbui.abstractui.fields.BaseArrayEditor.resize_editor
+ProvCon.dbui.wxwin.fields.Entry.BaseArray.resize_editor" class="py-name" href="#" onclick="return doclink('link-66', 'resize_editor', 'link-66');">resize_editor</a></tt><tt class="py-op">(</tt><tt class="py-number">0</tt><tt class="py-op">)</tt> </tt>
+<a name="L146"></a><tt class="py-lineno">146</tt>  <tt class="py-line">        <tt class="py-keyword">else</tt><tt class="py-op">:</tt> </tt>
+<a name="L147"></a><tt class="py-lineno">147</tt>  <tt class="py-line">            <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-67" class="py-name"><a title="ProvCon.dbui.abstractui.fields.BaseArrayEditor.resize_editor
+ProvCon.dbui.wxwin.fields.Entry.BaseArray.resize_editor" class="py-name" href="#" onclick="return doclink('link-67', 'resize_editor', 'link-66');">resize_editor</a></tt> <tt class="py-op">(</tt> <tt class="py-name">len</tt> <tt class="py-op">(</tt><tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">array</tt><tt class="py-op">)</tt> <tt class="py-op">)</tt>         </tt>
+<a name="L148"></a><tt class="py-lineno">148</tt>  <tt class="py-line">            <tt class="py-keyword">for</tt> <tt class="py-name">idx</tt><tt class="py-op">,</tt> <tt class="py-name">item</tt> <tt class="py-keyword">in</tt> <tt class="py-name">enumerate</tt><tt class="py-op">(</tt><tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">array</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+<a name="L149"></a><tt class="py-lineno">149</tt>  <tt class="py-line">                <tt class="py-keyword">if</tt> <tt class="py-name">idx</tt> <tt class="py-op">&lt;</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">size</tt><tt class="py-op">:</tt> </tt>
+<a name="L150"></a><tt class="py-lineno">150</tt>  <tt class="py-line">                    <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-68" class="py-name" targets="Method ProvCon.dbui.abstractui.fields.BaseArrayEditor.set_current_editor_item_value()=ProvCon.dbui.abstractui.fields.BaseArrayEditor-class.html#set_current_editor_item_value,Method ProvCon.dbui.wxwin.fields.Entry.BaseArray.set_current_editor_item_value()=ProvCon.dbui.wxwin.fields.Entry.BaseArray-class.html#set_current_editor_item_value"><a title="ProvCon.dbui.abstractui.fields.BaseArrayEditor.set_current_editor_item_value
+ProvCon.dbui.wxwin.fields.Entry.BaseArray.set_current_editor_item_value" class="py-name" href="#" onclick="return doclink('link-68', 'set_current_editor_item_value', 'link-68');">set_current_editor_item_value</a></tt> <tt class="py-op">(</tt><tt class="py-name">idx</tt><tt class="py-op">,</tt> <tt class="py-name">item</tt><tt class="py-op">)</tt> </tt>
+</div><a name="L151"></a><tt class="py-lineno">151</tt>  <tt class="py-line">             </tt>
+<a name="BaseArrayEditor.set_current_editor_item_value"></a><div id="BaseArrayEditor.set_current_editor_item_value-def"><a name="L152"></a><tt class="py-lineno">152</tt> <a class="py-toggle" href="#" id="BaseArrayEditor.set_current_editor_item_value-toggle" onclick="return toggle('BaseArrayEditor.set_current_editor_item_value');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="ProvCon.dbui.abstractui.fields.BaseArrayEditor-class.html#set_current_editor_item_value">set_current_editor_item_value</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">,</tt> <tt class="py-param">idx</tt><tt class="py-op">,</tt> <tt class="py-param">value</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="BaseArrayEditor.set_current_editor_item_value-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="BaseArrayEditor.set_current_editor_item_value-expanded"><a name="L153"></a><tt class="py-lineno">153</tt>  <tt class="py-line">        <tt class="py-keyword">raise</tt> <tt class="py-name">NotImplementedError</tt><tt class="py-op">(</tt><tt class="py-op">)</tt> </tt>
+</div><a name="L154"></a><tt class="py-lineno">154</tt>  <tt class="py-line">     </tt>
+<a name="BaseArrayEditor.get_current_editor_value"></a><div id="BaseArrayEditor.get_current_editor_value-def"><a name="L155"></a><tt class="py-lineno">155</tt> <a class="py-toggle" href="#" id="BaseArrayEditor.get_current_editor_value-toggle" onclick="return toggle('BaseArrayEditor.get_current_editor_value');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="ProvCon.dbui.abstractui.fields.BaseArrayEditor-class.html#get_current_editor_value">get_current_editor_value</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="BaseArrayEditor.get_current_editor_value-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="BaseArrayEditor.get_current_editor_value-expanded"><a name="L156"></a><tt class="py-lineno">156</tt>  <tt class="py-line">        <tt class="py-keyword">raise</tt> <tt class="py-name">NotImplementedError</tt><tt class="py-op">(</tt><tt class="py-op">)</tt> </tt>
+</div><a name="L157"></a><tt class="py-lineno">157</tt>  <tt class="py-line">     </tt>
+<a name="BaseArrayEditor.get_current_editor_item_value"></a><div id="BaseArrayEditor.get_current_editor_item_value-def"><a name="L158"></a><tt class="py-lineno">158</tt> <a class="py-toggle" href="#" id="BaseArrayEditor.get_current_editor_item_value-toggle" onclick="return toggle('BaseArrayEditor.get_current_editor_item_value');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="ProvCon.dbui.abstractui.fields.BaseArrayEditor-class.html#get_current_editor_item_value">get_current_editor_item_value</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">,</tt> <tt class="py-param">idx</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="BaseArrayEditor.get_current_editor_item_value-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="BaseArrayEditor.get_current_editor_item_value-expanded"><a name="L159"></a><tt class="py-lineno">159</tt>  <tt class="py-line">        <tt class="py-keyword">raise</tt> <tt class="py-name">NotImplementedError</tt><tt class="py-op">(</tt><tt class="py-op">)</tt> </tt>
+</div></div><a name="L160"></a><tt class="py-lineno">160</tt>  <tt class="py-line"> </tt>
+<a name="ConcreteBaseArrayEditor"></a><div id="ConcreteBaseArrayEditor-def"><a name="L161"></a><tt class="py-lineno">161</tt> <a class="py-toggle" href="#" id="ConcreteBaseArrayEditor-toggle" onclick="return toggle('ConcreteBaseArrayEditor');">-</a><tt class="py-line"><tt class="py-keyword">def</tt> <a class="py-def-name" href="ProvCon.dbui.abstractui.fields-module.html#ConcreteBaseArrayEditor">ConcreteBaseArrayEditor</a><tt class="py-op">(</tt><tt class="py-param">ItemEditorClass</tt><tt class="py-op">,</tt> <tt class="py-param">ButtonBoxClass</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="ConcreteBaseArrayEditor-collapsed" style="display:none;" pad="+++" indent="++++"></div><div id="ConcreteBaseArrayEditor-expanded"><a name="L162"></a><tt class="py-lineno">162</tt>  <tt class="py-line">    <tt class="py-keyword">class</tt> <tt class="py-def-name">ConcreteArrayEditor</tt><tt class="py-op">(</tt><tt class="py-base-class">BaseArrayEditor</tt><tt class="py-op">)</tt><tt class="py-op">:</tt>         </tt>
+<a name="L163"></a><tt class="py-lineno">163</tt>  <tt class="py-line">        <tt class="py-decorator">@</tt><tt class="py-decorator">staticmethod</tt> </tt>
+<a name="L164"></a><tt class="py-lineno">164</tt>  <tt class="py-line">        <tt class="py-keyword">def</tt> <tt class="py-def-name">get_item_editor_class</tt><tt class="py-op">(</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> <tt class="py-keyword">return</tt> <tt class="py-name">ItemEditorClass</tt> </tt>
+<a name="L165"></a><tt class="py-lineno">165</tt>  <tt class="py-line">        <tt class="py-decorator">@</tt><tt class="py-decorator">staticmethod</tt> </tt>
+<a name="L166"></a><tt class="py-lineno">166</tt>  <tt class="py-line">        <tt class="py-keyword">def</tt> <tt class="py-def-name">get_button_box_class</tt><tt class="py-op">(</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> <tt class="py-keyword">return</tt> <tt class="py-name">ButtonBoxClass</tt> </tt>
+</div><a name="L167"></a><tt class="py-lineno">167</tt>  <tt class="py-line">    <tt class="py-keyword">return</tt> <tt class="py-name">ConcreteArrayEditor</tt> </tt>
+</div><a name="L168"></a><tt class="py-lineno">168</tt>  <tt class="py-line">     </tt>
+<a name="BaseArrayItemEditor"></a><div id="BaseArrayItemEditor-def"><a name="L169"></a><tt class="py-lineno">169</tt> <a class="py-toggle" href="#" id="BaseArrayItemEditor-toggle" onclick="return toggle('BaseArrayItemEditor');">-</a><tt class="py-line"><tt class="py-keyword">class</tt> <a class="py-def-name" href="ProvCon.dbui.abstractui.fields.BaseArrayItemEditor-class.html">BaseArrayItemEditor</a><tt class="py-op">(</tt><tt class="py-base-class">BaseFieldEditor</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="BaseArrayItemEditor-collapsed" style="display:none;" pad="+++" indent="++++"></div><div id="BaseArrayItemEditor-expanded"><a name="BaseArrayItemEditor.__init__"></a><div id="BaseArrayItemEditor.__init__-def"><a name="L170"></a><tt class="py-lineno">170</tt> <a class="py-toggle" href="#" id="BaseArrayItemEditor.__init__-toggle" onclick="return toggle('BaseArrayItemEditor.__init__');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="ProvCon.dbui.abstractui.fields.BaseArrayItemEditor-class.html#__init__">__init__</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">,</tt> <tt class="py-param">field</tt><tt class="py-op">,</tt> <tt class="py-param">parenteditor</tt><tt class="py-op">,</tt> <tt class="py-param">idx</tt><tt class="py-op">,</tt> <tt class="py-op">*</tt><tt class="py-param">args</tt><tt class="py-op">,</tt> <tt class="py-op">**</tt><tt class="py-param">kwargs</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="BaseArrayItemEditor.__init__-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="BaseArrayItemEditor.__init__-expanded"><a name="L171"></a><tt class="py-lineno">171</tt>  <tt class="py-line">        <tt id="link-69" class="py-name"><a title="ProvCon.dbui.abstractui.fields.BaseFieldEditor" class="py-name" href="#" onclick="return doclink('link-69', 'BaseFieldEditor', 'link-33');">BaseFieldEditor</a></tt><tt class="py-op">.</tt><tt id="link-70" class="py-name"><a title="ProvCon.TFTP.Protocol.Packet.__init__
+ProvCon.TFTP.ProvisioningTFTP.BaseOven.__init__
+ProvCon.TFTP.ProvisioningTFTP.CableModemConfigCook.__init__
+ProvCon.TFTP.ProvisioningTFTP.FileCook.__init__
+ProvCon.TFTP.ProvisioningTFTP.ProvisioningTFTPServer.__init__
+ProvCon.TFTP.ProvisioningTFTP.TFTPDataSender.__init__
+ProvCon.TFTP.ProvisioningTFTP.pcTFTPD.__init__
+ProvCon.TFTP.Server.BaseTFTPServer.__init__
+ProvCon.cli.CLIServer.__init__
+ProvCon.cli.CLIWorker.__init__
+ProvCon.dbui.abstractui.fields.BaseArrayEditor.__init__
+ProvCon.dbui.abstractui.fields.BaseArrayItemButtonBox.__init__
+ProvCon.dbui.abstractui.fields.BaseArrayItemEditor.__init__
+ProvCon.dbui.abstractui.fields.BaseFieldEditor.__init__
+ProvCon.dbui.abstractui.fields.BaseReferenceEditor.__init__
+ProvCon.dbui.abstractui.forms.BaseForm.__init__
+ProvCon.dbui.abstractui.navigators.BaseNavigator.__init__
+ProvCon.dbui.abstractui.recordlists.BasePager.__init__
+ProvCon.dbui.abstractui.recordlists.BaseRecordList.__init__
+ProvCon.dbui.database.CFG.tCX.__init__
+ProvCon.dbui.di.rObject'.ObjectFlags.__init__
+ProvCon.dbui.di.rObject'.ObjectParams.__init__
+ProvCon.dbui.di.rObject'.rObject.__init__
+ProvCon.dbui.meta.field.Field.__init__
+ProvCon.dbui.meta.table.Table.__init__
+ProvCon.dbui.orm.form.Form.__init__
+ProvCon.dbui.orm.record.Record.DataManipulationError.__init__
+ProvCon.dbui.orm.record.Record.DataQueryError.__init__
+ProvCon.dbui.orm.record.Record.RecordNotFound.__init__
+ProvCon.dbui.orm.record.Record.__init__
+ProvCon.dbui.orm.recordlist.RecordList.__init__
+ProvCon.dbui.orm.recordsearch.OIDSearchList.__init__
+ProvCon.dbui.wxwin.complete.CompleteGenericForm.__init__
+ProvCon.dbui.wxwin.complete.FormToolbar.__init__
+ProvCon.dbui.wxwin.complete.InfoPopup.__init__
+ProvCon.dbui.wxwin.fields.Entry.ArrayCombo.__init__
+ProvCon.dbui.wxwin.fields.Entry.ArrayItemCombo.__init__
+ProvCon.dbui.wxwin.fields.Entry.ArrayItemStatic.__init__
+ProvCon.dbui.wxwin.fields.Entry.ArrayItemText.__init__
+ProvCon.dbui.wxwin.fields.Entry.ArrayText.__init__
+ProvCon.dbui.wxwin.fields.Entry.BaseArray.__init__
+ProvCon.dbui.wxwin.fields.Entry.Boolean.__init__
+ProvCon.dbui.wxwin.fields.Entry.ComboReference.__init__
+ProvCon.dbui.wxwin.fields.Entry.Memo.__init__
+ProvCon.dbui.wxwin.fields.Entry.StandardArrayItemButtonBox.__init__
+ProvCon.dbui.wxwin.fields.Entry.Static.__init__
+ProvCon.dbui.wxwin.fields.Entry.StaticReference.__init__
+ProvCon.dbui.wxwin.fields.Entry.Text.__init__
+ProvCon.dbui.wxwin.forms.GenericForm.__init__
+ProvCon.dbui.wxwin.mwx.CheckBox.__init__
+ProvCon.dbui.wxwin.mwx.ComboBox.__init__
+ProvCon.dbui.wxwin.mwx.StaticText.__init__
+ProvCon.dbui.wxwin.mwx.TextCtrl.__init__
+ProvCon.dbui.wxwin.mwx.mwxControl.__init__
+ProvCon.dbui.wxwin.navigators.Navigator.__init__
+ProvCon.dbui.wxwin.recordlists.RecordList.__init__
+ProvCon.docsis.cablemodem.cablemodem.__init__
+ProvCon.docsis.cablemodem.cablemodem._cos.__init__
+ProvCon.docsis.cablemodem.cablemodem._cpe.__init__
+ProvCon.docsis.cablemodem.cablemodem._mac.__init__
+ProvCon.docsis.compiler.config.config.__init__
+ProvCon.docsis.compiler.encoder.error.__init__
+ProvCon.docsis.compiler.encoder.tlv.__init__
+ProvCon.docsis.compiler.encoder.tlv_multipart.__init__
+ProvCon.docsis.compiler.encoder.tlv_multipart.append_proxy.__init__
+ProvCon.docsis.compiler.encoder.tlv_multipart.iterator.__init__
+ProvCon.docsis.compiler.encoder.tlv_multipart_subclass.__init__
+ProvCon.docsis.compiler.encoder.tlv_subclass.__init__
+ProvCon.func.classes.conditionalmethod.__init__
+ProvCon.func.events.eventemitter.__init__
+ProvCon.func.events.eventemitter.evt.__init__
+ProvCon.func.events.eventemitter.evthook.__init__
+ProvCon.func.events.eventexception.__init__
+ProvCon.func.variables.TracedVariable.Tracer.__init__
+ProvCon.func.variables.TracedVariable.__init__
+ProvCon.gui.FrontEndApp.FE.__init__
+ProvCon.gui.ProvisioningControl.GenericObjectEditor.__init__
+ProvCon.gui.ProvisioningControl.GridView.__init__
+ProvCon.gui.ProvisioningControl.MainTab.__init__
+ProvCon.gui.ProvisioningControl.ObjectEditorModel.__init__
+ProvCon.gui.ProvisioningControl.TopLevelWindow.__init__
+ProvCon.log.LoggingBackend.__init__
+ProvCon.log.LoggingClient.__init__
+ProvCon.log.LoggingServer.__init__
+ProvCon.ui.uierror.__init__
+ProvCon.wronolib.ipaddr.ip4addr.__init__
+ProvCon.wronolib.ipaddr.ip4prefix.__init__" class="py-name" href="#" onclick="return doclink('link-70', '__init__', 'link-34');">__init__</a></tt> <tt class="py-op">(</tt><tt class="py-name">self</tt><tt class="py-op">,</tt> <tt id="link-71" class="py-name"><a title="ProvCon.dbui.meta.field" class="py-name" href="#" onclick="return doclink('link-71', 'field', 'link-9');">field</a></tt><tt class="py-op">,</tt> <tt id="link-72" class="py-name"><a title="ProvCon.dbui.abstractui.fields.BaseFieldEditor.variable" class="py-name" href="#" onclick="return doclink('link-72', 'variable', 'link-11');">variable</a></tt><tt class="py-op">=</tt><tt class="py-name">parenteditor</tt><tt class="py-op">.</tt><tt id="link-73" class="py-name"><a title="ProvCon.dbui.abstractui.fields.BaseFieldEditor.variable" class="py-name" href="#" onclick="return doclink('link-73', 'variable', 'link-11');">variable</a></tt><tt class="py-op">,</tt> <tt class="py-op">**</tt><tt class="py-name">kwargs</tt><tt class="py-op">)</tt>                 </tt>
+<a name="L172"></a><tt class="py-lineno">172</tt>  <tt class="py-line">        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">parenteditor</tt> <tt class="py-op">=</tt> <tt class="py-name">parenteditor</tt> </tt>
+<a name="L173"></a><tt class="py-lineno">173</tt>  <tt class="py-line">        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">idx</tt> <tt class="py-op">=</tt> <tt class="py-name">idx</tt> </tt>
+</div><a name="L174"></a><tt class="py-lineno">174</tt>  <tt class="py-line">         </tt>
+<a name="BaseArrayItemEditor.variable_changed"></a><div id="BaseArrayItemEditor.variable_changed-def"><a name="L175"></a><tt class="py-lineno">175</tt> <a class="py-toggle" href="#" id="BaseArrayItemEditor.variable_changed-toggle" onclick="return toggle('BaseArrayItemEditor.variable_changed');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="ProvCon.dbui.abstractui.fields.BaseArrayItemEditor-class.html#variable_changed">variable_changed</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">,</tt> <tt class="py-param">action</tt><tt class="py-op">,</tt> <tt class="py-param">value</tt><tt class="py-op">,</tt> <tt class="py-param">var</tt><tt class="py-op">,</tt> <tt class="py-param">idx</tt><tt class="py-op">,</tt> <tt class="py-op">*</tt><tt class="py-param">args</tt><tt class="py-op">)</tt><tt class="py-op">:</tt>         </tt>
+</div><a name="L176"></a><tt class="py-lineno">176</tt>  <tt class="py-line">        <tt class="py-keyword">if</tt> <tt class="py-name">idx</tt> <tt class="py-op">==</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">idx</tt><tt class="py-op">:</tt> </tt>
+<a name="L177"></a><tt class="py-lineno">177</tt>  <tt class="py-line">            <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-74" class="py-name"><a title="ProvCon.dbui.abstractui.fields.BaseArrayEditor.set_current_editor_value
+ProvCon.dbui.abstractui.fields.BaseFieldEditor.set_current_editor_value
+ProvCon.dbui.wxwin.fields.Entry.ArrayItemCombo.set_current_editor_value
+ProvCon.dbui.wxwin.fields.Entry.ArrayItemStatic.set_current_editor_value
+ProvCon.dbui.wxwin.fields.Entry.ArrayItemText.set_current_editor_value
+ProvCon.dbui.wxwin.fields.Entry.Boolean.set_current_editor_value
+ProvCon.dbui.wxwin.fields.Entry.ComboReference.set_current_editor_value
+ProvCon.dbui.wxwin.fields.Entry.Static.set_current_editor_value
+ProvCon.dbui.wxwin.fields.Entry.StaticReference.set_current_editor_value
+ProvCon.dbui.wxwin.fields.Entry.Text.set_current_editor_value" class="py-name" href="#" onclick="return doclink('link-74', 'set_current_editor_value', 'link-21');">set_current_editor_value</a></tt><tt class="py-op">(</tt><tt id="link-75" class="py-name"><a title="ProvCon.docsis.compiler.encoder.tlv.value
+ProvCon.docsis.compiler.encoder.tlv_multipart.value" class="py-name" href="#" onclick="return doclink('link-75', 'value', 'link-22');">value</a></tt><tt class="py-op">)</tt> </tt>
+</div><a name="L178"></a><tt class="py-lineno">178</tt>  <tt class="py-line">             </tt>
+<a name="BaseArrayItemEditor.initialize_value"></a><div id="BaseArrayItemEditor.initialize_value-def"><a name="L179"></a><tt class="py-lineno">179</tt> <a class="py-toggle" href="#" id="BaseArrayItemEditor.initialize_value-toggle" onclick="return toggle('BaseArrayItemEditor.initialize_value');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="ProvCon.dbui.abstractui.fields.BaseArrayItemEditor-class.html#initialize_value">initialize_value</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">,</tt> <tt class="py-param">value</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="BaseArrayItemEditor.initialize_value-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="BaseArrayItemEditor.initialize_value-expanded"><a name="L180"></a><tt class="py-lineno">180</tt>  <tt class="py-line">        <tt class="py-docstring">"""called by the ArrayEditor when a new record/value is loaded"""</tt> </tt>
+<a name="L181"></a><tt class="py-lineno">181</tt>  <tt class="py-line">        <tt class="py-keyword">raise</tt> <tt class="py-name">NotImplementedError</tt> </tt>
+</div><a name="L182"></a><tt class="py-lineno">182</tt>  <tt class="py-line">             </tt>
+<a name="BaseArrayItemEditor.update_variable"></a><div id="BaseArrayItemEditor.update_variable-def"><a name="L183"></a><tt class="py-lineno">183</tt> <a class="py-toggle" href="#" id="BaseArrayItemEditor.update_variable-toggle" onclick="return toggle('BaseArrayItemEditor.update_variable');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="ProvCon.dbui.abstractui.fields.BaseArrayItemEditor-class.html#update_variable">update_variable</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="BaseArrayItemEditor.update_variable-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="BaseArrayItemEditor.update_variable-expanded"><a name="L184"></a><tt class="py-lineno">184</tt>  <tt class="py-line">        <tt class="py-keyword">try</tt><tt class="py-op">:</tt> </tt>
+<a name="L185"></a><tt class="py-lineno">185</tt>  <tt class="py-line">            <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-76" class="py-name"><a title="ProvCon.dbui.abstractui.fields.BaseFieldEditor.vtrace" class="py-name" href="#" onclick="return doclink('link-76', 'vtrace', 'link-19');">vtrace</a></tt><tt class="py-op">.</tt><tt id="link-77" class="py-name"><a title="ProvCon.func.classes.conditionalmethod.freeze
+ProvCon.func.events.eventemitter.evt.freeze
+ProvCon.func.events.eventemitter.evthook.freeze
+ProvCon.func.variables.TracedVariable.Tracer.freeze
+ProvCon.func.variables.TracedVariable.freeze" class="py-name" href="#" onclick="return doclink('link-77', 'freeze', 'link-24');">freeze</a></tt><tt class="py-op">(</tt><tt class="py-op">)</tt> </tt>
+<a name="L186"></a><tt class="py-lineno">186</tt>  <tt class="py-line">            <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-78" class="py-name"><a title="ProvCon.dbui.abstractui.fields.BaseFieldEditor.variable" class="py-name" href="#" onclick="return doclink('link-78', 'variable', 'link-11');">variable</a></tt><tt class="py-op">[</tt><tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">idx</tt><tt class="py-op">]</tt> <tt class="py-op">=</tt>  <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-79" class="py-name"><a title="ProvCon.dbui.abstractui.fields.BaseArrayEditor.get_current_editor_value
+ProvCon.dbui.abstractui.fields.BaseFieldEditor.get_current_editor_value
+ProvCon.dbui.wxwin.fields.Entry.ArrayItemCombo.get_current_editor_value
+ProvCon.dbui.wxwin.fields.Entry.ArrayItemStatic.get_current_editor_value
+ProvCon.dbui.wxwin.fields.Entry.ArrayItemText.get_current_editor_value
+ProvCon.dbui.wxwin.fields.Entry.BaseArray.get_current_editor_value
+ProvCon.dbui.wxwin.fields.Entry.Boolean.get_current_editor_value
+ProvCon.dbui.wxwin.fields.Entry.ComboReference.get_current_editor_value
+ProvCon.dbui.wxwin.fields.Entry.Text.get_current_editor_value" class="py-name" href="#" onclick="return doclink('link-79', 'get_current_editor_value', 'link-27');">get_current_editor_value</a></tt><tt class="py-op">(</tt><tt class="py-op">)</tt>  </tt>
+<a name="L187"></a><tt class="py-lineno">187</tt>  <tt class="py-line">        <tt class="py-keyword">finally</tt><tt class="py-op">:</tt> </tt>
+<a name="L188"></a><tt class="py-lineno">188</tt>  <tt class="py-line">            <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-80" class="py-name"><a title="ProvCon.dbui.abstractui.fields.BaseFieldEditor.vtrace" class="py-name" href="#" onclick="return doclink('link-80', 'vtrace', 'link-19');">vtrace</a></tt><tt class="py-op">.</tt><tt id="link-81" class="py-name"><a title="ProvCon.func.classes.conditionalmethod.thaw
+ProvCon.func.events.eventemitter.evt.thaw
+ProvCon.func.events.eventemitter.evthook.thaw
+ProvCon.func.variables.TracedVariable.Tracer.thaw
+ProvCon.func.variables.TracedVariable.thaw" class="py-name" href="#" onclick="return doclink('link-81', 'thaw', 'link-29');">thaw</a></tt><tt class="py-op">(</tt><tt class="py-op">)</tt>         </tt>
+</div><a name="L189"></a><tt class="py-lineno">189</tt>  <tt class="py-line">                 </tt>
+<a name="BaseArrayItemEditor.__repr__"></a><div id="BaseArrayItemEditor.__repr__-def"><a name="L190"></a><tt class="py-lineno">190</tt> <a class="py-toggle" href="#" id="BaseArrayItemEditor.__repr__-toggle" onclick="return toggle('BaseArrayItemEditor.__repr__');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="ProvCon.dbui.abstractui.fields.BaseArrayItemEditor-class.html#__repr__">__repr__</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="BaseArrayItemEditor.__repr__-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="BaseArrayItemEditor.__repr__-expanded"><a name="L191"></a><tt class="py-lineno">191</tt>  <tt class="py-line">        <tt class="py-keyword">return</tt> <tt class="py-string">"&lt;ItemEditor "</tt> <tt class="py-op">+</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-82" class="py-name"><a title="ProvCon.dbui.meta.field" class="py-name" href="#" onclick="return doclink('link-82', 'field', 'link-9');">field</a></tt><tt class="py-op">.</tt><tt class="py-name">name</tt> <tt class="py-op">+</tt> <tt class="py-string">"["</tt> <tt class="py-op">+</tt> <tt class="py-name">str</tt><tt class="py-op">(</tt><tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">idx</tt><tt class="py-op">)</tt> <tt class="py-op">+</tt> <tt class="py-string">"]&gt;"</tt> </tt>
+</div></div><a name="L192"></a><tt class="py-lineno">192</tt>  <tt class="py-line">     </tt>
+<a name="BaseArrayItemButtonBox"></a><div id="BaseArrayItemButtonBox-def"><a name="L193"></a><tt class="py-lineno">193</tt> <a class="py-toggle" href="#" id="BaseArrayItemButtonBox-toggle" onclick="return toggle('BaseArrayItemButtonBox');">-</a><tt class="py-line"><tt class="py-keyword">class</tt> <a class="py-def-name" href="ProvCon.dbui.abstractui.fields.BaseArrayItemButtonBox-class.html">BaseArrayItemButtonBox</a><tt class="py-op">(</tt><tt class="py-base-class">object</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="BaseArrayItemButtonBox-collapsed" style="display:none;" pad="+++" indent="++++"></div><div id="BaseArrayItemButtonBox-expanded"><a name="BaseArrayItemButtonBox.__init__"></a><div id="BaseArrayItemButtonBox.__init__-def"><a name="L194"></a><tt class="py-lineno">194</tt> <a class="py-toggle" href="#" id="BaseArrayItemButtonBox.__init__-toggle" onclick="return toggle('BaseArrayItemButtonBox.__init__');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="ProvCon.dbui.abstractui.fields.BaseArrayItemButtonBox-class.html#__init__">__init__</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">,</tt> <tt class="py-param">arrayeditor</tt><tt class="py-op">,</tt> <tt class="py-param">idx</tt><tt class="py-op">,</tt> <tt class="py-op">**</tt><tt class="py-param">kkw</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="BaseArrayItemButtonBox.__init__-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="BaseArrayItemButtonBox.__init__-expanded"><a name="L195"></a><tt class="py-lineno">195</tt>  <tt class="py-line">        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">arrayeditor</tt> <tt class="py-op">=</tt> <tt class="py-name">arrayeditor</tt> </tt>
+<a name="L196"></a><tt class="py-lineno">196</tt>  <tt class="py-line">        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">idx</tt> <tt class="py-op">=</tt> <tt class="py-name">idx</tt> </tt>
+<a name="L197"></a><tt class="py-lineno">197</tt>  <tt class="py-line">        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">commands</tt> <tt class="py-op">=</tt> <tt class="py-name">filter</tt> <tt class="py-op">(</tt> <tt class="py-keyword">lambda</tt> <tt class="py-name">k</tt><tt class="py-op">:</tt> <tt class="py-name">kkw</tt><tt class="py-op">[</tt><tt class="py-name">k</tt><tt class="py-op">]</tt><tt class="py-op">,</tt> <tt class="py-name">kkw</tt> <tt class="py-op">)</tt> </tt>
+</div><a name="L198"></a><tt class="py-lineno">198</tt>  <tt class="py-line">         </tt>
+<a name="BaseArrayItemButtonBox.command_insert"></a><div id="BaseArrayItemButtonBox.command_insert-def"><a name="L199"></a><tt class="py-lineno">199</tt> <a class="py-toggle" href="#" id="BaseArrayItemButtonBox.command_insert-toggle" onclick="return toggle('BaseArrayItemButtonBox.command_insert');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="ProvCon.dbui.abstractui.fields.BaseArrayItemButtonBox-class.html#command_insert">command_insert</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">,</tt> <tt class="py-op">*</tt><tt class="py-param">args</tt><tt class="py-op">)</tt><tt class="py-op">:</tt>         </tt>
+</div><a name="L200"></a><tt class="py-lineno">200</tt>  <tt class="py-line">        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">arrayeditor</tt><tt class="py-op">.</tt><tt id="link-83" class="py-name" targets="Method ProvCon.dbui.abstractui.fields.BaseArrayEditor.insert_item()=ProvCon.dbui.abstractui.fields.BaseArrayEditor-class.html#insert_item"><a title="ProvCon.dbui.abstractui.fields.BaseArrayEditor.insert_item" class="py-name" href="#" onclick="return doclink('link-83', 'insert_item', 'link-83');">insert_item</a></tt> <tt class="py-op">(</tt><tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">idx</tt><tt class="py-op">+</tt><tt class="py-number">1</tt><tt class="py-op">,</tt> <tt class="py-name">None</tt><tt class="py-op">)</tt> </tt>
+</div><a name="L201"></a><tt class="py-lineno">201</tt>  <tt class="py-line">         </tt>
+<a name="BaseArrayItemButtonBox.command_delete"></a><div id="BaseArrayItemButtonBox.command_delete-def"><a name="L202"></a><tt class="py-lineno">202</tt> <a class="py-toggle" href="#" id="BaseArrayItemButtonBox.command_delete-toggle" onclick="return toggle('BaseArrayItemButtonBox.command_delete');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="ProvCon.dbui.abstractui.fields.BaseArrayItemButtonBox-class.html#command_delete">command_delete</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">,</tt> <tt class="py-op">*</tt><tt class="py-param">args</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="BaseArrayItemButtonBox.command_delete-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="BaseArrayItemButtonBox.command_delete-expanded"><a name="L203"></a><tt class="py-lineno">203</tt>  <tt class="py-line">        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">arrayeditor</tt><tt class="py-op">.</tt><tt id="link-84" class="py-name" targets="Method ProvCon.dbui.abstractui.fields.BaseArrayEditor.remove_item()=ProvCon.dbui.abstractui.fields.BaseArrayEditor-class.html#remove_item"><a title="ProvCon.dbui.abstractui.fields.BaseArrayEditor.remove_item" class="py-name" href="#" onclick="return doclink('link-84', 'remove_item', 'link-84');">remove_item</a></tt> <tt class="py-op">(</tt><tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">idx</tt><tt class="py-op">)</tt> </tt>
+</div></div><a name="L204"></a><tt class="py-lineno">204</tt>  <tt class="py-line"> </tt><script type="text/javascript">
+<!--
+expandto(location.href);
+// -->
+</script>
+</pre>
+<br />
+<!-- ==================== NAVIGATION BAR ==================== -->
+<table class="navbar" border="0" width="100%" cellpadding="0"
+       bgcolor="#a0c0ff" cellspacing="0">
+  <tr valign="middle">
+  <!-- Home link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="ProvCon-module.html">Home</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Tree link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="module-tree.html">Trees</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Index link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="identifier-index.html">Indices</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Help link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="help.html">Help</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Project homepage -->
+      <th class="navbar" align="right" width="100%">
+        <table border="0" cellpadding="0" cellspacing="0">
+          <tr><th class="navbar" align="center"
+            >docsis-provisioning</th>
+          </tr></table></th>
+  </tr>
+</table>
+<table border="0" cellpadding="0" cellspacing="0" width="100%%">
+  <tr>
+    <td align="left" class="footer">
+    Generated by Epydoc 3.0.1 on Thu Jan  8 14:48:53 2009
+    </td>
+    <td align="right" class="footer">
+      <a target="mainFrame" href="http://epydoc.sourceforge.net"
+        >http://epydoc.sourceforge.net</a>
+    </td>
+  </tr>
+</table>
+
+<script type="text/javascript">
+  <!--
+  // Private objects are initially displayed (because if
+  // javascript is turned off then we want them to be
+  // visible); but by default, we want to hide them.  So hide
+  // them unless we have a cookie that says to show them.
+  checkCookie();
+  // -->
+</script>
+</body>
+</html>

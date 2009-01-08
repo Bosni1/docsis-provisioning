@@ -1,0 +1,1641 @@
+<?xml version="1.0" encoding="ascii"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+          "DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+  <title>ProvCon.dbui.orm.record.Record</title>
+  <link rel="stylesheet" href="epydoc.css" type="text/css" />
+  <script type="text/javascript" src="epydoc.js"></script>
+</head>
+
+<body bgcolor="white" text="black" link="blue" vlink="#204080"
+      alink="#204080">
+<!-- ==================== NAVIGATION BAR ==================== -->
+<table class="navbar" border="0" width="100%" cellpadding="0"
+       bgcolor="#a0c0ff" cellspacing="0">
+  <tr valign="middle">
+  <!-- Home link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="ProvCon-module.html">Home</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Tree link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="module-tree.html">Trees</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Index link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="identifier-index.html">Indices</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Help link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="help.html">Help</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Project homepage -->
+      <th class="navbar" align="right" width="100%">
+        <table border="0" cellpadding="0" cellspacing="0">
+          <tr><th class="navbar" align="center"
+            >docsis-provisioning</th>
+          </tr></table></th>
+  </tr>
+</table>
+<table width="100%" cellpadding="0" cellspacing="0">
+  <tr valign="top">
+    <td width="100%">
+      <span class="breadcrumbs">
+        <a href="ProvCon-module.html">Package&nbsp;ProvCon</a> ::
+        <a href="ProvCon.dbui-module.html">Package&nbsp;dbui</a> ::
+        <a href="ProvCon.dbui.orm-module.html">Package&nbsp;orm</a> ::
+        <a href="ProvCon.dbui.orm.record-module.html">Module&nbsp;record</a> ::
+        Class&nbsp;Record
+      </span>
+    </td>
+    <td>
+      <table cellpadding="0" cellspacing="0">
+        <!-- hide/show private -->
+        <tr><td align="right"><span class="options">[<a href="javascript:void(0);" class="privatelink"
+    onclick="toggle_private();">hide&nbsp;private</a>]</span></td></tr>
+        <tr><td align="right"><span class="options"
+            >[<a href="frames.html" target="_top">frames</a
+            >]&nbsp;|&nbsp;<a href="ProvCon.dbui.orm.record.Record-class.html"
+            target="_top">no&nbsp;frames</a>]</span></td></tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<!-- ==================== CLASS DESCRIPTION ==================== -->
+<h1 class="epydoc">Class Record</h1><p class="nomargin-top"><span class="codelink"><a href="ProvCon.dbui.orm.record-pysrc.html#Record">source&nbsp;code</a></span></p>
+<pre class="base-tree">
+              object --+    
+                       |    
+<a href="ProvCon.func.events.eventemitter-class.html">func.events.eventemitter</a> --+
+                           |
+                          <strong class="uidshort">Record</strong>
+</pre>
+
+<dl><dt>Known Subclasses:</dt>
+<dd>
+      <ul class="subclass-list">
+<li><a href="ProvCon.dbui.di.rObject%27.rObject-class.html">di.rObject'.rObject</a></li>  </ul>
+</dd></dl>
+
+<hr />
+<p>A single row in the database.</p>
+  <h1 class="heading">Attributes</h1>
+    <p>A Record object is a object-mapping of rows of database data. The 
+    API allows accessing column values in one og two convenient ways:</p>
+    <p><code>aRecord.<i>columnname</i></code></p>
+    <p><code>aRecord[&quot;<i>columnname</i>&quot;]</code></p>
+    <p>A Record object is set up using the meta-data in a <a 
+    href="ProvCon.dbui.meta.table.Table-class.html" class="link">Table</a> 
+    object.</p>
+    <p>All internal field names start with an '_' underscore character to 
+    avoid name clashes with column names. Column names that start with an 
+    underscore will not  be accessible.</p>
+    <p>The getattr and setattr methods are overridden to provide the 
+    following functionality:</p>
+    <ol start="1">
+      <li>
+        changing the _objectid attribute causes the object to be read from 
+        the database (this is wrapped be the setObjectID method.
+      </li>
+      <li>
+        changing the _table attribute causes the record to be reset as an 
+        empty record of the newly set table
+      </li>
+      <li>
+        special attributes PP_* can be used to get a nice textual 
+        representation of the record
+        <ul>
+          <li>
+            PP_TABLE prints a tabular representation of the record.
+          </li>
+        </ul>
+      </li>
+      <li>
+        attributes named &lt;field_name&gt;_REF return the Record 
+        referenced by the field.
+<pre class="py-doctest">
+<span class="py-prompt">&gt;&gt;&gt; </span>aCustomer.location_REF 
+<span class="py-output">aLocationRecordObject</span></pre>
+      </li>
+    </ol>
+  <h1 class="heading">References</h1>
+    <p>There are three modes in which referencing columns may be 
+    treated:</p>
+    <ol start="1">
+      <li>
+        <b>none</b>: do nothing, leave the objectid as the column value
+      </li>
+      <li>
+        <b>text</b>: <i>columnname</i>_REF returns a textual representation
+        of the referenced record
+      </li>
+      <li>
+        <b>record</b>: <i>columnname</i>_REF holds the actual referenced 
+        record
+      </li>
+    </ol>
+    <p>Record.__default_reference_mode__ is the global default mode of 
+    resolving references. Object-specific mode may be passed to the record 
+    constructor with the <code>resolvereference</code> keyword 
+    argument.</p>
+  <h1 class="heading">objectid, _objectid, setobjectID</h1>
+    <p>Perhaps the most confusing part of the Record object is the way 
+    'objectid' is handled.</p>
+    <p>The _objectid attribute always holds the current objectid, and 
+    setting it to a value triggers one of two actions:</p>
+    <ul>
+      <li>
+        if the value is not None, and is different from the current value, 
+        the record is read from the database,
+      </li>
+      <li>
+        if the value is None, the record is reset as a new record (isNew 
+        returns True)
+      </li>
+    </ul>
+    <p>The third possibility is - nothing happens, when the given value is 
+    the same as the current one, or the _feed attribute is set to True 
+    (meaning the record is fed data via the feedDataRow function).</p>
+    <p>The <code>setObjectID</code> method is an accessor to the _objectid 
+    attribute.</p>
+<pre class="py-doctest">
+<span class="py-prompt">&gt;&gt;&gt; </span>aRecord._objectid = 1
+<span class="py-prompt">&gt;&gt;&gt; </span>aRecord.setObjectID(1)</pre>
+    <p>are equivalent.</p>
+    <p>The <code>objectid</code> attribute holds the current record value 
+    of the <code>objectid</code> columns. Modifying it marks the record as 
+    <i>modified</i> and the new objectid will be written to the database on
+    the next <code>write</code>. <b>DO NOT DO THIS, IT IS EVIL, IT MAY KILL
+    YOU</b>!</p>
+
+<!-- ==================== NESTED CLASSES ==================== -->
+<a name="section-NestedClasses"></a>
+<table class="summary" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="table-header">
+  <td colspan="2" class="table-header">
+    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+      <tr valign="top">
+        <td align="left"><span class="table-header">Nested Classes</span></td>
+        <td align="right" valign="top"
+         ><span class="options">[<a href="#section-NestedClasses"
+         class="privatelink" onclick="toggle_private();"
+         >hide private</a>]</span></td>
+      </tr>
+    </table>
+  </td>
+</tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+        <a href="ProvCon.dbui.orm.record.Record.RecordIncomplete-class.html" class="summary-name">RecordIncomplete</a><br />
+      Exception raised when a record does not have a complete definition.
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+        <a href="ProvCon.dbui.orm.record.Record.RecordNotFound-class.html" class="summary-name">RecordNotFound</a>
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+        <a href="ProvCon.dbui.orm.record.Record.DataManipulationError-class.html" class="summary-name">DataManipulationError</a>
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+        <a href="ProvCon.dbui.orm.record.Record.DataQueryError-class.html" class="summary-name">DataQueryError</a>
+    </td>
+  </tr>
+  <tr>
+    <td colspan="2" class="summary">
+    <p class="indent-wrapped-lines"><b>Inherited from <code><a href="ProvCon.func.events.eventemitter-class.html">func.events.eventemitter</a></code></b>:
+      <code><a href="ProvCon.func.events.eventemitter.evt-class.html">evt</a></code>,
+      <code><a href="ProvCon.func.events.eventemitter.evthook-class.html">evthook</a></code>
+      </p>
+    </td>
+  </tr>
+</table>
+<!-- ==================== INSTANCE METHODS ==================== -->
+<a name="section-InstanceMethods"></a>
+<table class="summary" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="table-header">
+  <td colspan="2" class="table-header">
+    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+      <tr valign="top">
+        <td align="left"><span class="table-header">Instance Methods</span></td>
+        <td align="right" valign="top"
+         ><span class="options">[<a href="#section-InstanceMethods"
+         class="privatelink" onclick="toggle_private();"
+         >hide private</a>]</span></td>
+      </tr>
+    </table>
+  </td>
+</tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="ProvCon.dbui.orm.record.Record-class.html#__init__" class="summary-sig-name">__init__</a>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">**kkw</span>)</span><br />
+      Constructor.</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="ProvCon.dbui.orm.record-pysrc.html#Record.__init__">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="ProvCon.dbui.orm.record.Record-class.html#__setattr__" class="summary-sig-name">__setattr__</a>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">attrname</span>,
+        <span class="summary-sig-arg">attrval</span>)</span><br />
+      x.__setattr__('name', value) &lt;==&gt; x.name = value</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="ProvCon.dbui.orm.record-pysrc.html#Record.__setattr__">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a name="__getattr__"></a><span class="summary-sig-name">__getattr__</span>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">attrname</span>)</span></td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="ProvCon.dbui.orm.record-pysrc.html#Record.__getattr__">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a name="__getitem__"></a><span class="summary-sig-name">__getitem__</span>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">attrname</span>)</span></td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="ProvCon.dbui.orm.record-pysrc.html#Record.__getattr__">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr class="private">
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a name="__is_modified"></a><span class="summary-sig-name">__is_modified</span>(<span class="summary-sig-arg">self</span>)</span></td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="ProvCon.dbui.orm.record-pysrc.html#Record.__is_modified">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr class="private">
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a name="__is_new"></a><span class="summary-sig-name">__is_new</span>(<span class="summary-sig-arg">self</span>)</span></td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="ProvCon.dbui.orm.record-pysrc.html#Record.__is_new">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr class="private">
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a name="__hasdata"></a><span class="summary-sig-name">__hasdata</span>(<span class="summary-sig-arg">self</span>)</span></td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="ProvCon.dbui.orm.record-pysrc.html#Record.__hasdata">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr class="private">
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a name="__is_installed"></a><span class="summary-sig-name">__is_installed</span>(<span class="summary-sig-arg">self</span>)</span></td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="ProvCon.dbui.orm.record-pysrc.html#Record.__is_installed">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="ProvCon.dbui.orm.record.Record-class.html#nullify" class="summary-sig-name">nullify</a>(<span class="summary-sig-arg">self</span>)</span><br />
+      Clear all data.</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="ProvCon.dbui.orm.record-pysrc.html#Record.nullify">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="ProvCon.dbui.orm.record.Record-class.html#setupRecord" class="summary-sig-name">setupRecord</a>(<span class="summary-sig-arg">self</span>)</span><br />
+      Import the record structure from the _table object.</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="ProvCon.dbui.orm.record-pysrc.html#Record.setupRecord">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a name="clearRecord"></a><span class="summary-sig-name">clearRecord</span>(<span class="summary-sig-arg">self</span>)</span><br />
+      Discard all data and the table definition.</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="ProvCon.dbui.orm.record-pysrc.html#Record.clearRecord">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="ProvCon.dbui.orm.record.Record-class.html#setFieldValue" class="summary-sig-name">setFieldValue</a>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">fieldname</span>,
+        <span class="summary-sig-arg">fieldvalue</span>)</span><br />
+      Set a field to a python-object value.</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="ProvCon.dbui.orm.record-pysrc.html#Record.setFieldValue">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="ProvCon.dbui.orm.record.Record-class.html#setFieldStringValue" class="summary-sig-name">setFieldStringValue</a>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">fieldname</span>,
+        <span class="summary-sig-arg">fieldstrvalue</span>)</span><br />
+      Set a field to a parsed string representation of the value.</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="ProvCon.dbui.orm.record-pysrc.html#Record.setFieldStringValue">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">object</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="ProvCon.dbui.orm.record.Record-class.html#getFieldValue" class="summary-sig-name">getFieldValue</a>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">fieldname</span>)</span><br />
+      Get a python value for a particular field.</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="ProvCon.dbui.orm.record-pysrc.html#Record.getFieldValue">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">string</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="ProvCon.dbui.orm.record.Record-class.html#getFieldStringValue" class="summary-sig-name">getFieldStringValue</a>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">fieldname</span>)</span><br />
+      Get a string representation of a field value.</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="ProvCon.dbui.orm.record-pysrc.html#Record.getFieldStringValue">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a name="updateReferenceField"></a><span class="summary-sig-name">updateReferenceField</span>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">field</span>)</span><br />
+      Read data referenced by one of the fields in the given reference 
+      resolving mode.</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="ProvCon.dbui.orm.record-pysrc.html#Record.updateReferenceField">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="ProvCon.dbui.orm.record.Record-class.html#feedDataRow" class="summary-sig-name">feedDataRow</a>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">row</span>,
+        <span class="summary-sig-arg">**kwargs</span>)</span><br />
+      Fill record data structures from a dictionary object.</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="ProvCon.dbui.orm.record-pysrc.html#Record.feedDataRow">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="ProvCon.dbui.orm.record.Record-class.html#read" class="summary-sig-name">read</a>(<span class="summary-sig-arg">self</span>)</span><br />
+      Read a row of data from the database.</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="ProvCon.dbui.orm.record-pysrc.html#Record.read">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="ProvCon.dbui.orm.record.Record-class.html#write" class="summary-sig-name">write</a>(<span class="summary-sig-arg">self</span>)</span><br />
+      Insert or update the record into the database.</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="ProvCon.dbui.orm.record-pysrc.html#Record.write">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="ProvCon.dbui.orm.record.Record-class.html#delete" class="summary-sig-name">delete</a>(<span class="summary-sig-arg">self</span>)</span><br />
+      Delete the record from the database.</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="ProvCon.dbui.orm.record-pysrc.html#Record.delete">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="ProvCon.dbui.orm.record.Record-class.html#setObjectID" class="summary-sig-name">setObjectID</a>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">objectid</span>)</span><br />
+      Set the _objectid.</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="ProvCon.dbui.orm.record-pysrc.html#Record.setObjectID">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="ProvCon.dbui.orm.record.Record-class.html#setTable" class="summary-sig-name">setTable</a>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">tabledef</span>)</span><br />
+      Set the table definition (meta-data).</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="ProvCon.dbui.orm.record-pysrc.html#Record.setTable">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">bool</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="ProvCon.dbui.orm.record.Record-class.html#ofTable" class="summary-sig-name">ofTable</a>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">tablename</span>)</span><br />
+      Check the name of the currently installed table definition.</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="ProvCon.dbui.orm.record-pysrc.html#Record.ofTable">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">dict</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="ProvCon.dbui.orm.record.Record-class.html#getData" class="summary-sig-name">getData</a>(<span class="summary-sig-arg">self</span>)</span><br />
+      Return record data as a <code>dict</code>.</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="ProvCon.dbui.orm.record-pysrc.html#Record.getData">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="ProvCon.dbui.orm.record.Record-class.html#__repr__" class="summary-sig-name">__repr__</a>(<span class="summary-sig-arg">self</span>)</span><br />
+      repr(x)</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="ProvCon.dbui.orm.record-pysrc.html#Record.__repr__">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+  <tr>
+    <td colspan="2" class="summary">
+    <p class="indent-wrapped-lines"><b>Inherited from <code><a href="ProvCon.func.events.eventemitter-class.html">func.events.eventemitter</a></code></b>:
+      <code><a href="ProvCon.func.events.eventemitter-class.html#add_emitted_event">add_emitted_event</a></code>,
+      <code><a href="ProvCon.func.events.eventemitter-class.html#add_listener">add_listener</a></code>,
+      <code><a href="ProvCon.func.events.eventemitter-class.html#emit_event">emit_event</a></code>,
+      <code><a href="ProvCon.func.events.eventemitter-class.html#register_event_hook">register_event_hook</a></code>
+      </p>
+    <p class="indent-wrapped-lines"><b>Inherited from <code>object</code></b>:
+      <code>__delattr__</code>,
+      <code>__format__</code>,
+      <code>__getattribute__</code>,
+      <code>__hash__</code>,
+      <code>__new__</code>,
+      <code>__reduce__</code>,
+      <code>__reduce_ex__</code>,
+      <code>__sizeof__</code>,
+      <code>__str__</code>,
+      <code>__subclasshook__</code>
+      </p>
+    </td>
+  </tr>
+</table>
+<!-- ==================== STATIC METHODS ==================== -->
+<a name="section-StaticMethods"></a>
+<table class="summary" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="table-header">
+  <td colspan="2" class="table-header">
+    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+      <tr valign="top">
+        <td align="left"><span class="table-header">Static Methods</span></td>
+        <td align="right" valign="top"
+         ><span class="options">[<a href="#section-StaticMethods"
+         class="privatelink" onclick="toggle_private();"
+         >hide private</a>]</span></td>
+      </tr>
+    </table>
+  </td>
+</tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">Record</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="ProvCon.dbui.orm.record.Record-class.html#ID" class="summary-sig-name">ID</a>(<span class="summary-sig-arg">objectid</span>,
+        <span class="summary-sig-arg">**kkw</span>)</span><br />
+      Create and load a record with the given objectid.</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="ProvCon.dbui.orm.record-pysrc.html#Record.ID">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">Record</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="ProvCon.dbui.orm.record.Record-class.html#EMPTY" class="summary-sig-name">EMPTY</a>(<span class="summary-sig-arg">tabledef</span>,
+        <span class="summary-sig-arg">**kkw</span>)</span><br />
+      Create a new (empty) record of given table.</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="ProvCon.dbui.orm.record-pysrc.html#Record.EMPTY">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a name="COPY"></a><span class="summary-sig-name">COPY</span>(<span class="summary-sig-arg">record</span>)</span></td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="ProvCon.dbui.orm.record-pysrc.html#Record.COPY">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">iterator</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="ProvCon.dbui.orm.record.Record-class.html#CHILDREN" class="summary-sig-name">CHILDREN</a>(<span class="summary-sig-arg">parentid</span>,
+        <span class="summary-sig-arg">reftable</span>,
+        <span class="summary-sig-arg">refcolumn</span>,
+        <span class="summary-sig-arg">**kwargs</span>)</span><br />
+      Generator allowing to iterate over child rows.</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="ProvCon.dbui.orm.record-pysrc.html#Record.CHILDREN">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">list</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="ProvCon.dbui.orm.record.Record-class.html#IDLIST" class="summary-sig-name">IDLIST</a>(<span class="summary-sig-arg">tablename</span>,
+        <span class="summary-sig-arg">**kwargs</span>)</span><br />
+      Return a list of object ids from a given table.</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="ProvCon.dbui.orm.record-pysrc.html#Record.IDLIST">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+</table>
+<!-- ==================== CLASS VARIABLES ==================== -->
+<a name="section-ClassVariables"></a>
+<table class="summary" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="table-header">
+  <td colspan="2" class="table-header">
+    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+      <tr valign="top">
+        <td align="left"><span class="table-header">Class Variables</span></td>
+        <td align="right" valign="top"
+         ><span class="options">[<a href="#section-ClassVariables"
+         class="privatelink" onclick="toggle_private();"
+         >hide private</a>]</span></td>
+      </tr>
+    </table>
+  </td>
+</tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+        <a name="__default_reference_mode__"></a><span class="summary-name">__default_reference_mode__</span> = <code title="'text'"><code class="variable-quote">'</code><code class="variable-string">text</code><code class="variable-quote">'</code></code>
+    </td>
+  </tr>
+</table>
+<!-- ==================== PROPERTIES ==================== -->
+<a name="section-Properties"></a>
+<table class="summary" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="table-header">
+  <td colspan="2" class="table-header">
+    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+      <tr valign="top">
+        <td align="left"><span class="table-header">Properties</span></td>
+        <td align="right" valign="top"
+         ><span class="options">[<a href="#section-Properties"
+         class="privatelink" onclick="toggle_private();"
+         >hide private</a>]</span></td>
+      </tr>
+    </table>
+  </td>
+</tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+        <a href="ProvCon.dbui.orm.record.Record-class.html#isModified" class="summary-name">isModified</a><br />
+      <code>True</code> if the record was edited since last read, write
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+        <a href="ProvCon.dbui.orm.record.Record-class.html#isNew" class="summary-name">isNew</a><br />
+      <code>True</code> if the record is new (not yet written to the 
+      database, objectid == None)
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+        <a href="ProvCon.dbui.orm.record.Record-class.html#hasData" class="summary-name">hasData</a><br />
+      <code>True</code> if the record holds data read from the database
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+        <a href="ProvCon.dbui.orm.record.Record-class.html#isInstalled" class="summary-name">isInstalled</a><br />
+      <code>True</code> if the record has a table schema installed
+    </td>
+  </tr>
+  <tr>
+    <td colspan="2" class="summary">
+    <p class="indent-wrapped-lines"><b>Inherited from <code>object</code></b>:
+      <code>__class__</code>
+      </p>
+    </td>
+  </tr>
+</table>
+<!-- ==================== METHOD DETAILS ==================== -->
+<a name="section-MethodDetails"></a>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="table-header">
+  <td colspan="2" class="table-header">
+    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+      <tr valign="top">
+        <td align="left"><span class="table-header">Method Details</span></td>
+        <td align="right" valign="top"
+         ><span class="options">[<a href="#section-MethodDetails"
+         class="privatelink" onclick="toggle_private();"
+         >hide private</a>]</span></td>
+      </tr>
+    </table>
+  </td>
+</tr>
+</table>
+<a name="__init__"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">__init__</span>(<span class="sig-arg">self</span>,
+        <span class="sig-arg">**kkw</span>)</span>
+    <br /><em class="fname">(Constructor)</em>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="ProvCon.dbui.orm.record-pysrc.html#Record.__init__">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>Constructor.</p>
+  <p>Keyword arguments:</p>
+  <ul>
+    <li>
+      <code>reprfunc</code> : string   <i>a function object which takes a 
+      record object and returns its textual representation</i>
+    </li>
+    <li>
+      <code>resolvereference</code> : string
+    </li>
+  </ul>
+  <p>A newly created Record object:</p>
+  <ul>
+    <li>
+      has no table definition,
+    </li>
+    <li>
+      has no data.
+    </li>
+  </ul>
+  <dl class="fields">
+    <dt>Overrides:
+        object.__init__
+    </dt>
+  </dl>
+</td></tr></table>
+</div>
+<a name="__setattr__"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">__setattr__</span>(<span class="sig-arg">self</span>,
+        <span class="sig-arg">attrname</span>,
+        <span class="sig-arg">attrval</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="ProvCon.dbui.orm.record-pysrc.html#Record.__setattr__">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>x.__setattr__('name', value) &lt;==&gt; x.name = value</p>
+  <dl class="fields">
+    <dt>Overrides:
+        object.__setattr__
+        <dd><em class="note">(inherited documentation)</em></dd>
+    </dt>
+  </dl>
+</td></tr></table>
+</div>
+<a name="nullify"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">nullify</span>(<span class="sig-arg">self</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="ProvCon.dbui.orm.record-pysrc.html#Record.nullify">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>Clear all data.</p>
+  <p>Note that _objectid remains unchanged, soafter a Record has been 
+  nullified, it may be read again.</p>
+  <p>Do not call on Records that are not yet installed (have no table 
+  definition).</p>
+  <dl class="fields">
+  </dl>
+</td></tr></table>
+</div>
+<a name="setupRecord"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">setupRecord</span>(<span class="sig-arg">self</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="ProvCon.dbui.orm.record-pysrc.html#Record.setupRecord">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>Import the record structure from the _table object.</p>
+  <p>If the record is not installed (no table definition, _table is None), 
+  attempt to install by querying the database to retrieve the object 
+  type.</p>
+  <p>If both _table and _objectid are empty, raise an exception.</p>
+  <p>On success the record has attributes corresponding to database table 
+  columns, and isInstalled returns True.</p>
+  <dl class="fields">
+  </dl>
+</td></tr></table>
+</div>
+<a name="setFieldValue"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">setFieldValue</span>(<span class="sig-arg">self</span>,
+        <span class="sig-arg">fieldname</span>,
+        <span class="sig-arg">fieldvalue</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="ProvCon.dbui.orm.record-pysrc.html#Record.setFieldValue">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>Set a field to a python-object value.</p>
+  <p>It is safe to use <code>aRecord.<i>fieldname</i> = 
+  <i>fieldvalue</i></code> instead.</p>
+  <dl class="fields">
+    <dt>Parameters:</dt>
+    <dd><ul class="nomargin-top">
+        <li><strong class="pname"><code>fieldname</code></strong> (string) - name of the field</li>
+        <li><strong class="pname"><code>fieldvalue</code></strong> (object) - new value</li>
+    </ul></dd>
+  </dl>
+</td></tr></table>
+</div>
+<a name="setFieldStringValue"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">setFieldStringValue</span>(<span class="sig-arg">self</span>,
+        <span class="sig-arg">fieldname</span>,
+        <span class="sig-arg">fieldstrvalue</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="ProvCon.dbui.orm.record-pysrc.html#Record.setFieldStringValue">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>Set a field to a parsed string representation of the value.</p>
+  <dl class="fields">
+    <dt>Parameters:</dt>
+    <dd><ul class="nomargin-top">
+        <li><strong class="pname"><code>fieldname</code></strong> (string) - name of the field</li>
+        <li><strong class="pname"><code>fieldstrvalue</code></strong> (string) - new string value</li>
+    </ul></dd>
+  </dl>
+</td></tr></table>
+</div>
+<a name="getFieldValue"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">getFieldValue</span>(<span class="sig-arg">self</span>,
+        <span class="sig-arg">fieldname</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="ProvCon.dbui.orm.record-pysrc.html#Record.getFieldValue">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>Get a python value for a particular field. It is safe to use 
+  <code>aRecord.<i>fieldname</i></code> instead.</p>
+  <dl class="fields">
+    <dt>Parameters:</dt>
+    <dd><ul class="nomargin-top">
+        <li><strong class="pname"><code>fieldname</code></strong> (string) - name of the field</li>
+    </ul></dd>
+    <dt>Returns: object</dt>
+        <dd>value of the field</dd>
+  </dl>
+</td></tr></table>
+</div>
+<a name="getFieldStringValue"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">getFieldStringValue</span>(<span class="sig-arg">self</span>,
+        <span class="sig-arg">fieldname</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="ProvCon.dbui.orm.record-pysrc.html#Record.getFieldStringValue">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>Get a string representation of a field value.</p>
+  <dl class="fields">
+    <dt>Parameters:</dt>
+    <dd><ul class="nomargin-top">
+        <li><strong class="pname"><code>fieldname</code></strong> (string) - name of the field</li>
+    </ul></dd>
+    <dt>Returns: string</dt>
+        <dd>string value of the field</dd>
+  </dl>
+</td></tr></table>
+</div>
+<a name="feedDataRow"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">feedDataRow</span>(<span class="sig-arg">self</span>,
+        <span class="sig-arg">row</span>,
+        <span class="sig-arg">**kwargs</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="ProvCon.dbui.orm.record-pysrc.html#Record.feedDataRow">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>Fill record data structures from a dictionary object.</p>
+  <p>This function may be used to fill a Record object with data bypassing 
+  all internal record mechanisms. It is useful, when Record objects must be
+  created in great numbers from data obtained by other means.</p>
+  <p>Creating a large number of Record objects involves a significant 
+  performance penalty (up to 3 SELECTs for each record).</p>
+  <dl class="fields">
+    <dt>Parameters:</dt>
+    <dd><ul class="nomargin-top">
+        <li><strong class="pname"><code>row</code></strong> (dict) - a dictionary of database row (column name -&gt; value).</li>
+    </ul></dd>
+  </dl>
+</td></tr></table>
+</div>
+<a name="read"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">read</span>(<span class="sig-arg">self</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="ProvCon.dbui.orm.record-pysrc.html#Record.read">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>Read a row of data from the database.</p>
+  <p>If there is no _table definition, call <a 
+  href="ProvCon.dbui.orm.record.Record-class.html#setupRecord" 
+  class="link">setupRecord</a> to attempt to fetch it based on the 
+  _objectid.</p>
+  <dl class="fields">
+  </dl>
+</td></tr></table>
+</div>
+<a name="write"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">write</span>(<span class="sig-arg">self</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="ProvCon.dbui.orm.record-pysrc.html#Record.write">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>Insert or update the record into the database.</p>
+  <p>Inserts a new record or updates an existing, locally modified record. 
+  The record is then re-read to reflect all changes done on the server-side
+  (triggers etc.)</p>
+  <p>EMITS</p>
+  <ul>
+    <li>
+      <b>record_added</b> (self)
+    </li>
+    <li>
+      <b>record_updated</b> (self)
+    </li>
+  </ul>
+  <dl class="fields">
+  </dl>
+</td></tr></table>
+</div>
+<a name="delete"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">delete</span>(<span class="sig-arg">self</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="ProvCon.dbui.orm.record-pysrc.html#Record.delete">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>Delete the record from the database.</p>
+  <p>EMITS</p>
+  <ul>
+    <li>
+      <b>record_deleted</b> (self)
+    </li>
+  </ul>
+  <dl class="fields">
+  </dl>
+</td></tr></table>
+</div>
+<a name="setObjectID"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">setObjectID</span>(<span class="sig-arg">self</span>,
+        <span class="sig-arg">objectid</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="ProvCon.dbui.orm.record-pysrc.html#Record.setObjectID">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>Set the _objectid. (see class docstring)</p>
+  <dl class="fields">
+    <dt>Parameters:</dt>
+    <dd><ul class="nomargin-top">
+        <li><strong class="pname"><code>objectid</code></strong> (integer) - new object id</li>
+    </ul></dd>
+  </dl>
+</td></tr></table>
+</div>
+<a name="setTable"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">setTable</span>(<span class="sig-arg">self</span>,
+        <span class="sig-arg">tabledef</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="ProvCon.dbui.orm.record-pysrc.html#Record.setTable">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>Set the table definition (meta-data).</p>
+  <dl class="fields">
+    <dt>Parameters:</dt>
+    <dd><ul class="nomargin-top">
+        <li><strong class="pname"><code>tabledef</code></strong> (string or <a href="ProvCon.dbui.meta.table.Table-class.html" 
+          class="link">Table</a>) - name of the table, or a Table object</li>
+    </ul></dd>
+  </dl>
+</td></tr></table>
+</div>
+<a name="ofTable"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">ofTable</span>(<span class="sig-arg">self</span>,
+        <span class="sig-arg">tablename</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="ProvCon.dbui.orm.record-pysrc.html#Record.ofTable">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>Check the name of the currently installed table definition.</p>
+  <dl class="fields">
+    <dt>Parameters:</dt>
+    <dd><ul class="nomargin-top">
+        <li><strong class="pname"><code>tablename</code></strong> (string) - name to check</li>
+    </ul></dd>
+    <dt>Returns: bool</dt>
+        <dd>is the currently set table definition is of a table named 
+          <code>tablename</code></dd>
+  </dl>
+</td></tr></table>
+</div>
+<a name="getData"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">getData</span>(<span class="sig-arg">self</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="ProvCon.dbui.orm.record-pysrc.html#Record.getData">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>Return record data as a <code>dict</code>.</p>
+  <dl class="fields">
+    <dt>Returns: dict</dt>
+        <dd>current record data as a columnname -&gt; value dictionary</dd>
+  </dl>
+</td></tr></table>
+</div>
+<a name="__repr__"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">__repr__</span>(<span class="sig-arg">self</span>)</span>
+    <br /><em class="fname">(Representation operator)</em>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="ProvCon.dbui.orm.record-pysrc.html#Record.__repr__">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>repr(x)</p>
+  <dl class="fields">
+    <dt>Overrides:
+        object.__repr__
+        <dd><em class="note">(inherited documentation)</em></dd>
+    </dt>
+  </dl>
+</td></tr></table>
+</div>
+<a name="ID"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">ID</span>(<span class="sig-arg">objectid</span>,
+        <span class="sig-arg">**kkw</span>)</span>
+    <br /><em class="fname">Static Method</em>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="ProvCon.dbui.orm.record-pysrc.html#Record.ID">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>Create and load a record with the given objectid.</p>
+  <dl class="fields">
+    <dt>Parameters:</dt>
+    <dd><ul class="nomargin-top">
+        <li><strong class="pname"><code>objectid</code></strong> (integer) - id of the object to load None - new record</li>
+    </ul></dd>
+    <dt>Returns: Record</dt>
+  </dl>
+</td></tr></table>
+</div>
+<a name="EMPTY"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">EMPTY</span>(<span class="sig-arg">tabledef</span>,
+        <span class="sig-arg">**kkw</span>)</span>
+    <br /><em class="fname">Static Method</em>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="ProvCon.dbui.orm.record-pysrc.html#Record.EMPTY">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>Create a new (empty) record of given table.</p>
+  <dl class="fields">
+    <dt>Parameters:</dt>
+    <dd><ul class="nomargin-top">
+        <li><strong class="pname"><code>tabledef</code></strong> (string or <a href="ProvCon.dbui.meta.table.Table-class.html" 
+          class="link">Table</a>) - name of the table, or a Table object</li>
+    </ul></dd>
+    <dt>Returns: Record</dt>
+  </dl>
+</td></tr></table>
+</div>
+<a name="CHILDREN"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">CHILDREN</span>(<span class="sig-arg">parentid</span>,
+        <span class="sig-arg">reftable</span>,
+        <span class="sig-arg">refcolumn</span>,
+        <span class="sig-arg">**kwargs</span>)</span>
+    <br /><em class="fname">Static Method</em>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="ProvCon.dbui.orm.record-pysrc.html#Record.CHILDREN">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>Generator allowing to iterate over child rows.</p>
+  <p>Generates a collection of records from <i>reftable</i> that reference 
+  an object with <i>objectid</i> = &quot;<i>parentid</i>&quot; by the 
+  <i>refcolumn</i>.</p>
+  <p>keyword arguments:</p>
+  <ul>
+    <li>
+      limit - max number of records, default None
+    </li>
+    <li>
+      order - expression to be used in the ORDER BY clause
+    </li>
+    <li>
+      reprfunc - function to generate _astxt values for each record
+    </li>
+    <li>
+      gettxt - boolean, fetch _astxt from database
+    </li>
+    <li>
+      select - array of fields to select from reftable, default ['*']
+    </li>
+  </ul>
+  <dl class="fields">
+    <dt>Parameters:</dt>
+    <dd><ul class="nomargin-top">
+        <li><strong class="pname"><code>parentid</code></strong> (integer) - object id of the parent (referenced) row</li>
+        <li><strong class="pname"><code>reftable</code></strong> (string) - name of the referencing table</li>
+        <li><strong class="pname"><code>refcolumn</code></strong> (string) - name of the referencing column</li>
+    </ul></dd>
+    <dt>Returns: iterator</dt>
+        <dd>iterator over the specifies, referencing rows</dd>
+  </dl>
+</td></tr></table>
+</div>
+<a name="IDLIST"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">IDLIST</span>(<span class="sig-arg">tablename</span>,
+        <span class="sig-arg">**kwargs</span>)</span>
+    <br /><em class="fname">Static Method</em>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="ProvCon.dbui.orm.record-pysrc.html#Record.IDLIST">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>Return a list of object ids from a given table.</p>
+  <p>keyword arguments:</p>
+  <ul>
+    <li>
+      where
+    </li>
+    <li>
+      order
+    </li>
+    <li>
+      limit
+    </li>
+    <li>
+      offset
+    </li>
+  </ul>
+  <p>are inserted into the SQL query in appropriate places.</p>
+  <dl class="fields">
+    <dt>Parameters:</dt>
+    <dd><ul class="nomargin-top">
+        <li><strong class="pname"><code>tablename</code></strong> (string) - name of the table</li>
+    </ul></dd>
+    <dt>Returns: list</dt>
+        <dd>list of object ids</dd>
+  </dl>
+</td></tr></table>
+</div>
+<br />
+<!-- ==================== PROPERTY DETAILS ==================== -->
+<a name="section-PropertyDetails"></a>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="table-header">
+  <td colspan="2" class="table-header">
+    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+      <tr valign="top">
+        <td align="left"><span class="table-header">Property Details</span></td>
+        <td align="right" valign="top"
+         ><span class="options">[<a href="#section-PropertyDetails"
+         class="privatelink" onclick="toggle_private();"
+         >hide private</a>]</span></td>
+      </tr>
+    </table>
+  </td>
+</tr>
+</table>
+<a name="isModified"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <h3 class="epydoc">isModified</h3>
+  <p><code>True</code> if the record was edited since last read, write</p>
+  <dl class="fields">
+    <dt>Get Method:</dt>
+    <dd class="value"><span class="summary-sig"><a href="ProvCon.dbui.orm.record.Record-class.html#__is_modified" class="summary-sig-name" onclick="show_private();">__is_modified</a>(<span class="summary-sig-arg">self</span>)</span>
+    </dd>
+  </dl>
+</td></tr></table>
+</div>
+<a name="isNew"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <h3 class="epydoc">isNew</h3>
+  <p><code>True</code> if the record is new (not yet written to the 
+  database, objectid == None)</p>
+  <dl class="fields">
+    <dt>Get Method:</dt>
+    <dd class="value"><span class="summary-sig"><a href="ProvCon.dbui.orm.record.Record-class.html#__is_new" class="summary-sig-name" onclick="show_private();">__is_new</a>(<span class="summary-sig-arg">self</span>)</span>
+    </dd>
+  </dl>
+</td></tr></table>
+</div>
+<a name="hasData"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <h3 class="epydoc">hasData</h3>
+  <p><code>True</code> if the record holds data read from the database</p>
+  <dl class="fields">
+    <dt>Get Method:</dt>
+    <dd class="value"><span class="summary-sig"><a href="ProvCon.dbui.orm.record.Record-class.html#__hasdata" class="summary-sig-name" onclick="show_private();">__hasdata</a>(<span class="summary-sig-arg">self</span>)</span>
+    </dd>
+  </dl>
+</td></tr></table>
+</div>
+<a name="isInstalled"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <h3 class="epydoc">isInstalled</h3>
+  <p><code>True</code> if the record has a table schema installed</p>
+  <dl class="fields">
+    <dt>Get Method:</dt>
+    <dd class="value"><span class="summary-sig"><a href="ProvCon.dbui.orm.record.Record-class.html#__is_installed" class="summary-sig-name" onclick="show_private();">__is_installed</a>(<span class="summary-sig-arg">self</span>)</span>
+    </dd>
+  </dl>
+</td></tr></table>
+</div>
+<br />
+<!-- ==================== NAVIGATION BAR ==================== -->
+<table class="navbar" border="0" width="100%" cellpadding="0"
+       bgcolor="#a0c0ff" cellspacing="0">
+  <tr valign="middle">
+  <!-- Home link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="ProvCon-module.html">Home</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Tree link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="module-tree.html">Trees</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Index link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="identifier-index.html">Indices</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Help link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="help.html">Help</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Project homepage -->
+      <th class="navbar" align="right" width="100%">
+        <table border="0" cellpadding="0" cellspacing="0">
+          <tr><th class="navbar" align="center"
+            >docsis-provisioning</th>
+          </tr></table></th>
+  </tr>
+</table>
+<table border="0" cellpadding="0" cellspacing="0" width="100%%">
+  <tr>
+    <td align="left" class="footer">
+    Generated by Epydoc 3.0.1 on Thu Jan  8 14:48:52 2009
+    </td>
+    <td align="right" class="footer">
+      <a target="mainFrame" href="http://epydoc.sourceforge.net"
+        >http://epydoc.sourceforge.net</a>
+    </td>
+  </tr>
+</table>
+
+<script type="text/javascript">
+  <!--
+  // Private objects are initially displayed (because if
+  // javascript is turned off then we want them to be
+  // visible); but by default, we want to hide them.  So hide
+  // them unless we have a cookie that says to show them.
+  checkCookie();
+  // -->
+</script>
+</body>
+</html>

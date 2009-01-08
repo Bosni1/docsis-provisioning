@@ -1,0 +1,422 @@
+<?xml version="1.0" encoding="ascii"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+          "DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+  <title>ProvCon.cli</title>
+  <link rel="stylesheet" href="epydoc.css" type="text/css" />
+  <script type="text/javascript" src="epydoc.js"></script>
+</head>
+
+<body bgcolor="white" text="black" link="blue" vlink="#204080"
+      alink="#204080">
+<!-- ==================== NAVIGATION BAR ==================== -->
+<table class="navbar" border="0" width="100%" cellpadding="0"
+       bgcolor="#a0c0ff" cellspacing="0">
+  <tr valign="middle">
+  <!-- Home link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="ProvCon-module.html">Home</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Tree link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="module-tree.html">Trees</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Index link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="identifier-index.html">Indices</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Help link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="help.html">Help</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Project homepage -->
+      <th class="navbar" align="right" width="100%">
+        <table border="0" cellpadding="0" cellspacing="0">
+          <tr><th class="navbar" align="center"
+            >docsis-provisioning</th>
+          </tr></table></th>
+  </tr>
+</table>
+<table width="100%" cellpadding="0" cellspacing="0">
+  <tr valign="top">
+    <td width="100%">
+      <span class="breadcrumbs">
+        <a href="ProvCon-module.html">Package&nbsp;ProvCon</a> ::
+        Module&nbsp;cli
+      </span>
+    </td>
+    <td>
+      <table cellpadding="0" cellspacing="0">
+        <!-- hide/show private -->
+        <tr><td align="right"><span class="options">[<a href="javascript:void(0);" class="privatelink"
+    onclick="toggle_private();">hide&nbsp;private</a>]</span></td></tr>
+        <tr><td align="right"><span class="options"
+            >[<a href="frames.html" target="_top">frames</a
+            >]&nbsp;|&nbsp;<a href="ProvCon.cli-pysrc.html"
+            target="_top">no&nbsp;frames</a>]</span></td></tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<h1 class="epydoc">Source Code for <a href="ProvCon.cli-module.html">Module ProvCon.cli</a></h1>
+<pre class="py-src">
+<a name="L1"></a><tt class="py-lineno">  1</tt>  <tt class="py-line"><tt class="py-comment">#!/bin/env python</tt> </tt>
+<a name="L2"></a><tt class="py-lineno">  2</tt>  <tt class="py-line"><tt class="py-keyword">import</tt> <tt id="link-0" class="py-name" targets="Package ProvCon=ProvCon-module.html"><a title="ProvCon" class="py-name" href="#" onclick="return doclink('link-0', 'ProvCon', 'link-0');">ProvCon</a></tt> </tt>
+<a name="L3"></a><tt class="py-lineno">  3</tt>  <tt class="py-line"><tt class="py-keyword">from</tt> <tt class="py-name">multiprocessing</tt> <tt class="py-keyword">import</tt> <tt class="py-name">Process</tt> </tt>
+<a name="L4"></a><tt class="py-lineno">  4</tt>  <tt class="py-line"><tt class="py-keyword">from</tt> <tt class="py-name">threading</tt> <tt class="py-keyword">import</tt> <tt class="py-name">Thread</tt> </tt>
+<a name="L5"></a><tt class="py-lineno">  5</tt>  <tt class="py-line"><tt class="py-keyword">import</tt> <tt class="py-name">Queue</tt> <tt class="py-keyword">as</tt> <tt class="py-name">ThreadingQueue</tt> </tt>
+<a name="L6"></a><tt class="py-lineno">  6</tt>  <tt class="py-line"> </tt>
+<a name="L7"></a><tt class="py-lineno">  7</tt>  <tt class="py-line"><tt class="py-keyword">from</tt> <tt class="py-name">multiprocessing</tt><tt class="py-op">.</tt><tt class="py-name">connection</tt> <tt class="py-keyword">import</tt> <tt class="py-name">Listener</tt><tt class="py-op">,</tt> <tt id="link-1" class="py-name" targets="Module ProvCon.TFTP.Client=ProvCon.TFTP.Client-module.html"><a title="ProvCon.TFTP.Client" class="py-name" href="#" onclick="return doclink('link-1', 'Client', 'link-1');">Client</a></tt> </tt>
+<a name="L8"></a><tt class="py-lineno">  8</tt>  <tt class="py-line"><tt class="py-keyword">import</tt> <tt class="py-name">select</tt><tt class="py-op">,</tt> <tt class="py-name">os</tt><tt class="py-op">,</tt> <tt class="py-name">sys</tt> </tt>
+<a name="L9"></a><tt class="py-lineno">  9</tt>  <tt class="py-line"><tt class="py-keyword">import</tt> <tt id="link-2" class="py-name" targets="Module ProvCon.ui=ProvCon.ui-module.html,Function ProvCon.ui.ui()=ProvCon.ui-module.html#ui"><a title="ProvCon.ui
+ProvCon.ui.ui" class="py-name" href="#" onclick="return doclink('link-2', 'ui', 'link-2');">ui</a></tt> </tt>
+<a name="L10"></a><tt class="py-lineno"> 10</tt>  <tt class="py-line"> </tt>
+<a name="CLIWorker"></a><div id="CLIWorker-def"><a name="L11"></a><tt class="py-lineno"> 11</tt> <a class="py-toggle" href="#" id="CLIWorker-toggle" onclick="return toggle('CLIWorker');">-</a><tt class="py-line"><tt class="py-keyword">class</tt> <a class="py-def-name" href="ProvCon.cli.CLIWorker-class.html">CLIWorker</a><tt class="py-op">(</tt><tt class="py-base-class">Thread</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="CLIWorker-collapsed" style="display:none;" pad="+++" indent="++++"></div><div id="CLIWorker-expanded"><a name="CLIWorker.__init__"></a><div id="CLIWorker.__init__-def"><a name="L12"></a><tt class="py-lineno"> 12</tt> <a class="py-toggle" href="#" id="CLIWorker.__init__-toggle" onclick="return toggle('CLIWorker.__init__');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="ProvCon.cli.CLIWorker-class.html#__init__">__init__</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">,</tt> <tt class="py-param">queue</tt><tt class="py-op">,</tt> <tt class="py-param">logger</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="CLIWorker.__init__-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="CLIWorker.__init__-expanded"><a name="L13"></a><tt class="py-lineno"> 13</tt>  <tt class="py-line">        <tt class="py-name">Thread</tt><tt class="py-op">.</tt><tt id="link-3" class="py-name" targets="Method ProvCon.TFTP.Protocol.Packet.__init__()=ProvCon.TFTP.Protocol.Packet-class.html#__init__,Method ProvCon.TFTP.ProvisioningTFTP.BaseOven.__init__()=ProvCon.TFTP.ProvisioningTFTP.BaseOven-class.html#__init__,Method ProvCon.TFTP.ProvisioningTFTP.CableModemConfigCook.__init__()=ProvCon.TFTP.ProvisioningTFTP.CableModemConfigCook-class.html#__init__,Method ProvCon.TFTP.ProvisioningTFTP.FileCook.__init__()=ProvCon.TFTP.ProvisioningTFTP.FileCook-class.html#__init__,Method ProvCon.TFTP.ProvisioningTFTP.ProvisioningTFTPServer.__init__()=ProvCon.TFTP.ProvisioningTFTP.ProvisioningTFTPServer-class.html#__init__,Method ProvCon.TFTP.ProvisioningTFTP.TFTPDataSender.__init__()=ProvCon.TFTP.ProvisioningTFTP.TFTPDataSender-class.html#__init__,Method ProvCon.TFTP.ProvisioningTFTP.pcTFTPD.__init__()=ProvCon.TFTP.ProvisioningTFTP.pcTFTPD-class.html#__init__,Method ProvCon.TFTP.Server.BaseTFTPServer.__init__()=ProvCon.TFTP.Server.BaseTFTPServer-class.html#__init__,Method ProvCon.cli.CLIServer.__init__()=ProvCon.cli.CLIServer-class.html#__init__,Method ProvCon.cli.CLIWorker.__init__()=ProvCon.cli.CLIWorker-class.html#__init__,Method ProvCon.dbui.abstractui.fields.BaseArrayEditor.__init__()=ProvCon.dbui.abstractui.fields.BaseArrayEditor-class.html#__init__,Method ProvCon.dbui.abstractui.fields.BaseArrayItemButtonBox.__init__()=ProvCon.dbui.abstractui.fields.BaseArrayItemButtonBox-class.html#__init__,Method ProvCon.dbui.abstractui.fields.BaseArrayItemEditor.__init__()=ProvCon.dbui.abstractui.fields.BaseArrayItemEditor-class.html#__init__,Method ProvCon.dbui.abstractui.fields.BaseFieldEditor.__init__()=ProvCon.dbui.abstractui.fields.BaseFieldEditor-class.html#__init__,Method ProvCon.dbui.abstractui.fields.BaseReferenceEditor.__init__()=ProvCon.dbui.abstractui.fields.BaseReferenceEditor-class.html#__init__,Method ProvCon.dbui.abstractui.forms.BaseForm.__init__()=ProvCon.dbui.abstractui.forms.BaseForm-class.html#__init__,Method ProvCon.dbui.abstractui.navigators.BaseNavigator.__init__()=ProvCon.dbui.abstractui.navigators.BaseNavigator-class.html#__init__,Method ProvCon.dbui.abstractui.recordlists.BasePager.__init__()=ProvCon.dbui.abstractui.recordlists.BasePager-class.html#__init__,Method ProvCon.dbui.abstractui.recordlists.BaseRecordList.__init__()=ProvCon.dbui.abstractui.recordlists.BaseRecordList-class.html#__init__,Method ProvCon.dbui.database.CFG.tCX.__init__()=ProvCon.dbui.database.CFG.tCX-class.html#__init__,Method ProvCon.dbui.di.rObject'.ObjectFlags.__init__()=ProvCon.dbui.di.rObject%27.ObjectFlags-class.html#__init__,Method ProvCon.dbui.di.rObject'.ObjectParams.__init__()=ProvCon.dbui.di.rObject%27.ObjectParams-class.html#__init__,Method ProvCon.dbui.di.rObject'.rObject.__init__()=ProvCon.dbui.di.rObject%27.rObject-class.html#__init__,Method ProvCon.dbui.meta.field.Field.__init__()=ProvCon.dbui.meta.field.Field-class.html#__init__,Method ProvCon.dbui.meta.table.Table.__init__()=ProvCon.dbui.meta.table.Table-class.html#__init__,Method ProvCon.dbui.orm.form.Form.__init__()=ProvCon.dbui.orm.form.Form-class.html#__init__,Method ProvCon.dbui.orm.record.Record.DataManipulationError.__init__()=ProvCon.dbui.orm.record.Record.DataManipulationError-class.html#__init__,Method ProvCon.dbui.orm.record.Record.DataQueryError.__init__()=ProvCon.dbui.orm.record.Record.DataQueryError-class.html#__init__,Method ProvCon.dbui.orm.record.Record.RecordNotFound.__init__()=ProvCon.dbui.orm.record.Record.RecordNotFound-class.html#__init__,Method ProvCon.dbui.orm.record.Record.__init__()=ProvCon.dbui.orm.record.Record-class.html#__init__,Method ProvCon.dbui.orm.recordlist.RecordList.__init__()=ProvCon.dbui.orm.recordlist.RecordList-class.html#__init__,Method ProvCon.dbui.orm.recordsearch.OIDSearchList.__init__()=ProvCon.dbui.orm.recordsearch.OIDSearchList-class.html#__init__,Method ProvCon.dbui.wxwin.complete.CompleteGenericForm.__init__()=ProvCon.dbui.wxwin.complete.CompleteGenericForm-class.html#__init__,Method ProvCon.dbui.wxwin.complete.FormToolbar.__init__()=ProvCon.dbui.wxwin.complete.FormToolbar-class.html#__init__,Method ProvCon.dbui.wxwin.complete.InfoPopup.__init__()=ProvCon.dbui.wxwin.complete.InfoPopup-class.html#__init__,Method ProvCon.dbui.wxwin.fields.Entry.ArrayCombo.__init__()=ProvCon.dbui.wxwin.fields.Entry.ArrayCombo-class.html#__init__,Method ProvCon.dbui.wxwin.fields.Entry.ArrayItemCombo.__init__()=ProvCon.dbui.wxwin.fields.Entry.ArrayItemCombo-class.html#__init__,Method ProvCon.dbui.wxwin.fields.Entry.ArrayItemStatic.__init__()=ProvCon.dbui.wxwin.fields.Entry.ArrayItemStatic-class.html#__init__,Method ProvCon.dbui.wxwin.fields.Entry.ArrayItemText.__init__()=ProvCon.dbui.wxwin.fields.Entry.ArrayItemText-class.html#__init__,Method ProvCon.dbui.wxwin.fields.Entry.ArrayText.__init__()=ProvCon.dbui.wxwin.fields.Entry.ArrayText-class.html#__init__,Method ProvCon.dbui.wxwin.fields.Entry.BaseArray.__init__()=ProvCon.dbui.wxwin.fields.Entry.BaseArray-class.html#__init__,Method ProvCon.dbui.wxwin.fields.Entry.Boolean.__init__()=ProvCon.dbui.wxwin.fields.Entry.Boolean-class.html#__init__,Method ProvCon.dbui.wxwin.fields.Entry.ComboReference.__init__()=ProvCon.dbui.wxwin.fields.Entry.ComboReference-class.html#__init__,Method ProvCon.dbui.wxwin.fields.Entry.Memo.__init__()=ProvCon.dbui.wxwin.fields.Entry.Memo-class.html#__init__,Method ProvCon.dbui.wxwin.fields.Entry.StandardArrayItemButtonBox.__init__()=ProvCon.dbui.wxwin.fields.Entry.StandardArrayItemButtonBox-class.html#__init__,Method ProvCon.dbui.wxwin.fields.Entry.Static.__init__()=ProvCon.dbui.wxwin.fields.Entry.Static-class.html#__init__,Method ProvCon.dbui.wxwin.fields.Entry.StaticReference.__init__()=ProvCon.dbui.wxwin.fields.Entry.StaticReference-class.html#__init__,Method ProvCon.dbui.wxwin.fields.Entry.Text.__init__()=ProvCon.dbui.wxwin.fields.Entry.Text-class.html#__init__,Method ProvCon.dbui.wxwin.forms.GenericForm.__init__()=ProvCon.dbui.wxwin.forms.GenericForm-class.html#__init__,Method ProvCon.dbui.wxwin.mwx.CheckBox.__init__()=ProvCon.dbui.wxwin.mwx.CheckBox-class.html#__init__,Method ProvCon.dbui.wxwin.mwx.ComboBox.__init__()=ProvCon.dbui.wxwin.mwx.ComboBox-class.html#__init__,Method ProvCon.dbui.wxwin.mwx.StaticText.__init__()=ProvCon.dbui.wxwin.mwx.StaticText-class.html#__init__,Method ProvCon.dbui.wxwin.mwx.TextCtrl.__init__()=ProvCon.dbui.wxwin.mwx.TextCtrl-class.html#__init__,Method ProvCon.dbui.wxwin.mwx.mwxControl.__init__()=ProvCon.dbui.wxwin.mwx.mwxControl-class.html#__init__,Method ProvCon.dbui.wxwin.navigators.Navigator.__init__()=ProvCon.dbui.wxwin.navigators.Navigator-class.html#__init__,Method ProvCon.dbui.wxwin.recordlists.RecordList.__init__()=ProvCon.dbui.wxwin.recordlists.RecordList-class.html#__init__,Method ProvCon.docsis.cablemodem.cablemodem.__init__()=ProvCon.docsis.cablemodem.cablemodem-class.html#__init__,Method ProvCon.docsis.cablemodem.cablemodem._cos.__init__()=ProvCon.docsis.cablemodem.cablemodem._cos-class.html#__init__,Method ProvCon.docsis.cablemodem.cablemodem._cpe.__init__()=ProvCon.docsis.cablemodem.cablemodem._cpe-class.html#__init__,Method ProvCon.docsis.cablemodem.cablemodem._mac.__init__()=ProvCon.docsis.cablemodem.cablemodem._mac-class.html#__init__,Method ProvCon.docsis.compiler.config.config.__init__()=ProvCon.docsis.compiler.config.config-class.html#__init__,Method ProvCon.docsis.compiler.encoder.error.__init__()=ProvCon.docsis.compiler.encoder.error-class.html#__init__,Method ProvCon.docsis.compiler.encoder.tlv.__init__()=ProvCon.docsis.compiler.encoder.tlv-class.html#__init__,Method ProvCon.docsis.compiler.encoder.tlv_multipart.__init__()=ProvCon.docsis.compiler.encoder.tlv_multipart-class.html#__init__,Method ProvCon.docsis.compiler.encoder.tlv_multipart.append_proxy.__init__()=ProvCon.docsis.compiler.encoder.tlv_multipart.append_proxy-class.html#__init__,Method ProvCon.docsis.compiler.encoder.tlv_multipart.iterator.__init__()=ProvCon.docsis.compiler.encoder.tlv_multipart.iterator-class.html#__init__,Method ProvCon.docsis.compiler.encoder.tlv_multipart_subclass.__init__()=ProvCon.docsis.compiler.encoder.tlv_multipart_subclass-class.html#__init__,Method ProvCon.docsis.compiler.encoder.tlv_subclass.__init__()=ProvCon.docsis.compiler.encoder.tlv_subclass-class.html#__init__,Method ProvCon.func.classes.conditionalmethod.__init__()=ProvCon.func.classes.conditionalmethod-class.html#__init__,Method ProvCon.func.events.eventemitter.__init__()=ProvCon.func.events.eventemitter-class.html#__init__,Method ProvCon.func.events.eventemitter.evt.__init__()=ProvCon.func.events.eventemitter.evt-class.html#__init__,Method ProvCon.func.events.eventemitter.evthook.__init__()=ProvCon.func.events.eventemitter.evthook-class.html#__init__,Method ProvCon.func.events.eventexception.__init__()=ProvCon.func.events.eventexception-class.html#__init__,Method ProvCon.func.variables.TracedVariable.Tracer.__init__()=ProvCon.func.variables.TracedVariable.Tracer-class.html#__init__,Method ProvCon.func.variables.TracedVariable.__init__()=ProvCon.func.variables.TracedVariable-class.html#__init__,Method ProvCon.gui.FrontEndApp.FE.__init__()=ProvCon.gui.FrontEndApp.FE-class.html#__init__,Method ProvCon.gui.ProvisioningControl.GenericObjectEditor.__init__()=ProvCon.gui.ProvisioningControl.GenericObjectEditor-class.html#__init__,Method ProvCon.gui.ProvisioningControl.GridView.__init__()=ProvCon.gui.ProvisioningControl.GridView-class.html#__init__,Method ProvCon.gui.ProvisioningControl.MainTab.__init__()=ProvCon.gui.ProvisioningControl.MainTab-class.html#__init__,Method ProvCon.gui.ProvisioningControl.ObjectEditorModel.__init__()=ProvCon.gui.ProvisioningControl.ObjectEditorModel-class.html#__init__,Method ProvCon.gui.ProvisioningControl.TopLevelWindow.__init__()=ProvCon.gui.ProvisioningControl.TopLevelWindow-class.html#__init__,Method ProvCon.log.LoggingBackend.__init__()=ProvCon.log.LoggingBackend-class.html#__init__,Method ProvCon.log.LoggingClient.__init__()=ProvCon.log.LoggingClient-class.html#__init__,Method ProvCon.log.LoggingServer.__init__()=ProvCon.log.LoggingServer-class.html#__init__,Method ProvCon.ui.uierror.__init__()=ProvCon.ui.uierror-class.html#__init__,Method ProvCon.wronolib.ipaddr.ip4addr.__init__()=ProvCon.wronolib.ipaddr.ip4addr-class.html#__init__,Method ProvCon.wronolib.ipaddr.ip4prefix.__init__()=ProvCon.wronolib.ipaddr.ip4prefix-class.html#__init__"><a title="ProvCon.TFTP.Protocol.Packet.__init__
+ProvCon.TFTP.ProvisioningTFTP.BaseOven.__init__
+ProvCon.TFTP.ProvisioningTFTP.CableModemConfigCook.__init__
+ProvCon.TFTP.ProvisioningTFTP.FileCook.__init__
+ProvCon.TFTP.ProvisioningTFTP.ProvisioningTFTPServer.__init__
+ProvCon.TFTP.ProvisioningTFTP.TFTPDataSender.__init__
+ProvCon.TFTP.ProvisioningTFTP.pcTFTPD.__init__
+ProvCon.TFTP.Server.BaseTFTPServer.__init__
+ProvCon.cli.CLIServer.__init__
+ProvCon.cli.CLIWorker.__init__
+ProvCon.dbui.abstractui.fields.BaseArrayEditor.__init__
+ProvCon.dbui.abstractui.fields.BaseArrayItemButtonBox.__init__
+ProvCon.dbui.abstractui.fields.BaseArrayItemEditor.__init__
+ProvCon.dbui.abstractui.fields.BaseFieldEditor.__init__
+ProvCon.dbui.abstractui.fields.BaseReferenceEditor.__init__
+ProvCon.dbui.abstractui.forms.BaseForm.__init__
+ProvCon.dbui.abstractui.navigators.BaseNavigator.__init__
+ProvCon.dbui.abstractui.recordlists.BasePager.__init__
+ProvCon.dbui.abstractui.recordlists.BaseRecordList.__init__
+ProvCon.dbui.database.CFG.tCX.__init__
+ProvCon.dbui.di.rObject'.ObjectFlags.__init__
+ProvCon.dbui.di.rObject'.ObjectParams.__init__
+ProvCon.dbui.di.rObject'.rObject.__init__
+ProvCon.dbui.meta.field.Field.__init__
+ProvCon.dbui.meta.table.Table.__init__
+ProvCon.dbui.orm.form.Form.__init__
+ProvCon.dbui.orm.record.Record.DataManipulationError.__init__
+ProvCon.dbui.orm.record.Record.DataQueryError.__init__
+ProvCon.dbui.orm.record.Record.RecordNotFound.__init__
+ProvCon.dbui.orm.record.Record.__init__
+ProvCon.dbui.orm.recordlist.RecordList.__init__
+ProvCon.dbui.orm.recordsearch.OIDSearchList.__init__
+ProvCon.dbui.wxwin.complete.CompleteGenericForm.__init__
+ProvCon.dbui.wxwin.complete.FormToolbar.__init__
+ProvCon.dbui.wxwin.complete.InfoPopup.__init__
+ProvCon.dbui.wxwin.fields.Entry.ArrayCombo.__init__
+ProvCon.dbui.wxwin.fields.Entry.ArrayItemCombo.__init__
+ProvCon.dbui.wxwin.fields.Entry.ArrayItemStatic.__init__
+ProvCon.dbui.wxwin.fields.Entry.ArrayItemText.__init__
+ProvCon.dbui.wxwin.fields.Entry.ArrayText.__init__
+ProvCon.dbui.wxwin.fields.Entry.BaseArray.__init__
+ProvCon.dbui.wxwin.fields.Entry.Boolean.__init__
+ProvCon.dbui.wxwin.fields.Entry.ComboReference.__init__
+ProvCon.dbui.wxwin.fields.Entry.Memo.__init__
+ProvCon.dbui.wxwin.fields.Entry.StandardArrayItemButtonBox.__init__
+ProvCon.dbui.wxwin.fields.Entry.Static.__init__
+ProvCon.dbui.wxwin.fields.Entry.StaticReference.__init__
+ProvCon.dbui.wxwin.fields.Entry.Text.__init__
+ProvCon.dbui.wxwin.forms.GenericForm.__init__
+ProvCon.dbui.wxwin.mwx.CheckBox.__init__
+ProvCon.dbui.wxwin.mwx.ComboBox.__init__
+ProvCon.dbui.wxwin.mwx.StaticText.__init__
+ProvCon.dbui.wxwin.mwx.TextCtrl.__init__
+ProvCon.dbui.wxwin.mwx.mwxControl.__init__
+ProvCon.dbui.wxwin.navigators.Navigator.__init__
+ProvCon.dbui.wxwin.recordlists.RecordList.__init__
+ProvCon.docsis.cablemodem.cablemodem.__init__
+ProvCon.docsis.cablemodem.cablemodem._cos.__init__
+ProvCon.docsis.cablemodem.cablemodem._cpe.__init__
+ProvCon.docsis.cablemodem.cablemodem._mac.__init__
+ProvCon.docsis.compiler.config.config.__init__
+ProvCon.docsis.compiler.encoder.error.__init__
+ProvCon.docsis.compiler.encoder.tlv.__init__
+ProvCon.docsis.compiler.encoder.tlv_multipart.__init__
+ProvCon.docsis.compiler.encoder.tlv_multipart.append_proxy.__init__
+ProvCon.docsis.compiler.encoder.tlv_multipart.iterator.__init__
+ProvCon.docsis.compiler.encoder.tlv_multipart_subclass.__init__
+ProvCon.docsis.compiler.encoder.tlv_subclass.__init__
+ProvCon.func.classes.conditionalmethod.__init__
+ProvCon.func.events.eventemitter.__init__
+ProvCon.func.events.eventemitter.evt.__init__
+ProvCon.func.events.eventemitter.evthook.__init__
+ProvCon.func.events.eventexception.__init__
+ProvCon.func.variables.TracedVariable.Tracer.__init__
+ProvCon.func.variables.TracedVariable.__init__
+ProvCon.gui.FrontEndApp.FE.__init__
+ProvCon.gui.ProvisioningControl.GenericObjectEditor.__init__
+ProvCon.gui.ProvisioningControl.GridView.__init__
+ProvCon.gui.ProvisioningControl.MainTab.__init__
+ProvCon.gui.ProvisioningControl.ObjectEditorModel.__init__
+ProvCon.gui.ProvisioningControl.TopLevelWindow.__init__
+ProvCon.log.LoggingBackend.__init__
+ProvCon.log.LoggingClient.__init__
+ProvCon.log.LoggingServer.__init__
+ProvCon.ui.uierror.__init__
+ProvCon.wronolib.ipaddr.ip4addr.__init__
+ProvCon.wronolib.ipaddr.ip4prefix.__init__" class="py-name" href="#" onclick="return doclink('link-3', '__init__', 'link-3');">__init__</a></tt><tt class="py-op">(</tt><tt class="py-name">self</tt><tt class="py-op">,</tt> <tt class="py-name">None</tt><tt class="py-op">,</tt> <tt class="py-name">None</tt><tt class="py-op">,</tt> <tt class="py-string">"pcUIw"</tt><tt class="py-op">)</tt> </tt>
+<a name="L14"></a><tt class="py-lineno"> 14</tt>  <tt class="py-line">        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">queue</tt> <tt class="py-op">=</tt> <tt class="py-name">queue</tt> </tt>
+<a name="L15"></a><tt class="py-lineno"> 15</tt>  <tt class="py-line">        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">logger</tt> <tt class="py-op">=</tt> <tt class="py-name">logger</tt> </tt>
+<a name="L16"></a><tt class="py-lineno"> 16</tt>  <tt class="py-line">        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">start</tt><tt class="py-op">(</tt><tt class="py-op">)</tt> </tt>
+</div><a name="L17"></a><tt class="py-lineno"> 17</tt>  <tt class="py-line">     </tt>
+<a name="CLIWorker.run"></a><div id="CLIWorker.run-def"><a name="L18"></a><tt class="py-lineno"> 18</tt> <a class="py-toggle" href="#" id="CLIWorker.run-toggle" onclick="return toggle('CLIWorker.run');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="ProvCon.cli.CLIWorker-class.html#run">run</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">)</tt><tt class="py-op">:</tt>         </tt>
+</div><a name="L19"></a><tt class="py-lineno"> 19</tt>  <tt class="py-line">        <tt id="link-4" class="py-name"><a title="ProvCon" class="py-name" href="#" onclick="return doclink('link-4', 'ProvCon', 'link-0');">ProvCon</a></tt><tt class="py-op">.</tt><tt id="link-5" class="py-name" targets="Function ProvCon.wronolib.procname.set_process_name()=ProvCon.wronolib.procname-module.html#set_process_name"><a title="ProvCon.wronolib.procname.set_process_name" class="py-name" href="#" onclick="return doclink('link-5', 'set_process_name', 'link-5');">set_process_name</a></tt> <tt class="py-op">(</tt> <tt class="py-string">"0@@UI_JOB"</tt> <tt class="py-op">)</tt> </tt>
+<a name="L20"></a><tt class="py-lineno"> 20</tt>  <tt class="py-line">        <tt class="py-keyword">while</tt> <tt class="py-name">True</tt><tt class="py-op">:</tt> </tt>
+<a name="L21"></a><tt class="py-lineno"> 21</tt>  <tt class="py-line">            <tt class="py-name">msg</tt><tt class="py-op">,</tt> <tt class="py-name">cnx</tt> <tt class="py-op">=</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">queue</tt><tt class="py-op">.</tt><tt id="link-6" class="py-name" targets="Method ProvCon.dbui.orm.recordsearch.OIDSearchList.get()=ProvCon.dbui.orm.recordsearch.OIDSearchList-class.html#get,Method ProvCon.func.variables.TracedVariable.get()=ProvCon.func.variables.TracedVariable-class.html#get"><a title="ProvCon.dbui.orm.recordsearch.OIDSearchList.get
+ProvCon.func.variables.TracedVariable.get" class="py-name" href="#" onclick="return doclink('link-6', 'get', 'link-6');">get</a></tt><tt class="py-op">(</tt><tt class="py-op">)</tt>                </tt>
+<a name="L22"></a><tt class="py-lineno"> 22</tt>  <tt class="py-line">            <tt class="py-keyword">if</tt> <tt class="py-name">msg</tt> <tt class="py-keyword">is</tt> <tt class="py-name">None</tt><tt class="py-op">:</tt> <tt class="py-keyword">break</tt> </tt>
+<a name="L23"></a><tt class="py-lineno"> 23</tt>  <tt class="py-line">            <tt class="py-name">result</tt> <tt class="py-op">=</tt> <tt class="py-name">None</tt> </tt>
+<a name="L24"></a><tt class="py-lineno"> 24</tt>  <tt class="py-line">            <tt class="py-keyword">try</tt><tt class="py-op">:</tt> </tt>
+<a name="L25"></a><tt class="py-lineno"> 25</tt>  <tt class="py-line">                <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">logger</tt> <tt class="py-op">(</tt> <tt class="py-op">`</tt><tt class="py-name">msg</tt><tt class="py-op">`</tt> <tt class="py-op">)</tt>             </tt>
+<a name="L26"></a><tt class="py-lineno"> 26</tt>  <tt class="py-line">                <tt class="py-name">result</tt> <tt class="py-op">=</tt> <tt id="link-7" class="py-name"><a title="ProvCon.ui
+ProvCon.ui.ui" class="py-name" href="#" onclick="return doclink('link-7', 'ui', 'link-2');">ui</a></tt><tt class="py-op">.</tt><tt id="link-8" class="py-name" targets="Function ProvCon.ui.action()=ProvCon.ui-module.html#action"><a title="ProvCon.ui.action" class="py-name" href="#" onclick="return doclink('link-8', 'action', 'link-8');">action</a></tt> <tt class="py-op">(</tt> <tt class="py-name">msg</tt><tt class="py-op">[</tt><tt class="py-string">'path'</tt><tt class="py-op">]</tt><tt class="py-op">,</tt> <tt class="py-name">None</tt><tt class="py-op">,</tt> <tt class="py-op">**</tt><tt class="py-name">msg</tt><tt class="py-op">[</tt><tt class="py-string">'args'</tt><tt class="py-op">]</tt> <tt class="py-op">)</tt> </tt>
+<a name="L27"></a><tt class="py-lineno"> 27</tt>  <tt class="py-line">            <tt class="py-keyword">except</tt> <tt id="link-9" class="py-name"><a title="ProvCon.ui
+ProvCon.ui.ui" class="py-name" href="#" onclick="return doclink('link-9', 'ui', 'link-2');">ui</a></tt><tt class="py-op">.</tt><tt id="link-10" class="py-name" targets="Class ProvCon.ui.uierror=ProvCon.ui.uierror-class.html"><a title="ProvCon.ui.uierror" class="py-name" href="#" onclick="return doclink('link-10', 'uierror', 'link-10');">uierror</a></tt> <tt class="py-keyword">as</tt> <tt class="py-name">err</tt><tt class="py-op">:</tt> </tt>
+<a name="L28"></a><tt class="py-lineno"> 28</tt>  <tt class="py-line">                <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">logger</tt> <tt class="py-op">(</tt> <tt class="py-string">"Failure! %s"</tt> <tt class="py-op">%</tt> <tt class="py-name">str</tt><tt class="py-op">(</tt><tt class="py-name">err</tt><tt class="py-op">)</tt> <tt class="py-op">)</tt> </tt>
+<a name="L29"></a><tt class="py-lineno"> 29</tt>  <tt class="py-line">                <tt class="py-name">cnx</tt><tt class="py-op">.</tt><tt class="py-name">send</tt> <tt class="py-op">(</tt> <tt class="py-op">{</tt> <tt class="py-string">'result'</tt> <tt class="py-op">:</tt> <tt class="py-name">None</tt><tt class="py-op">,</tt> <tt class="py-string">'error'</tt> <tt class="py-op">:</tt> <tt class="py-name">str</tt><tt class="py-op">(</tt><tt class="py-name">err</tt><tt class="py-op">)</tt><tt class="py-op">}</tt> <tt class="py-op">)</tt> </tt>
+<a name="L30"></a><tt class="py-lineno"> 30</tt>  <tt class="py-line">            <tt class="py-keyword">except</tt><tt class="py-op">:</tt> </tt>
+<a name="L31"></a><tt class="py-lineno"> 31</tt>  <tt class="py-line">                <tt id="link-11" class="py-name" targets="Method ProvCon.func.variables.TracedVariable.info()=ProvCon.func.variables.TracedVariable-class.html#info"><a title="ProvCon.func.variables.TracedVariable.info" class="py-name" href="#" onclick="return doclink('link-11', 'info', 'link-11');">info</a></tt> <tt class="py-op">=</tt> <tt class="py-name">sys</tt><tt class="py-op">.</tt><tt class="py-name">exc_info</tt><tt class="py-op">(</tt><tt class="py-op">)</tt><tt class="py-op">[</tt><tt class="py-op">:</tt><tt class="py-number">2</tt><tt class="py-op">]</tt> </tt>
+<a name="L32"></a><tt class="py-lineno"> 32</tt>  <tt class="py-line">                <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">logger</tt> <tt class="py-op">(</tt> <tt class="py-string">"Error: [%s, %s]"</tt> <tt class="py-op">%</tt> <tt class="py-op">(</tt><tt id="link-12" class="py-name"><a title="ProvCon.func.variables.TracedVariable.info" class="py-name" href="#" onclick="return doclink('link-12', 'info', 'link-11');">info</a></tt><tt class="py-op">[</tt><tt class="py-number">0</tt><tt class="py-op">]</tt><tt class="py-op">,</tt> <tt id="link-13" class="py-name"><a title="ProvCon.func.variables.TracedVariable.info" class="py-name" href="#" onclick="return doclink('link-13', 'info', 'link-11');">info</a></tt><tt class="py-op">[</tt><tt class="py-number">1</tt><tt class="py-op">]</tt><tt class="py-op">)</tt> <tt class="py-op">)</tt> </tt>
+<a name="L33"></a><tt class="py-lineno"> 33</tt>  <tt class="py-line">                 </tt>
+<a name="L34"></a><tt class="py-lineno"> 34</tt>  <tt class="py-line">            <tt class="py-keyword">try</tt><tt class="py-op">:</tt> </tt>
+<a name="L35"></a><tt class="py-lineno"> 35</tt>  <tt class="py-line">                <tt class="py-name">cnx</tt><tt class="py-op">.</tt><tt class="py-name">send</tt> <tt class="py-op">(</tt> <tt class="py-op">{</tt><tt class="py-string">'result'</tt> <tt class="py-op">:</tt> <tt class="py-name">result</tt><tt class="py-op">}</tt> <tt class="py-op">)</tt> </tt>
+<a name="L36"></a><tt class="py-lineno"> 36</tt>  <tt class="py-line">            <tt class="py-keyword">except</tt><tt class="py-op">:</tt> </tt>
+<a name="L37"></a><tt class="py-lineno"> 37</tt>  <tt class="py-line">                <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">logger</tt> <tt class="py-op">(</tt> <tt class="py-string">"Error in send!"</tt> <tt class="py-op">)</tt> </tt>
+<a name="L38"></a><tt class="py-lineno"> 38</tt>  <tt class="py-line">                <tt class="py-keyword">pass</tt> </tt>
+</div></div><a name="L39"></a><tt class="py-lineno"> 39</tt>  <tt class="py-line">                                 </tt>
+<a name="CLIServer"></a><div id="CLIServer-def"><a name="L40"></a><tt class="py-lineno"> 40</tt> <a class="py-toggle" href="#" id="CLIServer-toggle" onclick="return toggle('CLIServer');">-</a><tt class="py-line"><tt class="py-keyword">class</tt> <a class="py-def-name" href="ProvCon.cli.CLIServer-class.html">CLIServer</a> <tt class="py-op">(</tt><tt class="py-base-class">Listener</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="CLIServer-collapsed" style="display:none;" pad="+++" indent="++++"></div><div id="CLIServer-expanded"><a name="CLIServer.__init__"></a><div id="CLIServer.__init__-def"><a name="L41"></a><tt class="py-lineno"> 41</tt> <a class="py-toggle" href="#" id="CLIServer.__init__-toggle" onclick="return toggle('CLIServer.__init__');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="ProvCon.cli.CLIServer-class.html#__init__">__init__</a> <tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="CLIServer.__init__-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="CLIServer.__init__-expanded"><a name="L42"></a><tt class="py-lineno"> 42</tt>  <tt class="py-line">        <tt id="link-14" class="py-name" targets="Module ProvCon.dbui.config=ProvCon.dbui.config-module.html,Variable ProvCon.dbui.config.config=ProvCon.dbui.config-module.html#config,Module ProvCon.docsis.compiler.config=ProvCon.docsis.compiler.config-module.html,Class ProvCon.docsis.compiler.config.config=ProvCon.docsis.compiler.config.config-class.html"><a title="ProvCon.dbui.config
+ProvCon.dbui.config.config
+ProvCon.docsis.compiler.config
+ProvCon.docsis.compiler.config.config" class="py-name" href="#" onclick="return doclink('link-14', 'config', 'link-14');">config</a></tt> <tt class="py-op">=</tt> <tt id="link-15" class="py-name"><a title="ProvCon" class="py-name" href="#" onclick="return doclink('link-15', 'ProvCon', 'link-0');">ProvCon</a></tt><tt class="py-op">.</tt><tt id="link-16" class="py-name" targets="Function ProvCon.Configuration()=ProvCon-module.html#Configuration"><a title="ProvCon.Configuration" class="py-name" href="#" onclick="return doclink('link-16', 'Configuration', 'link-16');">Configuration</a></tt><tt class="py-op">(</tt><tt class="py-op">)</tt> </tt>
+<a name="L43"></a><tt class="py-lineno"> 43</tt>  <tt class="py-line">        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">logger</tt> <tt class="py-op">=</tt> <tt id="link-17" class="py-name"><a title="ProvCon" class="py-name" href="#" onclick="return doclink('link-17', 'ProvCon', 'link-0');">ProvCon</a></tt><tt class="py-op">.</tt><tt id="link-18" class="py-name" targets="Class ProvCon.log.LoggingClient=ProvCon.log.LoggingClient-class.html"><a title="ProvCon.log.LoggingClient" class="py-name" href="#" onclick="return doclink('link-18', 'LoggingClient', 'link-18');">LoggingClient</a></tt><tt class="py-op">(</tt><tt class="py-name">name</tt><tt class="py-op">=</tt><tt class="py-string">"UIHUB"</tt><tt class="py-op">)</tt> </tt>
+<a name="L44"></a><tt class="py-lineno"> 44</tt>  <tt class="py-line">        <tt class="py-name">addr</tt> <tt class="py-op">=</tt> <tt id="link-19" class="py-name"><a title="ProvCon" class="py-name" href="#" onclick="return doclink('link-19', 'ProvCon', 'link-0');">ProvCon</a></tt><tt class="py-op">.</tt><tt id="link-20" class="py-name" targets="Function ProvCon.parse_socket_address()=ProvCon-module.html#parse_socket_address"><a title="ProvCon.parse_socket_address" class="py-name" href="#" onclick="return doclink('link-20', 'parse_socket_address', 'link-20');">parse_socket_address</a></tt> <tt class="py-op">(</tt> <tt id="link-21" class="py-name"><a title="ProvCon.dbui.config
+ProvCon.dbui.config.config
+ProvCon.docsis.compiler.config
+ProvCon.docsis.compiler.config.config" class="py-name" href="#" onclick="return doclink('link-21', 'config', 'link-14');">config</a></tt><tt class="py-op">.</tt><tt id="link-22" class="py-name"><a title="ProvCon.dbui.orm.recordsearch.OIDSearchList.get
+ProvCon.func.variables.TracedVariable.get" class="py-name" href="#" onclick="return doclink('link-22', 'get', 'link-6');">get</a></tt> <tt class="py-op">(</tt> <tt class="py-string">"CLI"</tt><tt class="py-op">,</tt> <tt class="py-string">"server_address"</tt> <tt class="py-op">)</tt> <tt class="py-op">)</tt> </tt>
+<a name="L45"></a><tt class="py-lineno"> 45</tt>  <tt class="py-line">        <tt class="py-keyword">try</tt><tt class="py-op">:</tt> <tt class="py-name">os</tt><tt class="py-op">.</tt><tt class="py-name">unlink</tt> <tt class="py-op">(</tt><tt class="py-name">addr</tt><tt class="py-op">)</tt> </tt>
+<a name="L46"></a><tt class="py-lineno"> 46</tt>  <tt class="py-line">        <tt class="py-keyword">except</tt><tt class="py-op">:</tt> <tt class="py-keyword">pass</tt> </tt>
+<a name="L47"></a><tt class="py-lineno"> 47</tt>  <tt class="py-line">        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">logger</tt><tt class="py-op">(</tt> <tt class="py-string">"Starting. Listening on {0}"</tt><tt class="py-op">.</tt><tt class="py-name">format</tt> <tt class="py-op">(</tt><tt class="py-name">addr</tt><tt class="py-op">)</tt> <tt class="py-op">)</tt> </tt>
+<a name="L48"></a><tt class="py-lineno"> 48</tt>  <tt class="py-line">        <tt class="py-name">Listener</tt><tt class="py-op">.</tt><tt id="link-23" class="py-name"><a title="ProvCon.TFTP.Protocol.Packet.__init__
+ProvCon.TFTP.ProvisioningTFTP.BaseOven.__init__
+ProvCon.TFTP.ProvisioningTFTP.CableModemConfigCook.__init__
+ProvCon.TFTP.ProvisioningTFTP.FileCook.__init__
+ProvCon.TFTP.ProvisioningTFTP.ProvisioningTFTPServer.__init__
+ProvCon.TFTP.ProvisioningTFTP.TFTPDataSender.__init__
+ProvCon.TFTP.ProvisioningTFTP.pcTFTPD.__init__
+ProvCon.TFTP.Server.BaseTFTPServer.__init__
+ProvCon.cli.CLIServer.__init__
+ProvCon.cli.CLIWorker.__init__
+ProvCon.dbui.abstractui.fields.BaseArrayEditor.__init__
+ProvCon.dbui.abstractui.fields.BaseArrayItemButtonBox.__init__
+ProvCon.dbui.abstractui.fields.BaseArrayItemEditor.__init__
+ProvCon.dbui.abstractui.fields.BaseFieldEditor.__init__
+ProvCon.dbui.abstractui.fields.BaseReferenceEditor.__init__
+ProvCon.dbui.abstractui.forms.BaseForm.__init__
+ProvCon.dbui.abstractui.navigators.BaseNavigator.__init__
+ProvCon.dbui.abstractui.recordlists.BasePager.__init__
+ProvCon.dbui.abstractui.recordlists.BaseRecordList.__init__
+ProvCon.dbui.database.CFG.tCX.__init__
+ProvCon.dbui.di.rObject'.ObjectFlags.__init__
+ProvCon.dbui.di.rObject'.ObjectParams.__init__
+ProvCon.dbui.di.rObject'.rObject.__init__
+ProvCon.dbui.meta.field.Field.__init__
+ProvCon.dbui.meta.table.Table.__init__
+ProvCon.dbui.orm.form.Form.__init__
+ProvCon.dbui.orm.record.Record.DataManipulationError.__init__
+ProvCon.dbui.orm.record.Record.DataQueryError.__init__
+ProvCon.dbui.orm.record.Record.RecordNotFound.__init__
+ProvCon.dbui.orm.record.Record.__init__
+ProvCon.dbui.orm.recordlist.RecordList.__init__
+ProvCon.dbui.orm.recordsearch.OIDSearchList.__init__
+ProvCon.dbui.wxwin.complete.CompleteGenericForm.__init__
+ProvCon.dbui.wxwin.complete.FormToolbar.__init__
+ProvCon.dbui.wxwin.complete.InfoPopup.__init__
+ProvCon.dbui.wxwin.fields.Entry.ArrayCombo.__init__
+ProvCon.dbui.wxwin.fields.Entry.ArrayItemCombo.__init__
+ProvCon.dbui.wxwin.fields.Entry.ArrayItemStatic.__init__
+ProvCon.dbui.wxwin.fields.Entry.ArrayItemText.__init__
+ProvCon.dbui.wxwin.fields.Entry.ArrayText.__init__
+ProvCon.dbui.wxwin.fields.Entry.BaseArray.__init__
+ProvCon.dbui.wxwin.fields.Entry.Boolean.__init__
+ProvCon.dbui.wxwin.fields.Entry.ComboReference.__init__
+ProvCon.dbui.wxwin.fields.Entry.Memo.__init__
+ProvCon.dbui.wxwin.fields.Entry.StandardArrayItemButtonBox.__init__
+ProvCon.dbui.wxwin.fields.Entry.Static.__init__
+ProvCon.dbui.wxwin.fields.Entry.StaticReference.__init__
+ProvCon.dbui.wxwin.fields.Entry.Text.__init__
+ProvCon.dbui.wxwin.forms.GenericForm.__init__
+ProvCon.dbui.wxwin.mwx.CheckBox.__init__
+ProvCon.dbui.wxwin.mwx.ComboBox.__init__
+ProvCon.dbui.wxwin.mwx.StaticText.__init__
+ProvCon.dbui.wxwin.mwx.TextCtrl.__init__
+ProvCon.dbui.wxwin.mwx.mwxControl.__init__
+ProvCon.dbui.wxwin.navigators.Navigator.__init__
+ProvCon.dbui.wxwin.recordlists.RecordList.__init__
+ProvCon.docsis.cablemodem.cablemodem.__init__
+ProvCon.docsis.cablemodem.cablemodem._cos.__init__
+ProvCon.docsis.cablemodem.cablemodem._cpe.__init__
+ProvCon.docsis.cablemodem.cablemodem._mac.__init__
+ProvCon.docsis.compiler.config.config.__init__
+ProvCon.docsis.compiler.encoder.error.__init__
+ProvCon.docsis.compiler.encoder.tlv.__init__
+ProvCon.docsis.compiler.encoder.tlv_multipart.__init__
+ProvCon.docsis.compiler.encoder.tlv_multipart.append_proxy.__init__
+ProvCon.docsis.compiler.encoder.tlv_multipart.iterator.__init__
+ProvCon.docsis.compiler.encoder.tlv_multipart_subclass.__init__
+ProvCon.docsis.compiler.encoder.tlv_subclass.__init__
+ProvCon.func.classes.conditionalmethod.__init__
+ProvCon.func.events.eventemitter.__init__
+ProvCon.func.events.eventemitter.evt.__init__
+ProvCon.func.events.eventemitter.evthook.__init__
+ProvCon.func.events.eventexception.__init__
+ProvCon.func.variables.TracedVariable.Tracer.__init__
+ProvCon.func.variables.TracedVariable.__init__
+ProvCon.gui.FrontEndApp.FE.__init__
+ProvCon.gui.ProvisioningControl.GenericObjectEditor.__init__
+ProvCon.gui.ProvisioningControl.GridView.__init__
+ProvCon.gui.ProvisioningControl.MainTab.__init__
+ProvCon.gui.ProvisioningControl.ObjectEditorModel.__init__
+ProvCon.gui.ProvisioningControl.TopLevelWindow.__init__
+ProvCon.log.LoggingBackend.__init__
+ProvCon.log.LoggingClient.__init__
+ProvCon.log.LoggingServer.__init__
+ProvCon.ui.uierror.__init__
+ProvCon.wronolib.ipaddr.ip4addr.__init__
+ProvCon.wronolib.ipaddr.ip4prefix.__init__" class="py-name" href="#" onclick="return doclink('link-23', '__init__', 'link-3');">__init__</a></tt><tt class="py-op">(</tt><tt class="py-name">self</tt><tt class="py-op">,</tt> <tt class="py-name">addr</tt><tt class="py-op">)</tt> </tt>
+<a name="L49"></a><tt class="py-lineno"> 49</tt>  <tt class="py-line">        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">queue</tt> <tt class="py-op">=</tt> <tt class="py-name">ThreadingQueue</tt><tt class="py-op">.</tt><tt class="py-name">Queue</tt><tt class="py-op">(</tt><tt class="py-number">1024</tt><tt class="py-op">)</tt> </tt>
+<a name="L50"></a><tt class="py-lineno"> 50</tt>  <tt class="py-line">        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">workers</tt> <tt class="py-op">=</tt> <tt class="py-op">[</tt><tt id="link-24" class="py-name" targets="Class ProvCon.cli.CLIWorker=ProvCon.cli.CLIWorker-class.html"><a title="ProvCon.cli.CLIWorker" class="py-name" href="#" onclick="return doclink('link-24', 'CLIWorker', 'link-24');">CLIWorker</a></tt><tt class="py-op">(</tt><tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">queue</tt><tt class="py-op">,</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">logger</tt><tt class="py-op">)</tt> <tt class="py-keyword">for</tt> <tt class="py-name">i</tt> <tt class="py-keyword">in</tt> <tt class="py-name">range</tt><tt class="py-op">(</tt><tt class="py-number">0</tt><tt class="py-op">,</tt><tt class="py-number">5</tt><tt class="py-op">)</tt><tt class="py-op">]</tt> </tt>
+</div><a name="L51"></a><tt class="py-lineno"> 51</tt>  <tt class="py-line">         </tt>
+<a name="CLIServer.serve"></a><div id="CLIServer.serve-def"><a name="L52"></a><tt class="py-lineno"> 52</tt> <a class="py-toggle" href="#" id="CLIServer.serve-toggle" onclick="return toggle('CLIServer.serve');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="ProvCon.cli.CLIServer-class.html#serve">serve</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="CLIServer.serve-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="CLIServer.serve-expanded"><a name="L53"></a><tt class="py-lineno"> 53</tt>  <tt class="py-line">        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">on</tt> <tt class="py-op">=</tt> <tt class="py-name">True</tt> </tt>
+<a name="L54"></a><tt class="py-lineno"> 54</tt>  <tt class="py-line">        <tt class="py-comment">#This is rather bad. There is no guarantee that these fields will be kept in</tt> </tt>
+<a name="L55"></a><tt class="py-lineno"> 55</tt>  <tt class="py-line">        <tt class="py-comment">#the future versions. Also there is no guarantee that _listener, has a _socket</tt> </tt>
+<a name="L56"></a><tt class="py-lineno"> 56</tt>  <tt class="py-line">        <tt class="py-comment">#since it may be a Windows named pipe. Bu we'll worry about that when we start</tt> </tt>
+<a name="L57"></a><tt class="py-lineno"> 57</tt>  <tt class="py-line">        <tt class="py-comment">#porting to Win32, which will probably be never.</tt> </tt>
+<a name="L58"></a><tt class="py-lineno"> 58</tt>  <tt class="py-line">        <tt class="py-name">serverfd</tt> <tt class="py-op">=</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">_listener</tt><tt class="py-op">.</tt><tt class="py-name">_socket</tt><tt class="py-op">.</tt><tt class="py-name">fileno</tt><tt class="py-op">(</tt><tt class="py-op">)</tt>         </tt>
+<a name="L59"></a><tt class="py-lineno"> 59</tt>  <tt class="py-line">        <tt class="py-name">poller</tt> <tt class="py-op">=</tt> <tt class="py-name">select</tt><tt class="py-op">.</tt><tt class="py-name">poll</tt><tt class="py-op">(</tt><tt class="py-op">)</tt> </tt>
+<a name="L60"></a><tt class="py-lineno"> 60</tt>  <tt class="py-line">        <tt class="py-name">poller</tt><tt class="py-op">.</tt><tt class="py-name">register</tt> <tt class="py-op">(</tt> <tt class="py-name">serverfd</tt><tt class="py-op">,</tt> <tt class="py-name">select</tt><tt class="py-op">.</tt><tt class="py-name">POLLIN</tt> <tt class="py-op">|</tt> <tt class="py-name">select</tt><tt class="py-op">.</tt><tt class="py-name">POLLPRI</tt> <tt class="py-op">)</tt> </tt>
+<a name="L61"></a><tt class="py-lineno"> 61</tt>  <tt class="py-line">        <tt class="py-name">connection_map</tt> <tt class="py-op">=</tt> <tt class="py-op">{</tt><tt class="py-op">}</tt> </tt>
+<a name="L62"></a><tt class="py-lineno"> 62</tt>  <tt class="py-line">        <tt class="py-name">running</tt> <tt class="py-op">=</tt> <tt class="py-name">True</tt> </tt>
+<a name="L63"></a><tt class="py-lineno"> 63</tt>  <tt class="py-line">         </tt>
+<a name="L64"></a><tt class="py-lineno"> 64</tt>  <tt class="py-line">        <tt class="py-keyword">while</tt> <tt class="py-name">running</tt><tt class="py-op">:</tt> </tt>
+<a name="L65"></a><tt class="py-lineno"> 65</tt>  <tt class="py-line">            <tt class="py-name">ready</tt> <tt class="py-op">=</tt> <tt class="py-name">poller</tt><tt class="py-op">.</tt><tt class="py-name">poll</tt> <tt class="py-op">(</tt> <tt class="py-number">30000</tt> <tt class="py-op">)</tt> </tt>
+<a name="L66"></a><tt class="py-lineno"> 66</tt>  <tt class="py-line">            <tt class="py-keyword">for</tt> <tt class="py-name">fd</tt><tt class="py-op">,</tt> <tt class="py-name">event</tt> <tt class="py-keyword">in</tt> <tt class="py-name">ready</tt><tt class="py-op">:</tt> </tt>
+<a name="L67"></a><tt class="py-lineno"> 67</tt>  <tt class="py-line">                <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">logger</tt> <tt class="py-op">(</tt> <tt class="py-string">"({0}, {1})"</tt><tt class="py-op">.</tt><tt class="py-name">format</tt> <tt class="py-op">(</tt><tt class="py-name">fd</tt><tt class="py-op">,</tt> <tt class="py-name">event</tt><tt class="py-op">)</tt> <tt class="py-op">)</tt> </tt>
+<a name="L68"></a><tt class="py-lineno"> 68</tt>  <tt class="py-line">                <tt class="py-keyword">if</tt> <tt class="py-name">fd</tt> <tt class="py-op">==</tt> <tt class="py-name">serverfd</tt><tt class="py-op">:</tt> </tt>
+<a name="L69"></a><tt class="py-lineno"> 69</tt>  <tt class="py-line">                    <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">logger</tt> <tt class="py-op">(</tt> <tt class="py-string">"New connection %d %d"</tt> <tt class="py-op">%</tt> <tt class="py-op">(</tt><tt class="py-name">fd</tt><tt class="py-op">,</tt> <tt class="py-name">event</tt><tt class="py-op">)</tt> <tt class="py-op">)</tt> </tt>
+<a name="L70"></a><tt class="py-lineno"> 70</tt>  <tt class="py-line">                    <tt class="py-name">cnx</tt> <tt class="py-op">=</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">accept</tt><tt class="py-op">(</tt><tt class="py-op">)</tt> </tt>
+<a name="L71"></a><tt class="py-lineno"> 71</tt>  <tt class="py-line">                    <tt class="py-name">connection_map</tt> <tt class="py-op">[</tt><tt class="py-name">cnx</tt><tt class="py-op">.</tt><tt class="py-name">fileno</tt><tt class="py-op">(</tt><tt class="py-op">)</tt><tt class="py-op">]</tt> <tt class="py-op">=</tt> <tt class="py-name">cnx</tt> </tt>
+<a name="L72"></a><tt class="py-lineno"> 72</tt>  <tt class="py-line">                    <tt class="py-name">cnx</tt><tt class="py-op">.</tt><tt class="py-name">send</tt> <tt class="py-op">(</tt> <tt id="link-25" class="py-name"><a title="ProvCon.ui
+ProvCon.ui.ui" class="py-name" href="#" onclick="return doclink('link-25', 'ui', 'link-2');">ui</a></tt><tt class="py-op">.</tt><tt id="link-26" class="py-name" targets="Function ProvCon.ui.signature()=ProvCon.ui-module.html#signature"><a title="ProvCon.ui.signature" class="py-name" href="#" onclick="return doclink('link-26', 'signature', 'link-26');">signature</a></tt><tt class="py-op">(</tt><tt class="py-op">)</tt> <tt class="py-op">)</tt> </tt>
+<a name="L73"></a><tt class="py-lineno"> 73</tt>  <tt class="py-line">                    <tt class="py-name">poller</tt><tt class="py-op">.</tt><tt class="py-name">register</tt> <tt class="py-op">(</tt> <tt class="py-name">cnx</tt><tt class="py-op">.</tt><tt class="py-name">fileno</tt><tt class="py-op">(</tt><tt class="py-op">)</tt><tt class="py-op">,</tt> <tt class="py-name">select</tt><tt class="py-op">.</tt><tt class="py-name">POLLIN</tt> <tt class="py-op">|</tt> <tt class="py-name">select</tt><tt class="py-op">.</tt><tt class="py-name">POLLPRI</tt> <tt class="py-op">)</tt> </tt>
+<a name="L74"></a><tt class="py-lineno"> 74</tt>  <tt class="py-line">                <tt class="py-keyword">else</tt><tt class="py-op">:</tt> </tt>
+<a name="L75"></a><tt class="py-lineno"> 75</tt>  <tt class="py-line">                    <tt class="py-name">cnx</tt> <tt class="py-op">=</tt> <tt class="py-name">connection_map</tt><tt class="py-op">.</tt><tt id="link-27" class="py-name"><a title="ProvCon.dbui.orm.recordsearch.OIDSearchList.get
+ProvCon.func.variables.TracedVariable.get" class="py-name" href="#" onclick="return doclink('link-27', 'get', 'link-6');">get</a></tt> <tt class="py-op">(</tt> <tt class="py-name">fd</tt><tt class="py-op">,</tt> <tt class="py-name">None</tt> <tt class="py-op">)</tt> </tt>
+<a name="L76"></a><tt class="py-lineno"> 76</tt>  <tt class="py-line">                    <tt class="py-keyword">if</tt> <tt class="py-name">cnx</tt> <tt class="py-keyword">is</tt> <tt class="py-name">None</tt><tt class="py-op">:</tt> </tt>
+<a name="L77"></a><tt class="py-lineno"> 77</tt>  <tt class="py-line">                        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">logger</tt> <tt class="py-op">(</tt> <tt class="py-string">"Error: fd is not in connection map."</tt> <tt class="py-op">)</tt> </tt>
+<a name="L78"></a><tt class="py-lineno"> 78</tt>  <tt class="py-line">                        <tt class="py-keyword">continue</tt> </tt>
+<a name="L79"></a><tt class="py-lineno"> 79</tt>  <tt class="py-line">                    <tt class="py-keyword">try</tt><tt class="py-op">:</tt> </tt>
+<a name="L80"></a><tt class="py-lineno"> 80</tt>  <tt class="py-line">                        <tt class="py-name">msg</tt> <tt class="py-op">=</tt> <tt class="py-name">cnx</tt><tt class="py-op">.</tt><tt class="py-name">recv</tt><tt class="py-op">(</tt><tt class="py-op">)</tt>                                </tt>
+<a name="L81"></a><tt class="py-lineno"> 81</tt>  <tt class="py-line">                        <tt class="py-keyword">if</tt> <tt class="py-name">msg</tt> <tt class="py-op">==</tt> <tt class="py-string">"_SHUTDOWN"</tt><tt class="py-op">:</tt>  </tt>
+<a name="L82"></a><tt class="py-lineno"> 82</tt>  <tt class="py-line">                            <tt class="py-name">running</tt> <tt class="py-op">=</tt> <tt class="py-name">False</tt> </tt>
+<a name="L83"></a><tt class="py-lineno"> 83</tt>  <tt class="py-line">                            <tt class="py-name">cnx</tt><tt class="py-op">.</tt><tt class="py-name">close</tt><tt class="py-op">(</tt><tt class="py-op">)</tt> </tt>
+<a name="L84"></a><tt class="py-lineno"> 84</tt>  <tt class="py-line">                            <tt class="py-keyword">break</tt> </tt>
+<a name="L85"></a><tt class="py-lineno"> 85</tt>  <tt class="py-line">                        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">queue</tt><tt class="py-op">.</tt><tt class="py-name">put</tt> <tt class="py-op">(</tt> <tt class="py-op">(</tt><tt class="py-name">msg</tt><tt class="py-op">,</tt> <tt class="py-name">cnx</tt><tt class="py-op">)</tt> <tt class="py-op">)</tt> </tt>
+<a name="L86"></a><tt class="py-lineno"> 86</tt>  <tt class="py-line">                    <tt class="py-keyword">except</tt> <tt class="py-name">EOFError</tt><tt class="py-op">:</tt> </tt>
+<a name="L87"></a><tt class="py-lineno"> 87</tt>  <tt class="py-line">                        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">logger</tt> <tt class="py-op">(</tt> <tt class="py-string">"Connection({0}) closed."</tt><tt class="py-op">.</tt><tt class="py-name">format</tt> <tt class="py-op">(</tt><tt class="py-name">fd</tt><tt class="py-op">)</tt><tt class="py-op">)</tt> </tt>
+<a name="L88"></a><tt class="py-lineno"> 88</tt>  <tt class="py-line">                        <tt class="py-keyword">del</tt> <tt class="py-name">connection_map</tt><tt class="py-op">[</tt><tt class="py-name">fd</tt><tt class="py-op">]</tt> </tt>
+<a name="L89"></a><tt class="py-lineno"> 89</tt>  <tt class="py-line">                        <tt class="py-name">poller</tt><tt class="py-op">.</tt><tt class="py-name">unregister</tt><tt class="py-op">(</tt><tt class="py-name">fd</tt><tt class="py-op">)</tt> </tt>
+<a name="L90"></a><tt class="py-lineno"> 90</tt>  <tt class="py-line">                        <tt class="py-name">cnx</tt><tt class="py-op">.</tt><tt class="py-name">close</tt><tt class="py-op">(</tt><tt class="py-op">)</tt> </tt>
+<a name="L91"></a><tt class="py-lineno"> 91</tt>  <tt class="py-line">                        <tt class="py-keyword">continue</tt> </tt>
+<a name="L92"></a><tt class="py-lineno"> 92</tt>  <tt class="py-line">                    <tt class="py-keyword">except</tt> <tt class="py-name">IOError</tt><tt class="py-op">:</tt> </tt>
+<a name="L93"></a><tt class="py-lineno"> 93</tt>  <tt class="py-line">                        <tt id="link-28" class="py-name"><a title="ProvCon.func.variables.TracedVariable.info" class="py-name" href="#" onclick="return doclink('link-28', 'info', 'link-11');">info</a></tt> <tt class="py-op">=</tt> <tt class="py-name">sys</tt><tt class="py-op">.</tt><tt class="py-name">exc_info</tt><tt class="py-op">(</tt><tt class="py-op">)</tt><tt class="py-op">[</tt><tt class="py-op">:</tt><tt class="py-number">2</tt><tt class="py-op">]</tt> </tt>
+<a name="L94"></a><tt class="py-lineno"> 94</tt>  <tt class="py-line">                        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">logger</tt> <tt class="py-op">(</tt> <tt class="py-string">"Error: %s, %s."</tt> <tt class="py-op">%</tt> <tt class="py-op">(</tt> <tt id="link-29" class="py-name"><a title="ProvCon.func.variables.TracedVariable.info" class="py-name" href="#" onclick="return doclink('link-29', 'info', 'link-11');">info</a></tt><tt class="py-op">[</tt><tt class="py-number">0</tt><tt class="py-op">]</tt><tt class="py-op">,</tt> <tt id="link-30" class="py-name"><a title="ProvCon.func.variables.TracedVariable.info" class="py-name" href="#" onclick="return doclink('link-30', 'info', 'link-11');">info</a></tt><tt class="py-op">[</tt><tt class="py-number">1</tt><tt class="py-op">]</tt> <tt class="py-op">)</tt> <tt class="py-op">)</tt> </tt>
+<a name="L95"></a><tt class="py-lineno"> 95</tt>  <tt class="py-line">                        <tt class="py-keyword">del</tt> <tt class="py-name">connection_map</tt><tt class="py-op">[</tt><tt class="py-name">fd</tt><tt class="py-op">]</tt> </tt>
+<a name="L96"></a><tt class="py-lineno"> 96</tt>  <tt class="py-line">                        <tt class="py-name">poller</tt><tt class="py-op">.</tt><tt class="py-name">unregister</tt><tt class="py-op">(</tt><tt class="py-name">fd</tt><tt class="py-op">)</tt> </tt>
+<a name="L97"></a><tt class="py-lineno"> 97</tt>  <tt class="py-line">                        <tt class="py-name">cnx</tt><tt class="py-op">.</tt><tt class="py-name">close</tt><tt class="py-op">(</tt><tt class="py-op">)</tt> </tt>
+<a name="L98"></a><tt class="py-lineno"> 98</tt>  <tt class="py-line">                        <tt class="py-keyword">continue</tt> </tt>
+<a name="L99"></a><tt class="py-lineno"> 99</tt>  <tt class="py-line">                                       </tt>
+<a name="L100"></a><tt class="py-lineno">100</tt>  <tt class="py-line">            <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">logger</tt><tt class="py-op">(</tt><tt class="py-string">"POLL INT"</tt><tt class="py-op">)</tt> </tt>
+<a name="L101"></a><tt class="py-lineno">101</tt>  <tt class="py-line">        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">logger</tt> <tt class="py-op">(</tt> <tt class="py-string">"JOIN"</tt> <tt class="py-op">)</tt> </tt>
+<a name="L102"></a><tt class="py-lineno">102</tt>  <tt class="py-line">        <tt class="py-keyword">for</tt> <tt class="py-name">w</tt> <tt class="py-keyword">in</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">workers</tt><tt class="py-op">:</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">queue</tt><tt class="py-op">.</tt><tt class="py-name">put</tt> <tt class="py-op">(</tt> <tt class="py-op">(</tt><tt class="py-name">None</tt><tt class="py-op">,</tt> <tt class="py-name">None</tt><tt class="py-op">)</tt> <tt class="py-op">)</tt>  </tt>
+<a name="L103"></a><tt class="py-lineno">103</tt>  <tt class="py-line">        <tt class="py-keyword">for</tt> <tt class="py-name">w</tt> <tt class="py-keyword">in</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">workers</tt><tt class="py-op">:</tt> <tt class="py-name">w</tt><tt class="py-op">.</tt><tt class="py-name">join</tt><tt class="py-op">(</tt><tt class="py-op">)</tt> </tt>
+</div></div><a name="L104"></a><tt class="py-lineno">104</tt>  <tt class="py-line">         </tt>
+<a name="L105"></a><tt class="py-lineno">105</tt>  <tt class="py-line">         </tt>
+<a name="CLIClient"></a><div id="CLIClient-def"><a name="L106"></a><tt class="py-lineno">106</tt> <a class="py-toggle" href="#" id="CLIClient-toggle" onclick="return toggle('CLIClient');">-</a><tt class="py-line"><tt class="py-keyword">def</tt> <a class="py-def-name" href="ProvCon.cli-module.html#CLIClient">CLIClient</a> <tt class="py-op">(</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="CLIClient-collapsed" style="display:none;" pad="+++" indent="++++"></div><div id="CLIClient-expanded"><a name="L107"></a><tt class="py-lineno">107</tt>  <tt class="py-line">    <tt id="link-31" class="py-name"><a title="ProvCon.dbui.config
+ProvCon.dbui.config.config
+ProvCon.docsis.compiler.config
+ProvCon.docsis.compiler.config.config" class="py-name" href="#" onclick="return doclink('link-31', 'config', 'link-14');">config</a></tt> <tt class="py-op">=</tt> <tt id="link-32" class="py-name"><a title="ProvCon" class="py-name" href="#" onclick="return doclink('link-32', 'ProvCon', 'link-0');">ProvCon</a></tt><tt class="py-op">.</tt><tt id="link-33" class="py-name"><a title="ProvCon.Configuration" class="py-name" href="#" onclick="return doclink('link-33', 'Configuration', 'link-16');">Configuration</a></tt><tt class="py-op">(</tt><tt class="py-op">)</tt> </tt>
+<a name="L108"></a><tt class="py-lineno">108</tt>  <tt class="py-line">    <tt class="py-name">addr</tt> <tt class="py-op">=</tt> <tt id="link-34" class="py-name"><a title="ProvCon" class="py-name" href="#" onclick="return doclink('link-34', 'ProvCon', 'link-0');">ProvCon</a></tt><tt class="py-op">.</tt><tt id="link-35" class="py-name"><a title="ProvCon.parse_socket_address" class="py-name" href="#" onclick="return doclink('link-35', 'parse_socket_address', 'link-20');">parse_socket_address</a></tt> <tt class="py-op">(</tt> <tt id="link-36" class="py-name"><a title="ProvCon.dbui.config
+ProvCon.dbui.config.config
+ProvCon.docsis.compiler.config
+ProvCon.docsis.compiler.config.config" class="py-name" href="#" onclick="return doclink('link-36', 'config', 'link-14');">config</a></tt><tt class="py-op">.</tt><tt id="link-37" class="py-name"><a title="ProvCon.dbui.orm.recordsearch.OIDSearchList.get
+ProvCon.func.variables.TracedVariable.get" class="py-name" href="#" onclick="return doclink('link-37', 'get', 'link-6');">get</a></tt> <tt class="py-op">(</tt> <tt class="py-string">"CLI"</tt><tt class="py-op">,</tt> <tt class="py-string">"server_address"</tt> <tt class="py-op">)</tt> <tt class="py-op">)</tt> </tt>
+<a name="L109"></a><tt class="py-lineno">109</tt>  <tt class="py-line">    <tt class="py-keyword">return</tt> <tt id="link-38" class="py-name"><a title="ProvCon.TFTP.Client" class="py-name" href="#" onclick="return doclink('link-38', 'Client', 'link-1');">Client</a></tt> <tt class="py-op">(</tt><tt class="py-name">addr</tt><tt class="py-op">)</tt> </tt>
+</div><a name="L110"></a><tt class="py-lineno">110</tt>  <tt class="py-line"> </tt><script type="text/javascript">
+<!--
+expandto(location.href);
+// -->
+</script>
+</pre>
+<br />
+<!-- ==================== NAVIGATION BAR ==================== -->
+<table class="navbar" border="0" width="100%" cellpadding="0"
+       bgcolor="#a0c0ff" cellspacing="0">
+  <tr valign="middle">
+  <!-- Home link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="ProvCon-module.html">Home</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Tree link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="module-tree.html">Trees</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Index link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="identifier-index.html">Indices</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Help link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="help.html">Help</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Project homepage -->
+      <th class="navbar" align="right" width="100%">
+        <table border="0" cellpadding="0" cellspacing="0">
+          <tr><th class="navbar" align="center"
+            >docsis-provisioning</th>
+          </tr></table></th>
+  </tr>
+</table>
+<table border="0" cellpadding="0" cellspacing="0" width="100%%">
+  <tr>
+    <td align="left" class="footer">
+    Generated by Epydoc 3.0.1 on Thu Jan  8 14:48:53 2009
+    </td>
+    <td align="right" class="footer">
+      <a target="mainFrame" href="http://epydoc.sourceforge.net"
+        >http://epydoc.sourceforge.net</a>
+    </td>
+  </tr>
+</table>
+
+<script type="text/javascript">
+  <!--
+  // Private objects are initially displayed (because if
+  // javascript is turned off then we want them to be
+  // visible); but by default, we want to hide them.  So hide
+  // them unless we have a cookie that says to show them.
+  checkCookie();
+  // -->
+</script>
+</body>
+</html>

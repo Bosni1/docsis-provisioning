@@ -3,7 +3,7 @@
 import os
 import pymssql, _mssql
 import getpass
-from ProvCon.dbui.database import CFG
+from ProvCon.dbui.database import CFG, Init
 from ProvCon.dbui.di import rObject
 Record = rObject
 import atexit
@@ -49,6 +49,7 @@ def setObjectFlag (obj, flagname):
     
 if __name__=="__main__":
     #pw = getpass.getpass("Password for \\SQLEXPRESS\stansat:stansat@reklamy >")
+    Init()    
     pw = "wajig05850_hax0r"
     stansatDB = pymssql.connect ( user = 'stansat', database = 'stansat', host = 'reklamy',
                                   password = pw )
@@ -75,7 +76,7 @@ if __name__=="__main__":
             subRec.email = [ K["EMail"].decode("cp1250").encode("utf8") ]
         subRec.telephone = []
         if K["TelefonStacjonarny"]: subRec.telephone.append ( K["TelefonStacjonarny"][:32].decode("cp1250").encode("utf8") )
-        if K["TelefonKomorkowy"]: subRec.telephone.append ( K["TelefonKomorkowy"][:32].decode("cp1250").encode("utf8") )                
+        if K["TelefonKomorkowy"]: subRec.telephone.append ( K["TelefonKomorkowy"][:32].decode("cp1250").encode("utf8") )
         subRec.write()        
         if K["OdbiorFaktur"]: subRec.PARAM.ODBIOR_FAKTUR = K["OdbiorFaktur"]
         if K["Wyszukiwanie"]: subRec.PARAM.WYSZUKIWANIE = K["Wyszukiwanie"].decode ( "cp1250" )

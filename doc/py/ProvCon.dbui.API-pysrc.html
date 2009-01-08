@@ -1,0 +1,214 @@
+<?xml version="1.0" encoding="ascii"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+          "DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+  <title>ProvCon.dbui.API</title>
+  <link rel="stylesheet" href="epydoc.css" type="text/css" />
+  <script type="text/javascript" src="epydoc.js"></script>
+</head>
+
+<body bgcolor="white" text="black" link="blue" vlink="#204080"
+      alink="#204080">
+<!-- ==================== NAVIGATION BAR ==================== -->
+<table class="navbar" border="0" width="100%" cellpadding="0"
+       bgcolor="#a0c0ff" cellspacing="0">
+  <tr valign="middle">
+  <!-- Home link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="ProvCon-module.html">Home</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Tree link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="module-tree.html">Trees</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Index link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="identifier-index.html">Indices</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Help link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="help.html">Help</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Project homepage -->
+      <th class="navbar" align="right" width="100%">
+        <table border="0" cellpadding="0" cellspacing="0">
+          <tr><th class="navbar" align="center"
+            >docsis-provisioning</th>
+          </tr></table></th>
+  </tr>
+</table>
+<table width="100%" cellpadding="0" cellspacing="0">
+  <tr valign="top">
+    <td width="100%">
+      <span class="breadcrumbs">
+        <a href="ProvCon-module.html">Package&nbsp;ProvCon</a> ::
+        <a href="ProvCon.dbui-module.html">Package&nbsp;dbui</a> ::
+        Module&nbsp;API
+      </span>
+    </td>
+    <td>
+      <table cellpadding="0" cellspacing="0">
+        <!-- hide/show private -->
+        <tr><td align="right"><span class="options">[<a href="javascript:void(0);" class="privatelink"
+    onclick="toggle_private();">hide&nbsp;private</a>]</span></td></tr>
+        <tr><td align="right"><span class="options"
+            >[<a href="frames.html" target="_top">frames</a
+            >]&nbsp;|&nbsp;<a href="ProvCon.dbui.API-pysrc.html"
+            target="_top">no&nbsp;frames</a>]</span></td></tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<h1 class="epydoc">Source Code for <a href="ProvCon.dbui.API-module.html">Module ProvCon.dbui.API</a></h1>
+<pre class="py-src">
+<a name="L1"></a><tt class="py-lineno"> 1</tt>  <tt class="py-line"><tt class="py-comment">##$Id: API.py 68 2009-01-07 17:02:06Z wroniasty $</tt> </tt>
+<a name="L2"></a><tt class="py-lineno"> 2</tt>  <tt class="py-line"> </tt>
+<a name="Implements"></a><div id="Implements-def"><a name="L3"></a><tt class="py-lineno"> 3</tt> <a class="py-toggle" href="#" id="Implements-toggle" onclick="return toggle('Implements');">-</a><tt class="py-line"><tt class="py-keyword">def</tt> <a class="py-def-name" href="ProvCon.dbui.API-module.html#Implements">Implements</a><tt class="py-op">(</tt><tt class="py-op">*</tt><tt class="py-param">interfaces</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="Implements-collapsed" style="display:none;" pad="++" indent="++++"></div><div id="Implements-expanded"><a name="L4"></a><tt class="py-lineno"> 4</tt>  <tt class="py-line">    <tt class="py-keyword">def</tt> <tt class="py-def-name">DoCheck</tt><tt class="py-op">(</tt><tt class="py-param">cls</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+<a name="L5"></a><tt class="py-lineno"> 5</tt>  <tt class="py-line">        <tt class="py-keyword">print</tt> <tt class="py-string">"Checking the implementation of "</tt> <tt class="py-op">+</tt> <tt class="py-name">str</tt><tt class="py-op">(</tt><tt class="py-name">map</tt><tt class="py-op">(</tt><tt class="py-keyword">lambda</tt> <tt class="py-name">i</tt><tt class="py-op">:</tt> <tt class="py-name">i</tt><tt class="py-op">.</tt><tt class="py-name">__name__</tt><tt class="py-op">,</tt> <tt class="py-name">interfaces</tt><tt class="py-op">)</tt><tt class="py-op">)</tt> <tt class="py-op">+</tt> <tt class="py-string">" in "</tt> <tt class="py-op">+</tt> <tt class="py-name">str</tt><tt class="py-op">(</tt><tt class="py-name">cls</tt><tt class="py-op">.</tt><tt class="py-name">__name__</tt><tt class="py-op">)</tt> </tt>
+<a name="L6"></a><tt class="py-lineno"> 6</tt>  <tt class="py-line">        <tt class="py-keyword">for</tt> <tt class="py-name">i</tt> <tt class="py-keyword">in</tt> <tt class="py-name">interfaces</tt><tt class="py-op">:</tt> </tt>
+<a name="L7"></a><tt class="py-lineno"> 7</tt>  <tt class="py-line">            <tt class="py-keyword">for</tt> <tt class="py-name">method</tt> <tt class="py-keyword">in</tt> <tt class="py-name">dir</tt><tt class="py-op">(</tt><tt class="py-name">i</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+<a name="L8"></a><tt class="py-lineno"> 8</tt>  <tt class="py-line">                <tt class="py-keyword">if</tt> <tt class="py-name">method</tt><tt class="py-op">.</tt><tt class="py-name">startswith</tt> <tt class="py-op">(</tt><tt class="py-string">"__"</tt><tt class="py-op">)</tt> <tt class="py-keyword">and</tt> <tt class="py-name">method</tt><tt class="py-op">.</tt><tt class="py-name">endswith</tt><tt class="py-op">(</tt><tt class="py-string">"__"</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> <tt class="py-keyword">continue</tt> </tt>
+<a name="L9"></a><tt class="py-lineno"> 9</tt>  <tt class="py-line">                <tt class="py-name">iattr</tt> <tt class="py-op">=</tt> <tt class="py-name">getattr</tt><tt class="py-op">(</tt><tt class="py-name">i</tt><tt class="py-op">,</tt> <tt class="py-name">method</tt><tt class="py-op">)</tt>                 </tt>
+<a name="L10"></a><tt class="py-lineno">10</tt>  <tt class="py-line">                <tt class="py-keyword">try</tt><tt class="py-op">:</tt> </tt>
+<a name="L11"></a><tt class="py-lineno">11</tt>  <tt class="py-line">                    <tt class="py-name">cattr</tt> <tt class="py-op">=</tt> <tt class="py-name">getattr</tt><tt class="py-op">(</tt><tt class="py-name">cls</tt><tt class="py-op">,</tt> <tt class="py-name">method</tt><tt class="py-op">)</tt> </tt>
+<a name="L12"></a><tt class="py-lineno">12</tt>  <tt class="py-line">                <tt class="py-keyword">except</tt> <tt class="py-name">AttributeError</tt><tt class="py-op">:</tt> </tt>
+<a name="L13"></a><tt class="py-lineno">13</tt>  <tt class="py-line">                    <tt class="py-keyword">if</tt> <tt class="py-name">isinstance</tt><tt class="py-op">(</tt><tt class="py-name">iattr</tt><tt class="py-op">,</tt> <tt class="py-name">property</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+<a name="L14"></a><tt class="py-lineno">14</tt>  <tt class="py-line">                        <tt class="py-name">attrtype</tt> <tt class="py-op">=</tt> <tt class="py-string">'property'</tt> </tt>
+<a name="L15"></a><tt class="py-lineno">15</tt>  <tt class="py-line">                    <tt class="py-keyword">else</tt><tt class="py-op">:</tt> </tt>
+<a name="L16"></a><tt class="py-lineno">16</tt>  <tt class="py-line">                        <tt class="py-name">attrtype</tt> <tt class="py-op">=</tt> <tt class="py-string">'method'</tt> </tt>
+<a name="L17"></a><tt class="py-lineno">17</tt>  <tt class="py-line">                    <tt class="py-keyword">print</tt> <tt class="py-string">" + Warning! Incomplete implementation of '"</tt> <tt class="py-op">+</tt> <tt class="py-name">i</tt><tt class="py-op">.</tt><tt class="py-name">__name__</tt> <tt class="py-op">+</tt> <tt class="py-string">"' in '"</tt> <tt class="py-op">+</tt> <tt class="py-name">cls</tt><tt class="py-op">.</tt><tt class="py-name">__name__</tt> <tt class="py-op">+</tt> <tt class="py-string">"' "</tt> <tt class="py-op">+</tt> <tt class="py-name">attrtype</tt> <tt class="py-op">+</tt> <tt class="py-string">"  '"</tt> <tt class="py-op">+</tt> <tt class="py-name">method</tt> <tt class="py-op">+</tt> <tt class="py-string">"' is missing."</tt>                </tt>
+<a name="L18"></a><tt class="py-lineno">18</tt>  <tt class="py-line">                    <tt class="py-keyword">continue</tt> </tt>
+<a name="L19"></a><tt class="py-lineno">19</tt>  <tt class="py-line">               </tt>
+<a name="L20"></a><tt class="py-lineno">20</tt>  <tt class="py-line">        <tt class="py-keyword">return</tt> <tt class="py-name">cls</tt> </tt>
+</div><a name="L21"></a><tt class="py-lineno">21</tt>  <tt class="py-line">    <tt class="py-keyword">return</tt> <tt class="py-name">DoCheck</tt> </tt>
+</div><a name="L22"></a><tt class="py-lineno">22</tt>  <tt class="py-line">     </tt>
+<a name="Interface"></a><div id="Interface-def"><a name="L23"></a><tt class="py-lineno">23</tt> <a class="py-toggle" href="#" id="Interface-toggle" onclick="return toggle('Interface');">-</a><tt class="py-line"><tt class="py-keyword">class</tt> <a class="py-def-name" href="ProvCon.dbui.API.Interface-class.html">Interface</a><tt class="py-op">:</tt>  </tt>
+</div><a name="L24"></a><tt class="py-lineno">24</tt>  <tt class="py-line">    <tt id="link-0" class="py-name" targets="Variable ProvCon.dbui.API.Interface.__emits__=ProvCon.dbui.API.Interface-class.html#__emits__"><a title="ProvCon.dbui.API.Interface.__emits__" class="py-name" href="#" onclick="return doclink('link-0', '__emits__', 'link-0');">__emits__</a></tt> <tt class="py-op">=</tt> <tt class="py-op">[</tt><tt class="py-op">]</tt> </tt>
+</div><a name="L25"></a><tt class="py-lineno">25</tt>  <tt class="py-line"> </tt>
+<a name="IRecordList"></a><div id="IRecordList-def"><a name="L26"></a><tt class="py-lineno">26</tt> <a class="py-toggle" href="#" id="IRecordList-toggle" onclick="return toggle('IRecordList');">-</a><tt class="py-line"><tt class="py-keyword">class</tt> <a class="py-def-name" href="ProvCon.dbui.API.IRecordList-class.html">IRecordList</a><tt class="py-op">(</tt><tt class="py-base-class">Interface</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="IRecordList-collapsed" style="display:none;" pad="++" indent="++++"></div><div id="IRecordList-expanded"><a name="L27"></a><tt class="py-lineno">27</tt>  <tt class="py-line">    <tt class="py-docstring">"""</tt> </tt>
+<a name="L28"></a><tt class="py-lineno">28</tt>  <tt class="py-line"><tt class="py-docstring">    iterable</tt> </tt>
+<a name="L29"></a><tt class="py-lineno">29</tt>  <tt class="py-line"><tt class="py-docstring">    """</tt> </tt>
+<a name="IRecordList.reload"></a><div id="IRecordList.reload-def"><a name="L30"></a><tt class="py-lineno">30</tt> <a class="py-toggle" href="#" id="IRecordList.reload-toggle" onclick="return toggle('IRecordList.reload');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="ProvCon.dbui.API.IRecordList-class.html#reload">reload</a><tt class="py-op">(</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> <tt class="py-keyword">pass</tt> </tt>
+</div><a name="IRecordList.reloadsingle"></a><div id="IRecordList.reloadsingle-def"><a name="L31"></a><tt class="py-lineno">31</tt> <a class="py-toggle" href="#" id="IRecordList.reloadsingle-toggle" onclick="return toggle('IRecordList.reloadsingle');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="ProvCon.dbui.API.IRecordList-class.html#reloadsingle">reloadsingle</a><tt class="py-op">(</tt><tt class="py-param">objectid</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> <tt class="py-keyword">pass</tt> </tt>
+</div><a name="IRecordList.clear"></a><div id="IRecordList.clear-def"><a name="L32"></a><tt class="py-lineno">32</tt> <a class="py-toggle" href="#" id="IRecordList.clear-toggle" onclick="return toggle('IRecordList.clear');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="ProvCon.dbui.API.IRecordList-class.html#clear">clear</a><tt class="py-op">(</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> <tt class="py-keyword">pass</tt> </tt>
+</div><a name="IRecordList.getindex"></a><div id="IRecordList.getindex-def"><a name="L33"></a><tt class="py-lineno">33</tt> <a class="py-toggle" href="#" id="IRecordList.getindex-toggle" onclick="return toggle('IRecordList.getindex');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="ProvCon.dbui.API.IRecordList-class.html#getindex">getindex</a><tt class="py-op">(</tt><tt class="py-param">objectid</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> <tt class="py-keyword">pass</tt> </tt>
+</div><a name="IRecordList.getbyid"></a><div id="IRecordList.getbyid-def"><a name="L34"></a><tt class="py-lineno">34</tt> <a class="py-toggle" href="#" id="IRecordList.getbyid-toggle" onclick="return toggle('IRecordList.getbyid');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="ProvCon.dbui.API.IRecordList-class.html#getbyid">getbyid</a><tt class="py-op">(</tt><tt class="py-param">objectid</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> <tt class="py-keyword">pass</tt> </tt>
+</div></div><a name="L35"></a><tt class="py-lineno">35</tt>  <tt class="py-line"> </tt>
+<a name="IRecordListHolder"></a><div id="IRecordListHolder-def"><a name="L36"></a><tt class="py-lineno">36</tt> <a class="py-toggle" href="#" id="IRecordListHolder-toggle" onclick="return toggle('IRecordListHolder');">-</a><tt class="py-line"><tt class="py-keyword">class</tt> <a class="py-def-name" href="ProvCon.dbui.API.IRecordListHolder-class.html">IRecordListHolder</a><tt class="py-op">(</tt><tt class="py-base-class">Interface</tt><tt class="py-op">)</tt><tt class="py-op">:</tt>     </tt>
+</div><a name="IRecordListHolder.set_records"></a><div id="IRecordListHolder.set_records-def"><a name="L37"></a><tt class="py-lineno">37</tt> <a class="py-toggle" href="#" id="IRecordListHolder.set_records-toggle" onclick="return toggle('IRecordListHolder.set_records');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="ProvCon.dbui.API.IRecordListHolder-class.html#set_records">set_records</a><tt class="py-op">(</tt><tt class="py-param">recordlist</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> <tt class="py-keyword">pass</tt> </tt>
+</div><a name="IRecordListHolder.get_records"></a><div id="IRecordListHolder.get_records-def"><a name="L38"></a><tt class="py-lineno">38</tt> <a class="py-toggle" href="#" id="IRecordListHolder.get_records-toggle" onclick="return toggle('IRecordListHolder.get_records');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="ProvCon.dbui.API.IRecordListHolder-class.html#get_records">get_records</a><tt class="py-op">(</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> <tt class="py-keyword">pass</tt> </tt>
+</div><a name="L39"></a><tt class="py-lineno">39</tt>  <tt class="py-line">    <tt id="link-1" class="py-name" targets="Variable ProvCon.dbui.API.IRecordListHolder.records=ProvCon.dbui.API.IRecordListHolder-class.html#records,Variable ProvCon.dbui.abstractui.navigators.BaseNavigator.records=ProvCon.dbui.abstractui.navigators.BaseNavigator-class.html#records,Variable ProvCon.dbui.abstractui.recordlists.BaseRecordList.records=ProvCon.dbui.abstractui.recordlists.BaseRecordList-class.html#records"><a title="ProvCon.dbui.API.IRecordListHolder.records
+ProvCon.dbui.abstractui.navigators.BaseNavigator.records
+ProvCon.dbui.abstractui.recordlists.BaseRecordList.records" class="py-name" href="#" onclick="return doclink('link-1', 'records', 'link-1');">records</a></tt> <tt class="py-op">=</tt> <tt class="py-name">property</tt><tt class="py-op">(</tt><tt class="py-op">)</tt>     </tt>
+</div><a name="L40"></a><tt class="py-lineno">40</tt>  <tt class="py-line"> </tt>
+<a name="IDumbNavigator"></a><div id="IDumbNavigator-def"><a name="L41"></a><tt class="py-lineno">41</tt> <a class="py-toggle" href="#" id="IDumbNavigator-toggle" onclick="return toggle('IDumbNavigator');">-</a><tt class="py-line"><tt class="py-keyword">class</tt> <a class="py-def-name" href="ProvCon.dbui.API.IDumbNavigator-class.html">IDumbNavigator</a><tt class="py-op">(</tt><tt class="py-base-class">Interface</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="IDumbNavigator-collapsed" style="display:none;" pad="++" indent="++++"></div><div id="IDumbNavigator-expanded"><a name="L42"></a><tt class="py-lineno">42</tt>  <tt class="py-line">    <tt class="py-docstring">"""</tt> </tt>
+<a name="L43"></a><tt class="py-lineno">43</tt>  <tt class="py-line"><tt class="py-docstring">    EMITS: navigate</tt> </tt>
+<a name="L44"></a><tt class="py-lineno">44</tt>  <tt class="py-line"><tt class="py-docstring">    """</tt> </tt>
+</div><a name="L45"></a><tt class="py-lineno">45</tt>  <tt class="py-line"> </tt>
+<a name="IRecordHolder"></a><div id="IRecordHolder-def"><a name="L46"></a><tt class="py-lineno">46</tt> <a class="py-toggle" href="#" id="IRecordHolder-toggle" onclick="return toggle('IRecordHolder');">-</a><tt class="py-line"><tt class="py-keyword">class</tt> <a class="py-def-name" href="ProvCon.dbui.API.IRecordHolder-class.html">IRecordHolder</a><tt class="py-op">(</tt><tt class="py-base-class">Interface</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="IRecordHolder-collapsed" style="display:none;" pad="++" indent="++++"></div><div id="IRecordHolder-expanded"><a name="L47"></a><tt class="py-lineno">47</tt>  <tt class="py-line">    <tt class="py-docstring">"""</tt> </tt>
+<a name="L48"></a><tt class="py-lineno">48</tt>  <tt class="py-line"><tt class="py-docstring">    EMITS: request_record_change</tt> </tt>
+<a name="L49"></a><tt class="py-lineno">49</tt>  <tt class="py-line"><tt class="py-docstring">    EMITS: current_record_changed</tt> </tt>
+<a name="L50"></a><tt class="py-lineno">50</tt>  <tt class="py-line"><tt class="py-docstring">    EMITS: navigate</tt> </tt>
+<a name="L51"></a><tt class="py-lineno">51</tt>  <tt class="py-line"><tt class="py-docstring">    EMITS: data_loaded    </tt> </tt>
+<a name="L52"></a><tt class="py-lineno">52</tt>  <tt class="py-line"><tt class="py-docstring">    """</tt> </tt>
+<a name="L53"></a><tt class="py-lineno">53</tt>  <tt class="py-line">    <tt id="link-2" class="py-name" targets="Variable ProvCon.dbui.API.IRecordHolder.current=ProvCon.dbui.API.IRecordHolder-class.html#current,Variable ProvCon.dbui.orm.form.Form.current=ProvCon.dbui.orm.form.Form-class.html#current"><a title="ProvCon.dbui.API.IRecordHolder.current
+ProvCon.dbui.orm.form.Form.current" class="py-name" href="#" onclick="return doclink('link-2', 'current', 'link-2');">current</a></tt> <tt class="py-op">=</tt> <tt class="py-name">property</tt><tt class="py-op">(</tt><tt class="py-op">)</tt> </tt>
+<a name="IRecordHolder.setid"></a><div id="IRecordHolder.setid-def"><a name="L54"></a><tt class="py-lineno">54</tt> <a class="py-toggle" href="#" id="IRecordHolder.setid-toggle" onclick="return toggle('IRecordHolder.setid');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="ProvCon.dbui.API.IRecordHolder-class.html#setid">setid</a><tt class="py-op">(</tt><tt class="py-param">id</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> <tt class="py-keyword">pass</tt> </tt>
+</div><a name="IRecordHolder.revert"></a><div id="IRecordHolder.revert-def"><a name="L55"></a><tt class="py-lineno">55</tt> <a class="py-toggle" href="#" id="IRecordHolder.revert-toggle" onclick="return toggle('IRecordHolder.revert');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="ProvCon.dbui.API.IRecordHolder-class.html#revert">revert</a><tt class="py-op">(</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> <tt class="py-keyword">pass</tt>     </tt>
+</div></div><a name="L56"></a><tt class="py-lineno">56</tt>  <tt class="py-line"> </tt>
+<a name="INavigator"></a><div id="INavigator-def"><a name="L57"></a><tt class="py-lineno">57</tt> <a class="py-toggle" href="#" id="INavigator-toggle" onclick="return toggle('INavigator');">-</a><tt class="py-line"><tt class="py-keyword">class</tt> <a class="py-def-name" href="ProvCon.dbui.API.INavigator-class.html">INavigator</a><tt class="py-op">(</tt><tt class="py-base-class">IDumbNavigator</tt><tt class="py-op">,</tt> <tt class="py-base-class">IRecordListHolder</tt><tt class="py-op">)</tt><tt class="py-op">:</tt>     </tt>
+</div><a name="INavigator.navigate"></a><div id="INavigator.navigate-def"><a name="L58"></a><tt class="py-lineno">58</tt> <a class="py-toggle" href="#" id="INavigator.navigate-toggle" onclick="return toggle('INavigator.navigate');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="ProvCon.dbui.API.INavigator-class.html#navigate">navigate</a><tt class="py-op">(</tt><tt class="py-param">recordindex</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> <tt class="py-keyword">pass</tt> </tt>
+</div><a name="INavigator.first"></a><div id="INavigator.first-def"><a name="L59"></a><tt class="py-lineno">59</tt> <a class="py-toggle" href="#" id="INavigator.first-toggle" onclick="return toggle('INavigator.first');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="ProvCon.dbui.API.INavigator-class.html#first">first</a><tt class="py-op">(</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> <tt class="py-keyword">pass</tt> </tt>
+</div><a name="INavigator.prev"></a><div id="INavigator.prev-def"><a name="L60"></a><tt class="py-lineno">60</tt> <a class="py-toggle" href="#" id="INavigator.prev-toggle" onclick="return toggle('INavigator.prev');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="ProvCon.dbui.API.INavigator-class.html#prev">prev</a><tt class="py-op">(</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> <tt class="py-keyword">pass</tt> </tt>
+</div><a name="INavigator.next"></a><div id="INavigator.next-def"><a name="L61"></a><tt class="py-lineno">61</tt> <a class="py-toggle" href="#" id="INavigator.next-toggle" onclick="return toggle('INavigator.next');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="ProvCon.dbui.API.INavigator-class.html#next">next</a><tt class="py-op">(</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> <tt class="py-keyword">pass</tt> </tt>
+</div><a name="INavigator.last"></a><div id="INavigator.last-def"><a name="L62"></a><tt class="py-lineno">62</tt> <a class="py-toggle" href="#" id="INavigator.last-toggle" onclick="return toggle('INavigator.last');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="ProvCon.dbui.API.INavigator-class.html#last">last</a><tt class="py-op">(</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> <tt class="py-keyword">pass</tt> </tt>
+</div><a name="INavigator.currentid"></a><div id="INavigator.currentid-def"><a name="L63"></a><tt class="py-lineno">63</tt> <a class="py-toggle" href="#" id="INavigator.currentid-toggle" onclick="return toggle('INavigator.currentid');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="ProvCon.dbui.API.INavigator-class.html#currentid">currentid</a><tt class="py-op">(</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> <tt class="py-keyword">pass</tt> </tt>
+</div><a name="INavigator.currentrecord"></a><div id="INavigator.currentrecord-def"><a name="L64"></a><tt class="py-lineno">64</tt> <a class="py-toggle" href="#" id="INavigator.currentrecord-toggle" onclick="return toggle('INavigator.currentrecord');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="ProvCon.dbui.API.INavigator-class.html#currentrecord">currentrecord</a><tt class="py-op">(</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> <tt class="py-keyword">pass</tt> </tt>
+</div><a name="INavigator.indexof"></a><div id="INavigator.indexof-def"><a name="L65"></a><tt class="py-lineno">65</tt> <a class="py-toggle" href="#" id="INavigator.indexof-toggle" onclick="return toggle('INavigator.indexof');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="ProvCon.dbui.API.INavigator-class.html#indexof">indexof</a><tt class="py-op">(</tt><tt class="py-param">id</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> <tt class="py-keyword">pass</tt> </tt>
+</div></div><a name="L66"></a><tt class="py-lineno">66</tt>  <tt class="py-line"> </tt>
+<a name="L67"></a><tt class="py-lineno">67</tt>  <tt class="py-line"> </tt>
+<a name="IRecordController"></a><div id="IRecordController-def"><a name="L68"></a><tt class="py-lineno">68</tt> <a class="py-toggle" href="#" id="IRecordController-toggle" onclick="return toggle('IRecordController');">-</a><tt class="py-line"><tt class="py-keyword">class</tt> <a class="py-def-name" href="ProvCon.dbui.API.IRecordController-class.html">IRecordController</a><tt class="py-op">(</tt><tt class="py-base-class">IRecordHolder</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="IRecordController-collapsed" style="display:none;" pad="++" indent="++++"></div><div id="IRecordController-expanded"><a name="L69"></a><tt class="py-lineno">69</tt>  <tt class="py-line">    <tt class="py-docstring">"""</tt> </tt>
+<a name="L70"></a><tt class="py-lineno">70</tt>  <tt class="py-line"><tt class="py-docstring">    EMITS: current_record_modified</tt> </tt>
+<a name="L71"></a><tt class="py-lineno">71</tt>  <tt class="py-line"><tt class="py-docstring">    EMITS: current_record_saved</tt> </tt>
+<a name="L72"></a><tt class="py-lineno">72</tt>  <tt class="py-line"><tt class="py-docstring">    EMITS: current_record_deleted    </tt> </tt>
+<a name="L73"></a><tt class="py-lineno">73</tt>  <tt class="py-line"><tt class="py-docstring">    """</tt> </tt>
+<a name="IRecordController.save"></a><div id="IRecordController.save-def"><a name="L74"></a><tt class="py-lineno">74</tt> <a class="py-toggle" href="#" id="IRecordController.save-toggle" onclick="return toggle('IRecordController.save');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="ProvCon.dbui.API.IRecordController-class.html#save">save</a><tt class="py-op">(</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> <tt class="py-keyword">pass</tt>         </tt>
+</div><a name="IRecordController.delete"></a><div id="IRecordController.delete-def"><a name="L75"></a><tt class="py-lineno">75</tt> <a class="py-toggle" href="#" id="IRecordController.delete-toggle" onclick="return toggle('IRecordController.delete');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="ProvCon.dbui.API.IRecordController-class.html#delete">delete</a><tt class="py-op">(</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> <tt class="py-keyword">pass</tt> </tt>
+</div><a name="IRecordController.getvar"></a><div id="IRecordController.getvar-def"><a name="L76"></a><tt class="py-lineno">76</tt> <a class="py-toggle" href="#" id="IRecordController.getvar-toggle" onclick="return toggle('IRecordController.getvar');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="ProvCon.dbui.API.IRecordController-class.html#getvar">getvar</a><tt class="py-op">(</tt><tt class="py-param">fieldname</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> <tt class="py-keyword">pass</tt> </tt>
+</div></div><a name="L77"></a><tt class="py-lineno">77</tt>  <tt class="py-line"> </tt>
+<a name="IForm"></a><div id="IForm-def"><a name="L78"></a><tt class="py-lineno">78</tt> <a class="py-toggle" href="#" id="IForm-toggle" onclick="return toggle('IForm');">-</a><tt class="py-line"><tt class="py-keyword">class</tt> <a class="py-def-name" href="ProvCon.dbui.API.IForm-class.html">IForm</a><tt class="py-op">(</tt><tt class="py-base-class">IRecordController</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="IForm-collapsed" style="display:none;" pad="++" indent="++++"></div><div id="IForm-expanded"><a name="L79"></a><tt class="py-lineno">79</tt>  <tt class="py-line">    <tt class="py-docstring">"""</tt> </tt>
+<a name="L80"></a><tt class="py-lineno">80</tt>  <tt class="py-line"><tt class="py-docstring">    EMITS: new_record</tt> </tt>
+<a name="L81"></a><tt class="py-lineno">81</tt>  <tt class="py-line"><tt class="py-docstring">    """</tt> </tt>
+<a name="IForm.new"></a><div id="IForm.new-def"><a name="L82"></a><tt class="py-lineno">82</tt> <a class="py-toggle" href="#" id="IForm.new-toggle" onclick="return toggle('IForm.new');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="ProvCon.dbui.API.IForm-class.html#new">new</a><tt class="py-op">(</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> <tt class="py-keyword">pass</tt> </tt>
+</div></div><a name="L83"></a><tt class="py-lineno">83</tt>  <tt class="py-line"> </tt>
+<a name="L84"></a><tt class="py-lineno">84</tt>  <tt class="py-line">     </tt>
+<a name="ISearchEngine"></a><div id="ISearchEngine-def"><a name="L85"></a><tt class="py-lineno">85</tt> <a class="py-toggle" href="#" id="ISearchEngine-toggle" onclick="return toggle('ISearchEngine');">-</a><tt class="py-line"><tt class="py-keyword">class</tt> <a class="py-def-name" href="ProvCon.dbui.API.ISearchEngine-class.html">ISearchEngine</a><tt class="py-op">(</tt><tt class="py-base-class">Interface</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="ISearchEngine-collapsed" style="display:none;" pad="++" indent="++++"></div><div id="ISearchEngine-expanded"><a name="ISearchEngine.runsearch"></a><div id="ISearchEngine.runsearch-def"><a name="L86"></a><tt class="py-lineno">86</tt> <a class="py-toggle" href="#" id="ISearchEngine.runsearch-toggle" onclick="return toggle('ISearchEngine.runsearch');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="ProvCon.dbui.API.ISearchEngine-class.html#runsearch">runsearch</a><tt class="py-op">(</tt><tt class="py-param">query</tt><tt class="py-op">,</tt> <tt class="py-param">ISearchTargetList</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> <tt class="py-keyword">pass</tt>  </tt>
+</div></div><a name="L87"></a><tt class="py-lineno">87</tt>  <tt class="py-line">     </tt>
+<a name="ISearchTarget"></a><div id="ISearchTarget-def"><a name="L88"></a><tt class="py-lineno">88</tt> <a class="py-toggle" href="#" id="ISearchTarget-toggle" onclick="return toggle('ISearchTarget');">-</a><tt class="py-line"><tt class="py-keyword">class</tt> <a class="py-def-name" href="ProvCon.dbui.API.ISearchTarget-class.html">ISearchTarget</a><tt class="py-op">(</tt><tt class="py-base-class">Interface</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="ISearchTarget-collapsed" style="display:none;" pad="++" indent="++++"></div><div id="ISearchTarget-expanded"><a name="ISearchTarget.processsearchresults"></a><div id="ISearchTarget.processsearchresults-def"><a name="L89"></a><tt class="py-lineno">89</tt> <a class="py-toggle" href="#" id="ISearchTarget.processsearchresults-toggle" onclick="return toggle('ISearchTarget.processsearchresults');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="ProvCon.dbui.API.ISearchTarget-class.html#processsearchresults">processsearchresults</a><tt class="py-op">(</tt><tt class="py-param">IRecordList</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> <tt class="py-keyword">pass</tt> </tt>
+</div></div><a name="L90"></a><tt class="py-lineno">90</tt>  <tt class="py-line"> </tt><script type="text/javascript">
+<!--
+expandto(location.href);
+// -->
+</script>
+</pre>
+<br />
+<!-- ==================== NAVIGATION BAR ==================== -->
+<table class="navbar" border="0" width="100%" cellpadding="0"
+       bgcolor="#a0c0ff" cellspacing="0">
+  <tr valign="middle">
+  <!-- Home link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="ProvCon-module.html">Home</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Tree link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="module-tree.html">Trees</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Index link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="identifier-index.html">Indices</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Help link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="help.html">Help</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Project homepage -->
+      <th class="navbar" align="right" width="100%">
+        <table border="0" cellpadding="0" cellspacing="0">
+          <tr><th class="navbar" align="center"
+            >docsis-provisioning</th>
+          </tr></table></th>
+  </tr>
+</table>
+<table border="0" cellpadding="0" cellspacing="0" width="100%%">
+  <tr>
+    <td align="left" class="footer">
+    Generated by Epydoc 3.0.1 on Thu Jan  8 14:48:54 2009
+    </td>
+    <td align="right" class="footer">
+      <a target="mainFrame" href="http://epydoc.sourceforge.net"
+        >http://epydoc.sourceforge.net</a>
+    </td>
+  </tr>
+</table>
+
+<script type="text/javascript">
+  <!--
+  // Private objects are initially displayed (because if
+  // javascript is turned off then we want them to be
+  // visible); but by default, we want to hide them.  So hide
+  // them unless we have a cookie that says to show them.
+  checkCookie();
+  // -->
+</script>
+</body>
+</html>

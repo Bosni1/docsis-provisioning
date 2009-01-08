@@ -1,13 +1,15 @@
 #!/bin/env python
-import ProvCon, ProvCon.TFTP
 from multiprocessing import Process
 from multiprocessing.connection import Listener, Client
 import time, sys
-from ProvCon.wronolib import daemonize
+
+import ProvCon
+from ProvCon.wronolib import daemonize, set_process_name
+from ProvCon.TFTP import pcTFTPD as srvTFTPD
 
 class Provisioning:
     _services_ = [
-        ("tftpd", ProvCon.TFTPD),
+        ("tftpd", srvTFTPD),
         ]
     _shutdown_sequence_ = [
         "tftpd",
@@ -66,7 +68,7 @@ sys.excepthook = UnhandledExceptionHook
 config = ProvCon.Configuration()
 print "Hello! I am Provisioning v1.0 and I will be running as a daemon!"
 daemonize ('/dev/null', config.get ("LOGGING", "stdout"), config.get("LOGGING", "stdout") )
-ProvCon.set_process_name ( "0@@Provisioning" )
+set_process_name ( "0@@Provisioning" )
 p = Provisioning()
 
 try:

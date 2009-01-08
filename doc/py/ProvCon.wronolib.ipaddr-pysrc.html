@@ -1,0 +1,268 @@
+<?xml version="1.0" encoding="ascii"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+          "DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+  <title>ProvCon.wronolib.ipaddr</title>
+  <link rel="stylesheet" href="epydoc.css" type="text/css" />
+  <script type="text/javascript" src="epydoc.js"></script>
+</head>
+
+<body bgcolor="white" text="black" link="blue" vlink="#204080"
+      alink="#204080">
+<!-- ==================== NAVIGATION BAR ==================== -->
+<table class="navbar" border="0" width="100%" cellpadding="0"
+       bgcolor="#a0c0ff" cellspacing="0">
+  <tr valign="middle">
+  <!-- Home link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="ProvCon-module.html">Home</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Tree link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="module-tree.html">Trees</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Index link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="identifier-index.html">Indices</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Help link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="help.html">Help</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Project homepage -->
+      <th class="navbar" align="right" width="100%">
+        <table border="0" cellpadding="0" cellspacing="0">
+          <tr><th class="navbar" align="center"
+            >docsis-provisioning</th>
+          </tr></table></th>
+  </tr>
+</table>
+<table width="100%" cellpadding="0" cellspacing="0">
+  <tr valign="top">
+    <td width="100%">
+      <span class="breadcrumbs">
+        <a href="ProvCon-module.html">Package&nbsp;ProvCon</a> ::
+        <a href="ProvCon.wronolib-module.html">Package&nbsp;wronolib</a> ::
+        Module&nbsp;ipaddr
+      </span>
+    </td>
+    <td>
+      <table cellpadding="0" cellspacing="0">
+        <!-- hide/show private -->
+        <tr><td align="right"><span class="options">[<a href="javascript:void(0);" class="privatelink"
+    onclick="toggle_private();">hide&nbsp;private</a>]</span></td></tr>
+        <tr><td align="right"><span class="options"
+            >[<a href="frames.html" target="_top">frames</a
+            >]&nbsp;|&nbsp;<a href="ProvCon.wronolib.ipaddr-pysrc.html"
+            target="_top">no&nbsp;frames</a>]</span></td></tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<h1 class="epydoc">Source Code for <a href="ProvCon.wronolib.ipaddr-module.html">Module ProvCon.wronolib.ipaddr</a></h1>
+<pre class="py-src">
+<a name="L1"></a><tt class="py-lineno"> 1</tt>  <tt class="py-line"><tt class="py-comment">#!/bin/env python</tt> </tt>
+<a name="L2"></a><tt class="py-lineno"> 2</tt>  <tt class="py-line"><tt class="py-keyword">from</tt> <tt class="py-name">socket</tt> <tt class="py-keyword">import</tt> <tt class="py-name">inet_aton</tt> <tt class="py-keyword">as</tt> <tt class="py-name">aton</tt><tt class="py-op">,</tt> <tt class="py-name">inet_ntoa</tt> <tt class="py-keyword">as</tt> <tt class="py-name">ntoa</tt><tt class="py-op">,</tt> <tt class="py-name">ntohl</tt><tt class="py-op">,</tt> <tt class="py-name">htonl</tt> </tt>
+<a name="L3"></a><tt class="py-lineno"> 3</tt>  <tt class="py-line"><tt class="py-keyword">from</tt> <tt class="py-name">struct</tt> <tt class="py-keyword">import</tt> <tt class="py-name">unpack</tt><tt class="py-op">,</tt> <tt class="py-name">pack</tt> </tt>
+<a name="L4"></a><tt class="py-lineno"> 4</tt>  <tt class="py-line"> </tt>
+<a name="str2ip4"></a><div id="str2ip4-def"><a name="L5"></a><tt class="py-lineno"> 5</tt> <a class="py-toggle" href="#" id="str2ip4-toggle" onclick="return toggle('str2ip4');">-</a><tt class="py-line"><tt class="py-keyword">def</tt> <a class="py-def-name" href="ProvCon.wronolib.ipaddr-module.html#str2ip4">str2ip4</a> <tt class="py-op">(</tt><tt class="py-param">ip4str</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="str2ip4-collapsed" style="display:none;" pad="++" indent="++++"></div><div id="str2ip4-expanded"><a name="L6"></a><tt class="py-lineno"> 6</tt>  <tt class="py-line">    <tt class="py-keyword">return</tt> <tt class="py-name">ntohl</tt><tt class="py-op">(</tt><tt class="py-name">unpack</tt><tt class="py-op">(</tt><tt class="py-string">'I'</tt><tt class="py-op">,</tt> <tt class="py-name">aton</tt><tt class="py-op">(</tt><tt class="py-name">ip4str</tt><tt class="py-op">)</tt><tt class="py-op">)</tt><tt class="py-op">[</tt><tt class="py-number">0</tt><tt class="py-op">]</tt><tt class="py-op">)</tt> </tt>
+</div><a name="L7"></a><tt class="py-lineno"> 7</tt>  <tt class="py-line"> </tt>
+<a name="mask"></a><div id="mask-def"><a name="L8"></a><tt class="py-lineno"> 8</tt> <a class="py-toggle" href="#" id="mask-toggle" onclick="return toggle('mask');">-</a><tt class="py-line"><tt class="py-keyword">def</tt> <a class="py-def-name" href="ProvCon.wronolib.ipaddr-module.html#mask">mask</a><tt class="py-op">(</tt><tt class="py-param">prefixlen</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="mask-collapsed" style="display:none;" pad="++" indent="++++"></div><div id="mask-expanded"><a name="L9"></a><tt class="py-lineno"> 9</tt>  <tt class="py-line">    <tt class="py-keyword">return</tt> <tt class="py-number">0xffffffff</tt> <tt class="py-op">^</tt> <tt class="py-op">(</tt><tt class="py-number">2</tt><tt class="py-op">**</tt><tt class="py-op">(</tt><tt class="py-number">32</tt> <tt class="py-op">-</tt><tt class="py-name">prefixlen</tt><tt class="py-op">)</tt> <tt class="py-op">-</tt> <tt class="py-number">1</tt><tt class="py-op">)</tt> </tt>
+</div><a name="L10"></a><tt class="py-lineno">10</tt>  <tt class="py-line"> </tt>
+<a name="ip_in_prefix"></a><div id="ip_in_prefix-def"><a name="L11"></a><tt class="py-lineno">11</tt> <a class="py-toggle" href="#" id="ip_in_prefix-toggle" onclick="return toggle('ip_in_prefix');">-</a><tt class="py-line"><tt class="py-keyword">def</tt> <a class="py-def-name" href="ProvCon.wronolib.ipaddr-module.html#ip_in_prefix">ip_in_prefix</a> <tt class="py-op">(</tt><tt class="py-param">prefix</tt><tt class="py-op">,</tt> <tt class="py-param">ip</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="ip_in_prefix-collapsed" style="display:none;" pad="++" indent="++++"></div><div id="ip_in_prefix-expanded"><a name="L12"></a><tt class="py-lineno">12</tt>  <tt class="py-line">    <tt class="py-op">(</tt><tt class="py-name">net</tt><tt class="py-op">,</tt><tt class="py-name">prlen</tt><tt class="py-op">)</tt> <tt class="py-op">=</tt> <tt class="py-name">prefix</tt><tt class="py-op">.</tt><tt class="py-name">split</tt><tt class="py-op">(</tt><tt class="py-string">"/"</tt><tt class="py-op">)</tt> </tt>
+<a name="L13"></a><tt class="py-lineno">13</tt>  <tt class="py-line">    <tt class="py-name">prlen</tt> <tt class="py-op">=</tt> <tt id="link-0" class="py-name" targets="Class int=int-class.html"><a title="int" class="py-name" href="#" onclick="return doclink('link-0', 'int', 'link-0');">int</a></tt><tt class="py-op">(</tt><tt class="py-name">prlen</tt><tt class="py-op">)</tt>     </tt>
+<a name="L14"></a><tt class="py-lineno">14</tt>  <tt class="py-line">    <tt class="py-keyword">if</tt> <tt class="py-name">prlen</tt> <tt class="py-op">&lt;=</tt> <tt class="py-number">0</tt><tt class="py-op">:</tt> <tt class="py-keyword">return</tt> <tt class="py-name">True</tt> </tt>
+<a name="L15"></a><tt class="py-lineno">15</tt>  <tt class="py-line">     </tt>
+<a name="L16"></a><tt class="py-lineno">16</tt>  <tt class="py-line">    <tt class="py-name">m</tt> <tt class="py-op">=</tt> <tt id="link-1" class="py-name" targets="Function ProvCon.wronolib.ipaddr.mask()=ProvCon.wronolib.ipaddr-module.html#mask"><a title="ProvCon.wronolib.ipaddr.mask" class="py-name" href="#" onclick="return doclink('link-1', 'mask', 'link-1');">mask</a></tt><tt class="py-op">(</tt><tt class="py-name">prlen</tt><tt class="py-op">)</tt>         </tt>
+<a name="L17"></a><tt class="py-lineno">17</tt>  <tt class="py-line">    <tt class="py-name">net</tt> <tt class="py-op">=</tt> <tt id="link-2" class="py-name" targets="Function ProvCon.wronolib.ipaddr.str2ip4()=ProvCon.wronolib.ipaddr-module.html#str2ip4"><a title="ProvCon.wronolib.ipaddr.str2ip4" class="py-name" href="#" onclick="return doclink('link-2', 'str2ip4', 'link-2');">str2ip4</a></tt><tt class="py-op">(</tt><tt class="py-name">net</tt><tt class="py-op">)</tt> <tt class="py-op">&amp;</tt> <tt class="py-name">m</tt> </tt>
+<a name="L18"></a><tt class="py-lineno">18</tt>  <tt class="py-line">    <tt class="py-name">ip</tt> <tt class="py-op">=</tt> <tt id="link-3" class="py-name"><a title="ProvCon.wronolib.ipaddr.str2ip4" class="py-name" href="#" onclick="return doclink('link-3', 'str2ip4', 'link-2');">str2ip4</a></tt><tt class="py-op">(</tt><tt class="py-name">ip</tt><tt class="py-op">)</tt> <tt class="py-op">&amp;</tt> <tt class="py-name">m</tt> </tt>
+<a name="L19"></a><tt class="py-lineno">19</tt>  <tt class="py-line">    <tt class="py-keyword">return</tt> <tt class="py-name">net</tt> <tt class="py-op">==</tt> <tt class="py-name">ip</tt> </tt>
+</div><a name="L20"></a><tt class="py-lineno">20</tt>  <tt class="py-line"> </tt>
+<a name="ip4addr"></a><div id="ip4addr-def"><a name="L21"></a><tt class="py-lineno">21</tt> <a class="py-toggle" href="#" id="ip4addr-toggle" onclick="return toggle('ip4addr');">-</a><tt class="py-line"><tt class="py-keyword">class</tt> <a class="py-def-name" href="ProvCon.wronolib.ipaddr.ip4addr-class.html">ip4addr</a><tt class="py-op">:</tt> </tt>
+</div><div id="ip4addr-collapsed" style="display:none;" pad="++" indent="++++"></div><div id="ip4addr-expanded"><a name="ip4addr.__init__"></a><div id="ip4addr.__init__-def"><a name="L22"></a><tt class="py-lineno">22</tt> <a class="py-toggle" href="#" id="ip4addr.__init__-toggle" onclick="return toggle('ip4addr.__init__');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="ProvCon.wronolib.ipaddr.ip4addr-class.html#__init__">__init__</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">,</tt> <tt class="py-param">ip</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="ip4addr.__init__-collapsed" style="display:none;" pad="++" indent="++++++++"></div><div id="ip4addr.__init__-expanded"><a name="L23"></a><tt class="py-lineno">23</tt>  <tt class="py-line">        <tt class="py-keyword">if</tt> <tt class="py-name">type</tt><tt class="py-op">(</tt><tt class="py-name">ip</tt><tt class="py-op">)</tt> <tt class="py-op">==</tt> <tt class="py-name">str</tt><tt class="py-op">:</tt> </tt>
+<a name="L24"></a><tt class="py-lineno">24</tt>  <tt class="py-line">            <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">addr</tt> <tt class="py-op">=</tt> <tt id="link-4" class="py-name"><a title="ProvCon.wronolib.ipaddr.str2ip4" class="py-name" href="#" onclick="return doclink('link-4', 'str2ip4', 'link-2');">str2ip4</a></tt><tt class="py-op">(</tt><tt class="py-name">ip</tt><tt class="py-op">)</tt> </tt>
+<a name="L25"></a><tt class="py-lineno">25</tt>  <tt class="py-line">        <tt class="py-keyword">elif</tt> <tt class="py-name">type</tt><tt class="py-op">(</tt><tt class="py-name">ip</tt><tt class="py-op">)</tt> <tt class="py-keyword">in</tt> <tt class="py-op">[</tt><tt id="link-5" class="py-name"><a title="int" class="py-name" href="#" onclick="return doclink('link-5', 'int', 'link-0');">int</a></tt><tt class="py-op">,</tt> <tt class="py-name">long</tt><tt class="py-op">]</tt><tt class="py-op">:</tt>             </tt>
+<a name="L26"></a><tt class="py-lineno">26</tt>  <tt class="py-line">            <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">addr</tt> <tt class="py-op">=</tt> <tt class="py-name">ip</tt> </tt>
+<a name="L27"></a><tt class="py-lineno">27</tt>  <tt class="py-line">        <tt class="py-keyword">elif</tt> <tt class="py-name">isinstance</tt><tt class="py-op">(</tt><tt class="py-name">ip</tt><tt class="py-op">,</tt> <tt id="link-6" class="py-name" targets="Class ProvCon.wronolib.ipaddr.ip4addr=ProvCon.wronolib.ipaddr.ip4addr-class.html"><a title="ProvCon.wronolib.ipaddr.ip4addr" class="py-name" href="#" onclick="return doclink('link-6', 'ip4addr', 'link-6');">ip4addr</a></tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+<a name="L28"></a><tt class="py-lineno">28</tt>  <tt class="py-line">            <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">addr</tt> <tt class="py-op">=</tt> <tt class="py-name">ip</tt><tt class="py-op">.</tt><tt class="py-name">addr</tt> </tt>
+<a name="L29"></a><tt class="py-lineno">29</tt>  <tt class="py-line">        <tt class="py-keyword">else</tt><tt class="py-op">:</tt> </tt>
+<a name="L30"></a><tt class="py-lineno">30</tt>  <tt class="py-line">            <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">addr</tt> <tt class="py-op">=</tt> <tt class="py-number">0</tt> </tt>
+</div><a name="ip4addr.__repr__"></a><div id="ip4addr.__repr__-def"><a name="L31"></a><tt class="py-lineno">31</tt> <a class="py-toggle" href="#" id="ip4addr.__repr__-toggle" onclick="return toggle('ip4addr.__repr__');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="ProvCon.wronolib.ipaddr.ip4addr-class.html#__repr__">__repr__</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="ip4addr.__repr__-collapsed" style="display:none;" pad="++" indent="++++++++"></div><div id="ip4addr.__repr__-expanded"><a name="L32"></a><tt class="py-lineno">32</tt>  <tt class="py-line">        <tt class="py-keyword">return</tt> <tt class="py-name">ntoa</tt><tt class="py-op">(</tt><tt class="py-name">pack</tt><tt class="py-op">(</tt><tt class="py-string">'I'</tt><tt class="py-op">,</tt> <tt class="py-name">htonl</tt><tt class="py-op">(</tt><tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">addr</tt><tt class="py-op">)</tt><tt class="py-op">)</tt><tt class="py-op">)</tt> </tt>
+</div></div><a name="L33"></a><tt class="py-lineno">33</tt>  <tt class="py-line">     </tt>
+<a name="ip4prefix"></a><div id="ip4prefix-def"><a name="L34"></a><tt class="py-lineno">34</tt> <a class="py-toggle" href="#" id="ip4prefix-toggle" onclick="return toggle('ip4prefix');">-</a><tt class="py-line"><tt class="py-keyword">class</tt> <a class="py-def-name" href="ProvCon.wronolib.ipaddr.ip4prefix-class.html">ip4prefix</a><tt class="py-op">(</tt><tt class="py-base-class">ip4addr</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="ip4prefix-collapsed" style="display:none;" pad="++" indent="++++"></div><div id="ip4prefix-expanded"><a name="ip4prefix.__init__"></a><div id="ip4prefix.__init__-def"><a name="L35"></a><tt class="py-lineno">35</tt> <a class="py-toggle" href="#" id="ip4prefix.__init__-toggle" onclick="return toggle('ip4prefix.__init__');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="ProvCon.wronolib.ipaddr.ip4prefix-class.html#__init__">__init__</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">,</tt> <tt class="py-param">ip</tt><tt class="py-op">,</tt> <tt class="py-param">prefixlen</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="ip4prefix.__init__-collapsed" style="display:none;" pad="++" indent="++++++++"></div><div id="ip4prefix.__init__-expanded"><a name="L36"></a><tt class="py-lineno">36</tt>  <tt class="py-line">        <tt id="link-7" class="py-name"><a title="ProvCon.wronolib.ipaddr.ip4addr" class="py-name" href="#" onclick="return doclink('link-7', 'ip4addr', 'link-6');">ip4addr</a></tt><tt class="py-op">.</tt><tt id="link-8" class="py-name" targets="Method ProvCon.TFTP.Protocol.Packet.__init__()=ProvCon.TFTP.Protocol.Packet-class.html#__init__,Method ProvCon.TFTP.ProvisioningTFTP.BaseOven.__init__()=ProvCon.TFTP.ProvisioningTFTP.BaseOven-class.html#__init__,Method ProvCon.TFTP.ProvisioningTFTP.CableModemConfigCook.__init__()=ProvCon.TFTP.ProvisioningTFTP.CableModemConfigCook-class.html#__init__,Method ProvCon.TFTP.ProvisioningTFTP.FileCook.__init__()=ProvCon.TFTP.ProvisioningTFTP.FileCook-class.html#__init__,Method ProvCon.TFTP.ProvisioningTFTP.ProvisioningTFTPServer.__init__()=ProvCon.TFTP.ProvisioningTFTP.ProvisioningTFTPServer-class.html#__init__,Method ProvCon.TFTP.ProvisioningTFTP.TFTPDataSender.__init__()=ProvCon.TFTP.ProvisioningTFTP.TFTPDataSender-class.html#__init__,Method ProvCon.TFTP.ProvisioningTFTP.pcTFTPD.__init__()=ProvCon.TFTP.ProvisioningTFTP.pcTFTPD-class.html#__init__,Method ProvCon.TFTP.Server.BaseTFTPServer.__init__()=ProvCon.TFTP.Server.BaseTFTPServer-class.html#__init__,Method ProvCon.cli.CLIServer.__init__()=ProvCon.cli.CLIServer-class.html#__init__,Method ProvCon.cli.CLIWorker.__init__()=ProvCon.cli.CLIWorker-class.html#__init__,Method ProvCon.dbui.abstractui.fields.BaseArrayEditor.__init__()=ProvCon.dbui.abstractui.fields.BaseArrayEditor-class.html#__init__,Method ProvCon.dbui.abstractui.fields.BaseArrayItemButtonBox.__init__()=ProvCon.dbui.abstractui.fields.BaseArrayItemButtonBox-class.html#__init__,Method ProvCon.dbui.abstractui.fields.BaseArrayItemEditor.__init__()=ProvCon.dbui.abstractui.fields.BaseArrayItemEditor-class.html#__init__,Method ProvCon.dbui.abstractui.fields.BaseFieldEditor.__init__()=ProvCon.dbui.abstractui.fields.BaseFieldEditor-class.html#__init__,Method ProvCon.dbui.abstractui.fields.BaseReferenceEditor.__init__()=ProvCon.dbui.abstractui.fields.BaseReferenceEditor-class.html#__init__,Method ProvCon.dbui.abstractui.forms.BaseForm.__init__()=ProvCon.dbui.abstractui.forms.BaseForm-class.html#__init__,Method ProvCon.dbui.abstractui.navigators.BaseNavigator.__init__()=ProvCon.dbui.abstractui.navigators.BaseNavigator-class.html#__init__,Method ProvCon.dbui.abstractui.recordlists.BasePager.__init__()=ProvCon.dbui.abstractui.recordlists.BasePager-class.html#__init__,Method ProvCon.dbui.abstractui.recordlists.BaseRecordList.__init__()=ProvCon.dbui.abstractui.recordlists.BaseRecordList-class.html#__init__,Method ProvCon.dbui.database.CFG.tCX.__init__()=ProvCon.dbui.database.CFG.tCX-class.html#__init__,Method ProvCon.dbui.di.rObject'.ObjectFlags.__init__()=ProvCon.dbui.di.rObject%27.ObjectFlags-class.html#__init__,Method ProvCon.dbui.di.rObject'.ObjectParams.__init__()=ProvCon.dbui.di.rObject%27.ObjectParams-class.html#__init__,Method ProvCon.dbui.di.rObject'.rObject.__init__()=ProvCon.dbui.di.rObject%27.rObject-class.html#__init__,Method ProvCon.dbui.meta.field.Field.__init__()=ProvCon.dbui.meta.field.Field-class.html#__init__,Method ProvCon.dbui.meta.table.Table.__init__()=ProvCon.dbui.meta.table.Table-class.html#__init__,Method ProvCon.dbui.orm.form.Form.__init__()=ProvCon.dbui.orm.form.Form-class.html#__init__,Method ProvCon.dbui.orm.record.Record.DataManipulationError.__init__()=ProvCon.dbui.orm.record.Record.DataManipulationError-class.html#__init__,Method ProvCon.dbui.orm.record.Record.DataQueryError.__init__()=ProvCon.dbui.orm.record.Record.DataQueryError-class.html#__init__,Method ProvCon.dbui.orm.record.Record.RecordNotFound.__init__()=ProvCon.dbui.orm.record.Record.RecordNotFound-class.html#__init__,Method ProvCon.dbui.orm.record.Record.__init__()=ProvCon.dbui.orm.record.Record-class.html#__init__,Method ProvCon.dbui.orm.recordlist.RecordList.__init__()=ProvCon.dbui.orm.recordlist.RecordList-class.html#__init__,Method ProvCon.dbui.orm.recordsearch.OIDSearchList.__init__()=ProvCon.dbui.orm.recordsearch.OIDSearchList-class.html#__init__,Method ProvCon.dbui.wxwin.complete.CompleteGenericForm.__init__()=ProvCon.dbui.wxwin.complete.CompleteGenericForm-class.html#__init__,Method ProvCon.dbui.wxwin.complete.FormToolbar.__init__()=ProvCon.dbui.wxwin.complete.FormToolbar-class.html#__init__,Method ProvCon.dbui.wxwin.complete.InfoPopup.__init__()=ProvCon.dbui.wxwin.complete.InfoPopup-class.html#__init__,Method ProvCon.dbui.wxwin.fields.Entry.ArrayCombo.__init__()=ProvCon.dbui.wxwin.fields.Entry.ArrayCombo-class.html#__init__,Method ProvCon.dbui.wxwin.fields.Entry.ArrayItemCombo.__init__()=ProvCon.dbui.wxwin.fields.Entry.ArrayItemCombo-class.html#__init__,Method ProvCon.dbui.wxwin.fields.Entry.ArrayItemStatic.__init__()=ProvCon.dbui.wxwin.fields.Entry.ArrayItemStatic-class.html#__init__,Method ProvCon.dbui.wxwin.fields.Entry.ArrayItemText.__init__()=ProvCon.dbui.wxwin.fields.Entry.ArrayItemText-class.html#__init__,Method ProvCon.dbui.wxwin.fields.Entry.ArrayText.__init__()=ProvCon.dbui.wxwin.fields.Entry.ArrayText-class.html#__init__,Method ProvCon.dbui.wxwin.fields.Entry.BaseArray.__init__()=ProvCon.dbui.wxwin.fields.Entry.BaseArray-class.html#__init__,Method ProvCon.dbui.wxwin.fields.Entry.Boolean.__init__()=ProvCon.dbui.wxwin.fields.Entry.Boolean-class.html#__init__,Method ProvCon.dbui.wxwin.fields.Entry.ComboReference.__init__()=ProvCon.dbui.wxwin.fields.Entry.ComboReference-class.html#__init__,Method ProvCon.dbui.wxwin.fields.Entry.Memo.__init__()=ProvCon.dbui.wxwin.fields.Entry.Memo-class.html#__init__,Method ProvCon.dbui.wxwin.fields.Entry.StandardArrayItemButtonBox.__init__()=ProvCon.dbui.wxwin.fields.Entry.StandardArrayItemButtonBox-class.html#__init__,Method ProvCon.dbui.wxwin.fields.Entry.Static.__init__()=ProvCon.dbui.wxwin.fields.Entry.Static-class.html#__init__,Method ProvCon.dbui.wxwin.fields.Entry.StaticReference.__init__()=ProvCon.dbui.wxwin.fields.Entry.StaticReference-class.html#__init__,Method ProvCon.dbui.wxwin.fields.Entry.Text.__init__()=ProvCon.dbui.wxwin.fields.Entry.Text-class.html#__init__,Method ProvCon.dbui.wxwin.forms.GenericForm.__init__()=ProvCon.dbui.wxwin.forms.GenericForm-class.html#__init__,Method ProvCon.dbui.wxwin.mwx.CheckBox.__init__()=ProvCon.dbui.wxwin.mwx.CheckBox-class.html#__init__,Method ProvCon.dbui.wxwin.mwx.ComboBox.__init__()=ProvCon.dbui.wxwin.mwx.ComboBox-class.html#__init__,Method ProvCon.dbui.wxwin.mwx.StaticText.__init__()=ProvCon.dbui.wxwin.mwx.StaticText-class.html#__init__,Method ProvCon.dbui.wxwin.mwx.TextCtrl.__init__()=ProvCon.dbui.wxwin.mwx.TextCtrl-class.html#__init__,Method ProvCon.dbui.wxwin.mwx.mwxControl.__init__()=ProvCon.dbui.wxwin.mwx.mwxControl-class.html#__init__,Method ProvCon.dbui.wxwin.navigators.Navigator.__init__()=ProvCon.dbui.wxwin.navigators.Navigator-class.html#__init__,Method ProvCon.dbui.wxwin.recordlists.RecordList.__init__()=ProvCon.dbui.wxwin.recordlists.RecordList-class.html#__init__,Method ProvCon.docsis.cablemodem.cablemodem.__init__()=ProvCon.docsis.cablemodem.cablemodem-class.html#__init__,Method ProvCon.docsis.cablemodem.cablemodem._cos.__init__()=ProvCon.docsis.cablemodem.cablemodem._cos-class.html#__init__,Method ProvCon.docsis.cablemodem.cablemodem._cpe.__init__()=ProvCon.docsis.cablemodem.cablemodem._cpe-class.html#__init__,Method ProvCon.docsis.cablemodem.cablemodem._mac.__init__()=ProvCon.docsis.cablemodem.cablemodem._mac-class.html#__init__,Method ProvCon.docsis.compiler.config.config.__init__()=ProvCon.docsis.compiler.config.config-class.html#__init__,Method ProvCon.docsis.compiler.encoder.error.__init__()=ProvCon.docsis.compiler.encoder.error-class.html#__init__,Method ProvCon.docsis.compiler.encoder.tlv.__init__()=ProvCon.docsis.compiler.encoder.tlv-class.html#__init__,Method ProvCon.docsis.compiler.encoder.tlv_multipart.__init__()=ProvCon.docsis.compiler.encoder.tlv_multipart-class.html#__init__,Method ProvCon.docsis.compiler.encoder.tlv_multipart.append_proxy.__init__()=ProvCon.docsis.compiler.encoder.tlv_multipart.append_proxy-class.html#__init__,Method ProvCon.docsis.compiler.encoder.tlv_multipart.iterator.__init__()=ProvCon.docsis.compiler.encoder.tlv_multipart.iterator-class.html#__init__,Method ProvCon.docsis.compiler.encoder.tlv_multipart_subclass.__init__()=ProvCon.docsis.compiler.encoder.tlv_multipart_subclass-class.html#__init__,Method ProvCon.docsis.compiler.encoder.tlv_subclass.__init__()=ProvCon.docsis.compiler.encoder.tlv_subclass-class.html#__init__,Method ProvCon.func.classes.conditionalmethod.__init__()=ProvCon.func.classes.conditionalmethod-class.html#__init__,Method ProvCon.func.events.eventemitter.__init__()=ProvCon.func.events.eventemitter-class.html#__init__,Method ProvCon.func.events.eventemitter.evt.__init__()=ProvCon.func.events.eventemitter.evt-class.html#__init__,Method ProvCon.func.events.eventemitter.evthook.__init__()=ProvCon.func.events.eventemitter.evthook-class.html#__init__,Method ProvCon.func.events.eventexception.__init__()=ProvCon.func.events.eventexception-class.html#__init__,Method ProvCon.func.variables.TracedVariable.Tracer.__init__()=ProvCon.func.variables.TracedVariable.Tracer-class.html#__init__,Method ProvCon.func.variables.TracedVariable.__init__()=ProvCon.func.variables.TracedVariable-class.html#__init__,Method ProvCon.gui.FrontEndApp.FE.__init__()=ProvCon.gui.FrontEndApp.FE-class.html#__init__,Method ProvCon.gui.ProvisioningControl.GenericObjectEditor.__init__()=ProvCon.gui.ProvisioningControl.GenericObjectEditor-class.html#__init__,Method ProvCon.gui.ProvisioningControl.GridView.__init__()=ProvCon.gui.ProvisioningControl.GridView-class.html#__init__,Method ProvCon.gui.ProvisioningControl.MainTab.__init__()=ProvCon.gui.ProvisioningControl.MainTab-class.html#__init__,Method ProvCon.gui.ProvisioningControl.ObjectEditorModel.__init__()=ProvCon.gui.ProvisioningControl.ObjectEditorModel-class.html#__init__,Method ProvCon.gui.ProvisioningControl.TopLevelWindow.__init__()=ProvCon.gui.ProvisioningControl.TopLevelWindow-class.html#__init__,Method ProvCon.log.LoggingBackend.__init__()=ProvCon.log.LoggingBackend-class.html#__init__,Method ProvCon.log.LoggingClient.__init__()=ProvCon.log.LoggingClient-class.html#__init__,Method ProvCon.log.LoggingServer.__init__()=ProvCon.log.LoggingServer-class.html#__init__,Method ProvCon.ui.uierror.__init__()=ProvCon.ui.uierror-class.html#__init__,Method ProvCon.wronolib.ipaddr.ip4addr.__init__()=ProvCon.wronolib.ipaddr.ip4addr-class.html#__init__,Method ProvCon.wronolib.ipaddr.ip4prefix.__init__()=ProvCon.wronolib.ipaddr.ip4prefix-class.html#__init__"><a title="ProvCon.TFTP.Protocol.Packet.__init__
+ProvCon.TFTP.ProvisioningTFTP.BaseOven.__init__
+ProvCon.TFTP.ProvisioningTFTP.CableModemConfigCook.__init__
+ProvCon.TFTP.ProvisioningTFTP.FileCook.__init__
+ProvCon.TFTP.ProvisioningTFTP.ProvisioningTFTPServer.__init__
+ProvCon.TFTP.ProvisioningTFTP.TFTPDataSender.__init__
+ProvCon.TFTP.ProvisioningTFTP.pcTFTPD.__init__
+ProvCon.TFTP.Server.BaseTFTPServer.__init__
+ProvCon.cli.CLIServer.__init__
+ProvCon.cli.CLIWorker.__init__
+ProvCon.dbui.abstractui.fields.BaseArrayEditor.__init__
+ProvCon.dbui.abstractui.fields.BaseArrayItemButtonBox.__init__
+ProvCon.dbui.abstractui.fields.BaseArrayItemEditor.__init__
+ProvCon.dbui.abstractui.fields.BaseFieldEditor.__init__
+ProvCon.dbui.abstractui.fields.BaseReferenceEditor.__init__
+ProvCon.dbui.abstractui.forms.BaseForm.__init__
+ProvCon.dbui.abstractui.navigators.BaseNavigator.__init__
+ProvCon.dbui.abstractui.recordlists.BasePager.__init__
+ProvCon.dbui.abstractui.recordlists.BaseRecordList.__init__
+ProvCon.dbui.database.CFG.tCX.__init__
+ProvCon.dbui.di.rObject'.ObjectFlags.__init__
+ProvCon.dbui.di.rObject'.ObjectParams.__init__
+ProvCon.dbui.di.rObject'.rObject.__init__
+ProvCon.dbui.meta.field.Field.__init__
+ProvCon.dbui.meta.table.Table.__init__
+ProvCon.dbui.orm.form.Form.__init__
+ProvCon.dbui.orm.record.Record.DataManipulationError.__init__
+ProvCon.dbui.orm.record.Record.DataQueryError.__init__
+ProvCon.dbui.orm.record.Record.RecordNotFound.__init__
+ProvCon.dbui.orm.record.Record.__init__
+ProvCon.dbui.orm.recordlist.RecordList.__init__
+ProvCon.dbui.orm.recordsearch.OIDSearchList.__init__
+ProvCon.dbui.wxwin.complete.CompleteGenericForm.__init__
+ProvCon.dbui.wxwin.complete.FormToolbar.__init__
+ProvCon.dbui.wxwin.complete.InfoPopup.__init__
+ProvCon.dbui.wxwin.fields.Entry.ArrayCombo.__init__
+ProvCon.dbui.wxwin.fields.Entry.ArrayItemCombo.__init__
+ProvCon.dbui.wxwin.fields.Entry.ArrayItemStatic.__init__
+ProvCon.dbui.wxwin.fields.Entry.ArrayItemText.__init__
+ProvCon.dbui.wxwin.fields.Entry.ArrayText.__init__
+ProvCon.dbui.wxwin.fields.Entry.BaseArray.__init__
+ProvCon.dbui.wxwin.fields.Entry.Boolean.__init__
+ProvCon.dbui.wxwin.fields.Entry.ComboReference.__init__
+ProvCon.dbui.wxwin.fields.Entry.Memo.__init__
+ProvCon.dbui.wxwin.fields.Entry.StandardArrayItemButtonBox.__init__
+ProvCon.dbui.wxwin.fields.Entry.Static.__init__
+ProvCon.dbui.wxwin.fields.Entry.StaticReference.__init__
+ProvCon.dbui.wxwin.fields.Entry.Text.__init__
+ProvCon.dbui.wxwin.forms.GenericForm.__init__
+ProvCon.dbui.wxwin.mwx.CheckBox.__init__
+ProvCon.dbui.wxwin.mwx.ComboBox.__init__
+ProvCon.dbui.wxwin.mwx.StaticText.__init__
+ProvCon.dbui.wxwin.mwx.TextCtrl.__init__
+ProvCon.dbui.wxwin.mwx.mwxControl.__init__
+ProvCon.dbui.wxwin.navigators.Navigator.__init__
+ProvCon.dbui.wxwin.recordlists.RecordList.__init__
+ProvCon.docsis.cablemodem.cablemodem.__init__
+ProvCon.docsis.cablemodem.cablemodem._cos.__init__
+ProvCon.docsis.cablemodem.cablemodem._cpe.__init__
+ProvCon.docsis.cablemodem.cablemodem._mac.__init__
+ProvCon.docsis.compiler.config.config.__init__
+ProvCon.docsis.compiler.encoder.error.__init__
+ProvCon.docsis.compiler.encoder.tlv.__init__
+ProvCon.docsis.compiler.encoder.tlv_multipart.__init__
+ProvCon.docsis.compiler.encoder.tlv_multipart.append_proxy.__init__
+ProvCon.docsis.compiler.encoder.tlv_multipart.iterator.__init__
+ProvCon.docsis.compiler.encoder.tlv_multipart_subclass.__init__
+ProvCon.docsis.compiler.encoder.tlv_subclass.__init__
+ProvCon.func.classes.conditionalmethod.__init__
+ProvCon.func.events.eventemitter.__init__
+ProvCon.func.events.eventemitter.evt.__init__
+ProvCon.func.events.eventemitter.evthook.__init__
+ProvCon.func.events.eventexception.__init__
+ProvCon.func.variables.TracedVariable.Tracer.__init__
+ProvCon.func.variables.TracedVariable.__init__
+ProvCon.gui.FrontEndApp.FE.__init__
+ProvCon.gui.ProvisioningControl.GenericObjectEditor.__init__
+ProvCon.gui.ProvisioningControl.GridView.__init__
+ProvCon.gui.ProvisioningControl.MainTab.__init__
+ProvCon.gui.ProvisioningControl.ObjectEditorModel.__init__
+ProvCon.gui.ProvisioningControl.TopLevelWindow.__init__
+ProvCon.log.LoggingBackend.__init__
+ProvCon.log.LoggingClient.__init__
+ProvCon.log.LoggingServer.__init__
+ProvCon.ui.uierror.__init__
+ProvCon.wronolib.ipaddr.ip4addr.__init__
+ProvCon.wronolib.ipaddr.ip4prefix.__init__" class="py-name" href="#" onclick="return doclink('link-8', '__init__', 'link-8');">__init__</a></tt><tt class="py-op">(</tt><tt class="py-name">self</tt><tt class="py-op">,</tt> <tt class="py-name">ip</tt><tt class="py-op">)</tt> </tt>
+<a name="L37"></a><tt class="py-lineno">37</tt>  <tt class="py-line">        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">prefixlen</tt> <tt class="py-op">=</tt> <tt class="py-name">max</tt><tt class="py-op">(</tt><tt class="py-number">0</tt><tt class="py-op">,</tt> <tt class="py-name">min</tt><tt class="py-op">(</tt><tt class="py-number">32</tt><tt class="py-op">,</tt> <tt class="py-name">prefixlen</tt><tt class="py-op">)</tt><tt class="py-op">)</tt> </tt>
+<a name="L38"></a><tt class="py-lineno">38</tt>  <tt class="py-line">        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-9" class="py-name"><a title="ProvCon.wronolib.ipaddr.mask" class="py-name" href="#" onclick="return doclink('link-9', 'mask', 'link-1');">mask</a></tt> <tt class="py-op">=</tt> <tt id="link-10" class="py-name"><a title="ProvCon.wronolib.ipaddr.mask" class="py-name" href="#" onclick="return doclink('link-10', 'mask', 'link-1');">mask</a></tt><tt class="py-op">(</tt><tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">prefixlen</tt><tt class="py-op">)</tt> </tt>
+<a name="L39"></a><tt class="py-lineno">39</tt>  <tt class="py-line">        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">network</tt> <tt class="py-op">=</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">addr</tt> <tt class="py-op">&amp;</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-11" class="py-name"><a title="ProvCon.wronolib.ipaddr.mask" class="py-name" href="#" onclick="return doclink('link-11', 'mask', 'link-1');">mask</a></tt> </tt>
+<a name="L40"></a><tt class="py-lineno">40</tt>  <tt class="py-line">        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">broadcast</tt> <tt class="py-op">=</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">addr</tt> <tt class="py-op">|</tt> <tt class="py-op">(</tt><tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-12" class="py-name"><a title="ProvCon.wronolib.ipaddr.mask" class="py-name" href="#" onclick="return doclink('link-12', 'mask', 'link-1');">mask</a></tt> <tt class="py-op">^</tt> <tt id="link-13" class="py-name"><a title="ProvCon.wronolib.ipaddr.mask" class="py-name" href="#" onclick="return doclink('link-13', 'mask', 'link-1');">mask</a></tt><tt class="py-op">(</tt><tt class="py-number">32</tt><tt class="py-op">)</tt><tt class="py-op">)</tt>         </tt>
+<a name="L41"></a><tt class="py-lineno">41</tt>  <tt class="py-line">        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">addr</tt> <tt class="py-op">=</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">network</tt> </tt>
+</div><a name="L42"></a><tt class="py-lineno">42</tt>  <tt class="py-line">         </tt>
+<a name="ip4prefix.get_network"></a><div id="ip4prefix.get_network-def"><a name="L43"></a><tt class="py-lineno">43</tt> <a class="py-toggle" href="#" id="ip4prefix.get_network-toggle" onclick="return toggle('ip4prefix.get_network');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="ProvCon.wronolib.ipaddr.ip4prefix-class.html#get_network">get_network</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="ip4prefix.get_network-collapsed" style="display:none;" pad="++" indent="++++++++"></div><div id="ip4prefix.get_network-expanded"><a name="L44"></a><tt class="py-lineno">44</tt>  <tt class="py-line">        <tt class="py-keyword">return</tt> <tt id="link-14" class="py-name"><a title="ProvCon.wronolib.ipaddr.ip4addr" class="py-name" href="#" onclick="return doclink('link-14', 'ip4addr', 'link-6');">ip4addr</a></tt> <tt class="py-op">(</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">network</tt> <tt class="py-op">)</tt> </tt>
+</div><a name="L45"></a><tt class="py-lineno">45</tt>  <tt class="py-line"> </tt>
+<a name="ip4prefix.get_broadcast"></a><div id="ip4prefix.get_broadcast-def"><a name="L46"></a><tt class="py-lineno">46</tt> <a class="py-toggle" href="#" id="ip4prefix.get_broadcast-toggle" onclick="return toggle('ip4prefix.get_broadcast');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="ProvCon.wronolib.ipaddr.ip4prefix-class.html#get_broadcast">get_broadcast</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="ip4prefix.get_broadcast-collapsed" style="display:none;" pad="++" indent="++++++++"></div><div id="ip4prefix.get_broadcast-expanded"><a name="L47"></a><tt class="py-lineno">47</tt>  <tt class="py-line">        <tt class="py-keyword">return</tt> <tt id="link-15" class="py-name"><a title="ProvCon.wronolib.ipaddr.ip4addr" class="py-name" href="#" onclick="return doclink('link-15', 'ip4addr', 'link-6');">ip4addr</a></tt> <tt class="py-op">(</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">broadcast</tt> <tt class="py-op">)</tt> </tt>
+</div><a name="L48"></a><tt class="py-lineno">48</tt>  <tt class="py-line">     </tt>
+<a name="ip4prefix.contains"></a><div id="ip4prefix.contains-def"><a name="L49"></a><tt class="py-lineno">49</tt> <a class="py-toggle" href="#" id="ip4prefix.contains-toggle" onclick="return toggle('ip4prefix.contains');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="ProvCon.wronolib.ipaddr.ip4prefix-class.html#contains">contains</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">,</tt> <tt class="py-param">ip</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="ip4prefix.contains-collapsed" style="display:none;" pad="++" indent="++++++++"></div><div id="ip4prefix.contains-expanded"><a name="L50"></a><tt class="py-lineno">50</tt>  <tt class="py-line">        <tt class="py-keyword">if</tt> <tt class="py-name">isinstance</tt><tt class="py-op">(</tt><tt class="py-name">ip</tt><tt class="py-op">,</tt> <tt class="py-name">str</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+<a name="L51"></a><tt class="py-lineno">51</tt>  <tt class="py-line">            <tt class="py-name">pr</tt> <tt class="py-op">=</tt> <tt id="link-16" class="py-name" targets="Class ProvCon.wronolib.ipaddr.ip4prefix=ProvCon.wronolib.ipaddr.ip4prefix-class.html"><a title="ProvCon.wronolib.ipaddr.ip4prefix" class="py-name" href="#" onclick="return doclink('link-16', 'ip4prefix', 'link-16');">ip4prefix</a></tt> <tt class="py-op">(</tt><tt class="py-name">ip</tt><tt class="py-op">,</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">prefixlen</tt><tt class="py-op">)</tt> </tt>
+<a name="L52"></a><tt class="py-lineno">52</tt>  <tt class="py-line">            <tt class="py-keyword">return</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">network</tt> <tt class="py-op">==</tt> <tt class="py-name">pr</tt><tt class="py-op">.</tt><tt class="py-name">network</tt> </tt>
+<a name="L53"></a><tt class="py-lineno">53</tt>  <tt class="py-line">        <tt class="py-keyword">elif</tt> <tt class="py-name">isinstance</tt><tt class="py-op">(</tt><tt class="py-name">ip</tt><tt class="py-op">,</tt> <tt id="link-17" class="py-name"><a title="ProvCon.wronolib.ipaddr.ip4addr" class="py-name" href="#" onclick="return doclink('link-17', 'ip4addr', 'link-6');">ip4addr</a></tt><tt class="py-op">)</tt><tt class="py-op">:</tt>             </tt>
+<a name="L54"></a><tt class="py-lineno">54</tt>  <tt class="py-line">            <tt class="py-keyword">return</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">network</tt> <tt class="py-op">==</tt> <tt class="py-op">(</tt><tt class="py-name">ip</tt><tt class="py-op">.</tt><tt class="py-name">addr</tt> <tt class="py-op">&amp;</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-18" class="py-name"><a title="ProvCon.wronolib.ipaddr.mask" class="py-name" href="#" onclick="return doclink('link-18', 'mask', 'link-1');">mask</a></tt><tt class="py-op">)</tt> </tt>
+<a name="L55"></a><tt class="py-lineno">55</tt>  <tt class="py-line">        <tt class="py-keyword">elif</tt> <tt class="py-name">isinstance</tt><tt class="py-op">(</tt><tt class="py-name">ip</tt><tt class="py-op">,</tt> <tt id="link-19" class="py-name"><a title="ProvCon.wronolib.ipaddr.ip4prefix" class="py-name" href="#" onclick="return doclink('link-19', 'ip4prefix', 'link-16');">ip4prefix</a></tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+<a name="L56"></a><tt class="py-lineno">56</tt>  <tt class="py-line">            <tt class="py-name">pr</tt> <tt class="py-op">=</tt> <tt id="link-20" class="py-name"><a title="ProvCon.wronolib.ipaddr.ip4prefix" class="py-name" href="#" onclick="return doclink('link-20', 'ip4prefix', 'link-16');">ip4prefix</a></tt> <tt class="py-op">(</tt><tt class="py-name">ip</tt><tt class="py-op">.</tt><tt class="py-name">addr</tt><tt class="py-op">,</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">prefixlen</tt><tt class="py-op">)</tt> </tt>
+<a name="L57"></a><tt class="py-lineno">57</tt>  <tt class="py-line">            <tt class="py-keyword">return</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">network</tt> <tt class="py-op">==</tt> <tt class="py-name">pr</tt><tt class="py-op">.</tt><tt class="py-name">network</tt> <tt class="py-keyword">and</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">prefixlen</tt> <tt class="py-op">&lt;=</tt> <tt class="py-name">pr</tt><tt class="py-op">.</tt><tt class="py-name">prefixlen</tt> </tt>
+</div><a name="L58"></a><tt class="py-lineno">58</tt>  <tt class="py-line"> </tt>
+<a name="ip4prefix.__repr__"></a><div id="ip4prefix.__repr__-def"><a name="L59"></a><tt class="py-lineno">59</tt> <a class="py-toggle" href="#" id="ip4prefix.__repr__-toggle" onclick="return toggle('ip4prefix.__repr__');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="ProvCon.wronolib.ipaddr.ip4prefix-class.html#__repr__">__repr__</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="ip4prefix.__repr__-collapsed" style="display:none;" pad="++" indent="++++++++"></div><div id="ip4prefix.__repr__-expanded"><a name="L60"></a><tt class="py-lineno">60</tt>  <tt class="py-line">        <tt class="py-keyword">return</tt> <tt class="py-string">"%s/%s"</tt> <tt class="py-op">%</tt> <tt class="py-op">(</tt><tt class="py-name">ntoa</tt><tt class="py-op">(</tt><tt class="py-name">pack</tt><tt class="py-op">(</tt><tt class="py-string">'I'</tt><tt class="py-op">,</tt> <tt class="py-name">htonl</tt><tt class="py-op">(</tt><tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">addr</tt><tt class="py-op">)</tt><tt class="py-op">)</tt><tt class="py-op">)</tt><tt class="py-op">,</tt> <tt class="py-name">ntoa</tt><tt class="py-op">(</tt><tt class="py-name">pack</tt><tt class="py-op">(</tt><tt class="py-string">'I'</tt><tt class="py-op">,</tt> <tt class="py-name">htonl</tt><tt class="py-op">(</tt><tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-21" class="py-name"><a title="ProvCon.wronolib.ipaddr.mask" class="py-name" href="#" onclick="return doclink('link-21', 'mask', 'link-1');">mask</a></tt><tt class="py-op">)</tt><tt class="py-op">)</tt><tt class="py-op">)</tt> <tt class="py-op">)</tt> </tt>
+</div></div><a name="L61"></a><tt class="py-lineno">61</tt>  <tt class="py-line"> </tt><script type="text/javascript">
+<!--
+expandto(location.href);
+// -->
+</script>
+</pre>
+<br />
+<!-- ==================== NAVIGATION BAR ==================== -->
+<table class="navbar" border="0" width="100%" cellpadding="0"
+       bgcolor="#a0c0ff" cellspacing="0">
+  <tr valign="middle">
+  <!-- Home link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="ProvCon-module.html">Home</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Tree link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="module-tree.html">Trees</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Index link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="identifier-index.html">Indices</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Help link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="help.html">Help</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Project homepage -->
+      <th class="navbar" align="right" width="100%">
+        <table border="0" cellpadding="0" cellspacing="0">
+          <tr><th class="navbar" align="center"
+            >docsis-provisioning</th>
+          </tr></table></th>
+  </tr>
+</table>
+<table border="0" cellpadding="0" cellspacing="0" width="100%%">
+  <tr>
+    <td align="left" class="footer">
+    Generated by Epydoc 3.0.1 on Thu Jan  8 14:48:53 2009
+    </td>
+    <td align="right" class="footer">
+      <a target="mainFrame" href="http://epydoc.sourceforge.net"
+        >http://epydoc.sourceforge.net</a>
+    </td>
+  </tr>
+</table>
+
+<script type="text/javascript">
+  <!--
+  // Private objects are initially displayed (because if
+  // javascript is turned off then we want them to be
+  // visible); but by default, we want to hide them.  So hide
+  // them unless we have a cookie that says to show them.
+  checkCookie();
+  // -->
+</script>
+</body>
+</html>

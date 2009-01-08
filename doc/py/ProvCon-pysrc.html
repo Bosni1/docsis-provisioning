@@ -1,0 +1,226 @@
+<?xml version="1.0" encoding="ascii"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+          "DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+  <title>ProvCon</title>
+  <link rel="stylesheet" href="epydoc.css" type="text/css" />
+  <script type="text/javascript" src="epydoc.js"></script>
+</head>
+
+<body bgcolor="white" text="black" link="blue" vlink="#204080"
+      alink="#204080">
+<!-- ==================== NAVIGATION BAR ==================== -->
+<table class="navbar" border="0" width="100%" cellpadding="0"
+       bgcolor="#a0c0ff" cellspacing="0">
+  <tr valign="middle">
+  <!-- Home link -->
+      <th bgcolor="#70b0f0" class="navbar-select"
+          >&nbsp;&nbsp;&nbsp;Home&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Tree link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="module-tree.html">Trees</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Index link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="identifier-index.html">Indices</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Help link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="help.html">Help</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Project homepage -->
+      <th class="navbar" align="right" width="100%">
+        <table border="0" cellpadding="0" cellspacing="0">
+          <tr><th class="navbar" align="center"
+            >docsis-provisioning</th>
+          </tr></table></th>
+  </tr>
+</table>
+<table width="100%" cellpadding="0" cellspacing="0">
+  <tr valign="top">
+    <td width="100%">
+      <span class="breadcrumbs">
+        Package&nbsp;ProvCon
+      </span>
+    </td>
+    <td>
+      <table cellpadding="0" cellspacing="0">
+        <!-- hide/show private -->
+        <tr><td align="right"><span class="options">[<a href="javascript:void(0);" class="privatelink"
+    onclick="toggle_private();">hide&nbsp;private</a>]</span></td></tr>
+        <tr><td align="right"><span class="options"
+            >[<a href="frames.html" target="_top">frames</a
+            >]&nbsp;|&nbsp;<a href="ProvCon-pysrc.html"
+            target="_top">no&nbsp;frames</a>]</span></td></tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<h1 class="epydoc">Source Code for <a href="ProvCon-module.html">Package ProvCon</a></h1>
+<pre class="py-src">
+<a name="L1"></a><tt class="py-lineno">  1</tt>  <tt class="py-line"><tt class="py-comment">#!/bin/env python</tt> </tt>
+<a name="L2"></a><tt class="py-lineno">  2</tt>  <tt class="py-line"> </tt>
+<a name="L3"></a><tt class="py-lineno">  3</tt>  <tt class="py-line"><tt class="py-comment">#from log import LoggingServer, LoggingClient</tt> </tt>
+<a name="L4"></a><tt class="py-lineno">  4</tt>  <tt class="py-line"><tt class="py-comment">#from cli import CLIServer, CLIClient</tt> </tt>
+<a name="L5"></a><tt class="py-lineno">  5</tt>  <tt class="py-line"><tt class="py-comment">#from wronolib import set_process_name</tt> </tt>
+<a name="L6"></a><tt class="py-lineno">  6</tt>  <tt class="py-line"><tt class="py-comment">#from ProvCon.wronolib import set_process_name</tt> </tt>
+<a name="L7"></a><tt class="py-lineno">  7</tt>  <tt class="py-line"> </tt>
+<a name="L8"></a><tt class="py-lineno">  8</tt>  <tt class="py-line"><tt class="py-keyword">from</tt> <tt class="py-name">os</tt> <tt class="py-keyword">import</tt> <tt class="py-name">getenv</tt> </tt>
+<a name="L9"></a><tt class="py-lineno">  9</tt>  <tt class="py-line"> </tt>
+<a name="L10"></a><tt class="py-lineno"> 10</tt>  <tt class="py-line"><tt id="link-0" class="py-name" targets="Variable ProvCon.ConfigFileBE=ProvCon-module.html#ConfigFileBE"><a title="ProvCon.ConfigFileBE" class="py-name" href="#" onclick="return doclink('link-0', 'ConfigFileBE', 'link-0');">ConfigFileBE</a></tt> <tt class="py-op">=</tt> <tt class="py-op">(</tt><tt class="py-name">getenv</tt><tt class="py-op">(</tt><tt class="py-string">"PROVISIONING_ROOT"</tt><tt class="py-op">)</tt> <tt class="py-keyword">or</tt> <tt class="py-string">"/home/kuba/src/docsis-provisioning/site"</tt><tt class="py-op">)</tt> <tt class="py-op">+</tt> <tt class="py-string">"/etc/ProvisioningBE.cfg"</tt> </tt>
+<a name="L11"></a><tt class="py-lineno"> 11</tt>  <tt class="py-line"><tt class="py-string">"""Path of the configuration file used by the back-end process"""</tt> </tt>
+<a name="L12"></a><tt class="py-lineno"> 12</tt>  <tt class="py-line"><tt id="link-1" class="py-name" targets="Variable ProvCon.ConfigFileFE=ProvCon-module.html#ConfigFileFE"><a title="ProvCon.ConfigFileFE" class="py-name" href="#" onclick="return doclink('link-1', 'ConfigFileFE', 'link-1');">ConfigFileFE</a></tt> <tt class="py-op">=</tt>  <tt class="py-op">(</tt><tt class="py-name">getenv</tt><tt class="py-op">(</tt><tt class="py-string">"PROVISIONING_ROOT"</tt><tt class="py-op">)</tt> <tt class="py-keyword">or</tt> <tt class="py-string">"/home/kuba/src/docsis-provisioning/site"</tt><tt class="py-op">)</tt> <tt class="py-op">+</tt> <tt class="py-string">"/etc/ProvisioningFE.cfg"</tt> </tt>
+<a name="L13"></a><tt class="py-lineno"> 13</tt>  <tt class="py-line"><tt class="py-string">"""Path of the configuration file used by front-end processes"""</tt> </tt>
+<a name="L14"></a><tt class="py-lineno"> 14</tt>  <tt class="py-line"> </tt>
+<a name="L15"></a><tt class="py-lineno"> 15</tt>  <tt class="py-line"><tt id="link-2" class="py-name" targets="Variable ProvCon.ControllerKey=ProvCon-module.html#ControllerKey"><a title="ProvCon.ControllerKey" class="py-name" href="#" onclick="return doclink('link-2', 'ControllerKey', 'link-2');">ControllerKey</a></tt> <tt class="py-op">=</tt> <tt class="py-string">"VERY_VERY_QUIET"</tt> </tt>
+<a name="L16"></a><tt class="py-lineno"> 16</tt>  <tt class="py-line"><tt class="py-string">"""A shared "secret" used to encrypt Controller communication"""</tt> </tt>
+<a name="L17"></a><tt class="py-lineno"> 17</tt>  <tt class="py-line"> </tt>
+<a name="PreLaunchCheck"></a><div id="PreLaunchCheck-def"><a name="L18"></a><tt class="py-lineno"> 18</tt> <a class="py-toggle" href="#" id="PreLaunchCheck-toggle" onclick="return toggle('PreLaunchCheck');">-</a><tt class="py-line"><tt class="py-keyword">def</tt> <a class="py-def-name" href="ProvCon-module.html#PreLaunchCheck">PreLaunchCheck</a><tt class="py-op">(</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="PreLaunchCheck-collapsed" style="display:none;" pad="+++" indent="++++"></div><div id="PreLaunchCheck-expanded"><a name="L19"></a><tt class="py-lineno"> 19</tt>  <tt class="py-line">    <tt class="py-keyword">pass</tt> </tt>
+</div><a name="L20"></a><tt class="py-lineno"> 20</tt>  <tt class="py-line"> </tt>
+<a name="Controller"></a><div id="Controller-def"><a name="L21"></a><tt class="py-lineno"> 21</tt> <a class="py-toggle" href="#" id="Controller-toggle" onclick="return toggle('Controller');">-</a><tt class="py-line"><tt class="py-keyword">def</tt> <a class="py-def-name" href="ProvCon-module.html#Controller">Controller</a> <tt class="py-op">(</tt> <tt class="py-param">path</tt> <tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="Controller-collapsed" style="display:none;" pad="+++" indent="++++"></div><div id="Controller-expanded"><a name="L22"></a><tt class="py-lineno"> 22</tt>  <tt class="py-line">    <tt class="py-docstring">"""</tt> </tt>
+<a name="L23"></a><tt class="py-lineno"> 23</tt>  <tt class="py-line"><tt class="py-docstring">    Create and return a new "Controller" socket.</tt> </tt>
+<a name="L24"></a><tt class="py-lineno"> 24</tt>  <tt class="py-line"><tt class="py-docstring">    </tt> </tt>
+<a name="L25"></a><tt class="py-lineno"> 25</tt>  <tt class="py-line"><tt class="py-docstring">    A "Controller" is a process which listens for remote management requests to the Provisioning</tt> </tt>
+<a name="L26"></a><tt class="py-lineno"> 26</tt>  <tt class="py-line"><tt class="py-docstring">    back-end services (such as TFTPD)</tt> </tt>
+<a name="L27"></a><tt class="py-lineno"> 27</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
+<a name="L28"></a><tt class="py-lineno"> 28</tt>  <tt class="py-line"><tt class="py-docstring">    @type   path: string</tt> </tt>
+<a name="L29"></a><tt class="py-lineno"> 29</tt>  <tt class="py-line"><tt class="py-docstring">    @param  path: path of the unix socket</tt> </tt>
+<a name="L30"></a><tt class="py-lineno"> 30</tt>  <tt class="py-line"><tt class="py-docstring">    </tt> </tt>
+<a name="L31"></a><tt class="py-lineno"> 31</tt>  <tt class="py-line"><tt class="py-docstring">    @rtype:       multiprocessing.connection.Listener</tt> </tt>
+<a name="L32"></a><tt class="py-lineno"> 32</tt>  <tt class="py-line"><tt class="py-docstring">    @return:      the new Listener object</tt> </tt>
+<a name="L33"></a><tt class="py-lineno"> 33</tt>  <tt class="py-line"><tt class="py-docstring">    </tt> </tt>
+<a name="L34"></a><tt class="py-lineno"> 34</tt>  <tt class="py-line"><tt class="py-docstring">    """</tt> </tt>
+<a name="L35"></a><tt class="py-lineno"> 35</tt>  <tt class="py-line">    <tt class="py-keyword">from</tt> <tt class="py-name">multiprocessing</tt><tt class="py-op">.</tt><tt class="py-name">connection</tt> <tt class="py-keyword">import</tt> <tt class="py-name">Listener</tt> </tt>
+<a name="L36"></a><tt class="py-lineno"> 36</tt>  <tt class="py-line">    <tt class="py-keyword">from</tt> <tt class="py-name">os</tt> <tt class="py-keyword">import</tt> <tt class="py-name">unlink</tt> </tt>
+<a name="L37"></a><tt class="py-lineno"> 37</tt>  <tt class="py-line">    <tt class="py-keyword">try</tt><tt class="py-op">:</tt> <tt class="py-name">unlink</tt> <tt class="py-op">(</tt><tt class="py-name">path</tt><tt class="py-op">)</tt> </tt>
+<a name="L38"></a><tt class="py-lineno"> 38</tt>  <tt class="py-line">    <tt class="py-keyword">except</tt><tt class="py-op">:</tt> <tt class="py-keyword">pass</tt> </tt>
+<a name="L39"></a><tt class="py-lineno"> 39</tt>  <tt class="py-line">     </tt>
+<a name="L40"></a><tt class="py-lineno"> 40</tt>  <tt class="py-line">    <tt class="py-keyword">return</tt> <tt class="py-name">Listener</tt> <tt class="py-op">(</tt> <tt class="py-name">path</tt><tt class="py-op">,</tt> <tt class="py-name">authkey</tt><tt class="py-op">=</tt><tt id="link-3" class="py-name"><a title="ProvCon.ControllerKey" class="py-name" href="#" onclick="return doclink('link-3', 'ControllerKey', 'link-2');">ControllerKey</a></tt> <tt class="py-op">)</tt> </tt>
+</div><a name="L41"></a><tt class="py-lineno"> 41</tt>  <tt class="py-line"> </tt>
+<a name="ControllerWait"></a><div id="ControllerWait-def"><a name="L42"></a><tt class="py-lineno"> 42</tt> <a class="py-toggle" href="#" id="ControllerWait-toggle" onclick="return toggle('ControllerWait');">-</a><tt class="py-line"><tt class="py-keyword">def</tt> <a class="py-def-name" href="ProvCon-module.html#ControllerWait">ControllerWait</a> <tt class="py-op">(</tt> <tt class="py-param">ctrl</tt> <tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="ControllerWait-collapsed" style="display:none;" pad="+++" indent="++++"></div><div id="ControllerWait-expanded"><a name="L43"></a><tt class="py-lineno"> 43</tt>  <tt class="py-line">    <tt class="py-docstring">"""</tt> </tt>
+<a name="L44"></a><tt class="py-lineno"> 44</tt>  <tt class="py-line"><tt class="py-docstring">    Wait for a controller request.</tt> </tt>
+<a name="L45"></a><tt class="py-lineno"> 45</tt>  <tt class="py-line"><tt class="py-docstring">    </tt> </tt>
+<a name="L46"></a><tt class="py-lineno"> 46</tt>  <tt class="py-line"><tt class="py-docstring">    @type  ctrl: multiprocessing.connection.Listener</tt> </tt>
+<a name="L47"></a><tt class="py-lineno"> 47</tt>  <tt class="py-line"><tt class="py-docstring">    @param ctrl: a controller created with a call to Controller()</tt> </tt>
+<a name="L48"></a><tt class="py-lineno"> 48</tt>  <tt class="py-line"><tt class="py-docstring">    </tt> </tt>
+<a name="L49"></a><tt class="py-lineno"> 49</tt>  <tt class="py-line"><tt class="py-docstring">    @rtype:      object</tt> </tt>
+<a name="L50"></a><tt class="py-lineno"> 50</tt>  <tt class="py-line"><tt class="py-docstring">    @return:     the message (python object) sent by the client</tt> </tt>
+<a name="L51"></a><tt class="py-lineno"> 51</tt>  <tt class="py-line"><tt class="py-docstring">    """</tt> </tt>
+<a name="L52"></a><tt class="py-lineno"> 52</tt>  <tt class="py-line">    <tt class="py-name">connection</tt> <tt class="py-op">=</tt> <tt class="py-name">ctrl</tt><tt class="py-op">.</tt><tt class="py-name">accept</tt> <tt class="py-op">(</tt><tt class="py-op">)</tt> </tt>
+<a name="L53"></a><tt class="py-lineno"> 53</tt>  <tt class="py-line">    <tt class="py-name">msg</tt> <tt class="py-op">=</tt> <tt class="py-name">connection</tt><tt class="py-op">.</tt><tt class="py-name">recv</tt><tt class="py-op">(</tt><tt class="py-op">)</tt> </tt>
+<a name="L54"></a><tt class="py-lineno"> 54</tt>  <tt class="py-line">    <tt class="py-name">connection</tt><tt class="py-op">.</tt><tt class="py-name">close</tt><tt class="py-op">(</tt><tt class="py-op">)</tt> </tt>
+<a name="L55"></a><tt class="py-lineno"> 55</tt>  <tt class="py-line">    <tt class="py-keyword">return</tt> <tt class="py-name">msg</tt> </tt>
+</div><a name="L56"></a><tt class="py-lineno"> 56</tt>  <tt class="py-line"> </tt>
+<a name="ControllerAction"></a><div id="ControllerAction-def"><a name="L57"></a><tt class="py-lineno"> 57</tt> <a class="py-toggle" href="#" id="ControllerAction-toggle" onclick="return toggle('ControllerAction');">-</a><tt class="py-line"><tt class="py-keyword">def</tt> <a class="py-def-name" href="ProvCon-module.html#ControllerAction">ControllerAction</a> <tt class="py-op">(</tt><tt class="py-param">path</tt><tt class="py-op">,</tt> <tt class="py-param">action</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="ControllerAction-collapsed" style="display:none;" pad="+++" indent="++++"></div><div id="ControllerAction-expanded"><a name="L58"></a><tt class="py-lineno"> 58</tt>  <tt class="py-line">    <tt class="py-docstring">"""</tt> </tt>
+<a name="L59"></a><tt class="py-lineno"> 59</tt>  <tt class="py-line"><tt class="py-docstring">    Send a message to the Controller.</tt> </tt>
+<a name="L60"></a><tt class="py-lineno"> 60</tt>  <tt class="py-line"><tt class="py-docstring">    </tt> </tt>
+<a name="L61"></a><tt class="py-lineno"> 61</tt>  <tt class="py-line"><tt class="py-docstring">    This function is used by remote-management applications to control provisioning services.</tt> </tt>
+<a name="L62"></a><tt class="py-lineno"> 62</tt>  <tt class="py-line"><tt class="py-docstring">    </tt> </tt>
+<a name="L63"></a><tt class="py-lineno"> 63</tt>  <tt class="py-line"><tt class="py-docstring">    @type   path: string</tt> </tt>
+<a name="L64"></a><tt class="py-lineno"> 64</tt>  <tt class="py-line"><tt class="py-docstring">    @param  path: path of the controller socket</tt> </tt>
+<a name="L65"></a><tt class="py-lineno"> 65</tt>  <tt class="py-line"><tt class="py-docstring">    </tt> </tt>
+<a name="L66"></a><tt class="py-lineno"> 66</tt>  <tt class="py-line"><tt class="py-docstring">    @type  action: object</tt> </tt>
+<a name="L67"></a><tt class="py-lineno"> 67</tt>  <tt class="py-line"><tt class="py-docstring">    @param action: the message to send to the controller        </tt> </tt>
+<a name="L68"></a><tt class="py-lineno"> 68</tt>  <tt class="py-line"><tt class="py-docstring">    """</tt> </tt>
+<a name="L69"></a><tt class="py-lineno"> 69</tt>  <tt class="py-line">    <tt class="py-keyword">from</tt> <tt class="py-name">multiprocessing</tt><tt class="py-op">.</tt><tt class="py-name">connection</tt> <tt class="py-keyword">import</tt> <tt id="link-4" class="py-name" targets="Module ProvCon.TFTP.Client=ProvCon.TFTP.Client-module.html"><a title="ProvCon.TFTP.Client" class="py-name" href="#" onclick="return doclink('link-4', 'Client', 'link-4');">Client</a></tt> </tt>
+<a name="L70"></a><tt class="py-lineno"> 70</tt>  <tt class="py-line">    <tt class="py-name">c</tt> <tt class="py-op">=</tt> <tt id="link-5" class="py-name"><a title="ProvCon.TFTP.Client" class="py-name" href="#" onclick="return doclink('link-5', 'Client', 'link-4');">Client</a></tt> <tt class="py-op">(</tt> <tt class="py-name">path</tt><tt class="py-op">,</tt> <tt class="py-name">authkey</tt> <tt class="py-op">=</tt> <tt id="link-6" class="py-name"><a title="ProvCon.ControllerKey" class="py-name" href="#" onclick="return doclink('link-6', 'ControllerKey', 'link-2');">ControllerKey</a></tt> <tt class="py-op">)</tt> </tt>
+<a name="L71"></a><tt class="py-lineno"> 71</tt>  <tt class="py-line">    <tt class="py-name">c</tt><tt class="py-op">.</tt><tt class="py-name">send</tt> <tt class="py-op">(</tt> <tt id="link-7" class="py-name" targets="Function ProvCon.ui.action()=ProvCon.ui-module.html#action"><a title="ProvCon.ui.action" class="py-name" href="#" onclick="return doclink('link-7', 'action', 'link-7');">action</a></tt> <tt class="py-op">)</tt> </tt>
+<a name="L72"></a><tt class="py-lineno"> 72</tt>  <tt class="py-line">    <tt class="py-name">c</tt><tt class="py-op">.</tt><tt class="py-name">close</tt><tt class="py-op">(</tt><tt class="py-op">)</tt>     </tt>
+</div><a name="L73"></a><tt class="py-lineno"> 73</tt>  <tt class="py-line"> </tt>
+<a name="Configuration"></a><div id="Configuration-def"><a name="L74"></a><tt class="py-lineno"> 74</tt> <a class="py-toggle" href="#" id="Configuration-toggle" onclick="return toggle('Configuration');">-</a><tt class="py-line"><tt class="py-keyword">def</tt> <a class="py-def-name" href="ProvCon-module.html#Configuration">Configuration</a><tt class="py-op">(</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="Configuration-collapsed" style="display:none;" pad="+++" indent="++++"></div><div id="Configuration-expanded"><a name="L75"></a><tt class="py-lineno"> 75</tt>  <tt class="py-line">    <tt class="py-keyword">from</tt> <tt class="py-name">ConfigParser</tt> <tt class="py-keyword">import</tt> <tt class="py-name">ConfigParser</tt> </tt>
+<a name="L76"></a><tt class="py-lineno"> 76</tt>  <tt class="py-line">    <tt id="link-8" class="py-name" targets="Variable ProvCon.docsis.compiler.config.cfg=ProvCon.docsis.compiler.config-module.html#cfg"><a title="ProvCon.docsis.compiler.config.cfg" class="py-name" href="#" onclick="return doclink('link-8', 'cfg', 'link-8');">cfg</a></tt> <tt class="py-op">=</tt> <tt class="py-name">ConfigParser</tt><tt class="py-op">(</tt><tt class="py-op">)</tt> </tt>
+<a name="L77"></a><tt class="py-lineno"> 77</tt>  <tt class="py-line">    <tt id="link-9" class="py-name"><a title="ProvCon.docsis.compiler.config.cfg" class="py-name" href="#" onclick="return doclink('link-9', 'cfg', 'link-8');">cfg</a></tt><tt class="py-op">.</tt><tt id="link-10" class="py-name" targets="Method ProvCon.dbui.orm.record.Record.read()=ProvCon.dbui.orm.record.Record-class.html#read"><a title="ProvCon.dbui.orm.record.Record.read" class="py-name" href="#" onclick="return doclink('link-10', 'read', 'link-10');">read</a></tt> <tt class="py-op">(</tt> <tt id="link-11" class="py-name"><a title="ProvCon.ConfigFileBE" class="py-name" href="#" onclick="return doclink('link-11', 'ConfigFileBE', 'link-0');">ConfigFileBE</a></tt> <tt class="py-op">)</tt> </tt>
+<a name="L78"></a><tt class="py-lineno"> 78</tt>  <tt class="py-line">    <tt class="py-keyword">return</tt> <tt id="link-12" class="py-name"><a title="ProvCon.docsis.compiler.config.cfg" class="py-name" href="#" onclick="return doclink('link-12', 'cfg', 'link-8');">cfg</a></tt> </tt>
+</div><a name="L79"></a><tt class="py-lineno"> 79</tt>  <tt class="py-line"> </tt>
+<a name="ConfigurationFE"></a><div id="ConfigurationFE-def"><a name="L80"></a><tt class="py-lineno"> 80</tt> <a class="py-toggle" href="#" id="ConfigurationFE-toggle" onclick="return toggle('ConfigurationFE');">-</a><tt class="py-line"><tt class="py-keyword">def</tt> <a class="py-def-name" href="ProvCon-module.html#ConfigurationFE">ConfigurationFE</a><tt class="py-op">(</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="ConfigurationFE-collapsed" style="display:none;" pad="+++" indent="++++"></div><div id="ConfigurationFE-expanded"><a name="L81"></a><tt class="py-lineno"> 81</tt>  <tt class="py-line">    <tt class="py-keyword">from</tt> <tt class="py-name">ConfigParser</tt> <tt class="py-keyword">import</tt> <tt class="py-name">ConfigParser</tt> </tt>
+<a name="L82"></a><tt class="py-lineno"> 82</tt>  <tt class="py-line">    <tt id="link-13" class="py-name"><a title="ProvCon.docsis.compiler.config.cfg" class="py-name" href="#" onclick="return doclink('link-13', 'cfg', 'link-8');">cfg</a></tt> <tt class="py-op">=</tt> <tt class="py-name">ConfigParser</tt><tt class="py-op">(</tt><tt class="py-op">)</tt> </tt>
+<a name="L83"></a><tt class="py-lineno"> 83</tt>  <tt class="py-line">    <tt id="link-14" class="py-name"><a title="ProvCon.docsis.compiler.config.cfg" class="py-name" href="#" onclick="return doclink('link-14', 'cfg', 'link-8');">cfg</a></tt><tt class="py-op">.</tt><tt id="link-15" class="py-name"><a title="ProvCon.dbui.orm.record.Record.read" class="py-name" href="#" onclick="return doclink('link-15', 'read', 'link-10');">read</a></tt> <tt class="py-op">(</tt> <tt id="link-16" class="py-name"><a title="ProvCon.ConfigFileFE" class="py-name" href="#" onclick="return doclink('link-16', 'ConfigFileFE', 'link-1');">ConfigFileFE</a></tt> <tt class="py-op">)</tt> </tt>
+<a name="L84"></a><tt class="py-lineno"> 84</tt>  <tt class="py-line">    <tt class="py-keyword">return</tt> <tt id="link-17" class="py-name"><a title="ProvCon.docsis.compiler.config.cfg" class="py-name" href="#" onclick="return doclink('link-17', 'cfg', 'link-8');">cfg</a></tt> </tt>
+</div><a name="L85"></a><tt class="py-lineno"> 85</tt>  <tt class="py-line"> </tt>
+<a name="ConfigurationChecksum"></a><div id="ConfigurationChecksum-def"><a name="L86"></a><tt class="py-lineno"> 86</tt> <a class="py-toggle" href="#" id="ConfigurationChecksum-toggle" onclick="return toggle('ConfigurationChecksum');">-</a><tt class="py-line"><tt class="py-keyword">def</tt> <a class="py-def-name" href="ProvCon-module.html#ConfigurationChecksum">ConfigurationChecksum</a><tt class="py-op">(</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="ConfigurationChecksum-collapsed" style="display:none;" pad="+++" indent="++++"></div><div id="ConfigurationChecksum-expanded"><a name="L87"></a><tt class="py-lineno"> 87</tt>  <tt class="py-line">    <tt class="py-keyword">import</tt> <tt class="py-name">md5</tt> </tt>
+<a name="L88"></a><tt class="py-lineno"> 88</tt>  <tt class="py-line">    <tt class="py-name">h</tt> <tt class="py-op">=</tt> <tt class="py-name">md5</tt><tt class="py-op">.</tt><tt class="py-name">md5</tt><tt class="py-op">(</tt><tt class="py-op">)</tt> </tt>
+<a name="L89"></a><tt class="py-lineno"> 89</tt>  <tt class="py-line">    <tt class="py-keyword">with</tt> <tt class="py-name">open</tt><tt class="py-op">(</tt><tt class="py-name">ConfigFile</tt><tt class="py-op">,</tt> <tt class="py-string">'r'</tt><tt class="py-op">)</tt> <tt class="py-keyword">as</tt> <tt class="py-name">f</tt><tt class="py-op">:</tt> </tt>
+<a name="L90"></a><tt class="py-lineno"> 90</tt>  <tt class="py-line">        <tt class="py-name">h</tt><tt class="py-op">.</tt><tt id="link-18" class="py-name" targets="Method ProvCon.dbui.abstractui.navigators.BaseNavigator.update()=ProvCon.dbui.abstractui.navigators.BaseNavigator-class.html#update,Method ProvCon.dbui.di.rObject'.ObjectFlags.update()=ProvCon.dbui.di.rObject%27.ObjectFlags-class.html#update,Method ProvCon.dbui.di.rObject'.ObjectParams.update()=ProvCon.dbui.di.rObject%27.ObjectParams-class.html#update,Method ProvCon.dbui.wxwin.navigators.Navigator.update()=ProvCon.dbui.wxwin.navigators.Navigator-class.html#update"><a title="ProvCon.dbui.abstractui.navigators.BaseNavigator.update
+ProvCon.dbui.di.rObject'.ObjectFlags.update
+ProvCon.dbui.di.rObject'.ObjectParams.update
+ProvCon.dbui.wxwin.navigators.Navigator.update" class="py-name" href="#" onclick="return doclink('link-18', 'update', 'link-18');">update</a></tt> <tt class="py-op">(</tt><tt class="py-name">f</tt><tt class="py-op">.</tt><tt id="link-19" class="py-name"><a title="ProvCon.dbui.orm.record.Record.read" class="py-name" href="#" onclick="return doclink('link-19', 'read', 'link-10');">read</a></tt><tt class="py-op">(</tt><tt class="py-op">)</tt><tt class="py-op">)</tt> </tt>
+<a name="L91"></a><tt class="py-lineno"> 91</tt>  <tt class="py-line">    <tt class="py-keyword">return</tt> <tt class="py-name">h</tt><tt class="py-op">.</tt><tt class="py-name">hexdigest</tt><tt class="py-op">(</tt><tt class="py-op">)</tt> </tt>
+</div><a name="L92"></a><tt class="py-lineno"> 92</tt>  <tt class="py-line"> </tt>
+<a name="parse_socket_address"></a><div id="parse_socket_address-def"><a name="L93"></a><tt class="py-lineno"> 93</tt> <a class="py-toggle" href="#" id="parse_socket_address-toggle" onclick="return toggle('parse_socket_address');">-</a><tt class="py-line"><tt class="py-keyword">def</tt> <a class="py-def-name" href="ProvCon-module.html#parse_socket_address">parse_socket_address</a> <tt class="py-op">(</tt><tt class="py-param">addr</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="parse_socket_address-collapsed" style="display:none;" pad="+++" indent="++++"></div><div id="parse_socket_address-expanded"><a name="L94"></a><tt class="py-lineno"> 94</tt>  <tt class="py-line">    <tt class="py-keyword">if</tt> <tt class="py-name">addr</tt><tt class="py-op">.</tt><tt class="py-name">startswith</tt><tt class="py-op">(</tt><tt class="py-string">"unix://"</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+<a name="L95"></a><tt class="py-lineno"> 95</tt>  <tt class="py-line">        <tt class="py-keyword">return</tt> <tt class="py-name">addr</tt><tt class="py-op">[</tt><tt class="py-number">7</tt><tt class="py-op">:</tt><tt class="py-op">]</tt> </tt>
+<a name="L96"></a><tt class="py-lineno"> 96</tt>  <tt class="py-line">    <tt class="py-keyword">elif</tt> <tt class="py-name">addr</tt><tt class="py-op">.</tt><tt class="py-name">startswith</tt><tt class="py-op">(</tt><tt class="py-string">"udp://"</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+<a name="L97"></a><tt class="py-lineno"> 97</tt>  <tt class="py-line">        <tt class="py-name">atidx</tt> <tt class="py-op">=</tt> <tt class="py-name">addr</tt><tt class="py-op">.</tt><tt class="py-name">rfind</tt> <tt class="py-op">(</tt> <tt class="py-string">'@'</tt> <tt class="py-op">)</tt> </tt>
+<a name="L98"></a><tt class="py-lineno"> 98</tt>  <tt class="py-line">        <tt class="py-keyword">return</tt> <tt class="py-op">(</tt><tt class="py-name">addr</tt><tt class="py-op">[</tt><tt class="py-number">6</tt><tt class="py-op">:</tt><tt class="py-name">atidx</tt><tt class="py-op">]</tt><tt class="py-op">,</tt> <tt id="link-20" class="py-name" targets="Class int=int-class.html"><a title="int" class="py-name" href="#" onclick="return doclink('link-20', 'int', 'link-20');">int</a></tt><tt class="py-op">(</tt><tt class="py-name">addr</tt><tt class="py-op">[</tt><tt class="py-name">atidx</tt><tt class="py-op">+</tt><tt class="py-number">1</tt><tt class="py-op">:</tt><tt class="py-op">]</tt><tt class="py-op">)</tt><tt class="py-op">)</tt> </tt>
+<a name="L99"></a><tt class="py-lineno"> 99</tt>  <tt class="py-line">    <tt class="py-keyword">elif</tt> <tt class="py-name">addr</tt><tt class="py-op">.</tt><tt class="py-name">startswith</tt><tt class="py-op">(</tt><tt class="py-string">"tcp://"</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+<a name="L100"></a><tt class="py-lineno">100</tt>  <tt class="py-line">        <tt class="py-name">atidx</tt> <tt class="py-op">=</tt> <tt class="py-name">addr</tt><tt class="py-op">.</tt><tt class="py-name">rfind</tt> <tt class="py-op">(</tt> <tt class="py-string">'@'</tt> <tt class="py-op">)</tt> </tt>
+<a name="L101"></a><tt class="py-lineno">101</tt>  <tt class="py-line">        <tt class="py-keyword">return</tt> <tt class="py-op">(</tt><tt class="py-name">addr</tt><tt class="py-op">[</tt><tt class="py-number">6</tt><tt class="py-op">:</tt><tt class="py-name">atidx</tt><tt class="py-op">]</tt><tt class="py-op">,</tt> <tt id="link-21" class="py-name"><a title="int" class="py-name" href="#" onclick="return doclink('link-21', 'int', 'link-20');">int</a></tt><tt class="py-op">(</tt><tt class="py-name">addr</tt><tt class="py-op">[</tt><tt class="py-name">atidx</tt><tt class="py-op">+</tt><tt class="py-number">1</tt><tt class="py-op">:</tt><tt class="py-op">]</tt><tt class="py-op">)</tt><tt class="py-op">)</tt> </tt>
+<a name="L102"></a><tt class="py-lineno">102</tt>  <tt class="py-line">    <tt class="py-keyword">else</tt><tt class="py-op">:</tt> </tt>
+<a name="L103"></a><tt class="py-lineno">103</tt>  <tt class="py-line">        <tt class="py-keyword">return</tt> <tt class="py-name">addr</tt> </tt>
+</div><a name="L104"></a><tt class="py-lineno">104</tt>  <tt class="py-line"> </tt><script type="text/javascript">
+<!--
+expandto(location.href);
+// -->
+</script>
+</pre>
+<br />
+<!-- ==================== NAVIGATION BAR ==================== -->
+<table class="navbar" border="0" width="100%" cellpadding="0"
+       bgcolor="#a0c0ff" cellspacing="0">
+  <tr valign="middle">
+  <!-- Home link -->
+      <th bgcolor="#70b0f0" class="navbar-select"
+          >&nbsp;&nbsp;&nbsp;Home&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Tree link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="module-tree.html">Trees</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Index link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="identifier-index.html">Indices</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Help link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="help.html">Help</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Project homepage -->
+      <th class="navbar" align="right" width="100%">
+        <table border="0" cellpadding="0" cellspacing="0">
+          <tr><th class="navbar" align="center"
+            >docsis-provisioning</th>
+          </tr></table></th>
+  </tr>
+</table>
+<table border="0" cellpadding="0" cellspacing="0" width="100%%">
+  <tr>
+    <td align="left" class="footer">
+    Generated by Epydoc 3.0.1 on Thu Jan  8 14:48:54 2009
+    </td>
+    <td align="right" class="footer">
+      <a target="mainFrame" href="http://epydoc.sourceforge.net"
+        >http://epydoc.sourceforge.net</a>
+    </td>
+  </tr>
+</table>
+
+<script type="text/javascript">
+  <!--
+  // Private objects are initially displayed (because if
+  // javascript is turned off then we want them to be
+  // visible); but by default, we want to hide them.  So hide
+  // them unless we have a cookie that says to show them.
+  checkCookie();
+  // -->
+</script>
+</body>
+</html>

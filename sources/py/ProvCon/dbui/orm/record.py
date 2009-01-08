@@ -1,3 +1,58 @@
+"""
+The heart of the database abstraction layer. It defines the L{Record} class
+which represents the database at the table row level.
+
+The Record objects are designed to work with tables of a very specific structure. Current 
+implementation involves heavy usage of PostgreSQL features such as table-inheritance and
+C{SELECT ... FROM ONLY ...} .
+
+The assumptions may be roughly summarized as follows:
+
+   1. All tables are subtables (subclasses, descendants) of a table named C{object} with this
+   signature:
+      - objectid : int8 PRIMARY KEY
+      - objecttype : varchar (I{name of the actual table})
+      - objectcreation, objectmodification : timestamp
+      - objectscope : int2
+   2. All foreign keys reference the C{objectid} column in the referenced table.
+   3. Multiple-column references are not supported (simplicity).
+   
+I{for more specific information on the database structure refer to the database docs}      
+
+Usage
+=====
+
+Recommended usage pattern of the Record class:
+
+   >>> newRecord = Record.EMPTY ( "customer" )
+   >>> newRecord.objectid
+   None
+   >>> newRecord.email = "customer@server.com"
+   >>> newRecord.telephone = "001 123 445 444"
+   >>> newRecord.write()
+   >>> newRecord.objectid
+   1554
+   >>> oldRecord = Record.ID ( 1554 )
+   >>> oldRecord.ofTable ( "customer" )
+   True
+   >>> oldRecord.email = "customer@customers.com"
+   >>> oldRecord.isModified
+   True
+   >>> oldRecord.email
+   'customer@customers.com'
+   >>> oldRecord.read()
+   >>> oldRecord.isModified
+   False
+   >>> oldRecord.email
+   'customer@server.com'
+   >>> oldRecord.setObjectID(1667)
+   >>> oldRecord.email
+   'othercustomer@server.com'
+   >>> oldRecord.delete()
+   
+
+"""
+
 from ProvCon.dbui.database import CFG
 import ProvCon.dbui.database as db
 from ProvCon.func import eventemitter
@@ -6,47 +61,97 @@ from ProvCon.dbui.meta import Table
 import pg
 import cStringIO
 
+
+
 __revision__ = "$Revision$"
 
 class Record(eventemitter):
-    """==Record==
-    Record objects are the heart of the database abstraction layer. A Record object is 
-    capabable of manipulating a row of data in a table which fulfills the following
-    requirements:
-     - is a direct or indirect descendant of the "object" table
-     - has an "oid" column
-     - is described by a Table object
-     All tables that inherit "object" are uniquely identified by the "objectid" column. 
-     Moreover, the objectid is unique throughout these tables, and each row(record) 
-     holds information about the actual table the record belongs to. It is therefore 
-     possible to retrieve a record providing only its objectid.
-     
-     A Record object's state is defined by the following flags (instance attributes):
-     _isnew   ->  record is new, the data is only in memory, objectid is empty
-     _hasdata ->  data was read from the database
-     _isinstalled ->  the record's table definition was used to initialize object's
-                    attributes
-    _isreference  ->  the record is a reference column in another record, some columns
-                      may be unavailable
-    _ismodified     
+    """    
+    A single row in the database. 
+
+    Attributes
+    ==========
     
-    All object variables have names starting with an '_' character. Field values are 
-    stored in instance variables with the same names as fields.
+    A Record object is a object-mapping of rows of database data. The API allows accessing
+    column values in one og two convenient ways:
     
+    C{aRecord.I{columnname}}
+    
+    C{aRecord["I{columnname}"]}
+    
+    
+    A Record object is set up using the meta-data in a L{Table<ProvCon.dbui.meta.table.Table>} object.
+    
+    All internal field names start with an '_' underscore character to avoid name clashes with
+    column names. Column names that start with an underscore will not  be accessible.
+        
     The getattr and setattr methods are overridden to provide the following functionality:
-    - changing the _objectid attribute causes the object to be read from the database (this
-      is wrapped be the setObjectID method.
-    - changing the _table attribute causes the record to be reset as an empty record
-      of the newly set table
-    - special attributes PP_* can be used to get a nice textual representation of the record      
-    - attributes named <field_name>_REF return the Record referenced by the field.
+       1. changing the _objectid attribute causes the object to be read from the database (this
+       is wrapped be the setObjectID method.
+       
+       2. changing the _table attribute causes the record to be reset as an empty record
+       of the newly set table
+       
+       3. special attributes PP_* can be used to get a nice textual representation of the record             
+           - PP_TABLE prints a tabular representation of the record.
+           
+       4. attributes named <field_name>_REF return the Record referenced by the field.
+           
+           >>> aCustomer.location_REF 
+           aLocationRecordObject
+    
+    References
+    ==========
+    
+    There are three modes in which referencing columns may be treated:
+       1. B{none}: do nothing, leave the objectid as the column value
+       2. B{text}: I{columnname}_REF returns a textual representation of the referenced record
+       3. B{record}: I{columnname}_REF holds the actual referenced record
+       
+    Record.__default_reference_mode__ is the global default mode of resolving references.
+    Object-specific mode may be passed to the record constructor with the C{resolvereference}
+    keyword argument.
+    
+    objectid, _objectid, setobjectID
+    ================================
+    
+    Perhaps the most confusing part of the Record object is the way 'objectid' is handled.
+    
+    The _objectid attribute always holds the current objectid, and setting it to a value triggers
+    one of two actions:
+       - if the value is not None, and is different from the current value, the record is read
+       from the database,
+       - if the value is None, the record is reset as a new record (isNew returns True)
+    
+    The third possibility is - nothing happens, when the given value is the same as the current
+    one, or the _feed attribute is set to True (meaning the record is fed data via the feedDataRow
+    function).
+    
+    The C{setObjectID} method is an accessor to the _objectid attribute.
+    
+       >>> aRecord._objectid = 1
+       >>> aRecord.setObjectID(1)
+    
+    are equivalent.
+    
+    The C{objectid} attribute holds the current record value of the C{objectid} columns. Modifying
+    it marks the record as I{modified} and the new objectid will be written to the database on the
+    next C{write}. B{DO NOT DO THIS, IT IS EVIL, IT MAY KILL YOU}!
+           
     """
     class RecordIncomplete(ORMError):
+        """
+        Exception raised when a record does not have a complete definition.
+           - not enough parameters to retrieve meta-data, not Table nor ObjectID specified,
+           - read operation requested on an empty / new record (no objectid),
+           - write operation requested but no table definition installed.        
+        """
         def __repr__(self):
             return """Object-Relation Mapper SQL Error 
 - not enough parameters to retrieve meta-data, not Table nor ObjectID specified,
 - read operation requested on an empty / new record (no objectid),
 - write operation requested but no table definition installed."""
+    
     class RecordNotFound(ORMError): 
         def __init__(self, objectid, pgexception, **kkw):
             ORMError.__init__ (self)
@@ -86,6 +191,19 @@ API Error: {0.pgexception}""".format ( self )
     __default_reference_mode__ = "text"  # none | text | record
     
     def __init__(self, **kkw):
+        """
+        Constructor.
+        
+        Keyword arguments:
+           -  C{reprfunc} : string   I{a function object which takes a record object and returns
+           its textual representation}
+           -  C{resolvereference} : string 
+        
+        A newly created Record object:
+           - has no table definition,
+           - has no data.
+           
+        """
         eventemitter.__init__(self, [ 
             "record_loaded",
             "record_saved",
@@ -140,7 +258,7 @@ API Error: {0.pgexception}""".format ( self )
             #this is a record attribute
             if attrname in self._table:
                 self.setFieldValue ( attrname, attrval )
-                
+    
     def __getattr__(self, attrname):
         #special PP_* attributes return a "pretty printed" representation of the record
         if attrname.startswith ("PP_"):
@@ -158,10 +276,33 @@ API Error: {0.pgexception}""".format ( self )
         return self.__dict__[attrname]
     
     __getitem__ = __getattr__
-    
+
+    def __is_modified(self): 
+        return self._ismodified
+    isModified = property(__is_modified)
+    """C{True} if the record was edited since last read, write"""
+    def __is_new(self): 
+        return self._isnew
+    isNew = property(__is_new)
+    """C{True} if the record is new (not yet written to the database, objectid == None)"""
+    def __hasdata(self): 
+        return self._hasdata
+    hasData = property(__hasdata)
+    """C{True} if the record holds data read from the database"""
+    def __is_installed(self): 
+        return self._isinstalled
+    isInstalled = property(__is_installed)
+    """C{True} if the record has a table schema installed"""
+
     def nullify(self):
-        """Clear all data. Note that _objectid remains unchanged, so
-        after a Record has been nullified, it may be read again"""
+        """
+        Clear all data. 
+        
+        Note that _objectid remains unchanged, soafter a Record has been nullified, 
+        it may be read again.
+        
+        Do not call on Records that are not yet installed (have no table definition).
+        """
         self._original_values.clear()
         self._modified_values.clear()
         self._references.clear()
@@ -172,13 +313,17 @@ API Error: {0.pgexception}""".format ( self )
             for f in self._table:
                 self._original_values[f.name] = None                
                         
-    def setupRecord(self, vals={}):        
-        """This method sets up the internal data structures,
-        If the _table attribute is set, the values are written into
-        appropriate intance attributes.
-        If _table is not set, the object header is read from the the "object" table
-        and _table is set based on the "objecttype" column.
-        At _table or _objectid must be set before this method is called.
+    def setupRecord(self):        
+        """
+        Import the record structure from the _table object. 
+        
+        If the record is not installed (no table definition, _table is None), attempt to install
+        by querying the database to retrieve the object type.
+        
+        If both _table and _objectid are empty, raise an exception.
+        
+        On success the record has attributes corresponding to database table columns, and
+        isInstalled returns True.
         """
         if not self._table:
             if not self._objectid:
@@ -203,7 +348,9 @@ API Error: {0.pgexception}""".format ( self )
         return True
     
     def clearRecord(self):
-        """Clear all data, and lose the _table information."""            
+        """
+        Discard all data and the table definition.
+        """            
         if self._isinstalled:
             for f in self._table:
                 del self.__dict__[f.name]
@@ -217,36 +364,63 @@ API Error: {0.pgexception}""".format ( self )
             self._isinstalled = False
 
     def setFieldValue (self, fieldname, fieldvalue):
-        """set the field value to a python value"""
+        """
+        Set a field to a python-object value.
+        
+        It is safe to use C{aRecord.I{fieldname} = I{fieldvalue}} instead.
+        
+        @type fieldname:  string
+        @param fieldname: name of the field
+        @type fieldvalue: object
+        @param fieldvalue:new value        
+        """
         if fieldname in self._table:
             self._modified_values[fieldname] = fieldvalue
             self.__dict__[fieldname] = fieldvalue
             self._ismodified = True
             
     def setFieldStringValue (self, fieldname, fieldstrvalue):
-        """set field value parsed from a string"""
+        """
+        Set a field to a parsed string representation of the value.
+
+        @type fieldname:  string
+        @param fieldname: name of the field
+        @type fieldstrvalue: string
+        @param fieldstrvalue:new string value                
+        """
         if fieldname in self._table:
             pyval = self._table[fieldname].val_txt2py ( fieldstrvalue )
             self.setFieldValue (fieldname, pyval )
 
     def getFieldValue (self, fieldname):
-        """get a python value for a particular field"""
+        """
+        Get a python value for a particular field.
+        It is safe to use C{aRecord.I{fieldname}} instead.
+        
+        @type fieldname:  string
+        @param fieldname: name of the field        
+        
+        @rtype:  object
+        @return: value of the field
+        """
         return self._modified_values.get(fieldname, None) or self._original_values[fieldname]
 
     def getFieldStringValue (self, fieldname):
-        """get text value for a particular field"""
+        """
+        Get a string representation of a field value.
+        @type fieldname:  string
+        @param fieldname: name of the field        
+
+        @rtype:  string
+        @return: string value of the field
+        """
         v = self.getFieldValue ( fieldname )
         return self._table[fieldname].val_py2txt ( v )    
 
     def updateReferenceField(self, field):
-        """read a record referenced by one of the fields
-        There are 3 modes of resolving references:
-        "none" : just the field value is kept in the record, <field>_REF is None
-        "text" : the text from "object_search_txt" is stored in <field>_REF
-        "record" : a whole Record object is kept in <field>_REF
-        the mode is set with the "resolvereference" keyword argument to the
-        constructor, default mode is kept in the class variable"""
-        
+        """
+        Read data referenced by one of the fields in the given reference resolving mode.
+        """        
         if not field.reference: return
         decoded = self.__dict__[field.name]
         if not decoded: self._references[field.name] = None; return
@@ -268,7 +442,19 @@ API Error: {0.pgexception}""".format ( self )
 
     
     def feedDataRow(self, row, **kwargs):
-        """fill record data from a dictionary object"""
+        """
+        Fill record data structures from a dictionary object.
+
+        This function may be used to fill a Record object with data bypassing all internal
+        record mechanisms. It is useful, when Record objects must be created in great numbers
+        from data obtained by other means.
+        
+        Creating a large number of Record objects involves a significant performance penalty
+        (up to 3 SELECTs for each record).
+        
+        @type row: dict
+        @param row: a dictionary of database row (column name -> value).                
+        """
         
         #avoid calling "read" after changing the _objectid
         self._feed = True
@@ -311,6 +497,12 @@ API Error: {0.pgexception}""".format ( self )
             
         
     def read(self):
+        """
+        Read a row of data from the database.
+        
+        If there is no _table definition, call L{setupRecord} to attempt to fetch it based on the
+        _objectid.
+        """
         if not self._objectid:
             raise Record.RecordIncomplete()
 
@@ -327,6 +519,16 @@ API Error: {0.pgexception}""".format ( self )
             
         
     def write(self):
+        """
+        Insert or update the record into the database.
+
+        Inserts a new record or updates an existing, locally modified record.
+        The record is then re-read to reflect all changes done on the server-side (triggers etc.)
+        
+        EMITS        
+           - B{record_added} (self)
+           - B{record_updated} (self)
+        """
         if not self._table: raise ValueError ( "_table is Null" )
         if self._isnew:
             for m in self._modified_values:
@@ -366,7 +568,16 @@ API Error: {0.pgexception}""".format ( self )
                 
     
     def delete(self):
-        if not self._isnew:
+        """
+        Delete the record from the database.
+        
+        EMITS        
+           - B{record_deleted} (self)
+        """
+        if not self.isNew:
+            #We do not check the hasData property, so we can use this function to delete records
+            #without reading them first.
+            #TODO: this is stupid and unclean, change it
             try:
                 CFG.CX.delete ( CFG.DB.SCHEMA + ".object", { 'objectid' : self._objectid } )
                 self.clearRecord()
@@ -377,9 +588,20 @@ API Error: {0.pgexception}""".format ( self )
                                                      e)
                                         
     def setObjectID(self, objectid):
+        """
+        Set the _objectid. (see class docstring)
+        @type objectid: integer
+        @param objectid: new object id
+        """
         self._objectid = objectid
         
     def setTable(self, tabledef):
+        """
+        Set the table definition (meta-data).
+        
+        @type tabledef: string or L{Table}
+        @param tabledef: name of the table, or a Table object
+        """
         if isinstance(tabledef, str):
             self._table = Table.Get ( tabledef )
         elif isinstance(tabledef, Table):
@@ -387,10 +609,26 @@ API Error: {0.pgexception}""".format ( self )
         else:
             raise ValueError ("table - must be table name or Table instance." )    
         
-    def ofTable(tablename):
+    def ofTable(self, tablename):
+        """
+        Check the name of the currently installed table definition.
+        
+        
+        @type tablename: string
+        @param tablename: name to check
+        
+        @rtype: bool
+        @return: is the currently set table definition is of a table named C{tablename}
+        """
         return tablename == self._table.name
     
     def getData(self):
+        """
+        Return record data as a C{dict}.
+        
+        @rtype: dict
+        @return: current record data as a columnname -> value dictionary
+        """
         data = {}
         data.update ( self._original_values, self._modified_values )
         return data
@@ -402,14 +640,29 @@ API Error: {0.pgexception}""".format ( self )
         return "<record>"    
     @staticmethod
     def ID(objectid, **kkw):
-        """create a new record from objectid"""
+        """
+        Create and load a record with the given objectid.
+
+        @type objectid: integer
+        @param objectid: id of the object to load
+           None - new record
+           
+        @rtype: Record    
+        """
         rec = Record(**kkw)
         rec.setObjectID(objectid)        
         return rec
     
     @staticmethod
     def EMPTY(tabledef, **kkw):
-        """create a new record of given type"""
+        """
+        Create a new (empty) record of given table.
+
+        @type tabledef: string or L{Table}
+        @param tabledef: name of the table, or a Table object
+        
+        @rtype: Record            
+        """
         rec = Record(**kkw)
         rec.setTable (tabledef)
         rec._isnew = True
@@ -422,15 +675,29 @@ API Error: {0.pgexception}""".format ( self )
 
     @staticmethod
     def CHILDREN(parentid, reftable, refcolumn, **kwargs):
-        """Generate a collection of records from "reftable"
-        that reference an object with objectid = "parentid" by
-        the "refcolumn".
-        additional arguments: 
-        limit - max number of records, default None
-        order - expression to be used in the ORDER BY clause
-        reprfunc - function to generate _astxt values for each record
-        gettxt - boolean, fetch _astxt from database
-        select - array of fields to select from reftable, default ['*']
+        """
+        Generator allowing to iterate over child rows.
+        
+        Generates a collection of records from I{reftable} that reference an object with 
+        I{objectid} = "I{parentid}" by the I{refcolumn}.        
+        
+        keyword arguments: 
+           - limit - max number of records, default None
+           - order - expression to be used in the ORDER BY clause
+           - reprfunc - function to generate _astxt values for each record
+           - gettxt - boolean, fetch _astxt from database
+           - select - array of fields to select from reftable, default ['*']
+           
+        @type parentid: integer
+        @type reftable: string
+        @type refcolumn: string
+        
+        @param parentid: object id of the parent (referenced) row
+        @param reftable: name of the referencing table
+        @param refcolumn: name of the referencing column
+        
+        @rtype: iterator
+        @return: iterator over the specifies, referencing rows
         """
         limit = kwargs.get ( "limit", None )
         order = kwargs.get ( "order", ['o.objectid'] )
@@ -460,6 +727,22 @@ API Error: {0.pgexception}""".format ( self )
     
     @staticmethod
     def IDLIST(tablename, **kwargs):
+        """
+        Return a list of object ids from a given table.
+        
+        keyword arguments:
+           - where
+           - order
+           - limit
+           - offset
+        are inserted into the SQL query in appropriate places.
+        
+        @type tablename: string
+        @param tablename: name of the table
+        
+        @rtype: list
+        @returns: list of object ids
+        """
         limit = kwargs.get ( "limit", None )
         if limit: limit = "LIMIT " + str(limit)
         else: limit = ""

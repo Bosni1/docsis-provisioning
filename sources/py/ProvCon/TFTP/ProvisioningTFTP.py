@@ -1,12 +1,13 @@
 #!/bin/env python
-import ProvCon
-import Server, Protocol
-
 from multiprocessing import Process, Queue
 from multiprocessing.connection import Client
 from Queue import Queue as ThreadingQueue
 
 import os, time, signal, sys
+
+import ProvCon
+from ProvCon.wronolib.procname import set_process_name
+import Server, Protocol
 
 #The provisioning TFTP server is a multitasking application which
 #not only serves file contents via TFTP, but also ensures that
@@ -32,7 +33,7 @@ class TFTPDataSender(Process):
     #The loop stops until a "None" is the first element of
     #the tuple read from the queue
     def run(self):
-        ProvCon.set_process_name ( "0@TFTPD_DATA" )
+        set_process_name ( "0@TFTPD_DATA" )
         logger = ProvCon.LoggingClient ( name = "TFTPD%05d" % self.pid )
         queue_errors = 0
         while 1:
@@ -69,7 +70,7 @@ class CableModemConfigCook(Process):
         self.oven = oven
     
     def run(self):
-        ProvCon.set_process_name ( "0@TFTPD_CMCFG" )
+        set_process_name ( "0@TFTPD_CMCFG" )
         pass
         
 class FileCook(Process):
@@ -80,7 +81,7 @@ class FileCook(Process):
         self.oven = fileOven
         
     def run(self):
-        ProvCon.set_process_name ( "0@TFTPD_FILE" )
+        set_process_name ( "0@TFTPD_FILE" )
         logger = ProvCon.LoggingClient ( name="TFTP_FILE" )
         while True:
             (initiating_packet, client_address) = self.myQueue.get()
@@ -183,7 +184,7 @@ class CableModemConfigOven(BaseOven):
 class ProvisioningTFTPServer(Server.BaseTFTPServer):
     def __init__(self):
         Server.BaseTFTPServer.__init__(self)
-        ProvCon.set_process_name ( "0@TFTPD_LISTEN" )
+        set_process_name ( "0@TFTPD_LISTEN" )
         self.config = ProvCon.Configuration()
         self.logger = ProvCon.LoggingClient ( name="TFTPD_SRV" )
         #The queue for "ready-to-be-sent" files
@@ -274,7 +275,7 @@ class pcTFTPD(Process):
         self.start()
         
     def run(self):
-        ProvCon.set_process_name ( "0@TFTPD" )
+        set_process_name ( "0@TFTPD" )
         config = ProvCon.Configuration()
         logger = ProvCon.LoggingClient ( name="TFTPD" )
         

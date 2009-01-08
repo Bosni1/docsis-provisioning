@@ -2,19 +2,37 @@ import contextlib
 import cStringIO
 import pg, re
 import exceptions
-from config import config
 
 class CFG:
     """not really a class, just a nice-looking storage for application settings"""
     class DB:
-        HOST = config.get ( "DATABASE", "host" )
-        PORT = config.get ( "DATABASE", "port" )
-        DBNAME = config.get ( "DATABASE", "dbname" )
+        @classmethod
+        def initialize(cls):
+            if cls.__is_initialized: return
+            from config import config
+            cls.HOST = config.get ( "DATABASE", "host" )
+            cls.PORT = config.get ( "DATABASE", "port" )
+            cls.DBNAME = config.get ( "DATABASE", "dbname" )
+            cls.ROLE = None
+            cls.PASS = None
+            cls.SCHEMA = config.get ( "DATABASE", "schema" )        
+            cls.__is_initialized = True
+            
+        HOST = None
+        PORT = None
+        DBNAME = None
         ROLE = None
         PASS = None
-        SCHEMA = config.get ( "DATABASE", "schema" )        
+        SCHEMA = None
+        __is_initialized = False
+        
     class RT:
-        DATASCOPE = config.get ( "DATABASE", "scope" )        
+        @classmethod        
+        def initialize(cls):
+            from config import config
+            cls.DATASCOPE = config.get ( "DATABASE", "scope" )        
+        DATASCOPE = None
+        
     class tCX(pg.DB):        
         """==tCX==
         Besides being a PostgreSQL connection object, this class builds the ER
@@ -130,7 +148,8 @@ def text_to_array(text, depth):
 
 def StartupDatabaseConnection():
     print "DB STARTUP"
+    CFG.DB.initialize()
+    CFG.RT.initialize()
     CFG.CX = CFG.tCX.instance or CFG.tCX()
+Init = StartupDatabaseConnection
 
-
-StartupDatabaseConnection()

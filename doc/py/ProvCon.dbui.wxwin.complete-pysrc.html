@@ -1,0 +1,670 @@
+<?xml version="1.0" encoding="ascii"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+          "DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+  <title>ProvCon.dbui.wxwin.complete</title>
+  <link rel="stylesheet" href="epydoc.css" type="text/css" />
+  <script type="text/javascript" src="epydoc.js"></script>
+</head>
+
+<body bgcolor="white" text="black" link="blue" vlink="#204080"
+      alink="#204080">
+<!-- ==================== NAVIGATION BAR ==================== -->
+<table class="navbar" border="0" width="100%" cellpadding="0"
+       bgcolor="#a0c0ff" cellspacing="0">
+  <tr valign="middle">
+  <!-- Home link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="ProvCon-module.html">Home</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Tree link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="module-tree.html">Trees</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Index link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="identifier-index.html">Indices</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Help link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="help.html">Help</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Project homepage -->
+      <th class="navbar" align="right" width="100%">
+        <table border="0" cellpadding="0" cellspacing="0">
+          <tr><th class="navbar" align="center"
+            >docsis-provisioning</th>
+          </tr></table></th>
+  </tr>
+</table>
+<table width="100%" cellpadding="0" cellspacing="0">
+  <tr valign="top">
+    <td width="100%">
+      <span class="breadcrumbs">
+        <a href="ProvCon-module.html">Package&nbsp;ProvCon</a> ::
+        <a href="ProvCon.dbui-module.html">Package&nbsp;dbui</a> ::
+        <a href="ProvCon.dbui.wxwin-module.html">Package&nbsp;wxwin</a> ::
+        Module&nbsp;complete
+      </span>
+    </td>
+    <td>
+      <table cellpadding="0" cellspacing="0">
+        <!-- hide/show private -->
+        <tr><td align="right"><span class="options">[<a href="javascript:void(0);" class="privatelink"
+    onclick="toggle_private();">hide&nbsp;private</a>]</span></td></tr>
+        <tr><td align="right"><span class="options"
+            >[<a href="frames.html" target="_top">frames</a
+            >]&nbsp;|&nbsp;<a href="ProvCon.dbui.wxwin.complete-pysrc.html"
+            target="_top">no&nbsp;frames</a>]</span></td></tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<h1 class="epydoc">Source Code for <a href="ProvCon.dbui.wxwin.complete-module.html">Module ProvCon.dbui.wxwin.complete</a></h1>
+<pre class="py-src">
+<a name="L1"></a><tt class="py-lineno">  1</tt>  <tt class="py-line"><tt class="py-comment"># -*- coding: utf8 -*-</tt> </tt>
+<a name="L2"></a><tt class="py-lineno">  2</tt>  <tt class="py-line"><tt class="py-comment">## $Id: complete.py 62 2008-12-23 14:03:32Z wroniasty $</tt> </tt>
+<a name="L3"></a><tt class="py-lineno">  3</tt>  <tt class="py-line"><tt class="py-docstring">"""</tt> </tt>
+<a name="L4"></a><tt class="py-lineno">  4</tt>  <tt class="py-line"><tt class="py-docstring">This module implements a complete, user-ready generic form, capable of editing</tt> </tt>
+<a name="L5"></a><tt class="py-lineno">  5</tt>  <tt class="py-line"><tt class="py-docstring">data in a table in a provisioning-compatible database.</tt> </tt>
+<a name="L6"></a><tt class="py-lineno">  6</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
+<a name="L7"></a><tt class="py-lineno">  7</tt>  <tt class="py-line"><tt class="py-docstring">From the MVC point of view, a GenericForm is a View, a form object (IForm) is the Controller</tt> </tt>
+<a name="L8"></a><tt class="py-lineno">  8</tt>  <tt class="py-line"><tt class="py-docstring">and a Record is the Model.</tt> </tt>
+<a name="L9"></a><tt class="py-lineno">  9</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
+<a name="L10"></a><tt class="py-lineno"> 10</tt>  <tt class="py-line"><tt class="py-docstring">A generic </tt> </tt>
+<a name="L11"></a><tt class="py-lineno"> 11</tt>  <tt class="py-line"><tt class="py-docstring">"""</tt> </tt>
+<a name="L12"></a><tt class="py-lineno"> 12</tt>  <tt class="py-line"> </tt>
+<a name="L13"></a><tt class="py-lineno"> 13</tt>  <tt class="py-line"> </tt>
+<a name="L14"></a><tt class="py-lineno"> 14</tt>  <tt class="py-line"><tt class="py-keyword">from</tt> <tt id="link-0" class="py-name" targets="Module ProvCon.dbui.abstractui.forms=ProvCon.dbui.abstractui.forms-module.html,Module ProvCon.dbui.wxwin.forms=ProvCon.dbui.wxwin.forms-module.html"><a title="ProvCon.dbui.abstractui.forms
+ProvCon.dbui.wxwin.forms" class="py-name" href="#" onclick="return doclink('link-0', 'forms', 'link-0');">forms</a></tt> <tt class="py-keyword">import</tt> <tt id="link-1" class="py-name" targets="Class ProvCon.dbui.wxwin.forms.GenericForm=ProvCon.dbui.wxwin.forms.GenericForm-class.html"><a title="ProvCon.dbui.wxwin.forms.GenericForm" class="py-name" href="#" onclick="return doclink('link-1', 'GenericForm', 'link-1');">GenericForm</a></tt> </tt>
+<a name="L15"></a><tt class="py-lineno"> 15</tt>  <tt class="py-line"><tt class="py-keyword">from</tt> <tt id="link-2" class="py-name" targets="Module ProvCon.dbui.abstractui.navigators=ProvCon.dbui.abstractui.navigators-module.html,Module ProvCon.dbui.wxwin.navigators=ProvCon.dbui.wxwin.navigators-module.html"><a title="ProvCon.dbui.abstractui.navigators
+ProvCon.dbui.wxwin.navigators" class="py-name" href="#" onclick="return doclink('link-2', 'navigators', 'link-2');">navigators</a></tt> <tt class="py-keyword">import</tt> <tt id="link-3" class="py-name" targets="Class ProvCon.dbui.wxwin.navigators.Navigator=ProvCon.dbui.wxwin.navigators.Navigator-class.html"><a title="ProvCon.dbui.wxwin.navigators.Navigator" class="py-name" href="#" onclick="return doclink('link-3', 'Navigator', 'link-3');">Navigator</a></tt> </tt>
+<a name="L16"></a><tt class="py-lineno"> 16</tt>  <tt class="py-line"><tt class="py-keyword">from</tt> <tt id="link-4" class="py-name" targets="Package ProvCon=ProvCon-module.html"><a title="ProvCon" class="py-name" href="#" onclick="return doclink('link-4', 'ProvCon', 'link-4');">ProvCon</a></tt><tt class="py-op">.</tt><tt id="link-5" class="py-name" targets="Package ProvCon.dbui=ProvCon.dbui-module.html"><a title="ProvCon.dbui" class="py-name" href="#" onclick="return doclink('link-5', 'dbui', 'link-5');">dbui</a></tt> <tt class="py-keyword">import</tt> <tt id="link-6" class="py-name" targets="Package ProvCon.dbui.orm=ProvCon.dbui.orm-module.html"><a title="ProvCon.dbui.orm" class="py-name" href="#" onclick="return doclink('link-6', 'orm', 'link-6');">orm</a></tt><tt class="py-op">,</tt> <tt id="link-7" class="py-name" targets="Package ProvCon.dbui.meta=ProvCon.dbui.meta-module.html"><a title="ProvCon.dbui.meta" class="py-name" href="#" onclick="return doclink('link-7', 'meta', 'link-7');">meta</a></tt> </tt>
+<a name="L17"></a><tt class="py-lineno"> 17</tt>  <tt class="py-line"><tt class="py-keyword">from</tt> <tt id="link-8" class="py-name"><a title="ProvCon" class="py-name" href="#" onclick="return doclink('link-8', 'ProvCon', 'link-4');">ProvCon</a></tt><tt class="py-op">.</tt><tt id="link-9" class="py-name" targets="Package ProvCon.func=ProvCon.func-module.html"><a title="ProvCon.func" class="py-name" href="#" onclick="return doclink('link-9', 'func', 'link-9');">func</a></tt> <tt class="py-keyword">import</tt> <tt id="link-10" class="py-name" targets="Class ProvCon.func.classes.conditionalmethod=ProvCon.func.classes.conditionalmethod-class.html"><a title="ProvCon.func.classes.conditionalmethod" class="py-name" href="#" onclick="return doclink('link-10', 'conditionalmethod', 'link-10');">conditionalmethod</a></tt><tt class="py-op">,</tt> <tt id="link-11" class="py-name" targets="Class ProvCon.func.events.eventcancelled=ProvCon.func.events.eventcancelled-class.html"><a title="ProvCon.func.events.eventcancelled" class="py-name" href="#" onclick="return doclink('link-11', 'eventcancelled', 'link-11');">eventcancelled</a></tt> </tt>
+<a name="L18"></a><tt class="py-lineno"> 18</tt>  <tt class="py-line"><tt class="py-keyword">import</tt> <tt class="py-name">wx</tt> </tt>
+<a name="L19"></a><tt class="py-lineno"> 19</tt>  <tt class="py-line"> </tt>
+<a name="L20"></a><tt class="py-lineno"> 20</tt>  <tt class="py-line"><tt id="link-12" class="py-name" targets="Variable ProvCon.dbui.abstractui.fields.__revision__=ProvCon.dbui.abstractui.fields-module.html#__revision__,Variable ProvCon.dbui.abstractui.forms.__revision__=ProvCon.dbui.abstractui.forms-module.html#__revision__,Variable ProvCon.dbui.abstractui.navigators.__revision__=ProvCon.dbui.abstractui.navigators-module.html#__revision__,Variable ProvCon.dbui.abstractui.recordlists.__revision__=ProvCon.dbui.abstractui.recordlists-module.html#__revision__,Variable ProvCon.dbui.meta.field.__revision__=ProvCon.dbui.meta.field-module.html#__revision__,Variable ProvCon.dbui.orm.form.__revision__=ProvCon.dbui.orm.form-module.html#__revision__,Variable ProvCon.dbui.orm.record.__revision__=ProvCon.dbui.orm.record-module.html#__revision__,Variable ProvCon.dbui.orm.recordlist.__revision__=ProvCon.dbui.orm.recordlist-module.html#__revision__,Variable ProvCon.dbui.wxwin.complete.__revision__=ProvCon.dbui.wxwin.complete-module.html#__revision__,Variable ProvCon.dbui.wxwin.forms.__revision__=ProvCon.dbui.wxwin.forms-module.html#__revision__,Variable ProvCon.func.decorators.__revision__=ProvCon.func.decorators-module.html#__revision__,Variable ProvCon.func.functions.__revision__=ProvCon.func.functions-module.html#__revision__,Variable ProvCon.func.variables.__revision__=ProvCon.func.variables-module.html#__revision__"><a title="ProvCon.dbui.abstractui.fields.__revision__
+ProvCon.dbui.abstractui.forms.__revision__
+ProvCon.dbui.abstractui.navigators.__revision__
+ProvCon.dbui.abstractui.recordlists.__revision__
+ProvCon.dbui.meta.field.__revision__
+ProvCon.dbui.orm.form.__revision__
+ProvCon.dbui.orm.record.__revision__
+ProvCon.dbui.orm.recordlist.__revision__
+ProvCon.dbui.wxwin.complete.__revision__
+ProvCon.dbui.wxwin.forms.__revision__
+ProvCon.func.decorators.__revision__
+ProvCon.func.functions.__revision__
+ProvCon.func.variables.__revision__" class="py-name" href="#" onclick="return doclink('link-12', '__revision__', 'link-12');">__revision__</a></tt> <tt class="py-op">=</tt> <tt class="py-string">"$Revision: 62 $"</tt> </tt>
+<a name="L21"></a><tt class="py-lineno"> 21</tt>  <tt class="py-line"> </tt>
+<a name="L22"></a><tt class="py-lineno"> 22</tt>  <tt class="py-line"> </tt>
+<a name="InfoPopup"></a><div id="InfoPopup-def"><a name="L23"></a><tt class="py-lineno"> 23</tt> <a class="py-toggle" href="#" id="InfoPopup-toggle" onclick="return toggle('InfoPopup');">-</a><tt class="py-line"><tt class="py-keyword">class</tt> <a class="py-def-name" href="ProvCon.dbui.wxwin.complete.InfoPopup-class.html">InfoPopup</a> <tt class="py-op">(</tt><tt class="py-base-class">wx</tt><tt class="py-op">.</tt><tt class="py-base-class">PopupWindow</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="InfoPopup-collapsed" style="display:none;" pad="+++" indent="++++"></div><div id="InfoPopup-expanded"><a name="InfoPopup.__init__"></a><div id="InfoPopup.__init__-def"><a name="L24"></a><tt class="py-lineno"> 24</tt> <a class="py-toggle" href="#" id="InfoPopup.__init__-toggle" onclick="return toggle('InfoPopup.__init__');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="ProvCon.dbui.wxwin.complete.InfoPopup-class.html#__init__">__init__</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">,</tt> <tt class="py-param">form</tt><tt class="py-op">,</tt> <tt class="py-op">*</tt><tt class="py-param">args</tt><tt class="py-op">,</tt> <tt class="py-op">**</tt><tt class="py-param">kwargs</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="InfoPopup.__init__-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="InfoPopup.__init__-expanded"><a name="L25"></a><tt class="py-lineno"> 25</tt>  <tt class="py-line">        <tt class="py-name">wx</tt><tt class="py-op">.</tt><tt class="py-name">PopupWindow</tt><tt class="py-op">.</tt><tt id="link-13" class="py-name" targets="Method ProvCon.TFTP.Protocol.Packet.__init__()=ProvCon.TFTP.Protocol.Packet-class.html#__init__,Method ProvCon.TFTP.ProvisioningTFTP.BaseOven.__init__()=ProvCon.TFTP.ProvisioningTFTP.BaseOven-class.html#__init__,Method ProvCon.TFTP.ProvisioningTFTP.CableModemConfigCook.__init__()=ProvCon.TFTP.ProvisioningTFTP.CableModemConfigCook-class.html#__init__,Method ProvCon.TFTP.ProvisioningTFTP.FileCook.__init__()=ProvCon.TFTP.ProvisioningTFTP.FileCook-class.html#__init__,Method ProvCon.TFTP.ProvisioningTFTP.ProvisioningTFTPServer.__init__()=ProvCon.TFTP.ProvisioningTFTP.ProvisioningTFTPServer-class.html#__init__,Method ProvCon.TFTP.ProvisioningTFTP.TFTPDataSender.__init__()=ProvCon.TFTP.ProvisioningTFTP.TFTPDataSender-class.html#__init__,Method ProvCon.TFTP.ProvisioningTFTP.pcTFTPD.__init__()=ProvCon.TFTP.ProvisioningTFTP.pcTFTPD-class.html#__init__,Method ProvCon.TFTP.Server.BaseTFTPServer.__init__()=ProvCon.TFTP.Server.BaseTFTPServer-class.html#__init__,Method ProvCon.cli.CLIServer.__init__()=ProvCon.cli.CLIServer-class.html#__init__,Method ProvCon.cli.CLIWorker.__init__()=ProvCon.cli.CLIWorker-class.html#__init__,Method ProvCon.dbui.abstractui.fields.BaseArrayEditor.__init__()=ProvCon.dbui.abstractui.fields.BaseArrayEditor-class.html#__init__,Method ProvCon.dbui.abstractui.fields.BaseArrayItemButtonBox.__init__()=ProvCon.dbui.abstractui.fields.BaseArrayItemButtonBox-class.html#__init__,Method ProvCon.dbui.abstractui.fields.BaseArrayItemEditor.__init__()=ProvCon.dbui.abstractui.fields.BaseArrayItemEditor-class.html#__init__,Method ProvCon.dbui.abstractui.fields.BaseFieldEditor.__init__()=ProvCon.dbui.abstractui.fields.BaseFieldEditor-class.html#__init__,Method ProvCon.dbui.abstractui.fields.BaseReferenceEditor.__init__()=ProvCon.dbui.abstractui.fields.BaseReferenceEditor-class.html#__init__,Method ProvCon.dbui.abstractui.forms.BaseForm.__init__()=ProvCon.dbui.abstractui.forms.BaseForm-class.html#__init__,Method ProvCon.dbui.abstractui.navigators.BaseNavigator.__init__()=ProvCon.dbui.abstractui.navigators.BaseNavigator-class.html#__init__,Method ProvCon.dbui.abstractui.recordlists.BasePager.__init__()=ProvCon.dbui.abstractui.recordlists.BasePager-class.html#__init__,Method ProvCon.dbui.abstractui.recordlists.BaseRecordList.__init__()=ProvCon.dbui.abstractui.recordlists.BaseRecordList-class.html#__init__,Method ProvCon.dbui.database.CFG.tCX.__init__()=ProvCon.dbui.database.CFG.tCX-class.html#__init__,Method ProvCon.dbui.di.rObject'.ObjectFlags.__init__()=ProvCon.dbui.di.rObject%27.ObjectFlags-class.html#__init__,Method ProvCon.dbui.di.rObject'.ObjectParams.__init__()=ProvCon.dbui.di.rObject%27.ObjectParams-class.html#__init__,Method ProvCon.dbui.di.rObject'.rObject.__init__()=ProvCon.dbui.di.rObject%27.rObject-class.html#__init__,Method ProvCon.dbui.meta.field.Field.__init__()=ProvCon.dbui.meta.field.Field-class.html#__init__,Method ProvCon.dbui.meta.table.Table.__init__()=ProvCon.dbui.meta.table.Table-class.html#__init__,Method ProvCon.dbui.orm.form.Form.__init__()=ProvCon.dbui.orm.form.Form-class.html#__init__,Method ProvCon.dbui.orm.record.Record.DataManipulationError.__init__()=ProvCon.dbui.orm.record.Record.DataManipulationError-class.html#__init__,Method ProvCon.dbui.orm.record.Record.DataQueryError.__init__()=ProvCon.dbui.orm.record.Record.DataQueryError-class.html#__init__,Method ProvCon.dbui.orm.record.Record.RecordNotFound.__init__()=ProvCon.dbui.orm.record.Record.RecordNotFound-class.html#__init__,Method ProvCon.dbui.orm.record.Record.__init__()=ProvCon.dbui.orm.record.Record-class.html#__init__,Method ProvCon.dbui.orm.recordlist.RecordList.__init__()=ProvCon.dbui.orm.recordlist.RecordList-class.html#__init__,Method ProvCon.dbui.orm.recordsearch.OIDSearchList.__init__()=ProvCon.dbui.orm.recordsearch.OIDSearchList-class.html#__init__,Method ProvCon.dbui.wxwin.complete.CompleteGenericForm.__init__()=ProvCon.dbui.wxwin.complete.CompleteGenericForm-class.html#__init__,Method ProvCon.dbui.wxwin.complete.FormToolbar.__init__()=ProvCon.dbui.wxwin.complete.FormToolbar-class.html#__init__,Method ProvCon.dbui.wxwin.complete.InfoPopup.__init__()=ProvCon.dbui.wxwin.complete.InfoPopup-class.html#__init__,Method ProvCon.dbui.wxwin.fields.Entry.ArrayCombo.__init__()=ProvCon.dbui.wxwin.fields.Entry.ArrayCombo-class.html#__init__,Method ProvCon.dbui.wxwin.fields.Entry.ArrayItemCombo.__init__()=ProvCon.dbui.wxwin.fields.Entry.ArrayItemCombo-class.html#__init__,Method ProvCon.dbui.wxwin.fields.Entry.ArrayItemStatic.__init__()=ProvCon.dbui.wxwin.fields.Entry.ArrayItemStatic-class.html#__init__,Method ProvCon.dbui.wxwin.fields.Entry.ArrayItemText.__init__()=ProvCon.dbui.wxwin.fields.Entry.ArrayItemText-class.html#__init__,Method ProvCon.dbui.wxwin.fields.Entry.ArrayText.__init__()=ProvCon.dbui.wxwin.fields.Entry.ArrayText-class.html#__init__,Method ProvCon.dbui.wxwin.fields.Entry.BaseArray.__init__()=ProvCon.dbui.wxwin.fields.Entry.BaseArray-class.html#__init__,Method ProvCon.dbui.wxwin.fields.Entry.Boolean.__init__()=ProvCon.dbui.wxwin.fields.Entry.Boolean-class.html#__init__,Method ProvCon.dbui.wxwin.fields.Entry.ComboReference.__init__()=ProvCon.dbui.wxwin.fields.Entry.ComboReference-class.html#__init__,Method ProvCon.dbui.wxwin.fields.Entry.Memo.__init__()=ProvCon.dbui.wxwin.fields.Entry.Memo-class.html#__init__,Method ProvCon.dbui.wxwin.fields.Entry.StandardArrayItemButtonBox.__init__()=ProvCon.dbui.wxwin.fields.Entry.StandardArrayItemButtonBox-class.html#__init__,Method ProvCon.dbui.wxwin.fields.Entry.Static.__init__()=ProvCon.dbui.wxwin.fields.Entry.Static-class.html#__init__,Method ProvCon.dbui.wxwin.fields.Entry.StaticReference.__init__()=ProvCon.dbui.wxwin.fields.Entry.StaticReference-class.html#__init__,Method ProvCon.dbui.wxwin.fields.Entry.Text.__init__()=ProvCon.dbui.wxwin.fields.Entry.Text-class.html#__init__,Method ProvCon.dbui.wxwin.forms.GenericForm.__init__()=ProvCon.dbui.wxwin.forms.GenericForm-class.html#__init__,Method ProvCon.dbui.wxwin.mwx.CheckBox.__init__()=ProvCon.dbui.wxwin.mwx.CheckBox-class.html#__init__,Method ProvCon.dbui.wxwin.mwx.ComboBox.__init__()=ProvCon.dbui.wxwin.mwx.ComboBox-class.html#__init__,Method ProvCon.dbui.wxwin.mwx.StaticText.__init__()=ProvCon.dbui.wxwin.mwx.StaticText-class.html#__init__,Method ProvCon.dbui.wxwin.mwx.TextCtrl.__init__()=ProvCon.dbui.wxwin.mwx.TextCtrl-class.html#__init__,Method ProvCon.dbui.wxwin.mwx.mwxControl.__init__()=ProvCon.dbui.wxwin.mwx.mwxControl-class.html#__init__,Method ProvCon.dbui.wxwin.navigators.Navigator.__init__()=ProvCon.dbui.wxwin.navigators.Navigator-class.html#__init__,Method ProvCon.dbui.wxwin.recordlists.RecordList.__init__()=ProvCon.dbui.wxwin.recordlists.RecordList-class.html#__init__,Method ProvCon.docsis.cablemodem.cablemodem.__init__()=ProvCon.docsis.cablemodem.cablemodem-class.html#__init__,Method ProvCon.docsis.cablemodem.cablemodem._cos.__init__()=ProvCon.docsis.cablemodem.cablemodem._cos-class.html#__init__,Method ProvCon.docsis.cablemodem.cablemodem._cpe.__init__()=ProvCon.docsis.cablemodem.cablemodem._cpe-class.html#__init__,Method ProvCon.docsis.cablemodem.cablemodem._mac.__init__()=ProvCon.docsis.cablemodem.cablemodem._mac-class.html#__init__,Method ProvCon.docsis.compiler.config.config.__init__()=ProvCon.docsis.compiler.config.config-class.html#__init__,Method ProvCon.docsis.compiler.encoder.error.__init__()=ProvCon.docsis.compiler.encoder.error-class.html#__init__,Method ProvCon.docsis.compiler.encoder.tlv.__init__()=ProvCon.docsis.compiler.encoder.tlv-class.html#__init__,Method ProvCon.docsis.compiler.encoder.tlv_multipart.__init__()=ProvCon.docsis.compiler.encoder.tlv_multipart-class.html#__init__,Method ProvCon.docsis.compiler.encoder.tlv_multipart.append_proxy.__init__()=ProvCon.docsis.compiler.encoder.tlv_multipart.append_proxy-class.html#__init__,Method ProvCon.docsis.compiler.encoder.tlv_multipart.iterator.__init__()=ProvCon.docsis.compiler.encoder.tlv_multipart.iterator-class.html#__init__,Method ProvCon.docsis.compiler.encoder.tlv_multipart_subclass.__init__()=ProvCon.docsis.compiler.encoder.tlv_multipart_subclass-class.html#__init__,Method ProvCon.docsis.compiler.encoder.tlv_subclass.__init__()=ProvCon.docsis.compiler.encoder.tlv_subclass-class.html#__init__,Method ProvCon.func.classes.conditionalmethod.__init__()=ProvCon.func.classes.conditionalmethod-class.html#__init__,Method ProvCon.func.events.eventemitter.__init__()=ProvCon.func.events.eventemitter-class.html#__init__,Method ProvCon.func.events.eventemitter.evt.__init__()=ProvCon.func.events.eventemitter.evt-class.html#__init__,Method ProvCon.func.events.eventemitter.evthook.__init__()=ProvCon.func.events.eventemitter.evthook-class.html#__init__,Method ProvCon.func.events.eventexception.__init__()=ProvCon.func.events.eventexception-class.html#__init__,Method ProvCon.func.variables.TracedVariable.Tracer.__init__()=ProvCon.func.variables.TracedVariable.Tracer-class.html#__init__,Method ProvCon.func.variables.TracedVariable.__init__()=ProvCon.func.variables.TracedVariable-class.html#__init__,Method ProvCon.gui.FrontEndApp.FE.__init__()=ProvCon.gui.FrontEndApp.FE-class.html#__init__,Method ProvCon.gui.ProvisioningControl.GenericObjectEditor.__init__()=ProvCon.gui.ProvisioningControl.GenericObjectEditor-class.html#__init__,Method ProvCon.gui.ProvisioningControl.GridView.__init__()=ProvCon.gui.ProvisioningControl.GridView-class.html#__init__,Method ProvCon.gui.ProvisioningControl.MainTab.__init__()=ProvCon.gui.ProvisioningControl.MainTab-class.html#__init__,Method ProvCon.gui.ProvisioningControl.ObjectEditorModel.__init__()=ProvCon.gui.ProvisioningControl.ObjectEditorModel-class.html#__init__,Method ProvCon.gui.ProvisioningControl.TopLevelWindow.__init__()=ProvCon.gui.ProvisioningControl.TopLevelWindow-class.html#__init__,Method ProvCon.log.LoggingBackend.__init__()=ProvCon.log.LoggingBackend-class.html#__init__,Method ProvCon.log.LoggingClient.__init__()=ProvCon.log.LoggingClient-class.html#__init__,Method ProvCon.log.LoggingServer.__init__()=ProvCon.log.LoggingServer-class.html#__init__,Method ProvCon.ui.uierror.__init__()=ProvCon.ui.uierror-class.html#__init__,Method ProvCon.wronolib.ipaddr.ip4addr.__init__()=ProvCon.wronolib.ipaddr.ip4addr-class.html#__init__,Method ProvCon.wronolib.ipaddr.ip4prefix.__init__()=ProvCon.wronolib.ipaddr.ip4prefix-class.html#__init__"><a title="ProvCon.TFTP.Protocol.Packet.__init__
+ProvCon.TFTP.ProvisioningTFTP.BaseOven.__init__
+ProvCon.TFTP.ProvisioningTFTP.CableModemConfigCook.__init__
+ProvCon.TFTP.ProvisioningTFTP.FileCook.__init__
+ProvCon.TFTP.ProvisioningTFTP.ProvisioningTFTPServer.__init__
+ProvCon.TFTP.ProvisioningTFTP.TFTPDataSender.__init__
+ProvCon.TFTP.ProvisioningTFTP.pcTFTPD.__init__
+ProvCon.TFTP.Server.BaseTFTPServer.__init__
+ProvCon.cli.CLIServer.__init__
+ProvCon.cli.CLIWorker.__init__
+ProvCon.dbui.abstractui.fields.BaseArrayEditor.__init__
+ProvCon.dbui.abstractui.fields.BaseArrayItemButtonBox.__init__
+ProvCon.dbui.abstractui.fields.BaseArrayItemEditor.__init__
+ProvCon.dbui.abstractui.fields.BaseFieldEditor.__init__
+ProvCon.dbui.abstractui.fields.BaseReferenceEditor.__init__
+ProvCon.dbui.abstractui.forms.BaseForm.__init__
+ProvCon.dbui.abstractui.navigators.BaseNavigator.__init__
+ProvCon.dbui.abstractui.recordlists.BasePager.__init__
+ProvCon.dbui.abstractui.recordlists.BaseRecordList.__init__
+ProvCon.dbui.database.CFG.tCX.__init__
+ProvCon.dbui.di.rObject'.ObjectFlags.__init__
+ProvCon.dbui.di.rObject'.ObjectParams.__init__
+ProvCon.dbui.di.rObject'.rObject.__init__
+ProvCon.dbui.meta.field.Field.__init__
+ProvCon.dbui.meta.table.Table.__init__
+ProvCon.dbui.orm.form.Form.__init__
+ProvCon.dbui.orm.record.Record.DataManipulationError.__init__
+ProvCon.dbui.orm.record.Record.DataQueryError.__init__
+ProvCon.dbui.orm.record.Record.RecordNotFound.__init__
+ProvCon.dbui.orm.record.Record.__init__
+ProvCon.dbui.orm.recordlist.RecordList.__init__
+ProvCon.dbui.orm.recordsearch.OIDSearchList.__init__
+ProvCon.dbui.wxwin.complete.CompleteGenericForm.__init__
+ProvCon.dbui.wxwin.complete.FormToolbar.__init__
+ProvCon.dbui.wxwin.complete.InfoPopup.__init__
+ProvCon.dbui.wxwin.fields.Entry.ArrayCombo.__init__
+ProvCon.dbui.wxwin.fields.Entry.ArrayItemCombo.__init__
+ProvCon.dbui.wxwin.fields.Entry.ArrayItemStatic.__init__
+ProvCon.dbui.wxwin.fields.Entry.ArrayItemText.__init__
+ProvCon.dbui.wxwin.fields.Entry.ArrayText.__init__
+ProvCon.dbui.wxwin.fields.Entry.BaseArray.__init__
+ProvCon.dbui.wxwin.fields.Entry.Boolean.__init__
+ProvCon.dbui.wxwin.fields.Entry.ComboReference.__init__
+ProvCon.dbui.wxwin.fields.Entry.Memo.__init__
+ProvCon.dbui.wxwin.fields.Entry.StandardArrayItemButtonBox.__init__
+ProvCon.dbui.wxwin.fields.Entry.Static.__init__
+ProvCon.dbui.wxwin.fields.Entry.StaticReference.__init__
+ProvCon.dbui.wxwin.fields.Entry.Text.__init__
+ProvCon.dbui.wxwin.forms.GenericForm.__init__
+ProvCon.dbui.wxwin.mwx.CheckBox.__init__
+ProvCon.dbui.wxwin.mwx.ComboBox.__init__
+ProvCon.dbui.wxwin.mwx.StaticText.__init__
+ProvCon.dbui.wxwin.mwx.TextCtrl.__init__
+ProvCon.dbui.wxwin.mwx.mwxControl.__init__
+ProvCon.dbui.wxwin.navigators.Navigator.__init__
+ProvCon.dbui.wxwin.recordlists.RecordList.__init__
+ProvCon.docsis.cablemodem.cablemodem.__init__
+ProvCon.docsis.cablemodem.cablemodem._cos.__init__
+ProvCon.docsis.cablemodem.cablemodem._cpe.__init__
+ProvCon.docsis.cablemodem.cablemodem._mac.__init__
+ProvCon.docsis.compiler.config.config.__init__
+ProvCon.docsis.compiler.encoder.error.__init__
+ProvCon.docsis.compiler.encoder.tlv.__init__
+ProvCon.docsis.compiler.encoder.tlv_multipart.__init__
+ProvCon.docsis.compiler.encoder.tlv_multipart.append_proxy.__init__
+ProvCon.docsis.compiler.encoder.tlv_multipart.iterator.__init__
+ProvCon.docsis.compiler.encoder.tlv_multipart_subclass.__init__
+ProvCon.docsis.compiler.encoder.tlv_subclass.__init__
+ProvCon.func.classes.conditionalmethod.__init__
+ProvCon.func.events.eventemitter.__init__
+ProvCon.func.events.eventemitter.evt.__init__
+ProvCon.func.events.eventemitter.evthook.__init__
+ProvCon.func.events.eventexception.__init__
+ProvCon.func.variables.TracedVariable.Tracer.__init__
+ProvCon.func.variables.TracedVariable.__init__
+ProvCon.gui.FrontEndApp.FE.__init__
+ProvCon.gui.ProvisioningControl.GenericObjectEditor.__init__
+ProvCon.gui.ProvisioningControl.GridView.__init__
+ProvCon.gui.ProvisioningControl.MainTab.__init__
+ProvCon.gui.ProvisioningControl.ObjectEditorModel.__init__
+ProvCon.gui.ProvisioningControl.TopLevelWindow.__init__
+ProvCon.log.LoggingBackend.__init__
+ProvCon.log.LoggingClient.__init__
+ProvCon.log.LoggingServer.__init__
+ProvCon.ui.uierror.__init__
+ProvCon.wronolib.ipaddr.ip4addr.__init__
+ProvCon.wronolib.ipaddr.ip4prefix.__init__" class="py-name" href="#" onclick="return doclink('link-13', '__init__', 'link-13');">__init__</a></tt><tt class="py-op">(</tt><tt class="py-name">self</tt><tt class="py-op">,</tt> <tt id="link-14" class="py-name" targets="Module ProvCon.dbui.orm.form=ProvCon.dbui.orm.form-module.html"><a title="ProvCon.dbui.orm.form" class="py-name" href="#" onclick="return doclink('link-14', 'form', 'link-14');">form</a></tt><tt class="py-op">,</tt> <tt class="py-op">*</tt><tt class="py-name">args</tt><tt class="py-op">,</tt> <tt class="py-op">**</tt><tt class="py-name">kwargs</tt><tt class="py-op">)</tt> </tt>
+<a name="L26"></a><tt class="py-lineno"> 26</tt>  <tt class="py-line">        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-15" class="py-name"><a title="ProvCon.dbui.orm.form" class="py-name" href="#" onclick="return doclink('link-15', 'form', 'link-14');">form</a></tt> <tt class="py-op">=</tt> <tt id="link-16" class="py-name"><a title="ProvCon.dbui.orm.form" class="py-name" href="#" onclick="return doclink('link-16', 'form', 'link-14');">form</a></tt> </tt>
+<a name="L27"></a><tt class="py-lineno"> 27</tt>  <tt class="py-line">        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">SetBackgroundColour</tt> <tt class="py-op">(</tt> <tt class="py-name">wx</tt><tt class="py-op">.</tt><tt class="py-name">NamedColor</tt> <tt class="py-op">(</tt> <tt class="py-string">"yellow"</tt> <tt class="py-op">)</tt> <tt class="py-op">)</tt> </tt>
+<a name="L28"></a><tt class="py-lineno"> 28</tt>  <tt class="py-line">        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">SetForegroundColour</tt> <tt class="py-op">(</tt> <tt class="py-name">wx</tt><tt class="py-op">.</tt><tt class="py-name">NamedColor</tt> <tt class="py-op">(</tt> <tt class="py-string">"red"</tt> <tt class="py-op">)</tt> <tt class="py-op">)</tt> </tt>
+<a name="L29"></a><tt class="py-lineno"> 29</tt>  <tt class="py-line">        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">label</tt> <tt class="py-op">=</tt> <tt class="py-name">wx</tt><tt class="py-op">.</tt><tt id="link-17" class="py-name" targets="Class ProvCon.dbui.wxwin.mwx.StaticText=ProvCon.dbui.wxwin.mwx.StaticText-class.html"><a title="ProvCon.dbui.wxwin.mwx.StaticText" class="py-name" href="#" onclick="return doclink('link-17', 'StaticText', 'link-17');">StaticText</a></tt> <tt class="py-op">(</tt> <tt class="py-name">self</tt><tt class="py-op">,</tt> <tt class="py-name">label</tt> <tt class="py-op">=</tt> <tt class="py-string">"***"</tt><tt class="py-op">,</tt> <tt class="py-name">pos</tt> <tt class="py-op">=</tt> <tt class="py-op">(</tt><tt class="py-number">10</tt><tt class="py-op">,</tt><tt class="py-number">10</tt><tt class="py-op">)</tt> <tt class="py-op">)</tt> </tt>
+</div><a name="L30"></a><tt class="py-lineno"> 30</tt>  <tt class="py-line">         </tt>
+<a name="InfoPopup.ShowMessage"></a><div id="InfoPopup.ShowMessage-def"><a name="L31"></a><tt class="py-lineno"> 31</tt> <a class="py-toggle" href="#" id="InfoPopup.ShowMessage-toggle" onclick="return toggle('InfoPopup.ShowMessage');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="ProvCon.dbui.wxwin.complete.InfoPopup-class.html#ShowMessage">ShowMessage</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">,</tt> <tt class="py-param">msg</tt><tt class="py-op">,</tt> <tt class="py-param">timeout</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="InfoPopup.ShowMessage-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="InfoPopup.ShowMessage-expanded"><a name="L32"></a><tt class="py-lineno"> 32</tt>  <tt class="py-line">        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">label</tt><tt class="py-op">.</tt><tt class="py-name">Label</tt> <tt class="py-op">=</tt> <tt class="py-name">msg</tt> </tt>
+<a name="L33"></a><tt class="py-lineno"> 33</tt>  <tt class="py-line">        <tt class="py-name">sz</tt> <tt class="py-op">=</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">label</tt><tt class="py-op">.</tt><tt class="py-name">GetBestSize</tt><tt class="py-op">(</tt><tt class="py-op">)</tt> </tt>
+<a name="L34"></a><tt class="py-lineno"> 34</tt>  <tt class="py-line">        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">SetSize</tt> <tt class="py-op">(</tt> <tt class="py-op">(</tt> <tt class="py-name">sz</tt><tt class="py-op">.</tt><tt class="py-name">width</tt> <tt class="py-op">+</tt> <tt class="py-number">20</tt><tt class="py-op">,</tt> <tt class="py-name">sz</tt><tt class="py-op">.</tt><tt class="py-name">height</tt><tt class="py-op">+</tt><tt class="py-number">20</tt><tt class="py-op">)</tt> <tt class="py-op">)</tt> </tt>
+<a name="L35"></a><tt class="py-lineno"> 35</tt>  <tt class="py-line">        <tt class="py-name">ppos</tt> <tt class="py-op">=</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-18" class="py-name"><a title="ProvCon.dbui.orm.form" class="py-name" href="#" onclick="return doclink('link-18', 'form', 'link-14');">form</a></tt><tt class="py-op">.</tt><tt class="py-name">ClientToScreen</tt> <tt class="py-op">(</tt> <tt class="py-op">(</tt><tt class="py-number">0</tt><tt class="py-op">,</tt><tt class="py-number">0</tt><tt class="py-op">)</tt> <tt class="py-op">)</tt> </tt>
+<a name="L36"></a><tt class="py-lineno"> 36</tt>  <tt class="py-line">        <tt class="py-name">psiz</tt> <tt class="py-op">=</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-19" class="py-name"><a title="ProvCon.dbui.orm.form" class="py-name" href="#" onclick="return doclink('link-19', 'form', 'link-14');">form</a></tt><tt class="py-op">.</tt><tt class="py-name">Size</tt>         </tt>
+<a name="L37"></a><tt class="py-lineno"> 37</tt>  <tt class="py-line">        <tt class="py-keyword">print</tt> <tt class="py-name">ppos</tt><tt class="py-op">,</tt> <tt class="py-name">psiz</tt> </tt>
+<a name="L38"></a><tt class="py-lineno"> 38</tt>  <tt class="py-line">        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">SetPosition</tt> <tt class="py-op">(</tt> <tt class="py-op">(</tt> <tt class="py-name">ppos</tt><tt class="py-op">.</tt><tt class="py-name">x</tt> <tt class="py-op">+</tt> <tt class="py-name">psiz</tt><tt class="py-op">.</tt><tt class="py-name">x</tt> <tt class="py-op">/</tt> <tt class="py-number">2</tt> <tt class="py-op">-</tt> <tt class="py-name">sz</tt><tt class="py-op">.</tt><tt class="py-name">x</tt> <tt class="py-op">/</tt> <tt class="py-number">2</tt><tt class="py-op">,</tt> <tt class="py-name">ppos</tt><tt class="py-op">.</tt><tt class="py-name">y</tt> <tt class="py-op">+</tt> <tt class="py-name">psiz</tt><tt class="py-op">.</tt><tt class="py-name">y</tt> <tt class="py-op">/</tt> <tt class="py-number">2</tt> <tt class="py-op">-</tt> <tt class="py-name">sz</tt><tt class="py-op">.</tt><tt class="py-name">y</tt> <tt class="py-op">/</tt> <tt class="py-number">2</tt><tt class="py-op">)</tt> <tt class="py-op">)</tt> </tt>
+<a name="L39"></a><tt class="py-lineno"> 39</tt>  <tt class="py-line">        <tt class="py-keyword">print</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">GetPosition</tt><tt class="py-op">(</tt><tt class="py-op">)</tt> </tt>
+<a name="L40"></a><tt class="py-lineno"> 40</tt>  <tt class="py-line">        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">Popup</tt><tt class="py-op">(</tt><tt class="py-op">)</tt> </tt>
+<a name="L41"></a><tt class="py-lineno"> 41</tt>  <tt class="py-line">        <tt class="py-name">wx</tt><tt class="py-op">.</tt><tt class="py-name">CallLater</tt> <tt class="py-op">(</tt> <tt class="py-name">timeout</tt><tt class="py-op">,</tt> <tt class="py-keyword">lambda</tt> <tt class="py-name">self</tt><tt class="py-op">=</tt><tt class="py-name">self</tt><tt class="py-op">:</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">Hide</tt><tt class="py-op">(</tt><tt class="py-op">)</tt> <tt class="py-op">)</tt> </tt>
+</div></div><a name="L42"></a><tt class="py-lineno"> 42</tt>  <tt class="py-line"> </tt>
+<a name="FormToolbar"></a><div id="FormToolbar-def"><a name="L43"></a><tt class="py-lineno"> 43</tt> <a class="py-toggle" href="#" id="FormToolbar-toggle" onclick="return toggle('FormToolbar');">-</a><tt class="py-line"><tt class="py-keyword">class</tt> <a class="py-def-name" href="ProvCon.dbui.wxwin.complete.FormToolbar-class.html">FormToolbar</a><tt class="py-op">(</tt><tt class="py-base-class">wx</tt><tt class="py-op">.</tt><tt class="py-base-class">ToolBar</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="FormToolbar-collapsed" style="display:none;" pad="+++" indent="++++"></div><div id="FormToolbar-expanded"><a name="FormToolbar.__init__"></a><div id="FormToolbar.__init__-def"><a name="L44"></a><tt class="py-lineno"> 44</tt> <a class="py-toggle" href="#" id="FormToolbar.__init__-toggle" onclick="return toggle('FormToolbar.__init__');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="ProvCon.dbui.wxwin.complete.FormToolbar-class.html#__init__">__init__</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">,</tt> <tt class="py-param">form</tt><tt class="py-op">,</tt> <tt class="py-op">**</tt><tt class="py-param">kkw</tt><tt class="py-op">)</tt><tt class="py-op">:</tt>         </tt>
+</div><a name="L45"></a><tt class="py-lineno"> 45</tt>  <tt class="py-line">        <tt class="py-name">wx</tt><tt class="py-op">.</tt><tt class="py-name">ToolBar</tt><tt class="py-op">.</tt><tt id="link-20" class="py-name"><a title="ProvCon.TFTP.Protocol.Packet.__init__
+ProvCon.TFTP.ProvisioningTFTP.BaseOven.__init__
+ProvCon.TFTP.ProvisioningTFTP.CableModemConfigCook.__init__
+ProvCon.TFTP.ProvisioningTFTP.FileCook.__init__
+ProvCon.TFTP.ProvisioningTFTP.ProvisioningTFTPServer.__init__
+ProvCon.TFTP.ProvisioningTFTP.TFTPDataSender.__init__
+ProvCon.TFTP.ProvisioningTFTP.pcTFTPD.__init__
+ProvCon.TFTP.Server.BaseTFTPServer.__init__
+ProvCon.cli.CLIServer.__init__
+ProvCon.cli.CLIWorker.__init__
+ProvCon.dbui.abstractui.fields.BaseArrayEditor.__init__
+ProvCon.dbui.abstractui.fields.BaseArrayItemButtonBox.__init__
+ProvCon.dbui.abstractui.fields.BaseArrayItemEditor.__init__
+ProvCon.dbui.abstractui.fields.BaseFieldEditor.__init__
+ProvCon.dbui.abstractui.fields.BaseReferenceEditor.__init__
+ProvCon.dbui.abstractui.forms.BaseForm.__init__
+ProvCon.dbui.abstractui.navigators.BaseNavigator.__init__
+ProvCon.dbui.abstractui.recordlists.BasePager.__init__
+ProvCon.dbui.abstractui.recordlists.BaseRecordList.__init__
+ProvCon.dbui.database.CFG.tCX.__init__
+ProvCon.dbui.di.rObject'.ObjectFlags.__init__
+ProvCon.dbui.di.rObject'.ObjectParams.__init__
+ProvCon.dbui.di.rObject'.rObject.__init__
+ProvCon.dbui.meta.field.Field.__init__
+ProvCon.dbui.meta.table.Table.__init__
+ProvCon.dbui.orm.form.Form.__init__
+ProvCon.dbui.orm.record.Record.DataManipulationError.__init__
+ProvCon.dbui.orm.record.Record.DataQueryError.__init__
+ProvCon.dbui.orm.record.Record.RecordNotFound.__init__
+ProvCon.dbui.orm.record.Record.__init__
+ProvCon.dbui.orm.recordlist.RecordList.__init__
+ProvCon.dbui.orm.recordsearch.OIDSearchList.__init__
+ProvCon.dbui.wxwin.complete.CompleteGenericForm.__init__
+ProvCon.dbui.wxwin.complete.FormToolbar.__init__
+ProvCon.dbui.wxwin.complete.InfoPopup.__init__
+ProvCon.dbui.wxwin.fields.Entry.ArrayCombo.__init__
+ProvCon.dbui.wxwin.fields.Entry.ArrayItemCombo.__init__
+ProvCon.dbui.wxwin.fields.Entry.ArrayItemStatic.__init__
+ProvCon.dbui.wxwin.fields.Entry.ArrayItemText.__init__
+ProvCon.dbui.wxwin.fields.Entry.ArrayText.__init__
+ProvCon.dbui.wxwin.fields.Entry.BaseArray.__init__
+ProvCon.dbui.wxwin.fields.Entry.Boolean.__init__
+ProvCon.dbui.wxwin.fields.Entry.ComboReference.__init__
+ProvCon.dbui.wxwin.fields.Entry.Memo.__init__
+ProvCon.dbui.wxwin.fields.Entry.StandardArrayItemButtonBox.__init__
+ProvCon.dbui.wxwin.fields.Entry.Static.__init__
+ProvCon.dbui.wxwin.fields.Entry.StaticReference.__init__
+ProvCon.dbui.wxwin.fields.Entry.Text.__init__
+ProvCon.dbui.wxwin.forms.GenericForm.__init__
+ProvCon.dbui.wxwin.mwx.CheckBox.__init__
+ProvCon.dbui.wxwin.mwx.ComboBox.__init__
+ProvCon.dbui.wxwin.mwx.StaticText.__init__
+ProvCon.dbui.wxwin.mwx.TextCtrl.__init__
+ProvCon.dbui.wxwin.mwx.mwxControl.__init__
+ProvCon.dbui.wxwin.navigators.Navigator.__init__
+ProvCon.dbui.wxwin.recordlists.RecordList.__init__
+ProvCon.docsis.cablemodem.cablemodem.__init__
+ProvCon.docsis.cablemodem.cablemodem._cos.__init__
+ProvCon.docsis.cablemodem.cablemodem._cpe.__init__
+ProvCon.docsis.cablemodem.cablemodem._mac.__init__
+ProvCon.docsis.compiler.config.config.__init__
+ProvCon.docsis.compiler.encoder.error.__init__
+ProvCon.docsis.compiler.encoder.tlv.__init__
+ProvCon.docsis.compiler.encoder.tlv_multipart.__init__
+ProvCon.docsis.compiler.encoder.tlv_multipart.append_proxy.__init__
+ProvCon.docsis.compiler.encoder.tlv_multipart.iterator.__init__
+ProvCon.docsis.compiler.encoder.tlv_multipart_subclass.__init__
+ProvCon.docsis.compiler.encoder.tlv_subclass.__init__
+ProvCon.func.classes.conditionalmethod.__init__
+ProvCon.func.events.eventemitter.__init__
+ProvCon.func.events.eventemitter.evt.__init__
+ProvCon.func.events.eventemitter.evthook.__init__
+ProvCon.func.events.eventexception.__init__
+ProvCon.func.variables.TracedVariable.Tracer.__init__
+ProvCon.func.variables.TracedVariable.__init__
+ProvCon.gui.FrontEndApp.FE.__init__
+ProvCon.gui.ProvisioningControl.GenericObjectEditor.__init__
+ProvCon.gui.ProvisioningControl.GridView.__init__
+ProvCon.gui.ProvisioningControl.MainTab.__init__
+ProvCon.gui.ProvisioningControl.ObjectEditorModel.__init__
+ProvCon.gui.ProvisioningControl.TopLevelWindow.__init__
+ProvCon.log.LoggingBackend.__init__
+ProvCon.log.LoggingClient.__init__
+ProvCon.log.LoggingServer.__init__
+ProvCon.ui.uierror.__init__
+ProvCon.wronolib.ipaddr.ip4addr.__init__
+ProvCon.wronolib.ipaddr.ip4prefix.__init__" class="py-name" href="#" onclick="return doclink('link-20', '__init__', 'link-13');">__init__</a></tt> <tt class="py-op">(</tt><tt class="py-name">self</tt><tt class="py-op">,</tt> <tt id="link-21" class="py-name"><a title="ProvCon.dbui.orm.form" class="py-name" href="#" onclick="return doclink('link-21', 'form', 'link-14');">form</a></tt><tt class="py-op">)</tt> </tt>
+<a name="L46"></a><tt class="py-lineno"> 46</tt>  <tt class="py-line">        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-22" class="py-name"><a title="ProvCon.dbui.orm.form" class="py-name" href="#" onclick="return doclink('link-22', 'form', 'link-14');">form</a></tt> <tt class="py-op">=</tt> <tt id="link-23" class="py-name"><a title="ProvCon.dbui.orm.form" class="py-name" href="#" onclick="return doclink('link-23', 'form', 'link-14');">form</a></tt> </tt>
+<a name="L47"></a><tt class="py-lineno"> 47</tt>  <tt class="py-line">         </tt>
+<a name="L48"></a><tt class="py-lineno"> 48</tt>  <tt class="py-line">        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">tools</tt> <tt class="py-op">=</tt> <tt class="py-op">{</tt><tt class="py-op">}</tt>         </tt>
+<a name="L49"></a><tt class="py-lineno"> 49</tt>  <tt class="py-line">        <tt class="py-keyword">import</tt> <tt id="link-24" class="py-name" targets="Module ProvCon.dbui.wxwin.art=ProvCon.dbui.wxwin.art-module.html"><a title="ProvCon.dbui.wxwin.art" class="py-name" href="#" onclick="return doclink('link-24', 'art', 'link-24');">art</a></tt> </tt>
+<a name="L50"></a><tt class="py-lineno"> 50</tt>  <tt class="py-line">        <tt class="py-keyword">for</tt> <tt class="py-name">b</tt> <tt class="py-keyword">in</tt> <tt class="py-op">[</tt> <tt class="py-string">"NEW"</tt><tt class="py-op">,</tt> <tt class="py-string">"DEL"</tt><tt class="py-op">,</tt> <tt class="py-string">"SAVE"</tt><tt class="py-op">,</tt> <tt class="py-string">"RELOAD"</tt> <tt class="py-op">]</tt><tt class="py-op">:</tt> </tt>
+<a name="L51"></a><tt class="py-lineno"> 51</tt>  <tt class="py-line">            <tt class="py-keyword">if</tt> <tt class="py-keyword">not</tt> <tt class="py-name">kkw</tt><tt class="py-op">.</tt><tt id="link-25" class="py-name" targets="Method ProvCon.dbui.orm.recordsearch.OIDSearchList.get()=ProvCon.dbui.orm.recordsearch.OIDSearchList-class.html#get,Method ProvCon.func.variables.TracedVariable.get()=ProvCon.func.variables.TracedVariable-class.html#get"><a title="ProvCon.dbui.orm.recordsearch.OIDSearchList.get
+ProvCon.func.variables.TracedVariable.get" class="py-name" href="#" onclick="return doclink('link-25', 'get', 'link-25');">get</a></tt> <tt class="py-op">(</tt> <tt class="py-string">"no_"</tt> <tt class="py-op">+</tt> <tt class="py-name">b</tt><tt class="py-op">,</tt> <tt class="py-name">False</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+<a name="L52"></a><tt class="py-lineno"> 52</tt>  <tt class="py-line">                <tt class="py-name">wxid</tt> <tt class="py-op">=</tt> <tt class="py-name">wx</tt><tt class="py-op">.</tt><tt class="py-name">NewId</tt><tt class="py-op">(</tt><tt class="py-op">)</tt> </tt>
+<a name="L53"></a><tt class="py-lineno"> 53</tt>  <tt class="py-line">                <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">tools</tt><tt class="py-op">[</tt><tt class="py-name">wxid</tt><tt class="py-op">]</tt> <tt class="py-op">=</tt> <tt class="py-op">(</tt><tt class="py-name">b</tt><tt class="py-op">,</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">AddLabelTool</tt> <tt class="py-op">(</tt><tt class="py-name">wxid</tt><tt class="py-op">,</tt> <tt class="py-name">b</tt><tt class="py-op">,</tt> <tt id="link-26" class="py-name"><a title="ProvCon.dbui.wxwin.art" class="py-name" href="#" onclick="return doclink('link-26', 'art', 'link-24');">art</a></tt><tt class="py-op">.</tt><tt id="link-27" class="py-name" targets="Variable ProvCon.dbui.wxwin.art.TB=ProvCon.dbui.wxwin.art-module.html#TB"><a title="ProvCon.dbui.wxwin.art.TB" class="py-name" href="#" onclick="return doclink('link-27', 'TB', 'link-27');">TB</a></tt><tt class="py-op">[</tt><tt class="py-name">b</tt><tt class="py-op">]</tt> <tt class="py-op">)</tt><tt class="py-op">)</tt> </tt>
+<a name="L54"></a><tt class="py-lineno"> 54</tt>  <tt class="py-line">         </tt>
+<a name="L55"></a><tt class="py-lineno"> 55</tt>  <tt class="py-line">        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">Bind</tt> <tt class="py-op">(</tt><tt class="py-name">wx</tt><tt class="py-op">.</tt><tt class="py-name">EVT_TOOL</tt><tt class="py-op">,</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-28" class="py-name" targets="Method ProvCon.dbui.wxwin.complete.FormToolbar.command()=ProvCon.dbui.wxwin.complete.FormToolbar-class.html#command"><a title="ProvCon.dbui.wxwin.complete.FormToolbar.command" class="py-name" href="#" onclick="return doclink('link-28', 'command', 'link-28');">command</a></tt><tt class="py-op">)</tt> </tt>
+<a name="L56"></a><tt class="py-lineno"> 56</tt>  <tt class="py-line">         </tt>
+<a name="L57"></a><tt class="py-lineno"> 57</tt>  <tt class="py-line">        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">label</tt> <tt class="py-op">=</tt> <tt class="py-name">wx</tt><tt class="py-op">.</tt><tt id="link-29" class="py-name"><a title="ProvCon.dbui.wxwin.mwx.StaticText" class="py-name" href="#" onclick="return doclink('link-29', 'StaticText', 'link-17');">StaticText</a></tt> <tt class="py-op">(</tt> <tt class="py-name">self</tt><tt class="py-op">,</tt> <tt class="py-name">label</tt><tt class="py-op">=</tt><tt class="py-string">"toolbar"</tt> <tt class="py-op">)</tt> </tt>
+<a name="L58"></a><tt class="py-lineno"> 58</tt>  <tt class="py-line">        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">AddControl</tt> <tt class="py-op">(</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">label</tt> <tt class="py-op">)</tt>         </tt>
+</div><a name="L59"></a><tt class="py-lineno"> 59</tt>  <tt class="py-line">         </tt>
+<a name="FormToolbar.SetRecordLabel"></a><div id="FormToolbar.SetRecordLabel-def"><a name="L60"></a><tt class="py-lineno"> 60</tt> <a class="py-toggle" href="#" id="FormToolbar.SetRecordLabel-toggle" onclick="return toggle('FormToolbar.SetRecordLabel');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="ProvCon.dbui.wxwin.complete.FormToolbar-class.html#SetRecordLabel">SetRecordLabel</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">,</tt> <tt class="py-param">label</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="FormToolbar.SetRecordLabel-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="FormToolbar.SetRecordLabel-expanded"><a name="L61"></a><tt class="py-lineno"> 61</tt>  <tt class="py-line">        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">label</tt><tt class="py-op">.</tt><tt class="py-name">SetLabel</tt> <tt class="py-op">(</tt> <tt class="py-name">label</tt> <tt class="py-op">)</tt> </tt>
+</div><a name="L62"></a><tt class="py-lineno"> 62</tt>  <tt class="py-line">         </tt>
+<a name="FormToolbar.command"></a><div id="FormToolbar.command-def"><a name="L63"></a><tt class="py-lineno"> 63</tt> <a class="py-toggle" href="#" id="FormToolbar.command-toggle" onclick="return toggle('FormToolbar.command');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="ProvCon.dbui.wxwin.complete.FormToolbar-class.html#command">command</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">,</tt> <tt class="py-param">event</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="FormToolbar.command-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="FormToolbar.command-expanded"><a name="L64"></a><tt class="py-lineno"> 64</tt>  <tt class="py-line">        <tt class="py-name">toolname</tt><tt class="py-op">,</tt> <tt class="py-name">tool</tt> <tt class="py-op">=</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">tools</tt><tt class="py-op">.</tt><tt id="link-30" class="py-name"><a title="ProvCon.dbui.orm.recordsearch.OIDSearchList.get
+ProvCon.func.variables.TracedVariable.get" class="py-name" href="#" onclick="return doclink('link-30', 'get', 'link-25');">get</a></tt> <tt class="py-op">(</tt> <tt class="py-name">event</tt><tt class="py-op">.</tt><tt class="py-name">GetId</tt><tt class="py-op">(</tt><tt class="py-op">)</tt><tt class="py-op">,</tt> <tt class="py-name">None</tt><tt class="py-op">)</tt> </tt>
+<a name="L65"></a><tt class="py-lineno"> 65</tt>  <tt class="py-line">        <tt class="py-keyword">if</tt> <tt class="py-name">tool</tt><tt class="py-op">:</tt> </tt>
+<a name="L66"></a><tt class="py-lineno"> 66</tt>  <tt class="py-line">            <tt class="py-keyword">try</tt><tt class="py-op">:</tt> </tt>
+<a name="L67"></a><tt class="py-lineno"> 67</tt>  <tt class="py-line">                <tt class="py-name">getattr</tt><tt class="py-op">(</tt><tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-31" class="py-name"><a title="ProvCon.dbui.orm.form" class="py-name" href="#" onclick="return doclink('link-31', 'form', 'link-14');">form</a></tt><tt class="py-op">,</tt> <tt class="py-string">"on_toolbar_"</tt> <tt class="py-op">+</tt> <tt class="py-name">toolname</tt><tt class="py-op">)</tt> <tt class="py-op">(</tt><tt class="py-op">)</tt> </tt>
+<a name="L68"></a><tt class="py-lineno"> 68</tt>  <tt class="py-line">            <tt class="py-keyword">except</tt> <tt class="py-name">AttributeError</tt><tt class="py-op">:</tt> </tt>
+<a name="L69"></a><tt class="py-lineno"> 69</tt>  <tt class="py-line">                <tt class="py-keyword">pass</tt>                             </tt>
+</div></div><a name="L70"></a><tt class="py-lineno"> 70</tt>  <tt class="py-line">             </tt>
+<a name="L71"></a><tt class="py-lineno"> 71</tt>  <tt class="py-line">         </tt>
+<a name="CompleteGenericForm"></a><div id="CompleteGenericForm-def"><a name="L72"></a><tt class="py-lineno"> 72</tt> <a class="py-toggle" href="#" id="CompleteGenericForm-toggle" onclick="return toggle('CompleteGenericForm');">-</a><tt class="py-line"><tt class="py-keyword">class</tt> <a class="py-def-name" href="ProvCon.dbui.wxwin.complete.CompleteGenericForm-class.html">CompleteGenericForm</a><tt class="py-op">(</tt><tt class="py-base-class">wx</tt><tt class="py-op">.</tt><tt class="py-base-class">Panel</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="CompleteGenericForm-collapsed" style="display:none;" pad="+++" indent="++++"></div><div id="CompleteGenericForm-expanded"><a name="L73"></a><tt class="py-lineno"> 73</tt>  <tt class="py-line">     </tt>
+<a name="CompleteGenericForm.__init__"></a><div id="CompleteGenericForm.__init__-def"><a name="L74"></a><tt class="py-lineno"> 74</tt> <a class="py-toggle" href="#" id="CompleteGenericForm.__init__-toggle" onclick="return toggle('CompleteGenericForm.__init__');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="ProvCon.dbui.wxwin.complete.CompleteGenericForm-class.html#__init__">__init__</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">,</tt> <tt class="py-param">parent</tt><tt class="py-op">,</tt> <tt class="py-op">**</tt><tt class="py-param">kwargs</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="CompleteGenericForm.__init__-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="CompleteGenericForm.__init__-expanded"><a name="L75"></a><tt class="py-lineno"> 75</tt>  <tt class="py-line">        <tt class="py-name">wx</tt><tt class="py-op">.</tt><tt class="py-name">Panel</tt><tt class="py-op">.</tt><tt id="link-32" class="py-name"><a title="ProvCon.TFTP.Protocol.Packet.__init__
+ProvCon.TFTP.ProvisioningTFTP.BaseOven.__init__
+ProvCon.TFTP.ProvisioningTFTP.CableModemConfigCook.__init__
+ProvCon.TFTP.ProvisioningTFTP.FileCook.__init__
+ProvCon.TFTP.ProvisioningTFTP.ProvisioningTFTPServer.__init__
+ProvCon.TFTP.ProvisioningTFTP.TFTPDataSender.__init__
+ProvCon.TFTP.ProvisioningTFTP.pcTFTPD.__init__
+ProvCon.TFTP.Server.BaseTFTPServer.__init__
+ProvCon.cli.CLIServer.__init__
+ProvCon.cli.CLIWorker.__init__
+ProvCon.dbui.abstractui.fields.BaseArrayEditor.__init__
+ProvCon.dbui.abstractui.fields.BaseArrayItemButtonBox.__init__
+ProvCon.dbui.abstractui.fields.BaseArrayItemEditor.__init__
+ProvCon.dbui.abstractui.fields.BaseFieldEditor.__init__
+ProvCon.dbui.abstractui.fields.BaseReferenceEditor.__init__
+ProvCon.dbui.abstractui.forms.BaseForm.__init__
+ProvCon.dbui.abstractui.navigators.BaseNavigator.__init__
+ProvCon.dbui.abstractui.recordlists.BasePager.__init__
+ProvCon.dbui.abstractui.recordlists.BaseRecordList.__init__
+ProvCon.dbui.database.CFG.tCX.__init__
+ProvCon.dbui.di.rObject'.ObjectFlags.__init__
+ProvCon.dbui.di.rObject'.ObjectParams.__init__
+ProvCon.dbui.di.rObject'.rObject.__init__
+ProvCon.dbui.meta.field.Field.__init__
+ProvCon.dbui.meta.table.Table.__init__
+ProvCon.dbui.orm.form.Form.__init__
+ProvCon.dbui.orm.record.Record.DataManipulationError.__init__
+ProvCon.dbui.orm.record.Record.DataQueryError.__init__
+ProvCon.dbui.orm.record.Record.RecordNotFound.__init__
+ProvCon.dbui.orm.record.Record.__init__
+ProvCon.dbui.orm.recordlist.RecordList.__init__
+ProvCon.dbui.orm.recordsearch.OIDSearchList.__init__
+ProvCon.dbui.wxwin.complete.CompleteGenericForm.__init__
+ProvCon.dbui.wxwin.complete.FormToolbar.__init__
+ProvCon.dbui.wxwin.complete.InfoPopup.__init__
+ProvCon.dbui.wxwin.fields.Entry.ArrayCombo.__init__
+ProvCon.dbui.wxwin.fields.Entry.ArrayItemCombo.__init__
+ProvCon.dbui.wxwin.fields.Entry.ArrayItemStatic.__init__
+ProvCon.dbui.wxwin.fields.Entry.ArrayItemText.__init__
+ProvCon.dbui.wxwin.fields.Entry.ArrayText.__init__
+ProvCon.dbui.wxwin.fields.Entry.BaseArray.__init__
+ProvCon.dbui.wxwin.fields.Entry.Boolean.__init__
+ProvCon.dbui.wxwin.fields.Entry.ComboReference.__init__
+ProvCon.dbui.wxwin.fields.Entry.Memo.__init__
+ProvCon.dbui.wxwin.fields.Entry.StandardArrayItemButtonBox.__init__
+ProvCon.dbui.wxwin.fields.Entry.Static.__init__
+ProvCon.dbui.wxwin.fields.Entry.StaticReference.__init__
+ProvCon.dbui.wxwin.fields.Entry.Text.__init__
+ProvCon.dbui.wxwin.forms.GenericForm.__init__
+ProvCon.dbui.wxwin.mwx.CheckBox.__init__
+ProvCon.dbui.wxwin.mwx.ComboBox.__init__
+ProvCon.dbui.wxwin.mwx.StaticText.__init__
+ProvCon.dbui.wxwin.mwx.TextCtrl.__init__
+ProvCon.dbui.wxwin.mwx.mwxControl.__init__
+ProvCon.dbui.wxwin.navigators.Navigator.__init__
+ProvCon.dbui.wxwin.recordlists.RecordList.__init__
+ProvCon.docsis.cablemodem.cablemodem.__init__
+ProvCon.docsis.cablemodem.cablemodem._cos.__init__
+ProvCon.docsis.cablemodem.cablemodem._cpe.__init__
+ProvCon.docsis.cablemodem.cablemodem._mac.__init__
+ProvCon.docsis.compiler.config.config.__init__
+ProvCon.docsis.compiler.encoder.error.__init__
+ProvCon.docsis.compiler.encoder.tlv.__init__
+ProvCon.docsis.compiler.encoder.tlv_multipart.__init__
+ProvCon.docsis.compiler.encoder.tlv_multipart.append_proxy.__init__
+ProvCon.docsis.compiler.encoder.tlv_multipart.iterator.__init__
+ProvCon.docsis.compiler.encoder.tlv_multipart_subclass.__init__
+ProvCon.docsis.compiler.encoder.tlv_subclass.__init__
+ProvCon.func.classes.conditionalmethod.__init__
+ProvCon.func.events.eventemitter.__init__
+ProvCon.func.events.eventemitter.evt.__init__
+ProvCon.func.events.eventemitter.evthook.__init__
+ProvCon.func.events.eventexception.__init__
+ProvCon.func.variables.TracedVariable.Tracer.__init__
+ProvCon.func.variables.TracedVariable.__init__
+ProvCon.gui.FrontEndApp.FE.__init__
+ProvCon.gui.ProvisioningControl.GenericObjectEditor.__init__
+ProvCon.gui.ProvisioningControl.GridView.__init__
+ProvCon.gui.ProvisioningControl.MainTab.__init__
+ProvCon.gui.ProvisioningControl.ObjectEditorModel.__init__
+ProvCon.gui.ProvisioningControl.TopLevelWindow.__init__
+ProvCon.log.LoggingBackend.__init__
+ProvCon.log.LoggingClient.__init__
+ProvCon.log.LoggingServer.__init__
+ProvCon.ui.uierror.__init__
+ProvCon.wronolib.ipaddr.ip4addr.__init__
+ProvCon.wronolib.ipaddr.ip4prefix.__init__" class="py-name" href="#" onclick="return doclink('link-32', '__init__', 'link-13');">__init__</a></tt> <tt class="py-op">(</tt><tt class="py-name">self</tt><tt class="py-op">,</tt> <tt class="py-name">parent</tt><tt class="py-op">,</tt> <tt class="py-name">style</tt><tt class="py-op">=</tt><tt class="py-name">wx</tt><tt class="py-op">.</tt><tt class="py-name">SUNKEN_BORDER</tt> <tt class="py-op">|</tt> <tt class="py-name">wx</tt><tt class="py-op">.</tt><tt class="py-name">TAB_TRAVERSAL</tt><tt class="py-op">)</tt> </tt>
+<a name="L76"></a><tt class="py-lineno"> 76</tt>  <tt class="py-line">         </tt>
+<a name="L77"></a><tt class="py-lineno"> 77</tt>  <tt class="py-line">        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">tablename</tt> <tt class="py-op">=</tt> <tt class="py-name">kwargs</tt><tt class="py-op">.</tt><tt id="link-33" class="py-name"><a title="ProvCon.dbui.orm.recordsearch.OIDSearchList.get
+ProvCon.func.variables.TracedVariable.get" class="py-name" href="#" onclick="return doclink('link-33', 'get', 'link-25');">get</a></tt> <tt class="py-op">(</tt> <tt class="py-string">"tablename"</tt><tt class="py-op">,</tt> <tt class="py-name">None</tt><tt class="py-op">)</tt> </tt>
+<a name="L78"></a><tt class="py-lineno"> 78</tt>  <tt class="py-line">        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-34" class="py-name" targets="Module ProvCon.dbui.meta.table=ProvCon.dbui.meta.table-module.html"><a title="ProvCon.dbui.meta.table" class="py-name" href="#" onclick="return doclink('link-34', 'table', 'link-34');">table</a></tt> <tt class="py-op">=</tt> <tt class="py-name">kwargs</tt><tt class="py-op">.</tt><tt id="link-35" class="py-name"><a title="ProvCon.dbui.orm.recordsearch.OIDSearchList.get
+ProvCon.func.variables.TracedVariable.get" class="py-name" href="#" onclick="return doclink('link-35', 'get', 'link-25');">get</a></tt> <tt class="py-op">(</tt> <tt class="py-string">"table"</tt><tt class="py-op">,</tt> <tt class="py-name">None</tt><tt class="py-op">)</tt> </tt>
+<a name="L79"></a><tt class="py-lineno"> 79</tt>  <tt class="py-line">        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-36" class="py-name"><a title="ProvCon.dbui.orm.form" class="py-name" href="#" onclick="return doclink('link-36', 'form', 'link-14');">form</a></tt> <tt class="py-op">=</tt> <tt class="py-name">kwargs</tt><tt class="py-op">.</tt><tt id="link-37" class="py-name"><a title="ProvCon.dbui.orm.recordsearch.OIDSearchList.get
+ProvCon.func.variables.TracedVariable.get" class="py-name" href="#" onclick="return doclink('link-37', 'get', 'link-25');">get</a></tt> <tt class="py-op">(</tt> <tt class="py-string">"form"</tt><tt class="py-op">,</tt> <tt class="py-name">None</tt> <tt class="py-op">)</tt> </tt>
+<a name="L80"></a><tt class="py-lineno"> 80</tt>  <tt class="py-line"> </tt>
+<a name="L81"></a><tt class="py-lineno"> 81</tt>  <tt class="py-line">        <tt class="py-keyword">if</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">tablename</tt><tt class="py-op">:</tt> </tt>
+<a name="L82"></a><tt class="py-lineno"> 82</tt>  <tt class="py-line">            <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-38" class="py-name"><a title="ProvCon.dbui.meta.table" class="py-name" href="#" onclick="return doclink('link-38', 'table', 'link-34');">table</a></tt> <tt class="py-op">=</tt> <tt id="link-39" class="py-name"><a title="ProvCon.dbui.meta" class="py-name" href="#" onclick="return doclink('link-39', 'meta', 'link-7');">meta</a></tt><tt class="py-op">.</tt><tt id="link-40" class="py-name" targets="Class ProvCon.dbui.meta.table.Table=ProvCon.dbui.meta.table.Table-class.html"><a title="ProvCon.dbui.meta.table.Table" class="py-name" href="#" onclick="return doclink('link-40', 'Table', 'link-40');">Table</a></tt><tt class="py-op">.</tt><tt id="link-41" class="py-name" targets="Static Method ProvCon.dbui.meta.table.Table.Get()=ProvCon.dbui.meta.table.Table-class.html#Get"><a title="ProvCon.dbui.meta.table.Table.Get" class="py-name" href="#" onclick="return doclink('link-41', 'Get', 'link-41');">Get</a></tt> <tt class="py-op">(</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">tablename</tt> <tt class="py-op">)</tt> </tt>
+<a name="L83"></a><tt class="py-lineno"> 83</tt>  <tt class="py-line">        <tt class="py-keyword">if</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-42" class="py-name"><a title="ProvCon.dbui.meta.table" class="py-name" href="#" onclick="return doclink('link-42', 'table', 'link-34');">table</a></tt><tt class="py-op">:</tt> </tt>
+<a name="L84"></a><tt class="py-lineno"> 84</tt>  <tt class="py-line">            <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">tablename</tt> <tt class="py-op">=</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-43" class="py-name"><a title="ProvCon.dbui.meta.table" class="py-name" href="#" onclick="return doclink('link-43', 'table', 'link-34');">table</a></tt><tt class="py-op">.</tt><tt class="py-name">name</tt> </tt>
+<a name="L85"></a><tt class="py-lineno"> 85</tt>  <tt class="py-line">            <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-44" class="py-name"><a title="ProvCon.dbui.orm.form" class="py-name" href="#" onclick="return doclink('link-44', 'form', 'link-14');">form</a></tt> <tt class="py-op">=</tt> <tt id="link-45" class="py-name"><a title="ProvCon.dbui.orm" class="py-name" href="#" onclick="return doclink('link-45', 'orm', 'link-6');">orm</a></tt><tt class="py-op">.</tt><tt id="link-46" class="py-name" targets="Class ProvCon.dbui.orm.form.Form=ProvCon.dbui.orm.form.Form-class.html"><a title="ProvCon.dbui.orm.form.Form" class="py-name" href="#" onclick="return doclink('link-46', 'Form', 'link-46');">Form</a></tt> <tt class="py-op">(</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-47" class="py-name"><a title="ProvCon.dbui.meta.table" class="py-name" href="#" onclick="return doclink('link-47', 'table', 'link-34');">table</a></tt> <tt class="py-op">)</tt> </tt>
+<a name="L86"></a><tt class="py-lineno"> 86</tt>  <tt class="py-line">        <tt class="py-keyword">if</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-48" class="py-name"><a title="ProvCon.dbui.orm.form" class="py-name" href="#" onclick="return doclink('link-48', 'form', 'link-14');">form</a></tt><tt class="py-op">:</tt> </tt>
+<a name="L87"></a><tt class="py-lineno"> 87</tt>  <tt class="py-line">            <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-49" class="py-name"><a title="ProvCon.dbui.meta.table" class="py-name" href="#" onclick="return doclink('link-49', 'table', 'link-34');">table</a></tt> <tt class="py-op">=</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-50" class="py-name"><a title="ProvCon.dbui.orm.form" class="py-name" href="#" onclick="return doclink('link-50', 'form', 'link-14');">form</a></tt><tt class="py-op">.</tt><tt id="link-51" class="py-name"><a title="ProvCon.dbui.meta.table" class="py-name" href="#" onclick="return doclink('link-51', 'table', 'link-34');">table</a></tt> </tt>
+<a name="L88"></a><tt class="py-lineno"> 88</tt>  <tt class="py-line">            <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">tablename</tt> <tt class="py-op">=</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-52" class="py-name"><a title="ProvCon.dbui.meta.table" class="py-name" href="#" onclick="return doclink('link-52', 'table', 'link-34');">table</a></tt><tt class="py-op">.</tt><tt class="py-name">name</tt> </tt>
+<a name="L89"></a><tt class="py-lineno"> 89</tt>  <tt class="py-line"> </tt>
+<a name="L90"></a><tt class="py-lineno"> 90</tt>  <tt class="py-line">        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-53" class="py-name" targets="Method ProvCon.dbui.API.IRecordController.save()=ProvCon.dbui.API.IRecordController-class.html#save,Method ProvCon.dbui.orm.form.Form.save()=ProvCon.dbui.orm.form.Form-class.html#save"><a title="ProvCon.dbui.API.IRecordController.save
+ProvCon.dbui.orm.form.Form.save" class="py-name" href="#" onclick="return doclink('link-53', 'save', 'link-53');">save</a></tt> <tt class="py-op">=</tt> <tt id="link-54" class="py-name"><a title="ProvCon.func.classes.conditionalmethod" class="py-name" href="#" onclick="return doclink('link-54', 'conditionalmethod', 'link-10');">conditionalmethod</a></tt> <tt class="py-op">(</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-55" class="py-name"><a title="ProvCon.dbui.orm.form" class="py-name" href="#" onclick="return doclink('link-55', 'form', 'link-14');">form</a></tt><tt class="py-op">.</tt><tt id="link-56" class="py-name"><a title="ProvCon.dbui.API.IRecordController.save
+ProvCon.dbui.orm.form.Form.save" class="py-name" href="#" onclick="return doclink('link-56', 'save', 'link-53');">save</a></tt> <tt class="py-op">)</tt> </tt>
+<a name="L91"></a><tt class="py-lineno"> 91</tt>  <tt class="py-line">        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-57" class="py-name" targets="Method ProvCon.dbui.API.IRecordList.reload()=ProvCon.dbui.API.IRecordList-class.html#reload,Method ProvCon.dbui.abstractui.navigators.BaseNavigator.reload()=ProvCon.dbui.abstractui.navigators.BaseNavigator-class.html#reload,Method ProvCon.dbui.orm.recordlist.RecordList.reload()=ProvCon.dbui.orm.recordlist.RecordList-class.html#reload"><a title="ProvCon.dbui.API.IRecordList.reload
+ProvCon.dbui.abstractui.navigators.BaseNavigator.reload
+ProvCon.dbui.orm.recordlist.RecordList.reload" class="py-name" href="#" onclick="return doclink('link-57', 'reload', 'link-57');">reload</a></tt> <tt class="py-op">=</tt> <tt id="link-58" class="py-name"><a title="ProvCon.func.classes.conditionalmethod" class="py-name" href="#" onclick="return doclink('link-58', 'conditionalmethod', 'link-10');">conditionalmethod</a></tt> <tt class="py-op">(</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-59" class="py-name"><a title="ProvCon.dbui.orm.form" class="py-name" href="#" onclick="return doclink('link-59', 'form', 'link-14');">form</a></tt><tt class="py-op">.</tt><tt id="link-60" class="py-name" targets="Method ProvCon.dbui.API.IRecordHolder.revert()=ProvCon.dbui.API.IRecordHolder-class.html#revert,Method ProvCon.dbui.orm.form.Form.revert()=ProvCon.dbui.orm.form.Form-class.html#revert"><a title="ProvCon.dbui.API.IRecordHolder.revert
+ProvCon.dbui.orm.form.Form.revert" class="py-name" href="#" onclick="return doclink('link-60', 'revert', 'link-60');">revert</a></tt> <tt class="py-op">)</tt> </tt>
+<a name="L92"></a><tt class="py-lineno"> 92</tt>  <tt class="py-line">        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-61" class="py-name" targets="Method ProvCon.dbui.API.IForm.new()=ProvCon.dbui.API.IForm-class.html#new,Method ProvCon.dbui.orm.form.Form.new()=ProvCon.dbui.orm.form.Form-class.html#new,Method ProvCon.dbui.wxwin.complete.CompleteGenericForm.new()=ProvCon.dbui.wxwin.complete.CompleteGenericForm-class.html#new"><a title="ProvCon.dbui.API.IForm.new
+ProvCon.dbui.orm.form.Form.new
+ProvCon.dbui.wxwin.complete.CompleteGenericForm.new" class="py-name" href="#" onclick="return doclink('link-61', 'new', 'link-61');">new</a></tt> <tt class="py-op">=</tt> <tt id="link-62" class="py-name"><a title="ProvCon.func.classes.conditionalmethod" class="py-name" href="#" onclick="return doclink('link-62', 'conditionalmethod', 'link-10');">conditionalmethod</a></tt> <tt class="py-op">(</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-63" class="py-name"><a title="ProvCon.dbui.API.IForm.new
+ProvCon.dbui.orm.form.Form.new
+ProvCon.dbui.wxwin.complete.CompleteGenericForm.new" class="py-name" href="#" onclick="return doclink('link-63', 'new', 'link-61');">new</a></tt> <tt class="py-op">)</tt> </tt>
+<a name="L93"></a><tt class="py-lineno"> 93</tt>  <tt class="py-line">        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-64" class="py-name" targets="Method ProvCon.dbui.API.IRecordController.delete()=ProvCon.dbui.API.IRecordController-class.html#delete,Method ProvCon.dbui.database.CFG.tCX.delete()=ProvCon.dbui.database.CFG.tCX-class.html#delete,Method ProvCon.dbui.orm.form.Form.delete()=ProvCon.dbui.orm.form.Form-class.html#delete,Method ProvCon.dbui.orm.record.Record.delete()=ProvCon.dbui.orm.record.Record-class.html#delete"><a title="ProvCon.dbui.API.IRecordController.delete
+ProvCon.dbui.database.CFG.tCX.delete
+ProvCon.dbui.orm.form.Form.delete
+ProvCon.dbui.orm.record.Record.delete" class="py-name" href="#" onclick="return doclink('link-64', 'delete', 'link-64');">delete</a></tt> <tt class="py-op">=</tt> <tt id="link-65" class="py-name"><a title="ProvCon.func.classes.conditionalmethod" class="py-name" href="#" onclick="return doclink('link-65', 'conditionalmethod', 'link-10');">conditionalmethod</a></tt> <tt class="py-op">(</tt><tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-66" class="py-name"><a title="ProvCon.dbui.orm.form" class="py-name" href="#" onclick="return doclink('link-66', 'form', 'link-14');">form</a></tt><tt class="py-op">.</tt><tt id="link-67" class="py-name"><a title="ProvCon.dbui.API.IRecordController.delete
+ProvCon.dbui.database.CFG.tCX.delete
+ProvCon.dbui.orm.form.Form.delete
+ProvCon.dbui.orm.record.Record.delete" class="py-name" href="#" onclick="return doclink('link-67', 'delete', 'link-64');">delete</a></tt> <tt class="py-op">)</tt> </tt>
+<a name="L94"></a><tt class="py-lineno"> 94</tt>  <tt class="py-line">     </tt>
+<a name="L95"></a><tt class="py-lineno"> 95</tt>  <tt class="py-line">         </tt>
+<a name="L96"></a><tt class="py-lineno"> 96</tt>  <tt class="py-line">        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">on_toolbar_SAVE</tt> <tt class="py-op">=</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-68" class="py-name"><a title="ProvCon.dbui.API.IRecordController.save
+ProvCon.dbui.orm.form.Form.save" class="py-name" href="#" onclick="return doclink('link-68', 'save', 'link-53');">save</a></tt> </tt>
+<a name="L97"></a><tt class="py-lineno"> 97</tt>  <tt class="py-line">        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">on_toolbar_NEW</tt> <tt class="py-op">=</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-69" class="py-name"><a title="ProvCon.dbui.API.IForm.new
+ProvCon.dbui.orm.form.Form.new
+ProvCon.dbui.wxwin.complete.CompleteGenericForm.new" class="py-name" href="#" onclick="return doclink('link-69', 'new', 'link-61');">new</a></tt> </tt>
+<a name="L98"></a><tt class="py-lineno"> 98</tt>  <tt class="py-line">        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">on_toolbar_RELOAD</tt> <tt class="py-op">=</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-70" class="py-name"><a title="ProvCon.dbui.API.IRecordList.reload
+ProvCon.dbui.abstractui.navigators.BaseNavigator.reload
+ProvCon.dbui.orm.recordlist.RecordList.reload" class="py-name" href="#" onclick="return doclink('link-70', 'reload', 'link-57');">reload</a></tt> </tt>
+<a name="L99"></a><tt class="py-lineno"> 99</tt>  <tt class="py-line">        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">on_toolbar_DEL</tt> <tt class="py-op">=</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-71" class="py-name"><a title="ProvCon.dbui.API.IRecordController.delete
+ProvCon.dbui.database.CFG.tCX.delete
+ProvCon.dbui.orm.form.Form.delete
+ProvCon.dbui.orm.record.Record.delete" class="py-name" href="#" onclick="return doclink('link-71', 'delete', 'link-64');">delete</a></tt> </tt>
+<a name="L100"></a><tt class="py-lineno">100</tt>  <tt class="py-line">         </tt>
+<a name="L101"></a><tt class="py-lineno">101</tt>  <tt class="py-line">        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">mainsizer</tt> <tt class="py-op">=</tt> <tt class="py-name">wx</tt><tt class="py-op">.</tt><tt class="py-name">BoxSizer</tt> <tt class="py-op">(</tt><tt class="py-name">wx</tt><tt class="py-op">.</tt><tt class="py-name">VERTICAL</tt><tt class="py-op">)</tt> </tt>
+<a name="L102"></a><tt class="py-lineno">102</tt>  <tt class="py-line">         </tt>
+<a name="L103"></a><tt class="py-lineno">103</tt>  <tt class="py-line">        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">toolbarconfig</tt> <tt class="py-op">=</tt> <tt class="py-name">kwargs</tt><tt class="py-op">.</tt><tt id="link-72" class="py-name"><a title="ProvCon.dbui.orm.recordsearch.OIDSearchList.get
+ProvCon.func.variables.TracedVariable.get" class="py-name" href="#" onclick="return doclink('link-72', 'get', 'link-25');">get</a></tt> <tt class="py-op">(</tt> <tt class="py-string">"toolbar"</tt><tt class="py-op">,</tt> <tt id="link-73" class="py-name" targets="Class ProvCon.dbui.wxwin.complete.FormToolbar=ProvCon.dbui.wxwin.complete.FormToolbar-class.html"><a title="ProvCon.dbui.wxwin.complete.FormToolbar" class="py-name" href="#" onclick="return doclink('link-73', 'FormToolbar', 'link-73');">FormToolbar</a></tt><tt class="py-op">)</tt> </tt>
+<a name="L104"></a><tt class="py-lineno">104</tt>  <tt class="py-line">         </tt>
+<a name="L105"></a><tt class="py-lineno">105</tt>  <tt class="py-line">        <tt class="py-comment">#tool bar</tt> </tt>
+<a name="L106"></a><tt class="py-lineno">106</tt>  <tt class="py-line">        <tt class="py-keyword">if</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">toolbarconfig</tt><tt class="py-op">:</tt> </tt>
+<a name="L107"></a><tt class="py-lineno">107</tt>  <tt class="py-line">            <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">toolbar</tt> <tt class="py-op">=</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">toolbarconfig</tt><tt class="py-op">(</tt><tt class="py-name">self</tt><tt class="py-op">,</tt> <tt class="py-op">**</tt><tt class="py-name">kwargs</tt><tt class="py-op">)</tt> </tt>
+<a name="L108"></a><tt class="py-lineno">108</tt>  <tt class="py-line">            <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">mainsizer</tt><tt class="py-op">.</tt><tt class="py-name">Add</tt> <tt class="py-op">(</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">toolbar</tt><tt class="py-op">,</tt> <tt class="py-name">flag</tt><tt class="py-op">=</tt><tt class="py-name">wx</tt><tt class="py-op">.</tt><tt class="py-name">EXPAND</tt> <tt class="py-op">)</tt> </tt>
+<a name="L109"></a><tt class="py-lineno">109</tt>  <tt class="py-line">        <tt class="py-keyword">else</tt><tt class="py-op">:</tt> </tt>
+<a name="L110"></a><tt class="py-lineno">110</tt>  <tt class="py-line">            <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">toolbar</tt> <tt class="py-op">=</tt> <tt class="py-name">None</tt> </tt>
+<a name="L111"></a><tt class="py-lineno">111</tt>  <tt class="py-line"> </tt>
+<a name="L112"></a><tt class="py-lineno">112</tt>  <tt class="py-line">        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">status</tt> <tt class="py-op">=</tt> <tt class="py-name">wx</tt><tt class="py-op">.</tt><tt id="link-74" class="py-name"><a title="ProvCon.dbui.wxwin.mwx.StaticText" class="py-name" href="#" onclick="return doclink('link-74', 'StaticText', 'link-17');">StaticText</a></tt> <tt class="py-op">(</tt> <tt class="py-name">self</tt> <tt class="py-op">)</tt> </tt>
+<a name="L113"></a><tt class="py-lineno">113</tt>  <tt class="py-line">        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">status</tt><tt class="py-op">.</tt><tt class="py-name">SetFont</tt> <tt class="py-op">(</tt> <tt class="py-name">wx</tt><tt class="py-op">.</tt><tt class="py-name">Font</tt> <tt class="py-op">(</tt> <tt class="py-number">8</tt><tt class="py-op">,</tt> <tt class="py-name">wx</tt><tt class="py-op">.</tt><tt class="py-name">FONTFAMILY_MAX</tt><tt class="py-op">,</tt> <tt class="py-name">wx</tt><tt class="py-op">.</tt><tt class="py-name">FONTSTYLE_NORMAL</tt><tt class="py-op">,</tt> <tt class="py-name">wx</tt><tt class="py-op">.</tt><tt class="py-name">FONTWEIGHT_BOLD</tt> <tt class="py-op">)</tt> <tt class="py-op">)</tt>         </tt>
+<a name="L114"></a><tt class="py-lineno">114</tt>  <tt class="py-line">        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">status</tt><tt class="py-op">.</tt><tt class="py-name">ForegroundColour</tt> <tt class="py-op">=</tt> <tt class="py-op">(</tt><tt class="py-number">122</tt><tt class="py-op">,</tt><tt class="py-number">66</tt><tt class="py-op">,</tt><tt class="py-number">66</tt><tt class="py-op">)</tt> </tt>
+<a name="L115"></a><tt class="py-lineno">115</tt>  <tt class="py-line">        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">status</tt><tt class="py-op">.</tt><tt class="py-name">SetThemeEnabled</tt> <tt class="py-op">(</tt><tt class="py-name">False</tt> <tt class="py-op">)</tt> </tt>
+<a name="L116"></a><tt class="py-lineno">116</tt>  <tt class="py-line">        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">mainsizer</tt><tt class="py-op">.</tt><tt class="py-name">Add</tt> <tt class="py-op">(</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">status</tt><tt class="py-op">,</tt> <tt class="py-name">flag</tt><tt class="py-op">=</tt><tt class="py-name">wx</tt><tt class="py-op">.</tt><tt class="py-name">EXPAND</tt> <tt class="py-op">|</tt> <tt class="py-name">wx</tt><tt class="py-op">.</tt><tt class="py-name">ALL</tt><tt class="py-op">,</tt> <tt class="py-name">border</tt><tt class="py-op">=</tt><tt class="py-number">5</tt> <tt class="py-op">)</tt> </tt>
+<a name="L117"></a><tt class="py-lineno">117</tt>  <tt class="py-line">             </tt>
+<a name="L118"></a><tt class="py-lineno">118</tt>  <tt class="py-line">        <tt class="py-comment">#editor</tt> </tt>
+<a name="L119"></a><tt class="py-lineno">119</tt>  <tt class="py-line">        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">editor_scrolled_window</tt> <tt class="py-op">=</tt> <tt class="py-name">wx</tt><tt class="py-op">.</tt><tt class="py-name">ScrolledWindow</tt> <tt class="py-op">(</tt> <tt class="py-name">self</tt><tt class="py-op">,</tt> <tt class="py-name">style</tt><tt class="py-op">=</tt><tt class="py-name">wx</tt><tt class="py-op">.</tt><tt class="py-name">VSCROLL</tt> <tt class="py-op">|</tt> <tt class="py-name">wx</tt><tt class="py-op">.</tt><tt class="py-name">TAB_TRAVERSAL</tt> <tt class="py-op">)</tt>             </tt>
+<a name="L120"></a><tt class="py-lineno">120</tt>  <tt class="py-line">        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">editor</tt> <tt class="py-op">=</tt> <tt id="link-75" class="py-name"><a title="ProvCon.dbui.wxwin.forms.GenericForm" class="py-name" href="#" onclick="return doclink('link-75', 'GenericForm', 'link-1');">GenericForm</a></tt> <tt class="py-op">(</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-76" class="py-name"><a title="ProvCon.dbui.orm.form" class="py-name" href="#" onclick="return doclink('link-76', 'form', 'link-14');">form</a></tt><tt class="py-op">,</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">editor_scrolled_window</tt> <tt class="py-op">)</tt>   </tt>
+<a name="L121"></a><tt class="py-lineno">121</tt>  <tt class="py-line">        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">editor</tt><tt class="py-op">.</tt><tt id="link-77" class="py-name" targets="Method ProvCon.dbui.abstractui.forms.BaseForm.create_widget()=ProvCon.dbui.abstractui.forms.BaseForm-class.html#create_widget"><a title="ProvCon.dbui.abstractui.forms.BaseForm.create_widget" class="py-name" href="#" onclick="return doclink('link-77', 'create_widget', 'link-77');">create_widget</a></tt><tt class="py-op">(</tt><tt class="py-op">)</tt> </tt>
+<a name="L122"></a><tt class="py-lineno">122</tt>  <tt class="py-line">        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">scrolledsizer</tt> <tt class="py-op">=</tt> <tt class="py-name">wx</tt><tt class="py-op">.</tt><tt class="py-name">BoxSizer</tt><tt class="py-op">(</tt><tt class="py-op">)</tt> </tt>
+<a name="L123"></a><tt class="py-lineno">123</tt>  <tt class="py-line">        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">scrolledsizer</tt><tt class="py-op">.</tt><tt class="py-name">Add</tt> <tt class="py-op">(</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">editor</tt><tt class="py-op">,</tt> <tt class="py-name">flag</tt><tt class="py-op">=</tt><tt class="py-name">wx</tt><tt class="py-op">.</tt><tt class="py-name">EXPAND</tt> <tt class="py-op">)</tt>         </tt>
+<a name="L124"></a><tt class="py-lineno">124</tt>  <tt class="py-line">        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">editor_scrolled_window</tt><tt class="py-op">.</tt><tt class="py-name">SetSizer</tt> <tt class="py-op">(</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">scrolledsizer</tt> <tt class="py-op">)</tt> </tt>
+<a name="L125"></a><tt class="py-lineno">125</tt>  <tt class="py-line">        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">editor_scrolled_window</tt><tt class="py-op">.</tt><tt class="py-name">SetScrollbars</tt><tt class="py-op">(</tt><tt class="py-number">20</tt><tt class="py-op">,</tt><tt class="py-number">20</tt><tt class="py-op">,</tt><tt class="py-number">50</tt><tt class="py-op">,</tt><tt class="py-number">50</tt><tt class="py-op">)</tt>         </tt>
+<a name="L126"></a><tt class="py-lineno">126</tt>  <tt class="py-line">        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">mainsizer</tt><tt class="py-op">.</tt><tt class="py-name">Add</tt> <tt class="py-op">(</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">editor_scrolled_window</tt><tt class="py-op">,</tt> <tt class="py-number">1</tt><tt class="py-op">,</tt> <tt class="py-name">flag</tt><tt class="py-op">=</tt><tt class="py-name">wx</tt><tt class="py-op">.</tt><tt class="py-name">EXPAND</tt> <tt class="py-op">)</tt> </tt>
+<a name="L127"></a><tt class="py-lineno">127</tt>  <tt class="py-line">         </tt>
+<a name="L128"></a><tt class="py-lineno">128</tt>  <tt class="py-line">        <tt class="py-comment">#navigator</tt> </tt>
+<a name="L129"></a><tt class="py-lineno">129</tt>  <tt class="py-line">        <tt class="py-name">navigator_config</tt> <tt class="py-op">=</tt> <tt class="py-name">kwargs</tt><tt class="py-op">.</tt><tt id="link-78" class="py-name"><a title="ProvCon.dbui.orm.recordsearch.OIDSearchList.get
+ProvCon.func.variables.TracedVariable.get" class="py-name" href="#" onclick="return doclink('link-78', 'get', 'link-25');">get</a></tt> <tt class="py-op">(</tt> <tt class="py-string">"navigator"</tt><tt class="py-op">,</tt> <tt id="link-79" class="py-name"><a title="ProvCon.dbui.wxwin.navigators.Navigator" class="py-name" href="#" onclick="return doclink('link-79', 'Navigator', 'link-3');">Navigator</a></tt> <tt class="py-op">)</tt> </tt>
+<a name="L130"></a><tt class="py-lineno">130</tt>  <tt class="py-line">        <tt class="py-name">navigator_options</tt> <tt class="py-op">=</tt> <tt class="py-name">kwargs</tt><tt class="py-op">.</tt><tt id="link-80" class="py-name"><a title="ProvCon.dbui.orm.recordsearch.OIDSearchList.get
+ProvCon.func.variables.TracedVariable.get" class="py-name" href="#" onclick="return doclink('link-80', 'get', 'link-25');">get</a></tt> <tt class="py-op">(</tt> <tt class="py-string">"navigatoroptions"</tt><tt class="py-op">,</tt> <tt class="py-op">{</tt><tt class="py-op">}</tt> <tt class="py-op">)</tt> </tt>
+<a name="L131"></a><tt class="py-lineno">131</tt>  <tt class="py-line">        <tt class="py-keyword">if</tt> <tt class="py-name">navigator_config</tt><tt class="py-op">:</tt> </tt>
+<a name="L132"></a><tt class="py-lineno">132</tt>  <tt class="py-line">            <tt class="py-name">navigator</tt> <tt class="py-op">=</tt> <tt class="py-name">navigator_config</tt><tt class="py-op">(</tt><tt class="py-name">self</tt><tt class="py-op">,</tt> <tt class="py-op">**</tt><tt class="py-name">navigator_options</tt><tt class="py-op">)</tt> </tt>
+<a name="L133"></a><tt class="py-lineno">133</tt>  <tt class="py-line">            <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-81" class="py-name" targets="Module ProvCon.dbui.orm.recordlist=ProvCon.dbui.orm.recordlist-module.html"><a title="ProvCon.dbui.orm.recordlist" class="py-name" href="#" onclick="return doclink('link-81', 'recordlist', 'link-81');">recordlist</a></tt> <tt class="py-op">=</tt> <tt id="link-82" class="py-name"><a title="ProvCon.dbui.orm" class="py-name" href="#" onclick="return doclink('link-82', 'orm', 'link-6');">orm</a></tt><tt class="py-op">.</tt><tt id="link-83" class="py-name" targets="Class ProvCon.dbui.orm.recordlist.RecordList=ProvCon.dbui.orm.recordlist.RecordList-class.html,Class ProvCon.dbui.wxwin.recordlists.RecordList=ProvCon.dbui.wxwin.recordlists.RecordList-class.html"><a title="ProvCon.dbui.orm.recordlist.RecordList
+ProvCon.dbui.wxwin.recordlists.RecordList" class="py-name" href="#" onclick="return doclink('link-83', 'RecordList', 'link-83');">RecordList</a></tt> <tt class="py-op">(</tt><tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-84" class="py-name"><a title="ProvCon.dbui.orm.form" class="py-name" href="#" onclick="return doclink('link-84', 'form', 'link-14');">form</a></tt><tt class="py-op">.</tt><tt id="link-85" class="py-name"><a title="ProvCon.dbui.meta.table" class="py-name" href="#" onclick="return doclink('link-85', 'table', 'link-34');">table</a></tt><tt class="py-op">)</tt><tt class="py-op">.</tt><tt id="link-86" class="py-name"><a title="ProvCon.dbui.API.IRecordList.reload
+ProvCon.dbui.abstractui.navigators.BaseNavigator.reload
+ProvCon.dbui.orm.recordlist.RecordList.reload" class="py-name" href="#" onclick="return doclink('link-86', 'reload', 'link-57');">reload</a></tt><tt class="py-op">(</tt><tt class="py-op">)</tt> </tt>
+<a name="L134"></a><tt class="py-lineno">134</tt>  <tt class="py-line">            <tt class="py-name">navigator</tt><tt class="py-op">.</tt><tt id="link-87" class="py-name" targets="Method ProvCon.dbui.API.IRecordListHolder.set_records()=ProvCon.dbui.API.IRecordListHolder-class.html#set_records,Method ProvCon.dbui.abstractui.navigators.BaseNavigator.set_records()=ProvCon.dbui.abstractui.navigators.BaseNavigator-class.html#set_records,Method ProvCon.dbui.abstractui.recordlists.BasePager.set_records()=ProvCon.dbui.abstractui.recordlists.BasePager-class.html#set_records,Method ProvCon.dbui.abstractui.recordlists.BaseRecordList.set_records()=ProvCon.dbui.abstractui.recordlists.BaseRecordList-class.html#set_records"><a title="ProvCon.dbui.API.IRecordListHolder.set_records
+ProvCon.dbui.abstractui.navigators.BaseNavigator.set_records
+ProvCon.dbui.abstractui.recordlists.BasePager.set_records
+ProvCon.dbui.abstractui.recordlists.BaseRecordList.set_records" class="py-name" href="#" onclick="return doclink('link-87', 'set_records', 'link-87');">set_records</a></tt> <tt class="py-op">(</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-88" class="py-name"><a title="ProvCon.dbui.orm.recordlist" class="py-name" href="#" onclick="return doclink('link-88', 'recordlist', 'link-81');">recordlist</a></tt> <tt class="py-op">)</tt> </tt>
+<a name="L135"></a><tt class="py-lineno">135</tt>  <tt class="py-line">            <tt class="py-name">navigator</tt><tt class="py-op">.</tt><tt id="link-89" class="py-name" targets="Method ProvCon.dbui.API.INavigator.first()=ProvCon.dbui.API.INavigator-class.html#first,Method ProvCon.dbui.abstractui.navigators.BaseNavigator.first()=ProvCon.dbui.abstractui.navigators.BaseNavigator-class.html#first"><a title="ProvCon.dbui.API.INavigator.first
+ProvCon.dbui.abstractui.navigators.BaseNavigator.first" class="py-name" href="#" onclick="return doclink('link-89', 'first', 'link-89');">first</a></tt><tt class="py-op">(</tt><tt class="py-op">)</tt> </tt>
+<a name="L136"></a><tt class="py-lineno">136</tt>  <tt class="py-line">            <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">mainsizer</tt><tt class="py-op">.</tt><tt class="py-name">Add</tt> <tt class="py-op">(</tt> <tt class="py-name">navigator</tt><tt class="py-op">,</tt> <tt class="py-name">flag</tt><tt class="py-op">=</tt><tt class="py-name">wx</tt><tt class="py-op">.</tt><tt class="py-name">EXPAND</tt> <tt class="py-op">)</tt>             </tt>
+<a name="L137"></a><tt class="py-lineno">137</tt>  <tt class="py-line">        <tt class="py-keyword">else</tt><tt class="py-op">:</tt> </tt>
+<a name="L138"></a><tt class="py-lineno">138</tt>  <tt class="py-line">            <tt class="py-name">navigator</tt> <tt class="py-op">=</tt> <tt class="py-name">None</tt> </tt>
+<a name="L139"></a><tt class="py-lineno">139</tt>  <tt class="py-line">             </tt>
+<a name="L140"></a><tt class="py-lineno">140</tt>  <tt class="py-line">        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">SetSizer</tt> <tt class="py-op">(</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">mainsizer</tt> <tt class="py-op">)</tt> </tt>
+<a name="L141"></a><tt class="py-lineno">141</tt>  <tt class="py-line">        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">SetSize</tt> <tt class="py-op">(</tt> <tt class="py-name">parent</tt><tt class="py-op">.</tt><tt class="py-name">GetSize</tt><tt class="py-op">(</tt><tt class="py-op">)</tt> <tt class="py-op">)</tt> </tt>
+<a name="L142"></a><tt class="py-lineno">142</tt>  <tt class="py-line">        <tt class="py-comment">#handlers</tt> </tt>
+<a name="L143"></a><tt class="py-lineno">143</tt>  <tt class="py-line">        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">editor_scrolled_window</tt><tt class="py-op">.</tt><tt class="py-name">Bind</tt> <tt class="py-op">(</tt> <tt class="py-name">wx</tt><tt class="py-op">.</tt><tt class="py-name">EVT_SIZE</tt><tt class="py-op">,</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-90" class="py-name" targets="Method ProvCon.dbui.wxwin.complete.CompleteGenericForm.on_resize()=ProvCon.dbui.wxwin.complete.CompleteGenericForm-class.html#on_resize"><a title="ProvCon.dbui.wxwin.complete.CompleteGenericForm.on_resize" class="py-name" href="#" onclick="return doclink('link-90', 'on_resize', 'link-90');">on_resize</a></tt><tt class="py-op">)</tt>          </tt>
+<a name="L144"></a><tt class="py-lineno">144</tt>  <tt class="py-line">        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">editor</tt><tt class="py-op">.</tt><tt class="py-name">Bind</tt> <tt class="py-op">(</tt> <tt class="py-name">wx</tt><tt class="py-op">.</tt><tt class="py-name">EVT_SIZE</tt><tt class="py-op">,</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-91" class="py-name" targets="Method ProvCon.dbui.wxwin.complete.CompleteGenericForm.on_editor_resize()=ProvCon.dbui.wxwin.complete.CompleteGenericForm-class.html#on_editor_resize"><a title="ProvCon.dbui.wxwin.complete.CompleteGenericForm.on_editor_resize" class="py-name" href="#" onclick="return doclink('link-91', 'on_editor_resize', 'link-91');">on_editor_resize</a></tt> <tt class="py-op">)</tt> </tt>
+<a name="L145"></a><tt class="py-lineno">145</tt>  <tt class="py-line"> </tt>
+<a name="L146"></a><tt class="py-lineno">146</tt>  <tt class="py-line">        <tt class="py-keyword">if</tt> <tt class="py-name">navigator</tt><tt class="py-op">:</tt> </tt>
+<a name="L147"></a><tt class="py-lineno">147</tt>  <tt class="py-line">            <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-92" class="py-name" targets="Method ProvCon.dbui.wxwin.complete.CompleteGenericForm.set_navigator()=ProvCon.dbui.wxwin.complete.CompleteGenericForm-class.html#set_navigator"><a title="ProvCon.dbui.wxwin.complete.CompleteGenericForm.set_navigator" class="py-name" href="#" onclick="return doclink('link-92', 'set_navigator', 'link-92');">set_navigator</a></tt> <tt class="py-op">(</tt> <tt class="py-name">navigator</tt> <tt class="py-op">)</tt> </tt>
+<a name="L148"></a><tt class="py-lineno">148</tt>  <tt class="py-line">             </tt>
+<a name="L149"></a><tt class="py-lineno">149</tt>  <tt class="py-line">        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-93" class="py-name"><a title="ProvCon.dbui.orm.form" class="py-name" href="#" onclick="return doclink('link-93', 'form', 'link-14');">form</a></tt><tt class="py-op">.</tt><tt id="link-94" class="py-name" targets="Method ProvCon.func.events.eventemitter.register_event_hook()=ProvCon.func.events.eventemitter-class.html#register_event_hook"><a title="ProvCon.func.events.eventemitter.register_event_hook" class="py-name" href="#" onclick="return doclink('link-94', 'register_event_hook', 'link-94');">register_event_hook</a></tt> <tt class="py-op">(</tt> <tt class="py-string">"request_record_change"</tt><tt class="py-op">,</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-95" class="py-name" targets="Method ProvCon.dbui.wxwin.complete.CompleteGenericForm.before_record_change()=ProvCon.dbui.wxwin.complete.CompleteGenericForm-class.html#before_record_change"><a title="ProvCon.dbui.wxwin.complete.CompleteGenericForm.before_record_change" class="py-name" href="#" onclick="return doclink('link-95', 'before_record_change', 'link-95');">before_record_change</a></tt> <tt class="py-op">)</tt> </tt>
+<a name="L150"></a><tt class="py-lineno">150</tt>  <tt class="py-line">        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-96" class="py-name"><a title="ProvCon.dbui.orm.form" class="py-name" href="#" onclick="return doclink('link-96', 'form', 'link-14');">form</a></tt><tt class="py-op">.</tt><tt id="link-97" class="py-name"><a title="ProvCon.func.events.eventemitter.register_event_hook" class="py-name" href="#" onclick="return doclink('link-97', 'register_event_hook', 'link-94');">register_event_hook</a></tt> <tt class="py-op">(</tt> <tt class="py-string">"current_record_modified"</tt><tt class="py-op">,</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-98" class="py-name" targets="Method ProvCon.dbui.wxwin.complete.CompleteGenericForm.current_record_modified()=ProvCon.dbui.wxwin.complete.CompleteGenericForm-class.html#current_record_modified"><a title="ProvCon.dbui.wxwin.complete.CompleteGenericForm.current_record_modified" class="py-name" href="#" onclick="return doclink('link-98', 'current_record_modified', 'link-98');">current_record_modified</a></tt> <tt class="py-op">)</tt> </tt>
+<a name="L151"></a><tt class="py-lineno">151</tt>  <tt class="py-line">        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-99" class="py-name"><a title="ProvCon.dbui.orm.form" class="py-name" href="#" onclick="return doclink('link-99', 'form', 'link-14');">form</a></tt><tt class="py-op">.</tt><tt id="link-100" class="py-name"><a title="ProvCon.func.events.eventemitter.register_event_hook" class="py-name" href="#" onclick="return doclink('link-100', 'register_event_hook', 'link-94');">register_event_hook</a></tt> <tt class="py-op">(</tt> <tt class="py-string">"current_record_deleted"</tt><tt class="py-op">,</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-101" class="py-name" targets="Method ProvCon.dbui.wxwin.complete.CompleteGenericForm.current_record_deleted()=ProvCon.dbui.wxwin.complete.CompleteGenericForm-class.html#current_record_deleted"><a title="ProvCon.dbui.wxwin.complete.CompleteGenericForm.current_record_deleted" class="py-name" href="#" onclick="return doclink('link-101', 'current_record_deleted', 'link-101');">current_record_deleted</a></tt> <tt class="py-op">)</tt> </tt>
+<a name="L152"></a><tt class="py-lineno">152</tt>  <tt class="py-line">        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-102" class="py-name"><a title="ProvCon.dbui.orm.form" class="py-name" href="#" onclick="return doclink('link-102', 'form', 'link-14');">form</a></tt><tt class="py-op">.</tt><tt id="link-103" class="py-name"><a title="ProvCon.func.events.eventemitter.register_event_hook" class="py-name" href="#" onclick="return doclink('link-103', 'register_event_hook', 'link-94');">register_event_hook</a></tt> <tt class="py-op">(</tt> <tt class="py-string">"current_record_saved"</tt><tt class="py-op">,</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-104" class="py-name" targets="Method ProvCon.dbui.wxwin.complete.CompleteGenericForm.current_record_saved()=ProvCon.dbui.wxwin.complete.CompleteGenericForm-class.html#current_record_saved"><a title="ProvCon.dbui.wxwin.complete.CompleteGenericForm.current_record_saved" class="py-name" href="#" onclick="return doclink('link-104', 'current_record_saved', 'link-104');">current_record_saved</a></tt> <tt class="py-op">)</tt> </tt>
+<a name="L153"></a><tt class="py-lineno">153</tt>  <tt class="py-line">        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-105" class="py-name"><a title="ProvCon.dbui.orm.form" class="py-name" href="#" onclick="return doclink('link-105', 'form', 'link-14');">form</a></tt><tt class="py-op">.</tt><tt id="link-106" class="py-name"><a title="ProvCon.func.events.eventemitter.register_event_hook" class="py-name" href="#" onclick="return doclink('link-106', 'register_event_hook', 'link-94');">register_event_hook</a></tt> <tt class="py-op">(</tt> <tt class="py-string">"data_loaded"</tt><tt class="py-op">,</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-107" class="py-name" targets="Method ProvCon.dbui.wxwin.complete.CompleteGenericForm.data_loaded()=ProvCon.dbui.wxwin.complete.CompleteGenericForm-class.html#data_loaded"><a title="ProvCon.dbui.wxwin.complete.CompleteGenericForm.data_loaded" class="py-name" href="#" onclick="return doclink('link-107', 'data_loaded', 'link-107');">data_loaded</a></tt> <tt class="py-op">)</tt> </tt>
+<a name="L154"></a><tt class="py-lineno">154</tt>  <tt class="py-line"> </tt>
+<a name="L155"></a><tt class="py-lineno">155</tt>  <tt class="py-line">        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">infowindow</tt> <tt class="py-op">=</tt> <tt id="link-108" class="py-name" targets="Class ProvCon.dbui.wxwin.complete.InfoPopup=ProvCon.dbui.wxwin.complete.InfoPopup-class.html"><a title="ProvCon.dbui.wxwin.complete.InfoPopup" class="py-name" href="#" onclick="return doclink('link-108', 'InfoPopup', 'link-108');">InfoPopup</a></tt><tt class="py-op">(</tt><tt class="py-name">self</tt><tt class="py-op">)</tt> </tt>
+</div><a name="L156"></a><tt class="py-lineno">156</tt>  <tt class="py-line">         </tt>
+<a name="CompleteGenericForm.current_record_modified"></a><div id="CompleteGenericForm.current_record_modified-def"><a name="L157"></a><tt class="py-lineno">157</tt> <a class="py-toggle" href="#" id="CompleteGenericForm.current_record_modified-toggle" onclick="return toggle('CompleteGenericForm.current_record_modified');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="ProvCon.dbui.wxwin.complete.CompleteGenericForm-class.html#current_record_modified">current_record_modified</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">,</tt> <tt class="py-param">record</tt><tt class="py-op">,</tt> <tt class="py-op">*</tt><tt class="py-param">args</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="CompleteGenericForm.current_record_modified-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="CompleteGenericForm.current_record_modified-expanded"><a name="L158"></a><tt class="py-lineno">158</tt>  <tt class="py-line">        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">status</tt><tt class="py-op">.</tt><tt class="py-name">SetLabel</tt> <tt class="py-op">(</tt> <tt class="py-string">"wprowadzono zmiany do danych"</tt> <tt class="py-op">)</tt> </tt>
+</div><a name="L159"></a><tt class="py-lineno">159</tt>  <tt class="py-line">         </tt>
+<a name="CompleteGenericForm.current_record_deleted"></a><div id="CompleteGenericForm.current_record_deleted-def"><a name="L160"></a><tt class="py-lineno">160</tt> <a class="py-toggle" href="#" id="CompleteGenericForm.current_record_deleted-toggle" onclick="return toggle('CompleteGenericForm.current_record_deleted');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="ProvCon.dbui.wxwin.complete.CompleteGenericForm-class.html#current_record_deleted">current_record_deleted</a> <tt class="py-op">(</tt> <tt class="py-param">self</tt><tt class="py-op">,</tt> <tt class="py-param">objectid</tt><tt class="py-op">,</tt> <tt class="py-op">*</tt><tt class="py-param">args</tt><tt class="py-op">)</tt><tt class="py-op">:</tt>         </tt>
+</div><a name="L161"></a><tt class="py-lineno">161</tt>  <tt class="py-line">        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">status</tt><tt class="py-op">.</tt><tt class="py-name">SetLabel</tt> <tt class="py-op">(</tt> <tt class="py-string">"Rekord usuni&#281;ty."</tt> <tt class="py-op">)</tt> </tt>
+<a name="L162"></a><tt class="py-lineno">162</tt>  <tt class="py-line">        <tt class="py-name">wx</tt><tt class="py-op">.</tt><tt class="py-name">CallLater</tt> <tt class="py-op">(</tt> <tt class="py-number">2000</tt><tt class="py-op">,</tt> <tt class="py-keyword">lambda</tt> <tt class="py-name">self</tt><tt class="py-op">=</tt><tt class="py-name">self</tt><tt class="py-op">:</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">status</tt><tt class="py-op">.</tt><tt class="py-name">SetLabel</tt> <tt class="py-op">(</tt> <tt class="py-string">""</tt> <tt class="py-op">)</tt> <tt class="py-op">)</tt> </tt>
+<a name="L163"></a><tt class="py-lineno">163</tt>  <tt class="py-line">        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">navigator</tt><tt class="py-op">.</tt><tt id="link-109" class="py-name"><a title="ProvCon.dbui.API.IRecordList.reload
+ProvCon.dbui.abstractui.navigators.BaseNavigator.reload
+ProvCon.dbui.orm.recordlist.RecordList.reload" class="py-name" href="#" onclick="return doclink('link-109', 'reload', 'link-57');">reload</a></tt><tt class="py-op">(</tt><tt class="py-op">-</tt><tt class="py-number">1</tt><tt class="py-op">)</tt> </tt>
+</div><a name="L164"></a><tt class="py-lineno">164</tt>  <tt class="py-line">     </tt>
+<a name="CompleteGenericForm.current_record_saved"></a><div id="CompleteGenericForm.current_record_saved-def"><a name="L165"></a><tt class="py-lineno">165</tt> <a class="py-toggle" href="#" id="CompleteGenericForm.current_record_saved-toggle" onclick="return toggle('CompleteGenericForm.current_record_saved');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="ProvCon.dbui.wxwin.complete.CompleteGenericForm-class.html#current_record_saved">current_record_saved</a> <tt class="py-op">(</tt> <tt class="py-param">self</tt><tt class="py-op">,</tt> <tt class="py-param">record</tt><tt class="py-op">,</tt> <tt class="py-param">wasnew</tt><tt class="py-op">,</tt> <tt class="py-op">*</tt><tt class="py-param">args</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="CompleteGenericForm.current_record_saved-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="CompleteGenericForm.current_record_saved-expanded"><a name="L166"></a><tt class="py-lineno">166</tt>  <tt class="py-line">        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">status</tt><tt class="py-op">.</tt><tt class="py-name">SetLabel</tt> <tt class="py-op">(</tt> <tt class="py-string">"Rekord zapisany."</tt> <tt class="py-op">)</tt>         </tt>
+<a name="L167"></a><tt class="py-lineno">167</tt>  <tt class="py-line">        <tt class="py-name">wx</tt><tt class="py-op">.</tt><tt class="py-name">CallLater</tt> <tt class="py-op">(</tt> <tt class="py-number">2000</tt><tt class="py-op">,</tt> <tt class="py-keyword">lambda</tt> <tt class="py-name">self</tt><tt class="py-op">=</tt><tt class="py-name">self</tt><tt class="py-op">:</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">status</tt><tt class="py-op">.</tt><tt class="py-name">SetLabel</tt> <tt class="py-op">(</tt> <tt class="py-string">""</tt> <tt class="py-op">)</tt> <tt class="py-op">)</tt> </tt>
+<a name="L168"></a><tt class="py-lineno">168</tt>  <tt class="py-line">        <tt class="py-keyword">if</tt> <tt class="py-name">wasnew</tt><tt class="py-op">:</tt> </tt>
+<a name="L169"></a><tt class="py-lineno">169</tt>  <tt class="py-line">            <tt class="py-keyword">if</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">navigator</tt><tt class="py-op">:</tt> </tt>
+<a name="L170"></a><tt class="py-lineno">170</tt>  <tt class="py-line">                <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">navigator</tt><tt class="py-op">.</tt><tt id="link-110" class="py-name"><a title="ProvCon.dbui.API.IRecordList.reload
+ProvCon.dbui.abstractui.navigators.BaseNavigator.reload
+ProvCon.dbui.orm.recordlist.RecordList.reload" class="py-name" href="#" onclick="return doclink('link-110', 'reload', 'link-57');">reload</a></tt><tt class="py-op">(</tt><tt id="link-111" class="py-name" targets="Module ProvCon.dbui.orm.record=ProvCon.dbui.orm.record-module.html"><a title="ProvCon.dbui.orm.record" class="py-name" href="#" onclick="return doclink('link-111', 'record', 'link-111');">record</a></tt><tt class="py-op">.</tt><tt class="py-name">objectid</tt><tt class="py-op">)</tt> </tt>
+<a name="L171"></a><tt class="py-lineno">171</tt>  <tt class="py-line">        <tt class="py-keyword">elif</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">navigator</tt><tt class="py-op">:</tt> </tt>
+<a name="L172"></a><tt class="py-lineno">172</tt>  <tt class="py-line">            <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">navigator</tt><tt class="py-op">.</tt><tt id="link-112" class="py-name" targets="Method ProvCon.dbui.API.IRecordList.reloadsingle()=ProvCon.dbui.API.IRecordList-class.html#reloadsingle,Method ProvCon.dbui.abstractui.navigators.BaseNavigator.reloadsingle()=ProvCon.dbui.abstractui.navigators.BaseNavigator-class.html#reloadsingle,Method ProvCon.dbui.orm.recordlist.RecordList.reloadsingle()=ProvCon.dbui.orm.recordlist.RecordList-class.html#reloadsingle"><a title="ProvCon.dbui.API.IRecordList.reloadsingle
+ProvCon.dbui.abstractui.navigators.BaseNavigator.reloadsingle
+ProvCon.dbui.orm.recordlist.RecordList.reloadsingle" class="py-name" href="#" onclick="return doclink('link-112', 'reloadsingle', 'link-112');">reloadsingle</a></tt> <tt class="py-op">(</tt> <tt id="link-113" class="py-name"><a title="ProvCon.dbui.orm.record" class="py-name" href="#" onclick="return doclink('link-113', 'record', 'link-111');">record</a></tt><tt class="py-op">.</tt><tt class="py-name">objectid</tt> <tt class="py-op">)</tt> </tt>
+</div><a name="L173"></a><tt class="py-lineno">173</tt>  <tt class="py-line"> </tt>
+<a name="CompleteGenericForm.data_loaded"></a><div id="CompleteGenericForm.data_loaded-def"><a name="L174"></a><tt class="py-lineno">174</tt> <a class="py-toggle" href="#" id="CompleteGenericForm.data_loaded-toggle" onclick="return toggle('CompleteGenericForm.data_loaded');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="ProvCon.dbui.wxwin.complete.CompleteGenericForm-class.html#data_loaded">data_loaded</a> <tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">,</tt> <tt class="py-param">record</tt><tt class="py-op">,</tt> <tt class="py-op">*</tt><tt class="py-param">args</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="CompleteGenericForm.data_loaded-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="CompleteGenericForm.data_loaded-expanded"><a name="L175"></a><tt class="py-lineno">175</tt>  <tt class="py-line">        <tt class="py-name">wx</tt><tt class="py-op">.</tt><tt class="py-name">CallLater</tt> <tt class="py-op">(</tt> <tt class="py-number">1000</tt><tt class="py-op">,</tt> <tt class="py-keyword">lambda</tt> <tt class="py-name">self</tt><tt class="py-op">=</tt><tt class="py-name">self</tt><tt class="py-op">:</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">status</tt><tt class="py-op">.</tt><tt class="py-name">SetLabel</tt> <tt class="py-op">(</tt> <tt class="py-string">""</tt> <tt class="py-op">)</tt> <tt class="py-op">)</tt> </tt>
+</div><a name="L176"></a><tt class="py-lineno">176</tt>  <tt class="py-line">     </tt>
+<a name="CompleteGenericForm.before_record_change"></a><div id="CompleteGenericForm.before_record_change-def"><a name="L177"></a><tt class="py-lineno">177</tt> <a class="py-toggle" href="#" id="CompleteGenericForm.before_record_change-toggle" onclick="return toggle('CompleteGenericForm.before_record_change');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="ProvCon.dbui.wxwin.complete.CompleteGenericForm-class.html#before_record_change">before_record_change</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">,</tt> <tt class="py-param">record</tt><tt class="py-op">,</tt> <tt class="py-param">newid</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="CompleteGenericForm.before_record_change-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="CompleteGenericForm.before_record_change-expanded"><a name="L178"></a><tt class="py-lineno">178</tt>  <tt class="py-line">        <tt class="py-keyword">if</tt> <tt id="link-114" class="py-name"><a title="ProvCon.dbui.orm.record" class="py-name" href="#" onclick="return doclink('link-114', 'record', 'link-111');">record</a></tt><tt class="py-op">.</tt><tt class="py-name">_ismodified</tt><tt class="py-op">:</tt> </tt>
+<a name="L179"></a><tt class="py-lineno">179</tt>  <tt class="py-line">            <tt class="py-name">ask</tt> <tt class="py-op">=</tt> <tt class="py-name">wx</tt><tt class="py-op">.</tt><tt class="py-name">MessageBox</tt> <tt class="py-op">(</tt> <tt class="py-string">"W aktualnym rekordzie s&#261; niezapisane dane, czy chcesz je zapisa&#263;?"</tt><tt class="py-op">,</tt> <tt class="py-string">"Uwaga!"</tt><tt class="py-op">,</tt> <tt class="py-name">wx</tt><tt class="py-op">.</tt><tt class="py-name">YES_NO</tt> <tt class="py-op">|</tt> <tt class="py-name">wx</tt><tt class="py-op">.</tt><tt class="py-name">CANCEL</tt> <tt class="py-op">)</tt>         </tt>
+<a name="L180"></a><tt class="py-lineno">180</tt>  <tt class="py-line">            <tt class="py-keyword">if</tt> <tt class="py-name">ask</tt> <tt class="py-op">==</tt> <tt class="py-name">wx</tt><tt class="py-op">.</tt><tt class="py-name">YES</tt><tt class="py-op">:</tt> </tt>
+<a name="L181"></a><tt class="py-lineno">181</tt>  <tt class="py-line">                <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-115" class="py-name"><a title="ProvCon.dbui.API.IRecordController.save
+ProvCon.dbui.orm.form.Form.save" class="py-name" href="#" onclick="return doclink('link-115', 'save', 'link-53');">save</a></tt><tt class="py-op">(</tt><tt class="py-op">)</tt> </tt>
+<a name="L182"></a><tt class="py-lineno">182</tt>  <tt class="py-line">            <tt class="py-keyword">elif</tt> <tt class="py-name">ask</tt> <tt class="py-op">==</tt> <tt class="py-name">wx</tt><tt class="py-op">.</tt><tt class="py-name">NO</tt><tt class="py-op">:</tt> </tt>
+<a name="L183"></a><tt class="py-lineno">183</tt>  <tt class="py-line">                <tt class="py-keyword">return</tt> </tt>
+<a name="L184"></a><tt class="py-lineno">184</tt>  <tt class="py-line">            <tt class="py-keyword">else</tt><tt class="py-op">:</tt> </tt>
+<a name="L185"></a><tt class="py-lineno">185</tt>  <tt class="py-line">                <tt class="py-keyword">raise</tt> <tt id="link-116" class="py-name"><a title="ProvCon.func.events.eventcancelled" class="py-name" href="#" onclick="return doclink('link-116', 'eventcancelled', 'link-11');">eventcancelled</a></tt><tt class="py-op">(</tt><tt class="py-op">)</tt> </tt>
+</div><a name="L186"></a><tt class="py-lineno">186</tt>  <tt class="py-line">                 </tt>
+<a name="L187"></a><tt class="py-lineno">187</tt>  <tt class="py-line">         </tt>
+<a name="CompleteGenericForm.on_editor_resize"></a><div id="CompleteGenericForm.on_editor_resize-def"><a name="L188"></a><tt class="py-lineno">188</tt> <a class="py-toggle" href="#" id="CompleteGenericForm.on_editor_resize-toggle" onclick="return toggle('CompleteGenericForm.on_editor_resize');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="ProvCon.dbui.wxwin.complete.CompleteGenericForm-class.html#on_editor_resize">on_editor_resize</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">,</tt> <tt class="py-param">event</tt><tt class="py-op">,</tt> <tt class="py-op">*</tt><tt class="py-param">args</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="CompleteGenericForm.on_editor_resize-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="CompleteGenericForm.on_editor_resize-expanded"><a name="L189"></a><tt class="py-lineno">189</tt>  <tt class="py-line">        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">editor_scrolled_window</tt><tt class="py-op">.</tt><tt class="py-name">SetVirtualSize</tt> <tt class="py-op">(</tt> <tt class="py-name">event</tt><tt class="py-op">.</tt><tt class="py-name">GetSize</tt><tt class="py-op">(</tt><tt class="py-op">)</tt> <tt class="py-op">)</tt>         </tt>
+<a name="L190"></a><tt class="py-lineno">190</tt>  <tt class="py-line">        <tt class="py-name">event</tt><tt class="py-op">.</tt><tt class="py-name">Skip</tt><tt class="py-op">(</tt><tt class="py-op">)</tt> </tt>
+</div><a name="L191"></a><tt class="py-lineno">191</tt>  <tt class="py-line">         </tt>
+<a name="CompleteGenericForm.on_resize"></a><div id="CompleteGenericForm.on_resize-def"><a name="L192"></a><tt class="py-lineno">192</tt> <a class="py-toggle" href="#" id="CompleteGenericForm.on_resize-toggle" onclick="return toggle('CompleteGenericForm.on_resize');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="ProvCon.dbui.wxwin.complete.CompleteGenericForm-class.html#on_resize">on_resize</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">,</tt> <tt class="py-param">event</tt><tt class="py-op">,</tt> <tt class="py-op">*</tt><tt class="py-param">args</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="CompleteGenericForm.on_resize-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="CompleteGenericForm.on_resize-expanded"><a name="L193"></a><tt class="py-lineno">193</tt>  <tt class="py-line">        <tt class="py-name">w</tt><tt class="py-op">,</tt> <tt class="py-name">h</tt> <tt class="py-op">=</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">editor_scrolled_window</tt><tt class="py-op">.</tt><tt class="py-name">GetSize</tt><tt class="py-op">(</tt><tt class="py-op">)</tt>         </tt>
+<a name="L194"></a><tt class="py-lineno">194</tt>  <tt class="py-line">        <tt class="py-name">ew</tt><tt class="py-op">,</tt> <tt class="py-name">eh</tt> <tt class="py-op">=</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">editor</tt><tt class="py-op">.</tt><tt class="py-name">GetSize</tt><tt class="py-op">(</tt><tt class="py-op">)</tt> </tt>
+<a name="L195"></a><tt class="py-lineno">195</tt>  <tt class="py-line">        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">editor</tt><tt class="py-op">.</tt><tt class="py-name">SetMinSize</tt> <tt class="py-op">(</tt> <tt class="py-op">(</tt> <tt class="py-name">w</tt><tt class="py-op">-</tt><tt class="py-number">20</tt><tt class="py-op">,</tt> <tt class="py-name">eh</tt> <tt class="py-op">)</tt> <tt class="py-op">)</tt>         </tt>
+<a name="L196"></a><tt class="py-lineno">196</tt>  <tt class="py-line">        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">editor_scrolled_window</tt><tt class="py-op">.</tt><tt class="py-name">SetVirtualSize</tt> <tt class="py-op">(</tt> <tt class="py-op">(</tt><tt class="py-name">ew</tt><tt class="py-op">,</tt> <tt class="py-name">eh</tt><tt class="py-op">)</tt> <tt class="py-op">)</tt> </tt>
+<a name="L197"></a><tt class="py-lineno">197</tt>  <tt class="py-line">        <tt class="py-name">event</tt><tt class="py-op">.</tt><tt class="py-name">Skip</tt><tt class="py-op">(</tt><tt class="py-op">)</tt> </tt>
+</div><a name="L198"></a><tt class="py-lineno">198</tt>  <tt class="py-line">     </tt>
+<a name="CompleteGenericForm.navigate"></a><div id="CompleteGenericForm.navigate-def"><a name="L199"></a><tt class="py-lineno">199</tt> <a class="py-toggle" href="#" id="CompleteGenericForm.navigate-toggle" onclick="return toggle('CompleteGenericForm.navigate');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="ProvCon.dbui.wxwin.complete.CompleteGenericForm-class.html#navigate">navigate</a> <tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">,</tt> <tt class="py-param">objectid</tt><tt class="py-op">)</tt><tt class="py-op">:</tt>   </tt>
+</div><a name="L200"></a><tt class="py-lineno">200</tt>  <tt class="py-line">         </tt>
+<a name="L201"></a><tt class="py-lineno">201</tt>  <tt class="py-line">        <tt class="py-keyword">if</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">navigator</tt> <tt class="py-keyword">and</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">navigator</tt><tt class="py-op">.</tt><tt id="link-117" class="py-name" targets="Method ProvCon.dbui.abstractui.navigators.BaseNavigator.isonnew()=ProvCon.dbui.abstractui.navigators.BaseNavigator-class.html#isonnew,Method ProvCon.dbui.abstractui.recordlists.BaseRecordList.isonnew()=ProvCon.dbui.abstractui.recordlists.BaseRecordList-class.html#isonnew"><a title="ProvCon.dbui.abstractui.navigators.BaseNavigator.isonnew
+ProvCon.dbui.abstractui.recordlists.BaseRecordList.isonnew" class="py-name" href="#" onclick="return doclink('link-117', 'isonnew', 'link-117');">isonnew</a></tt><tt class="py-op">(</tt><tt class="py-op">)</tt> <tt class="py-keyword">and</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">toolbar</tt><tt class="py-op">:</tt> </tt>
+<a name="L202"></a><tt class="py-lineno">202</tt>  <tt class="py-line">            <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">toolbar</tt><tt class="py-op">.</tt><tt id="link-118" class="py-name" targets="Method ProvCon.dbui.wxwin.complete.FormToolbar.SetRecordLabel()=ProvCon.dbui.wxwin.complete.FormToolbar-class.html#SetRecordLabel"><a title="ProvCon.dbui.wxwin.complete.FormToolbar.SetRecordLabel" class="py-name" href="#" onclick="return doclink('link-118', 'SetRecordLabel', 'link-118');">SetRecordLabel</a></tt> <tt class="py-op">(</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-119" class="py-name"><a title="ProvCon.dbui.orm.form" class="py-name" href="#" onclick="return doclink('link-119', 'form', 'link-14');">form</a></tt><tt class="py-op">.</tt><tt id="link-120" class="py-name"><a title="ProvCon.dbui.meta.table" class="py-name" href="#" onclick="return doclink('link-120', 'table', 'link-34');">table</a></tt><tt class="py-op">.</tt><tt class="py-name">title</tt> <tt class="py-op">+</tt> <tt class="py-string">" : ** NEW RECORD ** "</tt> <tt class="py-op">)</tt> </tt>
+<a name="L203"></a><tt class="py-lineno">203</tt>  <tt class="py-line">        <tt class="py-keyword">else</tt><tt class="py-op">:</tt> </tt>
+<a name="L204"></a><tt class="py-lineno">204</tt>  <tt class="py-line">            <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-121" class="py-name"><a title="ProvCon.dbui.orm.form" class="py-name" href="#" onclick="return doclink('link-121', 'form', 'link-14');">form</a></tt><tt class="py-op">.</tt><tt id="link-122" class="py-name" targets="Method ProvCon.dbui.API.IRecordHolder.setid()=ProvCon.dbui.API.IRecordHolder-class.html#setid,Method ProvCon.dbui.abstractui.navigators.BaseNavigator.setid()=ProvCon.dbui.abstractui.navigators.BaseNavigator-class.html#setid,Method ProvCon.dbui.orm.form.Form.setid()=ProvCon.dbui.orm.form.Form-class.html#setid"><a title="ProvCon.dbui.API.IRecordHolder.setid
+ProvCon.dbui.abstractui.navigators.BaseNavigator.setid
+ProvCon.dbui.orm.form.Form.setid" class="py-name" href="#" onclick="return doclink('link-122', 'setid', 'link-122');">setid</a></tt> <tt class="py-op">(</tt> <tt class="py-name">objectid</tt> <tt class="py-op">)</tt>         </tt>
+<a name="L205"></a><tt class="py-lineno">205</tt>  <tt class="py-line">            <tt class="py-keyword">if</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">toolbar</tt><tt class="py-op">:</tt> </tt>
+<a name="L206"></a><tt class="py-lineno">206</tt>  <tt class="py-line">                <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">toolbar</tt><tt class="py-op">.</tt><tt id="link-123" class="py-name"><a title="ProvCon.dbui.wxwin.complete.FormToolbar.SetRecordLabel" class="py-name" href="#" onclick="return doclink('link-123', 'SetRecordLabel', 'link-118');">SetRecordLabel</a></tt> <tt class="py-op">(</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-124" class="py-name"><a title="ProvCon.dbui.orm.form" class="py-name" href="#" onclick="return doclink('link-124', 'form', 'link-14');">form</a></tt><tt class="py-op">.</tt><tt id="link-125" class="py-name"><a title="ProvCon.dbui.meta.table" class="py-name" href="#" onclick="return doclink('link-125', 'table', 'link-34');">table</a></tt><tt class="py-op">.</tt><tt class="py-name">title</tt> <tt class="py-op">+</tt> <tt class="py-string">" : "</tt> <tt class="py-op">+</tt> <tt class="py-name">str</tt><tt class="py-op">(</tt><tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-126" class="py-name"><a title="ProvCon.dbui.orm.form" class="py-name" href="#" onclick="return doclink('link-126', 'form', 'link-14');">form</a></tt><tt class="py-op">.</tt><tt id="link-127" class="py-name" targets="Variable ProvCon.dbui.API.IRecordHolder.current=ProvCon.dbui.API.IRecordHolder-class.html#current,Variable ProvCon.dbui.orm.form.Form.current=ProvCon.dbui.orm.form.Form-class.html#current"><a title="ProvCon.dbui.API.IRecordHolder.current
+ProvCon.dbui.orm.form.Form.current" class="py-name" href="#" onclick="return doclink('link-127', 'current', 'link-127');">current</a></tt><tt class="py-op">)</tt> <tt class="py-op">)</tt> </tt>
+</div><a name="L207"></a><tt class="py-lineno">207</tt>  <tt class="py-line">     </tt>
+<a name="CompleteGenericForm.set_navigator"></a><div id="CompleteGenericForm.set_navigator-def"><a name="L208"></a><tt class="py-lineno">208</tt> <a class="py-toggle" href="#" id="CompleteGenericForm.set_navigator-toggle" onclick="return toggle('CompleteGenericForm.set_navigator');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="ProvCon.dbui.wxwin.complete.CompleteGenericForm-class.html#set_navigator">set_navigator</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">,</tt> <tt class="py-param">navigator</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="CompleteGenericForm.set_navigator-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="CompleteGenericForm.set_navigator-expanded"><a name="L209"></a><tt class="py-lineno">209</tt>  <tt class="py-line">        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">navigator</tt> <tt class="py-op">=</tt> <tt class="py-name">navigator</tt> </tt>
+<a name="L210"></a><tt class="py-lineno">210</tt>  <tt class="py-line">        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">navigator</tt><tt class="py-op">.</tt><tt id="link-128" class="py-name"><a title="ProvCon.func.events.eventemitter.register_event_hook" class="py-name" href="#" onclick="return doclink('link-128', 'register_event_hook', 'link-94');">register_event_hook</a></tt> <tt class="py-op">(</tt> <tt class="py-string">"navigate"</tt><tt class="py-op">,</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-129" class="py-name" targets="Method ProvCon.dbui.API.INavigator.navigate()=ProvCon.dbui.API.INavigator-class.html#navigate,Method ProvCon.dbui.abstractui.navigators.BaseNavigator.navigate()=ProvCon.dbui.abstractui.navigators.BaseNavigator-class.html#navigate,Method ProvCon.dbui.wxwin.complete.CompleteGenericForm.navigate()=ProvCon.dbui.wxwin.complete.CompleteGenericForm-class.html#navigate"><a title="ProvCon.dbui.API.INavigator.navigate
+ProvCon.dbui.abstractui.navigators.BaseNavigator.navigate
+ProvCon.dbui.wxwin.complete.CompleteGenericForm.navigate" class="py-name" href="#" onclick="return doclink('link-129', 'navigate', 'link-129');">navigate</a></tt> <tt class="py-op">)</tt>                 </tt>
+<a name="L211"></a><tt class="py-lineno">211</tt>  <tt class="py-line">        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-130" class="py-name"><a title="ProvCon.dbui.API.INavigator.navigate
+ProvCon.dbui.abstractui.navigators.BaseNavigator.navigate
+ProvCon.dbui.wxwin.complete.CompleteGenericForm.navigate" class="py-name" href="#" onclick="return doclink('link-130', 'navigate', 'link-129');">navigate</a></tt> <tt class="py-op">(</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">navigator</tt><tt class="py-op">.</tt><tt id="link-131" class="py-name" targets="Method ProvCon.dbui.API.INavigator.currentid()=ProvCon.dbui.API.INavigator-class.html#currentid,Method ProvCon.dbui.abstractui.navigators.BaseNavigator.currentid()=ProvCon.dbui.abstractui.navigators.BaseNavigator-class.html#currentid,Method ProvCon.dbui.abstractui.recordlists.BaseRecordList.currentid()=ProvCon.dbui.abstractui.recordlists.BaseRecordList-class.html#currentid"><a title="ProvCon.dbui.API.INavigator.currentid
+ProvCon.dbui.abstractui.navigators.BaseNavigator.currentid
+ProvCon.dbui.abstractui.recordlists.BaseRecordList.currentid" class="py-name" href="#" onclick="return doclink('link-131', 'currentid', 'link-131');">currentid</a></tt><tt class="py-op">(</tt><tt class="py-op">)</tt> <tt class="py-op">)</tt> </tt>
+</div><a name="L212"></a><tt class="py-lineno">212</tt>  <tt class="py-line">     </tt>
+<a name="CompleteGenericForm.new"></a><div id="CompleteGenericForm.new-def"><a name="L213"></a><tt class="py-lineno">213</tt> <a class="py-toggle" href="#" id="CompleteGenericForm.new-toggle" onclick="return toggle('CompleteGenericForm.new');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="ProvCon.dbui.wxwin.complete.CompleteGenericForm-class.html#new">new</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="CompleteGenericForm.new-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="CompleteGenericForm.new-expanded"><a name="L214"></a><tt class="py-lineno">214</tt>  <tt class="py-line">        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-132" class="py-name"><a title="ProvCon.dbui.orm.form" class="py-name" href="#" onclick="return doclink('link-132', 'form', 'link-14');">form</a></tt><tt class="py-op">.</tt><tt id="link-133" class="py-name"><a title="ProvCon.dbui.API.IForm.new
+ProvCon.dbui.orm.form.Form.new
+ProvCon.dbui.wxwin.complete.CompleteGenericForm.new" class="py-name" href="#" onclick="return doclink('link-133', 'new', 'link-61');">new</a></tt><tt class="py-op">(</tt><tt class="py-op">)</tt> </tt>
+<a name="L215"></a><tt class="py-lineno">215</tt>  <tt class="py-line">        <tt class="py-comment">##FIXME: ugly 'NEW_RECORD' hack!</tt> </tt>
+<a name="L216"></a><tt class="py-lineno">216</tt>  <tt class="py-line">        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">navigator</tt><tt class="py-op">.</tt><tt id="link-134" class="py-name"><a title="ProvCon.dbui.API.INavigator.navigate
+ProvCon.dbui.abstractui.navigators.BaseNavigator.navigate
+ProvCon.dbui.wxwin.complete.CompleteGenericForm.navigate" class="py-name" href="#" onclick="return doclink('link-134', 'navigate', 'link-129');">navigate</a></tt> <tt class="py-op">(</tt> <tt class="py-name">None</tt> <tt class="py-op">)</tt> </tt>
+</div></div><a name="L217"></a><tt class="py-lineno">217</tt>  <tt class="py-line"> </tt><script type="text/javascript">
+<!--
+expandto(location.href);
+// -->
+</script>
+</pre>
+<br />
+<!-- ==================== NAVIGATION BAR ==================== -->
+<table class="navbar" border="0" width="100%" cellpadding="0"
+       bgcolor="#a0c0ff" cellspacing="0">
+  <tr valign="middle">
+  <!-- Home link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="ProvCon-module.html">Home</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Tree link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="module-tree.html">Trees</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Index link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="identifier-index.html">Indices</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Help link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="help.html">Help</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Project homepage -->
+      <th class="navbar" align="right" width="100%">
+        <table border="0" cellpadding="0" cellspacing="0">
+          <tr><th class="navbar" align="center"
+            >docsis-provisioning</th>
+          </tr></table></th>
+  </tr>
+</table>
+<table border="0" cellpadding="0" cellspacing="0" width="100%%">
+  <tr>
+    <td align="left" class="footer">
+    Generated by Epydoc 3.0.1 on Thu Jan  8 14:48:54 2009
+    </td>
+    <td align="right" class="footer">
+      <a target="mainFrame" href="http://epydoc.sourceforge.net"
+        >http://epydoc.sourceforge.net</a>
+    </td>
+  </tr>
+</table>
+
+<script type="text/javascript">
+  <!--
+  // Private objects are initially displayed (because if
+  // javascript is turned off then we want them to be
+  // visible); but by default, we want to hide them.  So hide
+  // them unless we have a cookie that says to show them.
+  checkCookie();
+  // -->
+</script>
+</body>
+</html>
