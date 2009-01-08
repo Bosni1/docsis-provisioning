@@ -57,15 +57,123 @@ class MetaDataEditor(wx.App):
 
         menu = wx.MenuBar()
         menu_data = wx.Menu()
-        print "M ", menu_data.Append (wx.NewId(), "&Export", "Export meta-data to a text file." )
-        print "M ", menu_data.Append (wx.NewId(), "&Import", "Import meta-data to a text file." )
+        
+        mi_export = menu_data.Append (wx.NewId(), "&Export", "Export meta-data to a text file." )
+        mi_import = menu_data.Append (wx.NewId(), "&Import", "Import meta-data to a text file." )
+
+        self.Bind (wx.EVT_MENU, self.ExportData, id=mi_export.GetId() )
+        self.Bind (wx.EVT_MENU, self.ImportData, id=mi_import.GetId() )
+        
         menu.Append ( menu_data, "&Data" )
         self.toplevel.SetMenuBar ( menu )
         
         self.toplevel.Show()
         
         return True
+    
+    def ExportData(self, *args):
+        import cPickle
+        ti_rs = CFG.CX.query ( "SELECT * FROM {0}.table_info".format (CFG.DB.SCHEMA) ).dictresult()
+        fi_rs = CFG.CX.query ( "SELECT * FROM {0}.field_info".format (CFG.DB.SCHEMA) ).dictresult()
+        export = { 'table' : ti_rs, 'field' : fi_rs }
+        #export_data = cPickle.dumps(export)
+        
+        dlg = wx.FileDialog(self.toplevel, message="Export to file...",
+                            style=wx.SAVE,
+                            wildcard = "Meta-Data backup (*.md) |*.md|"  \
+                                       "All files (*.*)|*.*" )
+        if dlg.ShowModal() == wx.ID_OK:
+            f = open(dlg.GetPath(), 'w')
+            cPickle.dump(export, f)
+            f.close()
+            
+        dlg.Destroy()
+                                    
+    
+    def ImportData(self, *args):
+        import cPickle
+        dlg = wx.FileDialog(self.toplevel, message="Import from file...",
+                            style=wx.OPEN,
+                            wildcard = "Meta-Data backup (*.md) |*.md|"  \
+                                       "All files (*.*)|*.*" )
+        if dlg.ShowModal() == wx.ID_OK:
+            export = cPickle.load ( open(dlg.GetPath(), 'r') )
 
+            current_ti = CFG.CX.query ( "SELECT objectid, schema || '.' || name as path FROM {0}.table_info".format(CFG.DB.SCHEMA) ).dictresult()
+            current_fi = CFG.CX.query ( "SELECT objectid, classid as parent, path FROM {0}.field_info".format(CFG.DB.SCHEMA) ).dictresult()
+            
+            
+            cTI = {}
+            cFI = {}
+            for t in current_ti: cTI[t['path']] = t['objectid']
+            for f in current_fi: cFI[f['path']] = f['objectid']
+
+            oTI = {}
+            oFI = {}            
+            o_idTI = {}
+            o_idFI = {}            
+
+            ti = export['table']
+            fi = export['field']
+            
+            for t in ti: 
+                o_idTI[t['objectid']] = t
+                oTI[t['schema'] + "." + t['name']] = t
+                
+            for f in fi: 
+                o_idFI[t['objectid']] = f
+                oFI[f['path']] = f
+                
+            cTable = orm.Record.EMPTY("table_info")
+            cField = orm.Record.EMPTY("field_info")
+            
+            direct_copy = [ "label", "title", "info", "pprint_expression",
+                            "disabledfields", "recordlistpopup",
+                            "knownflags", "knownparams","hasevents",
+                            "hasnotes","excludedfields", 
+                            "txtexpression", "recordlisttoolbox" ]
+            for t in cTI:
+                ot = oTI[t]
+                cTable.setObjectID ( cTI[t] )
+
+                for cn in direct_copy:                    
+                    fld = cTable._table[cn]
+                    if fld.isarray: ot[cn] = "array:" + ot[cn]
+                    cTable.setFieldValue(cn, fld.val_txt2py(ot[cn]))
+                                
+                cTable.write()
+            
+            direct_copy = [ "label", "length", "choices", "ndims",
+                            "reference_editable", "pprint_fkexpression",
+                            "required", "protected", "nullable",
+                            "quickhelp", "helptopic", "info",
+                            "editor_class", "editor_class_params" ]
+            direct_copy.remove("choices")
+            #direct_copy.remove('editor_class_params')
+            for f in cFI:
+                of = oFI[f]
+                cField.setObjectID (cFI[f])
+                
+                for cn in direct_copy:                    
+                    fld = cField._table[cn]                    
+                    if fld.isarray: 
+                        if of[cn]: of[cn] = "array:" + of[cn]
+                        else: of[cn] = ''
+                    cField.setFieldValue(cn, fld.val_txt2py(of[cn]))
+                
+                if of["arrayof"]:    
+                    oldt = o_idTI [ of["arrayof"] ]
+                    oldtpath = oldt["schema"] + "." + oldt["name"]
+                    cField.arrayof = cTI[ oldtpath ]
+                    
+                    
+                    
+
+                cField.write()
+                                                
+            
+        dlg.Destroy()
+        
         
 Init()        
 app = MetaDataEditor()

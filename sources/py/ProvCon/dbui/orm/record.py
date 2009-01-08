@@ -276,6 +276,7 @@ API Error: {0.pgexception}""".format ( self )
         return self.__dict__[attrname]
     
     __getitem__ = __getattr__
+    __setitem__ = __setattr__
 
     def __is_modified(self): 
         return self._ismodified
@@ -313,7 +314,7 @@ API Error: {0.pgexception}""".format ( self )
             for f in self._table:
                 self._original_values[f.name] = None                
                         
-    def setupRecord(self):        
+    def setupRecord(self, vals={}):        
         """
         Import the record structure from the _table object. 
         

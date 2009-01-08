@@ -5,7 +5,7 @@ RecordList widgets hold a list of records.
 It is important to distinguish between record list widgets (which implement 
 the IRecordListHolder interface), and record lists ( IRecordList )
 """
-from ProvCon.dbui.API import Implements, IRecordListHolder
+from ProvCon.dbui.API import Implements, IRecordListHolder, INavigator
 
 __revision__ = "$Revision$"
  
@@ -46,23 +46,25 @@ class BaseRecordList(eventemitter):
         return str(self.current_record)
         
     def set_current_record (self, record):            
-        oldrecord = self.current_record
-        
+        oldrecord = self.current_record        
         try: 
             self.__current_record = record
             self.emit_event ( "navigate", self.currentid() )
             self.emit_event ( "current_record_changed", self.__current_record )            
         except eventcancelled:
             self.__current_record = oldrecord
-        
+    
+            
     def get_current_record (self):
         return self.__current_record
     current_record = property (get_current_record, set_current_record)
-        
+    currentrecord = current_record
+
+    
     def bind_to_form (self, myfield, form):
         self.parentform = (form, myfield)        
-        self.parenthook = form.register_event_hook ( "current_record_changed", self._on_parent_record_changed)        
-    
+        self.parenthook = form.register_event_hook ( "current_record_changed", self._on_parent_record_changed)            
+        
     def _on_parent_record_changed(self, parentrecord):
         if parentrecord and parentrecord._objectid:
             (pform, myfield) = self.parentform        
@@ -72,6 +74,7 @@ class BaseRecordList(eventemitter):
             self.records.clear()
             self.records.filter = ' FALSE '
         self.set_records ( self.records )
+    
     def isonnew(self, *args):
         return False
     

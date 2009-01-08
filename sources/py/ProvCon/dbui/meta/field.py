@@ -66,7 +66,7 @@ class Field(object):
     def val_py2sql(self, pyval):
         """convert a python variable into something we can insert into an pgSQL statement"""        
         if pyval is None:
-            return "NULL"
+            return None
         elif self.isarray:
             return array_as_text (pyval)
         elif self.type == "bit":

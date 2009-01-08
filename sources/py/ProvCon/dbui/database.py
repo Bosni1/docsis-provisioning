@@ -46,7 +46,7 @@ class CFG:
         @staticmethod
         def reconnect():
             CFG.CX = CFG.tCX()
-
+            
         def __init__(self):
             from meta import Table, Field
             pg.DB.__init__(self, dbname=CFG.DB.DBNAME, user=CFG.DB.ROLE, host=CFG.DB.HOST)            
@@ -88,7 +88,7 @@ class CFG:
 	    It deletes based on the objectid	    
 	    """
             qcl = pg._join_parts(self._split_schema(cl)) # build qualified name	    
-
+            
             q = 'DELETE FROM %s WHERE objectid=%s' % (qcl, a['objectid'] )
             self._do_debug(q)
             self.db.query(q)
@@ -151,5 +151,6 @@ def StartupDatabaseConnection():
     CFG.DB.initialize()
     CFG.RT.initialize()
     CFG.CX = CFG.tCX.instance or CFG.tCX()
+    CFG.CX.debug = "===== [SQL] =====\n%s\n================="
 Init = StartupDatabaseConnection
 

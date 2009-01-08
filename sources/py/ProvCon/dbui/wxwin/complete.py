@@ -165,11 +165,17 @@ class CompleteGenericForm(wx.Panel):
     def current_record_saved ( self, record, wasnew, *args):
         self.status.SetLabel ( "Rekord zapisany." )        
         wx.CallLater ( 2000, lambda self=self: self.status.SetLabel ( "" ) )
+        if record.objectid not in self.navigator.records:
+            #This is possible if the record was saved in an event handler of an event
+            #fired, when some parent form was navigated away this records parent.
+            #In this case it is not necessary nor possible to reload the just-saved
+            #record.
+            return
         if wasnew:
             if self.navigator:
                 self.navigator.reload(record.objectid)
         elif self.navigator:
-            self.navigator.reloadsingle ( record.objectid )
+            self.navigator.records.reloadsingle ( record.objectid )
 
     def data_loaded (self, record, *args):
         wx.CallLater ( 1000, lambda self=self: self.status.SetLabel ( "" ) )
@@ -182,8 +188,7 @@ class CompleteGenericForm(wx.Panel):
             elif ask == wx.NO:
                 return
             else:
-                raise eventcancelled()
-                
+                raise eventcancelled()                
         
     def on_editor_resize(self, event, *args):
         self.editor_scrolled_window.SetVirtualSize ( event.GetSize() )        

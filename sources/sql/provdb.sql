@@ -251,6 +251,7 @@ SELECT pv.setup_object_subtable ( 'city' );
 create table pv.street (
   name varchar(64) not null,
   handle varchar(16) not null,
+  "prefix" varchar(5) null default 'ul',
   cityid int8 REFERENCES pv.objectids ON DELETE CASCADE ON UPDATE CASCADE NOT NULL,
   default_postal_code varchar(16) null,
   UNIQUE (name, cityid)
@@ -271,13 +272,28 @@ create table pv.building (
 ) inherits ( pv."object" );
 SELECT pv.setup_object_subtable ( 'building' );
 
-create table pv.location (
-  number varchar(16) not null,
+create table pv.location (  
+  number varchar(16) null,
+  handle varchar(24) null,
   buildingid int8 REFERENCES pv.objectids ON DELETE CASCADE ON UPDATE CASCADE NOT NULL,
   entrance varchar(3) null,
-  floor varchar(3) null
+  floor varchar(3) null,
+  unique (number, buildingid)
 ) inherits ( pv."object" );
 SELECT pv.setup_object_subtable ( 'location' );
+
+CREATE FUNCTION pv.location_txt_expression (objid int8) returns varchar AS $$
+  DECLARE
+    r varchar;    
+  BEGIN
+    SELECT c.name || ' ' || s.name || ' ' || b.number || coalesce('/' || l.number, '') as repr INTO r 
+    FROM pv.location l, pv.building b, pv.street s, pv.city c WHERE 
+       l.buildingid = b.objectid AND b.streetid = s.objectid AND s.cityid = c.objectid
+       AND l.objectid = objid
+       LIMIT 1;    
+    RETURN r;
+  END;
+$$ LANGUAGE plpgsql;
 
 
 ----------------------------------------------------------------------------------------------------

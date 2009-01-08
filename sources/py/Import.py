@@ -159,6 +159,7 @@ if __name__=="__main__":
             
         if not kNrMieszkania  in location_objMap[bRec.objectid]:
             lRec = Record.EMPTY ( "location" )
+            if kNrMieszkania == "NULL": kNrMieszkania = None
             lRec.number = kNrMieszkania
             lRec.buildingid = bRec.objectid
             lRec.write()
@@ -172,10 +173,14 @@ if __name__=="__main__":
         subRec = subscriber_oldIdxMap[kIndex]
         try:
             subRec.primarylocationid = klient_localizationMap[kIndex].objectid
+            if klient_localizationMap[kIndex].number == "NULL":
+                klient_localizationMap[kIndex].number = None
+                klient_localizationMap[kIndex].write()                
         except KeyError:
             pass
         subRec.write()
-        
+
+    
     stansatDB.close()
     
 
