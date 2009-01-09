@@ -148,10 +148,13 @@ class MetaDataEditor(wx.App):
                             "required", "protected", "nullable",
                             "quickhelp", "helptopic", "info",
                             "editor_class", "editor_class_params" ]
-            direct_copy.remove("choices")
+            #direct_copy.remove("choices")
             #direct_copy.remove('editor_class_params')
             for f in cFI:
-                of = oFI[f]
+                try:
+                    of = oFI[f]
+                except KeyError:
+                    continue
                 cField.setObjectID (cFI[f])
                 
                 for cn in direct_copy:                    
