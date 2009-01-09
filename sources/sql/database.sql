@@ -235,7 +235,7 @@ select c1.objectid as reftableid, c1.name as reftable,  f1.name as refcolumn, f1
     INNER JOIN pv.table_info c2 ON c2.objectid = f1.reference 
     WHERE f1.reference is not null;
 
--- create table pv.x ( x text );
+create table pv.x ( x text );
 create function pv.handle_field_info_change() RETURNS trigger AS $body$
   DECLARE
     tname text;

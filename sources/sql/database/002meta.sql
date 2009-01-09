@@ -74,7 +74,7 @@ select c1.objectid as reftableid, c1.name as reftable,  f1.name as refcolumn, f1
     INNER JOIN {:SCHEMA:}table_info c2 ON c2.objectid = f1.reference 
     WHERE f1.reference is not null;
 
--- create table {:SCHEMA:}x ( x text );
+create table {:SCHEMA:}x ( x text );
 create function {:SCHEMA:}handle_field_info_change() RETURNS trigger AS $body$
   DECLARE
     tname text;
