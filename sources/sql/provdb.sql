@@ -35,6 +35,7 @@ create table pv.object_search_txt (
   objectid int8 PRIMARY KEY,
   txt varchar(128)
 );
+create index object_search_txt_objectid on pv.object_search_txt (objectid);
 
 create table pv.object (
   objectid SERIAL8,
@@ -122,7 +123,7 @@ CREATE FUNCTION pv.obj_txt_repr (objid int8, objtype name) returns text as $repr
     repr text;
   BEGIN
     SELECT e.objecttxtexpr INTO expr FROM pv.object_txt_expressions e INNER JOIN pv.object o ON o.objecttype = e.objecttype AND o.objectid = objid LIMIT 1;  
-    IF NOT FOUND THEN 
+      IF NOT FOUND THEN 
       RETURN '<null>';
     END IF;
     EXECUTE 'SELECT ' || expr || ' FROM pv.' || objtype || ' WHERE objectid = ' || objid INTO repr;
@@ -179,7 +180,8 @@ create function pv.object_param (objid int8, pname varchar) returns varchar AS $
   DECLARE
     cnt varchar;
   BEGIN
-    SELECT content INTO cnt FROM pv.object_parameter WHERE refobjectid = objid AND upper(parametername) = upper(pname);
+    SELECT content INTO cnt FROM pv.object_parameter WHERE refobjectid = objid 
+    AND upper(parametername) = upper(pname);
     IF NOT FOUND THEN
       RETURN NULL;
     ELSE
