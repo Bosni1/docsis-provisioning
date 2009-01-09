@@ -72,8 +72,8 @@ class Field(object):
         elif self.type == "bit":
             if pyval: return 1
             else: return 0
-        elif isinstance(pyval, (str, unicode) ):
-            return str(pyval.encode('utf-8'))
+        elif isinstance(pyval, (str, unicode)):
+            return str(pyval.encode ( 'utf-8'))
         else:
             return str(pyval)
     

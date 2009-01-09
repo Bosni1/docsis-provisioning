@@ -64,14 +64,15 @@ if __name__=="__main__":
     cr.execute ( "SELECT * FROM DaneKlientTelewizja" )
     dkt_all = dictresult ( cr )
 
-    CFG.CX.query ( "DELETE FROM pv.subscriber" )
+    CFG.CX.query ( "DELETE FROM {0}.subscriber".format(CFG.DB.SCHEMA) )
     subscriber_oldIdxMap = {}
     
     for K in klient_all:        
         subRec = Record ( "subscriber" )
         subRec.subscriberid = K["Index"]        
         subRec.name = ( (K["Imie"] or "") + " " + (K["Nazwisko"] or "")).strip().decode ( "cp1250" )
-        subRec.postaladdress = (K["AdresKorespondencji"] or "").decode("cp1250")        
+        subRec.postaladdress = (K["AdresKorespondencji"] or "").decode("cp1250").strip()
+        if len(subRec.postaladdress) == 0: subRec.postaladdress = None
         if K["EMail"]:
             subRec.email = [ K["EMail"].decode("cp1250").encode("utf8") ]
         subRec.telephone = []
@@ -87,7 +88,7 @@ if __name__=="__main__":
         subscriber_oldIdxMap[K["Index"]] = subRec
             
     #Miejscowości    
-    CFG.CX.query ( "DELETE FROM pv.city" )
+    CFG.CX.query ( "DELETE FROM {0}.city".format(CFG.DB.SCHEMA) )
     cr.execute ( "SELECT [Index], Nazwa FROM Miejscowosc" )
     city_onMap = {}
     city_nameMap = {}

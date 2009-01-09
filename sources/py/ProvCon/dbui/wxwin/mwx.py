@@ -12,6 +12,7 @@ class mwxControl(object):
         if mwxControl.Fonts is None:            
             mwxControl.Fonts = {
                 'Edit' : wx.Font ( 9, wx.FONTFAMILY_MODERN, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL ),
+                'Static' : wx.Font ( 11, wx.FONTFAMILY_MODERN, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL ),
             }
         return mwxControl.Fonts[name]
     
@@ -19,7 +20,7 @@ class StaticText  (mwxControl, wx.StaticText):
     def __init__(self, *args, **kwargs):
         wx.StaticText.__init__ ( self, *args, **kwargs)
         mwxControl.__init__ ( self )
-        self.SetFont ( self.GetEditorFont('Edit')  )
+        self.SetFont ( self.GetEditorFont('Static')  )
 
 class TextCtrl (mwxControl, wx.TextCtrl):
     def __init__(self, *args, **kwargs):

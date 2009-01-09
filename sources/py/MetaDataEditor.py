@@ -75,8 +75,7 @@ class MetaDataEditor(wx.App):
         import cPickle
         ti_rs = CFG.CX.query ( "SELECT * FROM {0}.table_info".format (CFG.DB.SCHEMA) ).dictresult()
         fi_rs = CFG.CX.query ( "SELECT * FROM {0}.field_info".format (CFG.DB.SCHEMA) ).dictresult()
-        export = { 'table' : ti_rs, 'field' : fi_rs }
-        #export_data = cPickle.dumps(export)
+        export = { 'table' : ti_rs, 'field' : fi_rs }        
         
         dlg = wx.FileDialog(self.toplevel, message="Export to file...",
                             style=wx.SAVE,
@@ -97,9 +96,18 @@ class MetaDataEditor(wx.App):
                             wildcard = "Meta-Data backup (*.md) |*.md|"  \
                                        "All files (*.*)|*.*" )
         if dlg.ShowModal() == wx.ID_OK:
-            export = cPickle.load ( open(dlg.GetPath(), 'r') )
+            dlg.Destroy()            
+            export = cPickle.load ( open(dlg.GetPath(), 'r') )            
+            
+        
+            dlg = wx.ProgressDialog ("Import danych z " + dlg.GetPath(), "Importowanie...",
+                                     parent = self.toplevel)
+                                     
+            dlg.Show()
 
+            dlg.Pulse()
             current_ti = CFG.CX.query ( "SELECT objectid, schema || '.' || name as path FROM {0}.table_info".format(CFG.DB.SCHEMA) ).dictresult()
+            dlg.Pulse()
             current_fi = CFG.CX.query ( "SELECT objectid, classid as parent, path FROM {0}.field_info".format(CFG.DB.SCHEMA) ).dictresult()
             
             
@@ -133,15 +141,22 @@ class MetaDataEditor(wx.App):
                             "hasnotes","excludedfields", 
                             "txtexpression", "recordlisttoolbox" ]
             for t in cTI:
+                dlg.Pulse(t)
                 ot = oTI[t]
                 cTable.setObjectID ( cTI[t] )
 
                 for cn in direct_copy:                    
                     fld = cTable._table[cn]
-                    if fld.isarray: ot[cn] = "array:" + ot[cn]
-                    cTable.setFieldValue(cn, fld.val_txt2py(ot[cn]))
+                    val = ot[cn]
+                    if fld.isarray: 
+                        if val: val = "array:" + val
+                        else: val = '' 
+                        val = fld.val_txt2py(val)                    
+                    print cn, val
+                    cTable.setFieldValue(cn, val)
                                 
                 cTable.write()
+                
             
             direct_copy = [ "label", "length", "choices", "ndims",
                             "reference_editable", "pprint_fkexpression",
@@ -150,19 +165,22 @@ class MetaDataEditor(wx.App):
                             "editor_class", "editor_class_params" ]
             #direct_copy.remove("choices")
             #direct_copy.remove('editor_class_params')
-            for f in cFI:
+            for f in cFI:                
                 try:
                     of = oFI[f]
                 except KeyError:
                     continue
+                dlg.Pulse(f)
                 cField.setObjectID (cFI[f])
                 
                 for cn in direct_copy:                    
                     fld = cField._table[cn]                    
+                    val = of[cn]
                     if fld.isarray: 
-                        if of[cn]: of[cn] = "array:" + of[cn]
-                        else: of[cn] = ''
-                    cField.setFieldValue(cn, fld.val_txt2py(of[cn]))
+                        if val: val = "array:" + val
+                        else: val = '' 
+                        val = fld.val_txt2py(val)                    
+                    cField.setFieldValue(cn, val)
                 
                 if of["arrayof"]:    
                     oldt = o_idTI [ of["arrayof"] ]
@@ -173,9 +191,11 @@ class MetaDataEditor(wx.App):
                     
 
                 cField.write()
+                
+            dlg.Destroy()
                                                 
-            
-        dlg.Destroy()
+        else:
+            dlg.Destroy()
         
         
 Init()        

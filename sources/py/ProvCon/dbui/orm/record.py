@@ -335,7 +335,7 @@ API Error: {0.pgexception}""".format ( self )
                                                                     'objectscope' : CFG.RT.DATASCOPE } )
                 except pg.DatabaseError, e:
                     raise Record.DataManipulationError ( "Error retrieving base object ID#{0}".format( self._objectid ),
-                                                         "get pv.object ({0})".format (self._objectid) )
+                                                         "get {1}.object ({0})".format (self._objectid, CFG.DB.SCHEMA) )
 
                 self._table = Table.Get ( row['objecttype'] )
 
@@ -712,7 +712,7 @@ API Error: {0.pgexception}""".format ( self )
         order = ",".join(order)
         select = ",".join(select)
         if gettxt:
-            gettxtq = ("LEFT JOIN pv.object_search_txt t ON t.objectid = o.objectid", ", t.txt as _astxt" )
+            gettxtq = ("LEFT JOIN{0}.object_search_txt t ON t.objectid = o.objectid", ", t.txt as _astxt".format(CFG.DB.SCHEMA) )
         else:
             gettxtq = ( "", "" )
         query = "SELECT {6}{8} FROM {5}.{0} o {7} WHERE \"{1}\" = '{2}' ORDER BY {3} {4}".format (
