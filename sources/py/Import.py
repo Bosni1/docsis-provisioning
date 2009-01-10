@@ -113,7 +113,7 @@ if __name__=="__main__":
     cr.execute ( "SELECT [Index], Nazwa, Skrot FROM Ulica" )
     ulica_idMap = {}
     for uIndex, uNazwa, uSkrot in cr.fetchall():
-        ulica_idMap[uIndex] = (uNazwa, uSkrot)
+        ulica_idMap[uIndex] = (uNazwa, uSkrot or "")
     
     cr.execute ( "SELECT [Index], Skrot, UlicaIndex, MiejscowoscIndex, NrDomu, NrMieszkania, KodPocztowy FROM Klient" )
 
