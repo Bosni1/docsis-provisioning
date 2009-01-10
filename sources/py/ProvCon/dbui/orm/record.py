@@ -712,7 +712,7 @@ API Error: {0.pgexception}""".format ( self )
         order = ",".join(order)
         select = ",".join(select)
         if gettxt:
-            gettxtq = ("LEFT JOIN {0}.object_search_txt t ON t.objectid = o.objectid", ", t.txt as _astxt".format(CFG.DB.SCHEMA) )
+            gettxtq = ("LEFT JOIN {0}.object_search_txt t ON t.objectid = o.objectid".format(CFG.DB.SCHEMA), ", t.txt as _astxt" )
         else:
             gettxtq = ( "", "" )
         query = "SELECT {6}{8} FROM {5}.{0} o {7} WHERE \"{1}\" = '{2}' ORDER BY {3} {4}".format (
