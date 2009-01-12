@@ -7,7 +7,8 @@ create table {:SCHEMA:}event (
   severity smallint not null default 0,
   planned bit not null default '0',
   initiator varchar(32) not null default 'internal',
-  data text
+  data text,
+  check (refobjectid <> objectid)
 ) inherits ( {:SCHEMA:}"object" );
 SELECT {:SCHEMA:}setup_object_subtable ( 'event' );
 
@@ -15,21 +16,24 @@ create table {:SCHEMA:}note (
   refobjectid int8 REFERENCES {:SCHEMA:}objectids ON DELETE CASCADE ON UPDATE CASCADE NOT NULL,
   timeadded timestamp not null default current_timestamp,
   addedby varchar(64) null,
-  content text  
+  content text,
+  check (refobjectid <> objectid)
 ) inherits ( {:SCHEMA:}"object" );
 SELECT {:SCHEMA:}setup_object_subtable ( 'note' );
 
 create table {:SCHEMA:}object_parameter (
   refobjectid int8 REFERENCES {:SCHEMA:}objectids ON DELETE CASCADE ON UPDATE CASCADE NOT NULL,
   parametername varchar(64) not null,
-  content text not null
+  content text not null,
+  check (refobjectid <> objectid)
 ) inherits ( {:SCHEMA:}"object" );
 SELECT {:SCHEMA:}setup_object_subtable ( 'object_parameter' );
 
 create table {:SCHEMA:}object_flag (
   refobjectid int8 REFERENCES {:SCHEMA:}objectids ON DELETE CASCADE ON UPDATE CASCADE NOT NULL,
   flagname varchar(64) not null,
-  unique (refobjectid, flagname)
+  unique (refobjectid, flagname),
+  check (refobjectid <> objectid)
 ) inherits ( {:SCHEMA:}"object" );
 SELECT {:SCHEMA:}setup_object_subtable ( 'object_flag' );
 

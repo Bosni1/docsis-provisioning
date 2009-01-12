@@ -1,4 +1,4 @@
--- $Id:$
+-- $Id$
 
 INSERT INTO {:SCHEMA:}table_info (schema, name, label, title, info, txtexpression) 
 SELECT n.nspname, c.relname, c.relname, c.relname, 'Table ' || c.relname || '.',

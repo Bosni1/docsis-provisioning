@@ -73,7 +73,10 @@ class Field(object):
             if pyval: return 1
             else: return 0
         elif isinstance(pyval, (str, unicode)):
-            return str(pyval.encode ( 'utf-8'))
+            try:
+                return pyval.encode ( 'utf-8')
+            except UnicodeDecodeError:
+                return pyval.decode ( 'utf-8' ).encode ( 'utf-8' )                
         else:
             return str(pyval)
     

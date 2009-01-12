@@ -74,7 +74,7 @@ select c1.objectid as reftableid, c1.name as reftable,  f1.name as refcolumn, f1
     INNER JOIN {:SCHEMA:}table_info c2 ON c2.objectid = f1.reference 
     WHERE f1.reference is not null;
 
-create table {:SCHEMA:}x ( x text );
+-- create table {:SCHEMA:}x ( x text );
 create function {:SCHEMA:}handle_field_info_change() RETURNS trigger AS $body$
   DECLARE
     tname text;
@@ -165,7 +165,7 @@ BEGIN
       cmd := cmd || {:SCHEMA:}constraint_constrtuct ( 'DELETE', con.confdeltype );
       cmd := cmd || ' ' || {:SCHEMA:}constraint_constrtuct ( 'UPDATE', con.confupdtype );
       EXECUTE cmd;               
-      insert into {:SCHEMA:}x values (cmd);      
+      -- insert into {:SCHEMA:}x values (cmd);      
       cmd := 'UPDATE {:SCHEMA:}field_info SET reference = {:SCHEMA:}table_object_id (''object'') WHERE path = ''' || child.name || '.' || refs.refcolumn || '''';
       EXECUTE cmd;      
     END LOOP;

@@ -101,7 +101,7 @@ if __name__=="__main__":
             continue
             
         nRec.name = cityName
-        nRec.handle = ""
+        nRec.handle = None
         try:
             nRec.write()
         except Record.DataManipulationError, e:

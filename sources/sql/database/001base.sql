@@ -141,3 +141,21 @@ CREATE FUNCTION {:SCHEMA:}obj_txt_repr (objid int8, objtype name) returns text a
   END;
 $repr$ LANGUAGE plpgsql;
 
+create function {:SCHEMA:}update_search_txt(objtype name) RETURNS BOoLEAn AS $body$  
+  BEGIN
+      UPDATE {:SCHEMA:}object_search_txt AS ost SET 
+        txt = {:SCHEMA:}obj_txt_repr ( ost.objectid::int8, o.objecttype::name ) 
+        FROM {:SCHEMA:}object o WHERE o.objectid = ost.objectid AND o.objecttype = objtype;    
+      return TRUE;  
+  END;
+$body$ LANGUAGE plpgsql;
+
+create function {:SCHEMA:}get_search_txt(objid int8) RETURNS varchar AS $body$  
+  declare
+  r varchar;
+  BEGIN
+      SELECT txt INTO r FROM {:SCHEMA:}object_search_txt  WHERE objectid = objid;
+      return r;  
+  END;
+$body$ LANGUAGE plpgsql;
+

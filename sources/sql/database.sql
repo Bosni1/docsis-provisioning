@@ -155,6 +155,24 @@ CREATE FUNCTION pv.obj_txt_repr (objid int8, objtype name) returns text as $repr
   END;
 $repr$ LANGUAGE plpgsql;
 
+create function pv.update_search_txt(objtype name) RETURNS BOoLEAn AS $body$  
+  BEGIN
+      UPDATE pv.object_search_txt AS ost SET 
+        txt = pv.obj_txt_repr ( ost.objectid::int8, o.objecttype::name ) 
+        FROM pv.object o WHERE o.objectid = ost.objectid AND o.objecttype = objtype;    
+      return TRUE;  
+  END;
+$body$ LANGUAGE plpgsql;
+
+create function pv.get_search_txt(objid int8) RETURNS varchar AS $body$  
+  declare
+  r varchar;
+  BEGIN
+      SELECT txt INTO r FROM pv.object_search_txt  WHERE objectid = objid;
+      return r;  
+  END;
+$body$ LANGUAGE plpgsql;
+
 ----------------------------------------------------------------------------------------------------
 --
 -- database/002meta.sql
@@ -235,7 +253,7 @@ select c1.objectid as reftableid, c1.name as reftable,  f1.name as refcolumn, f1
     INNER JOIN pv.table_info c2 ON c2.objectid = f1.reference 
     WHERE f1.reference is not null;
 
-create table pv.x ( x text );
+-- create table pv.x ( x text );
 create function pv.handle_field_info_change() RETURNS trigger AS $body$
   DECLARE
     tname text;
@@ -326,7 +344,7 @@ BEGIN
       cmd := cmd || pv.constraint_constrtuct ( 'DELETE', con.confdeltype );
       cmd := cmd || ' ' || pv.constraint_constrtuct ( 'UPDATE', con.confupdtype );
       EXECUTE cmd;               
-      insert into pv.x values (cmd);      
+      -- insert into pv.x values (cmd);      
       cmd := 'UPDATE pv.field_info SET reference = pv.table_object_id (''object'') WHERE path = ''' || child.name || '.' || refs.refcolumn || '''';
       EXECUTE cmd;      
     END LOOP;
@@ -503,14 +521,14 @@ CREATE TRIGGER ip_reservation_uniqueness_check BEFORE INSERT OR UPDATE ON pv.ip_
 -- database/500application/030location.sql
 ----------------------------------------------------------------------------------------------------
 -- $Id:$
-create table pv.city (
+CREATE TABLE pv.city (
   name varchar(64) not null unique,
   handle varchar(16) null,
   default_postal_code varchar(16) null
 ) inherits ( pv."object" );
 SELECT pv.setup_object_subtable ( 'city' );
 
-create table pv.street (
+CREATE TABLE pv.street (
   name varchar(64) not null,
   handle varchar(16) not null,
   "prefix" varchar(5) null default 'ul',
@@ -520,13 +538,13 @@ create table pv.street (
 ) inherits ( pv."object" );
 SELECT pv.setup_object_subtable ( 'street' );
 
-create table pv.street_aggregate (
+CREATE TABLE pv.street_aggregate (
   name varchar(64) not null unique,
   streetid int8 REFERENCES pv.objectids ON DELETE CASCADE ON UPDATE CASCADE NOT NULL
 ) inherits (pv."object");
 SELECT pv.setup_object_subtable ( 'street_aggregate' );
 
-create table pv.building (
+CREATE TABLE pv.building (
   number varchar(16) not null,
   handle varchar null,
   streetid int8 REFERENCES pv.objectids ON DELETE CASCADE ON UPDATE CASCADE NOT NULL,
@@ -534,7 +552,7 @@ create table pv.building (
 ) inherits ( pv."object" );
 SELECT pv.setup_object_subtable ( 'building' );
 
-create table pv.location (  
+CREATE TABLE pv.location (  
   number varchar(16) null,
   handle varchar(24) null,
   buildingid int8 REFERENCES pv.objectids ON DELETE CASCADE ON UPDATE CASCADE NOT NULL,
@@ -544,11 +562,36 @@ create table pv.location (
 ) inherits ( pv."object" );
 SELECT pv.setup_object_subtable ( 'location' );
 
+CREATE FUNCTION pv.street_txt_expression (objid int8) returns varchar AS $$
+  DECLARE
+    r varchar;    
+  BEGIN
+    SELECT c.name || ' ' || coalesce(s.prefix || '.', '') || s.name as repr INTO r 
+    FROM pv.city c, pv.street s WHERE 
+       s.cityid = c.objectid AND s.objectid = objid
+       LIMIT 1;    
+    RETURN r;
+  END;
+$$ LANGUAGE plpgsql;
+
+CREATE FUNCTION pv.building_txt_expression (objid int8) returns varchar AS $$
+  DECLARE
+    r varchar;    
+  BEGIN
+    SELECT c.name || ' ' || coalesce(s.prefix || '.', '') || s.name  || ' ' || b.number as repr INTO r 
+    FROM pv.building b, pv.street s, pv.city c WHERE 
+       b.streetid = s.objectid AND s.cityid = c.objectid
+       AND b.objectid = objid
+       LIMIT 1;    
+    RETURN r;
+  END;
+$$ LANGUAGE plpgsql;
+
 CREATE FUNCTION pv.location_txt_expression (objid int8) returns varchar AS $$
   DECLARE
     r varchar;    
   BEGIN
-    SELECT c.name || ' ' || s.name || ' ' || b.number || coalesce('/' || l.number, '') as repr INTO r 
+    SELECT c.name || ' ' || coalesce(s.prefix || '.', '') || s.name || ' ' || b.number || coalesce('/' || l.number, '') as repr INTO r 
     FROM pv.location l, pv.building b, pv.street s, pv.city c WHERE 
        l.buildingid = b.objectid AND b.streetid = s.objectid AND s.cityid = c.objectid
        AND l.objectid = objid
@@ -556,6 +599,22 @@ CREATE FUNCTION pv.location_txt_expression (objid int8) returns varchar AS $$
     RETURN r;
   END;
 $$ LANGUAGE plpgsql;
+
+CREATE FUNCTION pv.location_generic_handle (objid int8) returns varchar AS $$
+  DECLARE
+    r varchar;    
+  BEGIN
+    SELECT coalesce(c.handle || '/', '') || coalesce(s.handle , '') || coalesce(b.number, '') 
+    || coalesce('/' || l.number, '') as repr INTO r 
+    FROM pv.location l, pv.building b, pv.street s, pv.city c WHERE 
+       l.buildingid = b.objectid AND b.streetid = s.objectid AND s.cityid = c.objectid
+       AND l.objectid = objid
+       LIMIT 1;    
+    RETURN r;
+  END;
+$$ LANGUAGE plpgsql;
+
+
 ----------------------------------------------------------------------------------------------------
 --
 -- database/500application/040cos.sql
@@ -765,7 +824,7 @@ UPDATE pv.object_txt_expressions SET objecttxtexpr = '''[FIELD] '' || path' WHER
 --
 -- database/999finalize.sql
 ----------------------------------------------------------------------------------------------------
--- $Id:$
+-- $Id$
 
 INSERT INTO pv.table_info (schema, name, label, title, info, txtexpression) 
 SELECT n.nspname, c.relname, c.relname, c.relname, 'Table ' || c.relname || '.',

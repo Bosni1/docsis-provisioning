@@ -284,7 +284,9 @@ class Entry:
             
             self.item_rows = []
             self.sizer.Add ( wx.StaticLine ( self ), wx.EXPAND )
-            if bbclass: self.sizer.Add ( bbclass ( self, -1, self, insert=True ) )
+            if bbclass: 
+                self.topinsertbb = bbclass ( self, -1, self, insert=True )
+                self.sizer.Add ( self.topinsertbb )
             
         def resize_editor (self, newsize):
             itemclass = self.get_item_editor_class()     
@@ -295,26 +297,28 @@ class Entry:
                 item.Hide()
                 if bb: bb.Hide()
             
+                
             for idx in range( max(self.size, 0), newsize):
                 if idx < len(self.item_rows): continue
                 
                 item = itemclass (self.field, self, idx, self)                
-                sizeritem = self.sizer.Add (item, flag=wx.EXPAND)               
+                sizeritem = self.sizer.Add (item, flag=wx.EXPAND)                               
+                #sizeritem = self.sizer.Insert (2*idx, item, flag=wx.EXPAND)
 
                 if bbclass:
                     bb = bbclass (self, idx, self, insert=True, delete=True)
                     self.sizer.Add (bb)
+                    #self.sizer.Insert (2*idx+1, bb)
                 else:
                     bb = None
                     
                 self.item_rows.append ( (item, sizeritem, bb) )                    
-            
-            self.sizer.SetRows ( newsize )                
+                            
             for idx in range(newsize):
                 item, sizeritem, bb = self.item_rows[idx]
                 item.Show()
-                if bb: bb.Show()
-            
+                if bb: bb.Show()                        
+
             self.parent.Layout()
             self.parent.Fit()
             self.size = newsize

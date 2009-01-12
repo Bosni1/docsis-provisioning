@@ -121,6 +121,9 @@ def text_to_array(text, depth):
                 if bracestate == 1: continue
 
             if bracestate == 0:                
+                if curitem.startswith('"') and curitem.endswith('"'):
+                    curitem = curitem[1:-1]
+
                 content.append ( curitem )
                 if len(content) == 1 and curitem == '':
                     yield []
@@ -131,6 +134,8 @@ def text_to_array(text, depth):
                 continue
 
             if char == ',' and prev != '\\' and bracestate == 1:                
+                if curitem.startswith('"') and curitem.endswith('"'):
+                    curitem = curitem[1:-1]
                 content.append ( curitem )
                 curitem = ''
                 continue

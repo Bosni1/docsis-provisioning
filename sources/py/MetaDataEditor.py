@@ -185,10 +185,7 @@ class MetaDataEditor(wx.App):
                 if of["arrayof"]:    
                     oldt = o_idTI [ of["arrayof"] ]
                     oldtpath = oldt["schema"] + "." + oldt["name"]
-                    cField.arrayof = cTI[ oldtpath ]
-                    
-                    
-                    
+                    cField.arrayof = cTI[ oldtpath ]                                                        
 
                 cField.write()
                 
