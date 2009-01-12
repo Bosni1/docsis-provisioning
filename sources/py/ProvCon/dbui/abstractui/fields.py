@@ -41,13 +41,17 @@ class BaseFieldEditor(object):
     vtrace = property(_get_vtrace)
     
     def variable_changed(self, action, value, var=None, idx=None, *args):
-        """Callback function that handles variable value changes."""
+        """
+        Callback function that handles variable value changes.
+        """
         self.set_current_editor_value(value)
             
     def update_variable(self):
-        """Function used to update traced variable to the currently edited value.
+        """
+        Function used to update traced variable to the currently edited value.
         For example - TextBox widget's 'text' property will only be sent back to the
-        traced variable when this function is called"""
+        traced variable when this function is called
+        """
         try:
             #freeze the callback to avoid infinite recursion
             self.vtrace.freeze()            
@@ -56,10 +60,12 @@ class BaseFieldEditor(object):
             self.vtrace.thaw()        
 
     def set_current_editor_value(self, value):
-        """This function is responsible for setting the currently edited value to the traced
+        """
+        This function is responsible for setting the currently edited value to the traced
         variable's value. (For example, when a record is reloaded or changed) A subclass 
         implementation will propagate variable's value to the underlying widget (eg. by setting
         TextBox's 'text' property'.
+
         This function is called by the variable's trace function and should not be called directly.
         """
         raise NotImplementedError()
