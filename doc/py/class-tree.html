@@ -96,20 +96,19 @@
     </ul>
     </li>
     <li> <strong class="uidlink"><a href="ProvCon.dbui.database.CFG-class.html">ProvCon.dbui.database.CFG</a></strong>:
-      <em class="summary">not really a class, just a nice-looking storage for application 
-        settings</em>
+      <em class="summary">Static class containing application settings.</em>
+    </li>
+    <li> <strong class="uidlink"><a href="ProvCon.dbui.database.CFG.DB-class.html">ProvCon.dbui.database.CFG.DB</a></strong>:
+      <em class="summary">Database back-end connection settings.</em>
     </li>
     <li> <strong class="uidlink">pg.DB</strong>:
       <em class="summary">Wrapper class for the _pg connection type.</em>
     <ul>
     <li> <strong class="uidlink"><a href="ProvCon.dbui.database.CFG.tCX-class.html">ProvCon.dbui.database.CFG.tCX</a></strong>:
-      <em class="summary">==tCX== Besides being a PostgreSQL connection object, this class 
-        builds the ER structures used by forms, records, reference editors 
-        etc.</em>
+      <em class="summary">Besides being a PostgreSQL connection object, this class builds the
+        ER structures used by forms, records, reference editors etc.</em>
     </li>
     </ul>
-    </li>
-    <li> <strong class="uidlink"><a href="ProvCon.dbui.database.CFG.DB-class.html">ProvCon.dbui.database.CFG.DB</a></strong>
     </li>
     <li> <strong class="uidlink"><a href="ProvCon.dbui.wxwin.fields.Entry-class.html">ProvCon.dbui.wxwin.fields.Entry</a></strong>
     </li>
@@ -196,7 +195,7 @@ ERROR | 05    |  errorcode |   errormessage |   0  |
     <li> <strong class="uidlink"><a href="ProvCon.gui.ProvisioningControl.TopLevelWindow-class.html">ProvCon.gui.ProvisioningControl.TopLevelWindow</a></strong>
     </li>
     <li> <strong class="uidlink"><a href="ProvCon.func.variables.TracedVariable.Tracer-class.html">ProvCon.func.variables.TracedVariable.Tracer</a></strong>:
-      <em class="summary">A wrapped callback function for traced variables</em>
+      <em class="summary">A wrapped callback function for traced variables.</em>
     </li>
     <li> <strong class="uidlink"><a href="ProvCon.func.classes.conditionalmethod-class.html">ProvCon.func.classes.conditionalmethod</a></strong>
     </li>
@@ -237,10 +236,12 @@ ERROR | 05    |  errorcode |   errormessage |   0  |
     </li>
     </ul>
     </li>
-    <li> <strong class="uidlink"><a href="ProvCon.dbui.meta.errors.MetaDataError-class.html">ProvCon.dbui.meta.errors.MetaDataError</a></strong>
+    <li> <strong class="uidlink"><a href="ProvCon.dbui.meta.errors.MetaDataError-class.html">ProvCon.dbui.meta.errors.MetaDataError</a></strong>:
+      <em class="summary">Any error raised during the creation and usage of meta-data 
+        objects.</em>
     <ul>
     <li> <strong class="uidlink"><a href="ProvCon.dbui.meta.field.Field.IncompleteDefinition-class.html">ProvCon.dbui.meta.field.Field.IncompleteDefinition</a></strong>:
-      <em class="summary">raised when the Field constructor receives incomplete meta-data</em>
+      <em class="summary">Raised when the Field constructor receives incomplete meta-data.</em>
     </li>
     </ul>
     </li>
@@ -328,8 +329,8 @@ ERROR | 05    |  errorcode |   errormessage |   0  |
     <li> <strong class="uidlink"><a href="ProvCon.gui.FrontEndApp.FE-class.html">ProvCon.gui.FrontEndApp.FE</a></strong>
     </li>
     <li> <strong class="uidlink"><a href="ProvCon.dbui.meta.field.Field-class.html">ProvCon.dbui.meta.field.Field</a></strong>:
-      <em class="summary">==Field== Field objects hold meta data about columns in the 
-        database.</em>
+      <em class="summary">Field objects represent column meta data and provide 
+        data-conversion services.</em>
     </li>
     <li> <strong class="uidlink">wx._core.ItemContainer</strong>:
       <em class="summary">The wx.ItemContainer class defines an interface which is 
@@ -511,7 +512,7 @@ ERROR | 05    |  errorcode |   errormessage |   0  |
     </ul>
     </li>
     <li> <strong class="uidlink"><a href="ProvCon.dbui.meta.table.Table-class.html">ProvCon.dbui.meta.table.Table</a></strong>:
-      <em class="summary">Table objects hold database meta-data</em>
+      <em class="summary">Table objects hold database tables meta-data.</em>
     </li>
     <li> <strong class="uidlink"><a href="ProvCon.func.variables.TracedVariable-class.html">ProvCon.func.variables.TracedVariable</a></strong>:
       <em class="summary">TracedVariables are simple pythonic values which support tracing all changes in their values
@@ -588,7 +589,8 @@ via callback functions.</em>
     <ul>
     <li> <strong class="uidlink"><a href="ProvCon.dbui.orm.recordsearch.OIDSearchList-class.html">ProvCon.dbui.orm.recordsearch.OIDSearchList</a></strong>
     </li>
-    <li> <strong class="uidlink"><a href="ProvCon.dbui.orm.recordlist.RecordList-class.html">ProvCon.dbui.orm.recordlist.RecordList</a></strong>
+    <li> <strong class="uidlink"><a href="ProvCon.dbui.orm.recordlist.RecordList-class.html">ProvCon.dbui.orm.recordlist.RecordList</a></strong>:
+      <em class="summary">A simple list of database records.</em>
     </li>
     <li> <strong class="uidlink"><a href="ProvCon.func.events.eventemitter.evt-class.html">ProvCon.func.events.eventemitter.evt</a></strong>
     </li>
@@ -672,7 +674,7 @@ via callback functions.</em>
 <table border="0" cellpadding="0" cellspacing="0" width="100%%">
   <tr>
     <td align="left" class="footer">
-    Generated by Epydoc 3.0.1 on Thu Jan  8 14:48:51 2009
+    Generated by Epydoc 3.0.1 on Tue Jan 13 12:48:43 2009
     </td>
     <td align="right" class="footer">
       <a target="mainFrame" href="http://epydoc.sourceforge.net"

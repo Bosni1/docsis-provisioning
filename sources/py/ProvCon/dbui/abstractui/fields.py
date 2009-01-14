@@ -1,12 +1,15 @@
 ##$Id$
 """
-=== Base classes for field-editing widgets ===
+Base classes for field-editing widgets.
+
+These classes implement all functionality common to field editors that is not
+GUI related.
 
 These are the basic types of field-editing widgets:
 
-* simple editors : editors that hold one, easily editable value
-* reference editors : used for editing fields which reference other records
-* array editors : editing fields that hold arrays
+   - simple editors : editors that hold one, easily editable value,
+   - reference editors : used for editing fields which reference other records,
+   - array editors : editing fields that hold arrays
 
 Array editors, are a container for a number of simple/reference editors, they
 act as a proxy for unpacking the array into simple values, and then packing them
@@ -81,7 +84,7 @@ class BaseFieldEditor(object):
         return "<Editor " + self.field.name  + ">"
     
 class BaseReferenceEditor(BaseFieldEditor):
-    """BaseReferenceEditor
+    """
     Base class for editors of fields which reference other records. 
     A reference field, by assumption, holds the 'objectid' of the record it references.
     Since reference editors are usually widgets similar to combo boxes, the base reference editor
@@ -98,7 +101,7 @@ class BaseReferenceEditor(BaseFieldEditor):
             self.records = None
             
 class BaseArrayEditor(BaseFieldEditor):
-    """BaseArrayEditor
+    """
     A base class for widgets used to edit arrays.
 
     Concrete implementations should not subclass this class, but rather use the

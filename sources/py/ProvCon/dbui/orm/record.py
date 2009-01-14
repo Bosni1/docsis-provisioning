@@ -639,8 +639,8 @@ API Error: {0.pgexception}""".format ( self )
             return "<{1}> {2}".format (self._table.name, self._objectid,
                                                       self._astxt )
         return "<record>"    
-    @staticmethod
-    def ID(objectid, **kkw):
+    @classmethod
+    def ID(cls,objectid, **kkw):
         """
         Create and load a record with the given objectid.
 
@@ -650,12 +650,12 @@ API Error: {0.pgexception}""".format ( self )
            
         @rtype: Record    
         """
-        rec = Record(**kkw)
+        rec = cls(**kkw)
         rec.setObjectID(objectid)        
         return rec
     
-    @staticmethod
-    def EMPTY(tabledef, **kkw):
+    @classmethod
+    def EMPTY(cls, tabledef, **kkw):
         """
         Create a new (empty) record of given table.
 
@@ -664,18 +664,18 @@ API Error: {0.pgexception}""".format ( self )
         
         @rtype: Record            
         """
-        rec = Record(**kkw)
+        rec = cls(**kkw)
         rec.setTable (tabledef)
         rec._isnew = True
         return rec
     
-    @staticmethod
-    def COPY(record):        
-        assert isinstance(record, Record)
+    @classmethod
+    def COPY(cls, record):        
+        assert issubclass(record, Record)
         pass
 
-    @staticmethod
-    def CHILDREN(parentid, reftable, refcolumn, **kwargs):
+    @classmethod
+    def CHILDREN(cls, parentid, reftable, refcolumn, **kwargs):
         """
         Generator allowing to iterate over child rows.
         
@@ -721,13 +721,13 @@ API Error: {0.pgexception}""".format ( self )
         rowset = CFG.CX.query ( query ).dictresult()
         table = Table.Get ( reftable )
         for row in rowset:
-            record = Record.EMPTY (table, reprfunc = reprfunc )
+            record = cls.EMPTY (table, reprfunc = reprfunc )
             record.feedDataRow ( row )
             yield record
 
     
-    @staticmethod
-    def IDLIST(tablename, **kwargs):
+    @classmethod
+    def IDLIST(cls, tablename, **kwargs):
         """
         Return a list of object ids from a given table.
         

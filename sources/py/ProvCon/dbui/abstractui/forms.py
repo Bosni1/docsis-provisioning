@@ -4,6 +4,11 @@ import exceptions
 __revision__ = "$Revision$"
 
 class BaseForm(object):
+    """
+    A base for form widgets.
+    
+    A form widget is a widget capable of editing a single record.    
+    """
     __defaultattrs__ = {        
     }
     def __init__(self, form, *args, **kwargs):

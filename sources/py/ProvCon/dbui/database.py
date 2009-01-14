@@ -4,8 +4,13 @@ import pg, re
 import exceptions
 
 class CFG:
-    """not really a class, just a nice-looking storage for application settings"""
+    """
+    Static class containing application settings.
+    """
     class DB:
+        """
+        Database back-end connection settings.
+	"""
         @classmethod
         def initialize(cls):
             if cls.__is_initialized: return
@@ -27,19 +32,20 @@ class CFG:
         __is_initialized = False
         
     class RT:
-        @classmethod        
+        @classmethod
         def initialize(cls):
             from config import config
-            cls.DATASCOPE = config.get ( "DATABASE", "scope" )        
+            cls.DATASCOPE = config.get ( "DATABASE", "scope" )
         DATASCOPE = None
         
     class tCX(pg.DB):        
-        """==tCX==
+        """    
         Besides being a PostgreSQL connection object, this class builds the ER
         structures used by forms, records, reference editors etc.
+        
         Ideally it should only be instatiated once, the constructor attempts to
         ensure that it is so. The CFG.CX static variable should hold an active
-        connection at all times.
+        connection at all times.        
         """
         instanceCount = 0
         instance = None
@@ -94,10 +100,20 @@ class CFG:
             self.db.query(q)
 
         CX = None
+
 RaiseDBException = lambda *a: a
 
 def array_as_text(arr):
-    """convert a python list to a textual representation of a postgres array"""
+    """
+    Convert a python list to a text representation of a postgres array.
+    
+    @type arr: list
+    @param arr: the python list to be converted
+    
+    @rtype: string
+    @return: postgres array
+    
+    """
     if isinstance(arr, list):
         return "{" + ",".join(map(array_as_text, arr)) + "}"
     else:
@@ -105,8 +121,15 @@ def array_as_text(arr):
         else: return str(arr)
 
 def text_to_array(text, depth):
-    """parse a textual postgres array into a python list
-    depth - the number of dimensions the array has
+    """
+    Parse a text representation of a postgres array into a python list.
+    
+    @type text: str
+    @param text: the postgres array 
+    @type depth: int
+    @param depth: depth of the array
+    
+    @rtype: list    
     """
     def inside_array(t):
         bracestate = 0
@@ -151,11 +174,14 @@ def text_to_array(text, depth):
     else: return arr
 
 
-def StartupDatabaseConnection():
-    print "DB STARTUP"
+def StartupDatabaseConnection():    
+    """
+    Read configuration files, and connect to the database backend.
+    """
     CFG.DB.initialize()
     CFG.RT.initialize()
     CFG.CX = CFG.tCX.instance or CFG.tCX()
     CFG.CX.debug = "===== [SQL] =====\n%s\n================="
+    
 Init = StartupDatabaseConnection
 

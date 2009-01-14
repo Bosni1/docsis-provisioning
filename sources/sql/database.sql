@@ -414,7 +414,8 @@ create table pv.event (
   severity smallint not null default 0,
   planned bit not null default '0',
   initiator varchar(32) not null default 'internal',
-  data text
+  data text,
+  check (refobjectid <> objectid)
 ) inherits ( pv."object" );
 SELECT pv.setup_object_subtable ( 'event' );
 
@@ -422,21 +423,24 @@ create table pv.note (
   refobjectid int8 REFERENCES pv.objectids ON DELETE CASCADE ON UPDATE CASCADE NOT NULL,
   timeadded timestamp not null default current_timestamp,
   addedby varchar(64) null,
-  content text  
+  content text,
+  check (refobjectid <> objectid)
 ) inherits ( pv."object" );
 SELECT pv.setup_object_subtable ( 'note' );
 
 create table pv.object_parameter (
   refobjectid int8 REFERENCES pv.objectids ON DELETE CASCADE ON UPDATE CASCADE NOT NULL,
   parametername varchar(64) not null,
-  content text not null
+  content text not null,
+  check (refobjectid <> objectid)
 ) inherits ( pv."object" );
 SELECT pv.setup_object_subtable ( 'object_parameter' );
 
 create table pv.object_flag (
   refobjectid int8 REFERENCES pv.objectids ON DELETE CASCADE ON UPDATE CASCADE NOT NULL,
   flagname varchar(64) not null,
-  unique (refobjectid, flagname)
+  unique (refobjectid, flagname),
+  check (refobjectid <> objectid)
 ) inherits ( pv."object" );
 SELECT pv.setup_object_subtable ( 'object_flag' );
 
@@ -621,7 +625,9 @@ $$ LANGUAGE plpgsql;
 ----------------------------------------------------------------------------------------------------
 create table pv.class_of_service (
   classid varchar(8) not null unique,
-  name varchar(128) not null,
+  name varchar(256) not null,
+  official_name varchar(128) null,
+  info text null,  
   classparams varchar(256)[] not null  
 ) inherits (pv."object");
 SELECT pv.setup_object_subtable ( 'class_of_service' );
@@ -629,6 +635,8 @@ SELECT pv.setup_object_subtable ( 'class_of_service' );
 create table pv.type_of_service (
   typeid varchar(8) not null unique,
   name varchar(128) not null,
+  official_name varchar(128) null,
+  info text null,
   classmap int8[] not null  
 ) inherits (pv."object");
 SELECT pv.setup_object_subtable ( 'type_of_service' );----------------------------------------------------------------------------------------------------

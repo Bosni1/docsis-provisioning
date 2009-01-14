@@ -5,6 +5,9 @@ __revision__ = "$Revision$"
 
 @Implements(IRecordList)
 class RecordList(list):
+    """
+    A simple list of database records.       
+    """
     def __init__(self, table, _filter="TRUE", select=['0'], order="objectid", **kkw):
         list.__init__(self)
         self.table = table
@@ -16,6 +19,9 @@ class RecordList(list):
         self.hash_index = {}
     
     def reload(self):
+        """
+        Re-query the database and refresh the list.
+        """
         list.__init__(self)
         self += filter(self.filterfunc, self.table.recordObjectList (self.filter, self.select, self.order))
         self.hash_id.clear()
@@ -26,16 +32,25 @@ class RecordList(list):
         return self
     
     def reloadsingle(self, objectid):
-        """Refresh one record in the list"""
+        """
+        Refresh one record with given objectid.
+        @type objectid: int
+        """
         rl = self.table.recordObjectList ( self.filter + " AND o.objectid = %d " % objectid, self.select, self.order)
         self[self.hash_index[objectid]] = rl[0]
             
     def clear(self):
+        """
+        Clear all records in the database.
+        """
         list.__init__(self)
         self.hash_id.clear()
         
     def getindex(self, objectid):
-        """Get the index of an object in the list. Raise KeyError if not found."""
+        """
+        Get the index of the record with the given objectid in the list. 
+        Raise KeyError if not found.        
+        """
         return self.hash_index[objectid]
 
     def getbyid(self, objectid):

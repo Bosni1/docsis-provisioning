@@ -56,6 +56,19 @@ if __name__=="__main__":
     cr = stansatDB.cursor()
     atexit.register ( close, stansatDB )
     
+    n_TOS = {}
+    n_COS = {}
+    n2o_intMap = {}
+    n2o_tvMap = {}
+    o_pakietIntIdx = {}
+    p_pakietTVIdx = {}
+        
+    
+    #cr.execute ("SELECT * FROM PakietInternet")
+    #pakiet_all = dictresult (cr)
+    #for p in pakiet_all:
+    #    print p
+    #raise SystemExit
     
     cr.execute ( "SELECT * FROM Klient" )
     klient_all = dictresult ( cr )

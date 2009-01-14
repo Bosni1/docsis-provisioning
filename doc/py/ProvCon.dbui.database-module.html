@@ -84,8 +84,7 @@
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
         <a href="ProvCon.dbui.database.CFG-class.html" class="summary-name">CFG</a><br />
-      not really a class, just a nice-looking storage for application 
-        settings
+      Static class containing application settings.
     </td>
   </tr>
 </table>
@@ -124,12 +123,12 @@
   </tr>
 <tr>
     <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
+      <span class="summary-type">string</span>
     </td><td class="summary">
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
-          <td><span class="summary-sig"><a name="array_as_text"></a><span class="summary-sig-name">array_as_text</span>(<span class="summary-sig-arg">arr</span>)</span><br />
-      convert a python list to a textual representation of a postgres array</td>
+          <td><span class="summary-sig"><a href="ProvCon.dbui.database-module.html#array_as_text" class="summary-sig-name">array_as_text</a>(<span class="summary-sig-arg">arr</span>)</span><br />
+      Convert a python list to a text representation of a postgres array.</td>
           <td align="right" valign="top">
             <span class="codelink"><a href="ProvCon.dbui.database-pysrc.html#array_as_text">source&nbsp;code</a></span>
             
@@ -141,14 +140,13 @@
   </tr>
 <tr>
     <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
+      <span class="summary-type">list</span>
     </td><td class="summary">
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
-          <td><span class="summary-sig"><a name="text_to_array"></a><span class="summary-sig-name">text_to_array</span>(<span class="summary-sig-arg">text</span>,
+          <td><span class="summary-sig"><a href="ProvCon.dbui.database-module.html#text_to_array" class="summary-sig-name">text_to_array</a>(<span class="summary-sig-arg">text</span>,
         <span class="summary-sig-arg">depth</span>)</span><br />
-      parse a textual postgres array into a python list depth - the number 
-      of dimensions the array has</td>
+      Parse a text representation of a postgres array into a python list.</td>
           <td align="right" valign="top">
             <span class="codelink"><a href="ProvCon.dbui.database-pysrc.html#text_to_array">source&nbsp;code</a></span>
             
@@ -164,7 +162,8 @@
     </td><td class="summary">
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
-          <td><span class="summary-sig"><a name="StartupDatabaseConnection"></a><span class="summary-sig-name">StartupDatabaseConnection</span>()</span></td>
+          <td><span class="summary-sig"><a name="StartupDatabaseConnection"></a><span class="summary-sig-name">StartupDatabaseConnection</span>()</span><br />
+      Read configuration files, and connect to the database backend.</td>
           <td align="right" valign="top">
             <span class="codelink"><a href="ProvCon.dbui.database-pysrc.html#StartupDatabaseConnection">source&nbsp;code</a></span>
             
@@ -180,7 +179,8 @@
     </td><td class="summary">
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
-          <td><span class="summary-sig"><a name="Init"></a><span class="summary-sig-name">Init</span>()</span></td>
+          <td><span class="summary-sig"><a name="Init"></a><span class="summary-sig-name">Init</span>()</span><br />
+      Read configuration files, and connect to the database backend.</td>
           <td align="right" valign="top">
             <span class="codelink"><a href="ProvCon.dbui.database-pysrc.html#StartupDatabaseConnection">source&nbsp;code</a></span>
             
@@ -216,6 +216,78 @@
     </td>
   </tr>
 </table>
+<!-- ==================== FUNCTION DETAILS ==================== -->
+<a name="section-FunctionDetails"></a>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="table-header">
+  <td colspan="2" class="table-header">
+    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+      <tr valign="top">
+        <td align="left"><span class="table-header">Function Details</span></td>
+        <td align="right" valign="top"
+         ><span class="options">[<a href="#section-FunctionDetails"
+         class="privatelink" onclick="toggle_private();"
+         >hide private</a>]</span></td>
+      </tr>
+    </table>
+  </td>
+</tr>
+</table>
+<a name="array_as_text"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">array_as_text</span>(<span class="sig-arg">arr</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="ProvCon.dbui.database-pysrc.html#array_as_text">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>Convert a python list to a text representation of a postgres 
+  array.</p>
+  <dl class="fields">
+    <dt>Parameters:</dt>
+    <dd><ul class="nomargin-top">
+        <li><strong class="pname"><code>arr</code></strong> (list) - the python list to be converted</li>
+    </ul></dd>
+    <dt>Returns: string</dt>
+        <dd>postgres array</dd>
+  </dl>
+</td></tr></table>
+</div>
+<a name="text_to_array"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">text_to_array</span>(<span class="sig-arg">text</span>,
+        <span class="sig-arg">depth</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="ProvCon.dbui.database-pysrc.html#text_to_array">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>Parse a text representation of a postgres array into a python 
+  list.</p>
+  <dl class="fields">
+    <dt>Parameters:</dt>
+    <dd><ul class="nomargin-top">
+        <li><strong class="pname"><code>text</code></strong> (str) - the postgres array</li>
+        <li><strong class="pname"><code>depth</code></strong> (int) - depth of the array</li>
+    </ul></dd>
+    <dt>Returns: list</dt>
+  </dl>
+</td></tr></table>
+</div>
+<br />
 <!-- ==================== NAVIGATION BAR ==================== -->
 <table class="navbar" border="0" width="100%" cellpadding="0"
        bgcolor="#a0c0ff" cellspacing="0">
@@ -247,7 +319,7 @@
 <table border="0" cellpadding="0" cellspacing="0" width="100%%">
   <tr>
     <td align="left" class="footer">
-    Generated by Epydoc 3.0.1 on Thu Jan  8 14:48:51 2009
+    Generated by Epydoc 3.0.1 on Tue Jan 13 12:48:43 2009
     </td>
     <td align="right" class="footer">
       <a target="mainFrame" href="http://epydoc.sourceforge.net"

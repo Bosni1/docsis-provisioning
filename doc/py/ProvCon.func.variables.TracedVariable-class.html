@@ -71,34 +71,50 @@ object --+
 
 <hr />
 <pre class="literalblock">
+
 TracedVariables are simple pythonic values which support tracing all changes in their values
-via callback functions. The API resembles that of traced variables used in Tcl/Tk.
+via callback functions. 
+The API resembles that of traced variables used in Tcl/Tk.
+
 To define a variable you have to create a TracedVariable object:
-&gt;&gt; v = TracedVariable ( [name=varname:string]  )
+   &gt;&gt;&gt; v = TracedVariable ( [name=varname:string]  )
+
 to set or retrieve the current variable value use:
-&gt;&gt; x = v.get()
-&gt;&gt; v.set (x)
+
+   &gt;&gt;&gt; x = v.get()
+   &gt;&gt;&gt; v.set (x)
+
 Traced variables may hold arrays:
-&gt;&gt; v[0] = 'xxx'
-&gt;&gt; x = v[1]
+
+   &gt;&gt;&gt; v[0] = 'xxx'
+   &gt;&gt;&gt; x = v[1]
+
 To register a callback use the 'trace' method:
-&gt;&gt; tracer_obj = v.trace ( mode, callback )
+
+   &gt;&gt;&gt; tracer_obj = v.trace ( mode, callback )
+
 Where mode is 'r', 'w' or 'rw' and callback is the callback function with this signature:
-    def _callback ( action, value, variable, index )
-    where: 
-     action is 'r' or 'w' depending on the action that caused the callback to be fired,
-     value is the new value of the variable
-     variable is the variable :)
-     index is the index of the item changed if the variable holds an array. If index is None
-       then either the variable is not an array or the entire value was changed (not just one
-       item).
-v.trace returns a Tracer object, which is a callable wrapper for the callback function  
+
+   def _callback ( action, value, variable, index )
+
+where: 
+
+     - B{action} is 'r' or 'w' depending on the action that caused the callback to be fired,
+     - B{value} is the new value of the variable
+     - B{variable} is the variable :)
+     - B{index} is the index of the item changed if the variable holds an array. If index is None
+          then either the variable is not an array or the entire value was changed (not just one
+          item).
+
+B{v.trace} returns a Tracer object, which is a callable wrapper for the callback function  
 supporting 'freeze' and 'thaw' methods, and may be unregistered with a call to the 'untrace'
 method.
 
 A callback function may raise VariableCancel which stops processing the current event, and
 when the current operation is a write, resets the value. (NOT YET IMPLEMENTED)
-&gt;&gt; tracer_obj.untrace()    
+   
+   &gt;&gt;&gt; tracer_obj.untrace()    
+   
 
 </pre>
 
@@ -124,7 +140,7 @@ when the current operation is a write, resets the value. (NOT YET IMPLEMENTED)
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
         <a href="ProvCon.func.variables.TracedVariable.Tracer-class.html" class="summary-name">Tracer</a><br />
-      A wrapped callback function for traced variables
+      A wrapped callback function for traced variables.
     </td>
   </tr>
 </table>
@@ -189,7 +205,7 @@ when the current operation is a write, resets the value. (NOT YET IMPLEMENTED)
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
           <td><span class="summary-sig"><a name="get"></a><span class="summary-sig-name">get</span>(<span class="summary-sig-arg">self</span>)</span><br />
-      Get current value</td>
+      Get current value of the variable.</td>
           <td align="right" valign="top">
             <span class="codelink"><a href="ProvCon.func.variables-pysrc.html#TracedVariable.get">source&nbsp;code</a></span>
             
@@ -205,10 +221,10 @@ when the current operation is a write, resets the value. (NOT YET IMPLEMENTED)
     </td><td class="summary">
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
-          <td><span class="summary-sig"><a name="__setitem__"></a><span class="summary-sig-name">__setitem__</span>(<span class="summary-sig-arg">self</span>,
+          <td><span class="summary-sig"><a href="ProvCon.func.variables.TracedVariable-class.html#__setitem__" class="summary-sig-name">__setitem__</a>(<span class="summary-sig-arg">self</span>,
         <span class="summary-sig-arg">itemidx</span>,
         <span class="summary-sig-arg">itemvalue</span>)</span><br />
-      Set subitem value</td>
+      Set subitem value if the hel value is an array.</td>
           <td align="right" valign="top">
             <span class="codelink"><a href="ProvCon.func.variables-pysrc.html#TracedVariable.__setitem__">source&nbsp;code</a></span>
             
@@ -244,7 +260,7 @@ when the current operation is a write, resets the value. (NOT YET IMPLEMENTED)
         <tr>
           <td><span class="summary-sig"><a name="set"></a><span class="summary-sig-name">set</span>(<span class="summary-sig-arg">self</span>,
         <span class="summary-sig-arg">value</span>)</span><br />
-      Set value</td>
+      Set variable value</td>
           <td align="right" valign="top">
             <span class="codelink"><a href="ProvCon.func.variables-pysrc.html#TracedVariable.set">source&nbsp;code</a></span>
             
@@ -256,15 +272,15 @@ when the current operation is a write, resets the value. (NOT YET IMPLEMENTED)
   </tr>
 <tr>
     <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
+      <span class="summary-type">Tracer</span>
     </td><td class="summary">
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
-          <td><span class="summary-sig"><a name="trace"></a><span class="summary-sig-name">trace</span>(<span class="summary-sig-arg">self</span>,
+          <td><span class="summary-sig"><a href="ProvCon.func.variables.TracedVariable-class.html#trace" class="summary-sig-name">trace</a>(<span class="summary-sig-arg">self</span>,
         <span class="summary-sig-arg">mode</span>,
         <span class="summary-sig-arg">callback</span>,
         <span class="summary-sig-arg">**kkw</span>)</span><br />
-      Create, register and return a new tracer object</td>
+      Create, register and return a new Tracer object.</td>
           <td align="right" valign="top">
             <span class="codelink"><a href="ProvCon.func.variables-pysrc.html#TracedVariable.trace">source&nbsp;code</a></span>
             
@@ -500,6 +516,62 @@ when the current operation is a write, resets the value. (NOT YET IMPLEMENTED)
   </dl>
 </td></tr></table>
 </div>
+<a name="__setitem__"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">__setitem__</span>(<span class="sig-arg">self</span>,
+        <span class="sig-arg">itemidx</span>,
+        <span class="sig-arg">itemvalue</span>)</span>
+    <br /><em class="fname">(Index assignment operator)</em>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="ProvCon.func.variables-pysrc.html#TracedVariable.__setitem__">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>Set subitem value if the hel value is an array.</p>
+  <p>Otherwise do nothing.</p>
+  <dl class="fields">
+    <dt>Parameters:</dt>
+    <dd><ul class="nomargin-top">
+        <li><strong class="pname"><code>itemidx</code></strong> (int)</li>
+        <li><strong class="pname"><code>itemvalue</code></strong> (object)</li>
+    </ul></dd>
+  </dl>
+</td></tr></table>
+</div>
+<a name="trace"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">trace</span>(<span class="sig-arg">self</span>,
+        <span class="sig-arg">mode</span>,
+        <span class="sig-arg">callback</span>,
+        <span class="sig-arg">**kkw</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="ProvCon.func.variables-pysrc.html#TracedVariable.trace">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>Create, register and return a new Tracer object.</p>
+  <dl class="fields">
+    <dt>Parameters:</dt>
+    <dd><ul class="nomargin-top">
+        <li><strong class="pname"><code>mode</code></strong> (str) - 'r', 'w' or 'rw'</li>
+        <li><strong class="pname"><code>callback</code></strong> (callable) - callback function tracing variable changes</li>
+    </ul></dd>
+    <dt>Returns: Tracer</dt>
+  </dl>
+</td></tr></table>
+</div>
 <a name="untrace"></a>
 <div>
 <table class="details" border="1" cellpadding="3"
@@ -516,7 +588,7 @@ when the current operation is a write, resets the value. (NOT YET IMPLEMENTED)
   </tr></table>
   
   <p>Unregister the tracer object. Do NOT call directly, gets called by 
-  Tracer.untrace</p>
+  Tracer.untrace.</p>
   <dl class="fields">
   </dl>
 </td></tr></table>
@@ -537,7 +609,7 @@ when the current operation is a write, resets the value. (NOT YET IMPLEMENTED)
   </tr></table>
   
   <p>Unregister the tracer object. Do NOT call directly, gets called by 
-  Tracer.untrace</p>
+  Tracer.untrace.</p>
   <dl class="fields">
   </dl>
 </td></tr></table>
@@ -598,7 +670,7 @@ when the current operation is a write, resets the value. (NOT YET IMPLEMENTED)
 <table border="0" cellpadding="0" cellspacing="0" width="100%%">
   <tr>
     <td align="left" class="footer">
-    Generated by Epydoc 3.0.1 on Thu Jan  8 14:48:53 2009
+    Generated by Epydoc 3.0.1 on Tue Jan 13 12:48:45 2009
     </td>
     <td align="right" class="footer">
       <a target="mainFrame" href="http://epydoc.sourceforge.net"

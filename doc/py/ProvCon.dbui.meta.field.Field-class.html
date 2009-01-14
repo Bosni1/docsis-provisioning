@@ -71,9 +71,14 @@ object --+
 </pre>
 
 <hr />
-<p>==Field== Field objects hold meta data about columns in the database. 
-  They also provide data-conversion services. A Field object is created 
-  from a row of the 'field_info' table.</p>
+<p>Field objects represent column meta data and provide data-conversion 
+  services.</p>
+  <p>Field objects are created when a connection is made to the database. 
+  Each Field object represents one column in the <i>field_info</i> table. 
+  There should be no need for these objects to be created by the user 
+  elsewhere.</p>
+  <p>Data conversion SQL {&lt;-&gt;} PYTHON is also handled by Field 
+  objects.</p>
 
 <!-- ==================== NESTED CLASSES ==================== -->
 <a name="section-NestedClasses"></a>
@@ -97,7 +102,7 @@ object --+
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
         <a href="ProvCon.dbui.meta.field.Field.IncompleteDefinition-class.html" class="summary-name">IncompleteDefinition</a><br />
-      raised when the Field constructor receives incomplete meta-data
+      Raised when the Field constructor receives incomplete meta-data.
     </td>
   </tr>
 </table>
@@ -159,13 +164,13 @@ object --+
   </tr>
 <tr>
     <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
+      <span class="summary-type">object</span>
     </td><td class="summary">
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
-          <td><span class="summary-sig"><a name="val_sql2py"></a><span class="summary-sig-name">val_sql2py</span>(<span class="summary-sig-arg">self</span>,
+          <td><span class="summary-sig"><a href="ProvCon.dbui.meta.field.Field-class.html#val_sql2py" class="summary-sig-name">val_sql2py</a>(<span class="summary-sig-arg">self</span>,
         <span class="summary-sig-arg">sqlval</span>)</span><br />
-      convert the value returned by pg into a python variable</td>
+      Convert the value returned by postgres into a python variable.</td>
           <td align="right" valign="top">
             <span class="codelink"><a href="ProvCon.dbui.meta.field-pysrc.html#Field.val_sql2py">source&nbsp;code</a></span>
             
@@ -177,14 +182,14 @@ object --+
   </tr>
 <tr>
     <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
+      <span class="summary-type">str</span>
     </td><td class="summary">
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
-          <td><span class="summary-sig"><a name="val_py2sql"></a><span class="summary-sig-name">val_py2sql</span>(<span class="summary-sig-arg">self</span>,
+          <td><span class="summary-sig"><a href="ProvCon.dbui.meta.field.Field-class.html#val_py2sql" class="summary-sig-name">val_py2sql</a>(<span class="summary-sig-arg">self</span>,
         <span class="summary-sig-arg">pyval</span>)</span><br />
-      convert a python variable into something we can insert into an pgSQL 
-      statement</td>
+      Convert a python variable into something we can insert into an pgSQL 
+      statement.</td>
           <td align="right" valign="top">
             <span class="codelink"><a href="ProvCon.dbui.meta.field-pysrc.html#Field.val_py2sql">source&nbsp;code</a></span>
             
@@ -196,12 +201,14 @@ object --+
   </tr>
 <tr>
     <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
+      <span class="summary-type">str</span>
     </td><td class="summary">
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
-          <td><span class="summary-sig"><a name="val_py2txt"></a><span class="summary-sig-name">val_py2txt</span>(<span class="summary-sig-arg">self</span>,
-        <span class="summary-sig-arg">pyval</span>)</span></td>
+          <td><span class="summary-sig"><a href="ProvCon.dbui.meta.field.Field-class.html#val_py2txt" class="summary-sig-name">val_py2txt</a>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">pyval</span>)</span><br />
+      Convert a python variable to text that can be displayed in an input 
+      widget.</td>
           <td align="right" valign="top">
             <span class="codelink"><a href="ProvCon.dbui.meta.field-pysrc.html#Field.val_py2txt">source&nbsp;code</a></span>
             
@@ -213,12 +220,13 @@ object --+
   </tr>
 <tr>
     <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
+      <span class="summary-type">object</span>
     </td><td class="summary">
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
-          <td><span class="summary-sig"><a name="val_txt2py"></a><span class="summary-sig-name">val_txt2py</span>(<span class="summary-sig-arg">self</span>,
-        <span class="summary-sig-arg">txtval</span>)</span></td>
+          <td><span class="summary-sig"><a href="ProvCon.dbui.meta.field.Field-class.html#val_txt2py" class="summary-sig-name">val_txt2py</a>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">txtval</span>)</span><br />
+      Convert text to a python variable.</td>
           <td align="right" valign="top">
             <span class="codelink"><a href="ProvCon.dbui.meta.field-pysrc.html#Field.val_txt2py">source&nbsp;code</a></span>
             
@@ -268,9 +276,11 @@ object --+
     </td><td class="summary">
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
-          <td><span class="summary-sig"><a name="is_special"></a><span class="summary-sig-name">is_special</span>(<span class="summary-sig-arg">self</span>)</span></td>
+          <td><span class="summary-sig"><a href="ProvCon.dbui.meta.field.Field-class.html#isSpecial" class="summary-sig-name">isSpecial</a>(<span class="summary-sig-arg">self</span>)</span><br />
+      Check if the column is <i>special</i>, meaning it holds object 
+      meta-data.</td>
           <td align="right" valign="top">
-            <span class="codelink"><a href="ProvCon.dbui.meta.field-pysrc.html#Field.is_special">source&nbsp;code</a></span>
+            <span class="codelink"><a href="ProvCon.dbui.meta.field-pysrc.html#Field.isSpecial">source&nbsp;code</a></span>
             
           </td>
         </tr>
@@ -393,6 +403,129 @@ object --+
   </dl>
 </td></tr></table>
 </div>
+<a name="val_sql2py"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">val_sql2py</span>(<span class="sig-arg">self</span>,
+        <span class="sig-arg">sqlval</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="ProvCon.dbui.meta.field-pysrc.html#Field.val_sql2py">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>Convert the value returned by postgres into a python variable.</p>
+  <dl class="fields">
+    <dt>Parameters:</dt>
+    <dd><ul class="nomargin-top">
+        <li><strong class="pname"><code>sqlval</code></strong> (str) - value returned from a SELECT</li>
+    </ul></dd>
+    <dt>Returns: object</dt>
+  </dl>
+</td></tr></table>
+</div>
+<a name="val_py2sql"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">val_py2sql</span>(<span class="sig-arg">self</span>,
+        <span class="sig-arg">pyval</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="ProvCon.dbui.meta.field-pysrc.html#Field.val_py2sql">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>Convert a python variable into something we can insert into an pgSQL 
+  statement.</p>
+  <dl class="fields">
+    <dt>Parameters:</dt>
+    <dd><ul class="nomargin-top">
+        <li><strong class="pname"><code>pyval</code></strong> (object) - object represnting column value to be inserted .</li>
+    </ul></dd>
+    <dt>Returns: str</dt>
+  </dl>
+</td></tr></table>
+</div>
+<a name="val_py2txt"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">val_py2txt</span>(<span class="sig-arg">self</span>,
+        <span class="sig-arg">pyval</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="ProvCon.dbui.meta.field-pysrc.html#Field.val_py2txt">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>Convert a python variable to text that can be displayed in an input 
+  widget.</p>
+  <dl class="fields">
+    <dt>Parameters:</dt>
+    <dd><ul class="nomargin-top">
+        <li><strong class="pname"><code>pyval</code></strong> (object) - object represnting column value to be inserted .</li>
+    </ul></dd>
+    <dt>Returns: str</dt>
+  </dl>
+</td></tr></table>
+</div>
+<a name="val_txt2py"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">val_txt2py</span>(<span class="sig-arg">self</span>,
+        <span class="sig-arg">txtval</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="ProvCon.dbui.meta.field-pysrc.html#Field.val_txt2py">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>Convert text to a python variable.</p>
+  <dl class="fields">
+    <dt>Parameters:</dt>
+    <dd><ul class="nomargin-top">
+        <li><strong class="pname"><code>txtval</code></strong> (str) - text representation of column value</li>
+    </ul></dd>
+    <dt>Returns: object</dt>
+  </dl>
+</td></tr></table>
+</div>
+<a name="isSpecial"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">isSpecial</span>(<span class="sig-arg">self</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="ProvCon.dbui.meta.field-pysrc.html#Field.isSpecial">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>Check if the column is <i>special</i>, meaning it holds object 
+  meta-data. All columns inherited from the <i>object</i> table are 
+  considered special.</p>
+  <dl class="fields">
+  </dl>
+</td></tr></table>
+</div>
 <br />
 <!-- ==================== NAVIGATION BAR ==================== -->
 <table class="navbar" border="0" width="100%" cellpadding="0"
@@ -425,7 +558,7 @@ object --+
 <table border="0" cellpadding="0" cellspacing="0" width="100%%">
   <tr>
     <td align="left" class="footer">
-    Generated by Epydoc 3.0.1 on Thu Jan  8 14:48:51 2009
+    Generated by Epydoc 3.0.1 on Tue Jan 13 12:48:44 2009
     </td>
     <td align="right" class="footer">
       <a target="mainFrame" href="http://epydoc.sourceforge.net"

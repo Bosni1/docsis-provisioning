@@ -4,13 +4,19 @@ from ProvCon.dbui.database import array_as_text, text_to_array
 __revision__ = "$Revision$"
 
 class Field(object):
-    """ ==Field==
-    Field objects hold meta data about columns in the database.
-    They also provide data-conversion services.
-    A Field object is created from a row of the 'field_info' table.
+    """
+    Field objects represent column meta data and provide data-conversion services.
+
+    Field objects are created when a connection is made to the database. Each Field
+    object represents one column in the I{field_info} table. There should be no need
+    for these objects to be created by the user elsewhere.    
+
+    Data conversion SQL {<->} PYTHON is also handled by Field objects.    
     """    
     class IncompleteDefinition(MetaDataError): 
-        """raised when the Field constructor receives incomplete meta-data"""
+        """
+        Raised when the Field constructor receives incomplete meta-data.
+        """
         pass
     
             
@@ -39,7 +45,6 @@ class Field(object):
                     cv,cd = c, c
                 self.choices.append ( (cv, cd) )
                 
-
             params = text_to_array ( self.editor_class_params, 0 ) or []            
             params = map ( lambda x: tuple(x.split("::=")), params )
             self.editor_class_params = {}
@@ -54,7 +59,14 @@ class Field(object):
 
     
     def val_sql2py(self, sqlval):
-        """convert the value returned by pg into a python variable"""
+        """
+        Convert the value returned by postgres into a python variable.
+        
+        @type sqlval: str
+        @param sqlval: value returned from a SELECT 
+        
+        @rtype: object
+        """
         if self.isarray:
             return text_to_array (sqlval, self.arraysize-1)
         if self.type == 'bit': 
@@ -64,7 +76,14 @@ class Field(object):
         return sqlval
     
     def val_py2sql(self, pyval):
-        """convert a python variable into something we can insert into an pgSQL statement"""        
+        """
+        Convert a python variable into something we can insert into an pgSQL statement.
+        
+        @type pyval: object
+        @param pyval: object represnting column value to be inserted .
+        
+        @rtype: str
+        """        
         if pyval is None:
             return None
         elif self.isarray:
@@ -81,6 +100,13 @@ class Field(object):
             return str(pyval)
     
     def val_py2txt(self, pyval):
+        """
+        Convert a python variable to text that can be displayed in an input widget.
+        @type pyval: object
+        @param pyval: object represnting column value to be inserted .
+        
+        @rtype: str
+        """
         if self.isarray:
             return "array:" + array_as_text(pyval)
         if pyval is None:
@@ -91,6 +117,14 @@ class Field(object):
             return str(pyval)
     
     def val_txt2py(self, txtval):
+        """
+        Convert text to a python variable.
+        
+        @type txtval: str
+        @param txtval: text representation of column value
+        
+        @rtype: object
+        """
         if self.isarray:
             return text_to_array ( txtval[6:], self.arraysize-1 )
         return txtval
@@ -101,7 +135,11 @@ class Field(object):
     def decode(self, value):
         raise DeprecationWarning
     
-    def is_special(self):
+    def isSpecial(self):
+        """
+        Check if the column is I{special}, meaning it holds object meta-data. 
+        All columns inherited from the I{object} table are considered special.
+        """
         from ProvCon.dbui.meta import Table
         return self.name in Table.__special_columns__
     

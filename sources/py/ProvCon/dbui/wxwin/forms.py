@@ -28,8 +28,7 @@ class GenericForm(BaseForm, wx.Panel):
 
     def resize(self, e):
         e.Skip()
-        
-        
+                
     def _create_default_field_editor (self, field, parent=None, **kwargs):
         editor_class_name = "Text"
         options = {}
@@ -55,5 +54,4 @@ class GenericForm(BaseForm, wx.Panel):
         
         editor = editor_class (field, parent, variable = self.form.getvar(field.name), **options )        
         return editor
-
         

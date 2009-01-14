@@ -12,37 +12,55 @@ class VariableCancel(VariableError):
     pass
 
 class TracedVariable(object):    
-    """TracedVariables are simple pythonic values which support tracing all changes in their values
-    via callback functions. The API resembles that of traced variables used in Tcl/Tk.
+    """
+    TracedVariables are simple pythonic values which support tracing all changes in their values
+    via callback functions. 
+    The API resembles that of traced variables used in Tcl/Tk.
+
     To define a variable you have to create a TracedVariable object:
-    >> v = TracedVariable ( [name=varname:string]  )
+       >>> v = TracedVariable ( [name=varname:string]  )
+    
     to set or retrieve the current variable value use:
-    >> x = v.get()
-    >> v.set (x)
+
+       >>> x = v.get()
+       >>> v.set (x)
+
     Traced variables may hold arrays:
-    >> v[0] = 'xxx'
-    >> x = v[1]
+    
+       >>> v[0] = 'xxx'
+       >>> x = v[1]
+
     To register a callback use the 'trace' method:
-    >> tracer_obj = v.trace ( mode, callback )
+
+       >>> tracer_obj = v.trace ( mode, callback )
+    
     Where mode is 'r', 'w' or 'rw' and callback is the callback function with this signature:
-        def _callback ( action, value, variable, index )
-        where: 
-         action is 'r' or 'w' depending on the action that caused the callback to be fired,
-         value is the new value of the variable
-         variable is the variable :)
-         index is the index of the item changed if the variable holds an array. If index is None
-           then either the variable is not an array or the entire value was changed (not just one
-           item).
-    v.trace returns a Tracer object, which is a callable wrapper for the callback function  
+       def _callback ( action, value, variable, index )
+    
+    where: 
+    
+         - B{action} is 'r' or 'w' depending on the action that caused the callback to be fired,
+         - B{value} is the new value of the variable
+         - B{variable} is the variable :)
+         - B{index} is the index of the item changed if the variable holds an array. If index is None
+              then either the variable is not an array or the entire value was changed (not just one
+              item).
+    
+    B{v.trace} returns a Tracer object, which is a callable wrapper for the callback function  
     supporting 'freeze' and 'thaw' methods, and may be unregistered with a call to the 'untrace'
     method.
     
     A callback function may raise VariableCancel which stops processing the current event, and
     when the current operation is a write, resets the value. (NOT YET IMPLEMENTED)
-    >> tracer_obj.untrace()    
+       
+       >>> tracer_obj.untrace()    
+       
     """
     class Tracer:
-        """A wrapped callback function for traced variables"""
+        """
+        A wrapped callback function for traced variables.
+        Do not create directly, instead use var.trace() and var.untrace()
+        """
         W = 'w'
         R = 'r'
         RW = 'rw'
@@ -66,7 +84,6 @@ class TracedVariable(object):
             
         def __call__(self, action, value, var=None, idx=None):
             if not self.frozen:
-                #print "Calling: " + str(self)
                 return self.callback ( action, value, var, idx )
         
         def freeze(self): self.frozen = True
@@ -88,7 +105,9 @@ class TracedVariable(object):
         self.name = "TracedVariable(" + str(kkw.get("name", hash(self))) + ")"
 
     def _append_tracer(self, tracer, ignore_reentry=False):
-        """Register a tracer object. Do NOT call directly, is called by Tracer.__init__"""
+        """
+        Register a tracer object. Do NOT call directly, is called by Tracer.__init__
+        """
         if not ignore_reentry and (self.set.entered or self.__setitem__.entered):
             self.pending_tracers.append (tracer)
             return
@@ -99,12 +118,20 @@ class TracedVariable(object):
                 raise VariableError ( "Invalid tracing mode: '%s'" % m )    
     
     def get(self):
-        """Get current value"""
+        """
+        Get current value of the variable.
+        """
         for t in self.tracers['r']: t( 'r', self.value, self )
         return self.value
 
     def __setitem__(self, itemidx, itemvalue):
-        """Set subitem value"""
+        """
+        Set subitem value if the hel value is an array.
+        
+        Otherwise do nothing.
+        @type itemidx: int
+        @type itemvalue: object
+        """
         if not (isinstance(self.value, (list, tuple, dict))):
             return                
         try:
@@ -128,7 +155,7 @@ class TracedVariable(object):
             return None
         
     def set(self, value):
-        """Set value"""
+        """Set variable value"""
         try:
             self.value = value
             if not self.frozen_callbacks:
@@ -141,11 +168,22 @@ class TracedVariable(object):
         
     
     def trace(self, mode, callback, **kkw):
-        """Create, register and return a new tracer object"""
+        """
+        Create, register and return a new Tracer object.
+        @type mode: str
+        @param mode: 'r', 'w' or 'rw'
+        @type callback: callable
+        @param callback: callback function tracing variable changes
+        
+        @rtype: Tracer        
+        """
         return TracedVariable.Tracer ( self, mode, callback, **kkw )
     
     def untrace(self, tracer):
-        """Unregister the tracer object. Do NOT call directly, gets called by Tracer.untrace"""
+        """
+        Unregister the tracer object. 
+        Do NOT call directly, gets called by Tracer.untrace.
+        """
         for m in self.tracers: 
             try: 
                 self.tracers[m].remove(tracer)

@@ -1,4 +1,4 @@
--- $Id:$
+-- $Id$
 create table {:SCHEMA:}subscriber (
   subscriberid integer not null unique,
   name varchar(256) not null,  
