@@ -1,4 +1,5 @@
 #!/bin/env python
+##$Id$
 
 class cablemodem(object):
 

@@ -9,22 +9,24 @@ import ProvCon
 from ProvCon.wronolib.procname import set_process_name
 import Server, Protocol
 
-#The provisioning TFTP server is a multitasking application which
-#not only serves file contents via TFTP, but also ensures that
-#sent files are up to date with the provisioning database.
+"""
+The provisioning TFTP server is a multitasking application which
+not only serves file contents via TFTP, but also ensures that
+sent files are up to date with the provisioning database.
 
-#The main process should create an instance of TFTPProvisioningServer
-#and run the serve_forever method.
-#The server starts the following processes:
-# - TFTPDataSenders which communicate with clients,
-# - File "cooks", which check permisions and update the requested files,
-#Each "cook" is provided with an "oven" - an object that does the actual
-#preparation and updating of files.
+The main process should create an instance of TFTPProvisioningServer
+and run the serve_forever method.
+The server starts the following processes:
+ - TFTPDataSenders which communicate with clients,
+ - File "cooks", which check permisions and update the requested files,
+Each "cook" is provided with an "oven" - an object that does the actual
+preparation and updating of files.
 
-#TFTPDataSender : Process
-#The TFTPProvisioningServer starts a conigured number o these processes. Their
-#purpose is to wait or items to become available on the "Ready Files Queue"
-#then connect to the client and send the file contents.
+TFTPDataSender : Process
+The TFTPProvisioningServer starts a conigured number o these processes. Their
+purpose is to wait or items to become available on the "Ready Files Queue"
+then connect to the client and send the file contents.
+"""
 class TFTPDataSender(Process):       
     def __init__(self, rfQueue):
         Process.__init__(self, None, None, "pcTFTP_DATA")

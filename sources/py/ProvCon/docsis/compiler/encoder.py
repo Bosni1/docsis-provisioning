@@ -20,10 +20,16 @@ def hex2bin(self, hexstr):
     
     
 class tlv(object):
-    _isComplex = False
+    """
+    A basic Type-Length-Value record.
+    """
+    #_isComplex = False
     _canBeArray = False
+    """Can this TLV hold and array of values"""
     _allowedValueTypes = [str, int, unicode]
+    """A list of types of values that this TLV knows how to handle"""
     _typeName = "BASE_TLV"
+    """For runtime type check"""
     _isTLV = True
     
     def __init__(self, **kkw):
@@ -36,15 +42,34 @@ class tlv(object):
         self._uid = kkw.get ( "uid", None )
 
     def type_check (self, value):
+        """
+        Check if the value type is permitted.
+        @rtype bool
+        """
         return type(value) in self._allowedValueTypes
     
-    def value_check(self, value):        
+    def value_check(self, value):
+        """
+        Test if the given value can beassigned to this TLV.
+        @rtype bool
+        """
         return True
 
     def one_binary_value (self, oneval):
+        """
+        Convert the python object to its binary TLV representation, assuming
+        it is a simple value.
+        @type oneval: object
+        @param oneval: the object to convert to binnary
+        @rtype: str
+        """
         return oneval
     
     def isset(self):
+        """
+        Check if all required fields are set on this TLV.
+        @rtype: bool
+        """
         return self._code is not None and self._value is not None
     
     def _code_set(self, code):
@@ -53,22 +78,41 @@ class tlv(object):
             raise error ( "tlv code must be in (0,255)" )
         else:
             self._code = code
-    
-    def _code_get(self): return self._code
-
+    def _code_get(self): 
+        return self._code
     code = property(_code_get, _code_set)
+    """Code, or "type" of the TLV. [0-255] int """
 
     def _value_filter(self, value):
+        """
+        Filter function applied to each new value.
+        @type value: object
+        @rtype: object
+        """
         return value
     
-    def _value_get(self): return self._value
+    def _value_get(self): 
+        return self._value
     def _value_set(self, value):         
         value = self._value_filter(value)
         if self.value_check(value): self._value = value
         else: raise error ("Invalid value '%s' for '%s'" % ( str(value), self.__class__.__name__ ) ) 
     value = property(_value_get, _value_set)
+    """Value, the V in TLV"""
     
     def binary(self):
+        """
+        Return the binary form of this TLV.
+        
+        If this tlv is an array, or a complex value, recursively convert it to binary
+        form.
+
+        There are two possible scenarios when the value is an array:
+           - _canBeArray is True, each element of the array is simply encoded as binary data
+           - _canBeArray is False, each element is encoded as a separate TLV
+                   
+        @rtype: str
+        """
         if self.code is None: return None
         content = ''
         if isinstance(self.value, list):
@@ -76,11 +120,11 @@ class tlv(object):
                 for v in self.value: content += self.one_binary_value ( v )
             else:
                 for v in self.value: 
-                    p = self.one_binary_value ( v )
+                    p = self.one_binary_value (v)
                     content += chr(self.code) + chr(len(p)) + p
                 return content
         else:
-            content = self.one_binary_value(self.value)        
+            content = self.one_binary_value(self.value) 
         try:
             return chr(self.code) + chr(len(content)) + content
         except TypeError:
@@ -95,6 +139,11 @@ class tlv(object):
         return lside.ljust(50) + " := " + self.__reprval__()
 
 class tlv_generic(tlv):
+    """
+    TLV accepting string values.
+    
+    Strings can given in the "0x...." format as a hex binary string.
+    """
     def _value_filter(self, value):
         realval = ""
         if isinstance(value, str):            
@@ -134,12 +183,19 @@ class tlv_uchar(tlv):
         return chr(self.value)
     
 class tlv_snmp_value(tlv):
+    """
+    A generic SNMP TLV.
+    
+       >>> cfg.append.SNMP_MIB_OBJECT = ( ".1.3.6.1.2.1.1.6.0", rfc1155.OctetString("Value") )
+    """
     _typeName = "SNMP"
+    
     def value_check(self, value):
         #print value
         if not isinstance(value, tuple) or len(value) != 2:
             return False
         return True
+    
     def one_binary_value(self, v):
         oid, val = v
         varbind = rfc1157.VarBind( rfc1155.ObjectID(oid), val )
@@ -147,8 +203,7 @@ class tlv_snmp_value(tlv):
         return varbind
     
     def __reprval__(self):
-        o = rfc1155.OctetString()
-        
+        #o = rfc1155.OctetString()
         return self.value[0] + " = " + self.value[1].value
 
 class tlv_oid (tlv):
@@ -190,6 +245,9 @@ class tlv_string(tlv):
     _allowedValueTypes = [ str, unicode ]
 
 class tlv_string_zero(tlv):
+    """
+    Zero terminated string.
+    """
     _typeName = "STRING_Z"
     _allowedValueTypes = [ str, unicode ]
     def one_binary_value(self, v):
@@ -265,7 +323,20 @@ class tlv_subscriber_mgmt(tlv):
         pass
                 
 class tlv_subclass(object):
-    
+    """
+    For record-structured (multipart) TLVs, this class provides a clean interface, allowing
+    a quick and pretty access to its fields:
+
+       >>> cos = cfg.CLASS_OF_SERVICE
+       >>> cos.CLASS_ID = 1
+       >>> cos.CLASS_MAX_RATE_DOWN = 4000000
+       
+       >>> dcl = tlv_down_packet_classifier()
+       >>> dcl.CLASSIFIER_REFERENCE = 1
+       >>> dcl.CLASSIFIER_IDENTIFIER = 1
+       >>> cfg.append.ANY = dcl
+ 
+    """ 
     def __init__(self, definition, parentuid):
         self._definition = definition
         self._opt_dict = {}
@@ -314,6 +385,10 @@ class tlv_subclass(object):
         
             
 class tlv_multipart(tlv):
+    """
+    A record-structured TLV.
+    Supports iteration over sub-tlvs.
+    """
     class iterator:
         def __init__(self, multipart):            
             self.multipart = multipart
@@ -330,7 +405,7 @@ class tlv_multipart(tlv):
             self._docs = DOCSIS_TLV
 
         def __getattr__(self, attrname):            
-            x = self.__setattr__(attrname, None)            
+            x = self.__setattr__(attrname, None)
             return x
         
         def __setattr__(self, attrname, value):            
