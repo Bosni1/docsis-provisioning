@@ -35,8 +35,9 @@ class TFTPDataSender(Process):
     #The loop stops until a "None" is the first element of
     #the tuple read from the queue
     def run(self):
-        set_process_name ( "0@TFTPD_DATA" )
-        logger = ProvCon.LoggingClient ( name = "TFTPD%05d" % self.pid )
+        from app import APP
+        APP.Functions.set_process_name ( "0@TFTPD_DATA" )
+        logger = APP.LoggingClient ( name = "TFTPD%05d" % self.pid )
         queue_errors = 0
         while 1:
             try:
@@ -72,8 +73,8 @@ class CableModemConfigCook(Process):
         self.oven = oven
     
     def run(self):
-        set_process_name ( "0@TFTPD_CMCFG" )
-        pass
+        from app import APP
+        APP.Functions.set_process_name ( "0@TFTPD_CMCFG" )        
         
 class FileCook(Process):
     def __init__(self, myQueue, rfQueue, fileOven):
@@ -83,8 +84,9 @@ class FileCook(Process):
         self.oven = fileOven
         
     def run(self):
-        set_process_name ( "0@TFTPD_FILE" )
-        logger = ProvCon.LoggingClient ( name="TFTP_FILE" )
+        from app import APP
+        APP.Functions.set_process_name ( "0@TFTPD_FILE" )
+        logger = APP.LoggingClient ( name="TFTP_FILE" )
         while True:
             (initiating_packet, client_address) = self.myQueue.get()
             if initiating_packet is None: break
@@ -115,7 +117,7 @@ class FileCook(Process):
 #         ( 'file', 'cm-%(IP)s\.cfg' )  (the pattern uses the client ip address)
 #         ( 0, 0)                    match everything
 class BaseOven:
-    def __init__(self, **kkw):
+    def __init__(self, *kw, **kkw):
         self.root = os.path.abspath(os.path.dirname(kkw['root']))
         self.umask = kkw.get('umask', 0644 )
         self.denylist = []
@@ -185,36 +187,37 @@ class CableModemConfigOven(BaseOven):
 
 class ProvisioningTFTPServer(Server.BaseTFTPServer):
     def __init__(self):
+        from app import APP
         Server.BaseTFTPServer.__init__(self)
-        set_process_name ( "0@TFTPD_LISTEN" )
-        self.config = ProvCon.Configuration()
-        self.logger = ProvCon.LoggingClient ( name="TFTPD_SRV" )
+        APP.Functions.set_process_name ( "0@TFTPD_LISTEN" )
+        
+        self.logger = APP.LoggingClient ( name="TFTPD_SRV" )
         #The queue for "ready-to-be-sent" files
         self.rfQueue = Queue(2048)
         
         #The base oven & cook - simple TFTP
-        base_oven = FileOven ( root = self.config.get ( "TFTP", "dir" ), name="FILES" )
+        base_oven = FileOven ( root = APP.BE.TFTP.dir, name="FILES" )
         self.logger ( "Setting up %s." % base_oven )
-        base_queue_size =  self.config.getint ("TFTP", "queue_size")
+        base_queue_size =  APP.BE.TFTP._i_queue_size
         base_cook_queue = Queue(base_queue_size)
         
         #The cook for cm firmware files
-        cm_fw_oven = FileOven ( root = self.config.get ("DOCSIS", "fwdir"), name="CM FW" )
+        cm_fw_oven = FileOven ( root = APP.BE.DOCSIS.fwdir, name="CM FW" )
         self.logger ( "Setting up %s." % cm_fw_oven )
         cm_fw_oven.deny ( (0,0) )
         cm_fw_queue = Queue(16)
         
         #The cook for cm config files
-        cm_cfg_oven = CableModemConfigOven ( root = self.config.get ("DOCSIS", "dir"), name="CM CONFIG" )
+        cm_cfg_oven = CableModemConfigOven ( root = APP.BE.DOCSIS.dir, name="CM CONFIG" )
         self.logger ( "Setting up %s." % cm_cfg_oven )        
         cm_cfg_oven.deny ( (0,0) )
-        cm_cfg_queue_size = self.config.getint ( "DOCSIS", "tftp_queue_size" )
+        cm_cfg_queue_size = APP.BE.DOCSIS._i_tftp_queue_size
         cm_cfg_queue = Queue (cm_cfg_queue_size)
         
         #The sub-processes count
-        base_cooks_count = self.config.getint ("TFTP", "cooks")
-        cm_fw_cooks_count = self.config.getint ("DOCSIS", "tftp_cm_fw_cooks")
-        cm_cfg_cooks_count = self.config.getint ("DOCSIS", "tftp_cm_cfg_cooks")        
+        base_cooks_count = APP.BE.TFTP._i_cooks
+        cm_fw_cooks_count = APP.BE.DOCSIS._i_tftp_cm_fw_cooks
+        cm_cfg_cooks_count = APP.BE.DOCSIS._i_tftp_cm_cfg_cooks
         
         self.cooks = [ 
             (cm_cfg_oven, cm_cfg_queue, [CableModemConfigCook(cm_cfg_queue, self.rfQueue, cm_cfg_oven) for i in range(0,cm_cfg_cooks_count)]),
@@ -226,7 +229,7 @@ class ProvisioningTFTPServer(Server.BaseTFTPServer):
         for (_,_,cooklist) in self.cooks:
             for cook in cooklist: cook.start()
         
-        data_senders_count = self.config.getint ( "TFTP", "senders" )
+        data_senders_count = APP.BE.TFTP._i_senders
         self.data_senders = [ TFTPDataSender (self.rfQueue)  for i in range(0,data_senders_count) ]
         for sender in self.data_senders: sender.start()
         
@@ -277,18 +280,18 @@ class pcTFTPD(Process):
         self.start()
         
     def run(self):
-        set_process_name ( "0@TFTPD" )
-        config = ProvCon.Configuration()
-        logger = ProvCon.LoggingClient ( name="TFTPD" )
+        from app import APP
+        APP.Functions.set_process_name ( "0@TFTPD" )        
+        logger = APP.LoggingClient ( name="TFTPD" )
         
-        controller = ProvCon.Controller( config.get ( "CONTROLLER", "tftpd") )
+        controller = APP.Controller( APP.BE.CONTROLLER.tftpd )
         
         logger ( "Initializing the server." )
         server_process = Process ( name="TFTPD_LISTEN", target=ProvisioningTFTPServer )
         server_process.start()
         
         while True:
-            action = ProvCon.ControllerWait ( controller )
+            action = APP.ControllerWait ( controller )
             if action == "STOP": break
         
         logger ("Terminating the server.")

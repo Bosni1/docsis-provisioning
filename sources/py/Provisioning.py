@@ -5,33 +5,31 @@ from multiprocessing.connection import Listener, Client
 import time, sys
 
 import ProvCon
-from ProvCon.wronolib import daemonize, set_process_name
-from ProvCon.TFTP import pcTFTPD as srvTFTPD
+from app import APP
 
 class Provisioning:
     _services_ = [
-        ("tftpd", srvTFTPD),
+        ("tftpd", APP.Services.TFTP),
         ]
     _shutdown_sequence_ = [
         "tftpd",
         ]
         
     def run(self):
-        self.logging_server = ProvCon.LoggingServer()
-        self.logger = ProvCon.LoggingClient(name="MAIN")
+        
+        self.logging_server = APP.LoggingServer()
+        self.logger = APP.LoggingClient(name="MAIN")
         logger = self.logger
-        
-        config = ProvCon.Configuration()
-        
+                
         logger( "-=<" + ("-" * 70) + ">=-" )
         logger("Provisioning v0.01, started." )
 
         self.controllers = {}
-        for (cname, cpath) in config.items ( "CONTROLLER" ): self.controllers[cname] = cpath
+        for (cname, cpath) in APP.BE.CONTROLLER: self.controllers[cname] = cpath
 
         self.processes = {}
         self.start_services()
-        self.cli = ProvCon.CLIServer()
+        self.cli = APP.CLIServer()
         self.cli.serve()
         self.exit()
         
@@ -43,7 +41,7 @@ class Provisioning:
     def stop_services(self):
         for service in self._shutdown_sequence_:
             self.logger("Stopping %s." % service)
-            ProvCon.ControllerAction ( self.controllers[service], "STOP" )
+            APP.ControllerAction ( self.controllers[service], "STOP" )
             self.processes[service].join()
             
     def exit(self):
@@ -66,10 +64,10 @@ def UnhandledExceptionHook(extype, exvalue, tb):
 
 sys.excepthook = UnhandledExceptionHook    
         
-config = ProvCon.Configuration()
+
 print "Hello! I am Provisioning v1.0 and I will be running as a daemon!"
-daemonize ('/dev/null', config.get ("LOGGING", "stdout"), config.get("LOGGING", "stdout") )
-set_process_name ( "0@@Provisioning" )
+APP.Functions.daemonize ('/dev/null', APP.BE.LOGGING.stdout, APP.BE.LOGGING.stdout )
+APP.Functions.set_process_name ( "0@@Provisioning" )
 p = Provisioning()
 
 try:

@@ -7,6 +7,7 @@
 
 from os import getenv
 
+
 ConfigFileBE = (getenv("PROVISIONING_ROOT") or "/home/kuba/src/docsis-provisioning/site") + "/etc/ProvisioningBE.cfg"
 """Path of the configuration file used by the back-end process"""
 ConfigFileFE =  (getenv("PROVISIONING_ROOT") or "/home/kuba/src/docsis-provisioning/site") + "/etc/ProvisioningFE.cfg"
@@ -75,6 +76,7 @@ def Configuration():
     from ConfigParser import ConfigParser
     cfg = ConfigParser()
     cfg.read ( ConfigFileBE )
+    print "read", ConfigFileBE
     return cfg
 
 def ConfigurationFE():

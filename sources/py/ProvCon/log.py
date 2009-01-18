@@ -4,8 +4,9 @@ from multiprocessing.connection import Listener, Client, current_process
 import Queue as ThQueue
 import time, socket, cPickle
 from SocketServer import UDPServer
-import ProvCon
 import logging, logging.handlers
+import ProvCon
+
 
 class LoggingBackend(Process):
     def __init__(self, queue):
@@ -13,12 +14,12 @@ class LoggingBackend(Process):
         self.queue = queue
         
         
-    def run(self):        
-        ProvCon.set_process_name ( "0@@LOG_BE" )
-        config = ProvCon.Configuration ()
+    def run(self):            
+        from app import APP
+        APP.Functions.set_process_name ( "0@@LOG_BE" )        
         self.logger = logging.getLogger ( "provconf" )
         self.logger.setLevel ( logging.DEBUG )
-        self.handler = logging.handlers.RotatingFileHandler ( config.get ( "LOGGING", "filename" ), 
+        self.handler = logging.handlers.RotatingFileHandler ( APP.BE.LOGGING.filename, 
                                                               maxBytes=1024*1024*16, backupCount=8)
         formatter = logging.Formatter ( "%(message)s" )
         self.handler.setFormatter (formatter)        
@@ -34,21 +35,22 @@ class LoggingBackend(Process):
 
 class LoggingServer(Process, UDPServer):
 
-    def __init__ (self):
-        config = ProvCon.Configuration()        
-        port = config.getint ( "LOGGING", "server_port" )
+    def __init__ (self):   
+        from app import APP
+        port = APP.BE.LOGGING._i_server_port
 
         UDPServer.__init__(self, ('127.0.0.1', port), None)
         Process.__init__ (self, None, None, "pcLOG" )        
         
-        self.queue = Queue( config.getint ( "LOGGING", "queue_size") )        
+        self.queue = Queue( APP.BE.LOGGING._i_queue_size )        
         self.backend = LoggingBackend (self.queue)
         self.backend.start()
         self.on = True
         self.start()
     
-    def finish_request(self, request, client_address):
-        ProvCon.set_process_name ( "0@@LOG" )
+    def finish_request(self, request, client_address):        
+        from app import APP
+        APP.Functions.set_process_name ( "0@@LOG" )
         data, sock = request
         try:
             (src, svr,msg) = cPickle.loads ( data )                    
@@ -66,10 +68,10 @@ class LoggingServer(Process, UDPServer):
         
 
 class LoggingClient:
-    def __init__ (self, **kkw):
-        config = ProvCon.Configuration()
+    def __init__ (self, **kkw):        
+        from app import APP
         self.socket = socket.socket (socket.AF_INET, socket.SOCK_DGRAM )
-        port = config.getint ( "LOGGING", "server_port" )
+        port = APP.BE.LOGGING._i_server_port
         self.socket.connect ( ('127.0.0.1', port) )
         self.source = kkw.get ( "name", current_process().name )        
         self.level = kkw.get ( "level", 0 )

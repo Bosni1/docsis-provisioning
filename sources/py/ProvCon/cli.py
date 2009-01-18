@@ -1,5 +1,4 @@
 #!/bin/env python
-import ProvCon
 from multiprocessing import Process
 from threading import Thread
 import Queue as ThreadingQueue
@@ -7,6 +6,8 @@ import Queue as ThreadingQueue
 from multiprocessing.connection import Listener, Client
 import select, os, sys
 import ui
+
+#from ProvCon.app import APP
 
 class CLIWorker(Thread):
     def __init__(self, queue, logger):
@@ -16,7 +17,8 @@ class CLIWorker(Thread):
         self.start()
     
     def run(self):        
-        ProvCon.set_process_name ( "0@@UI_JOB" )
+        from app import APP
+        APP.Functions.set_process_name ( "0@@UI_JOB" )
         while True:
             msg, cnx = self.queue.get()               
             if msg is None: break
@@ -38,10 +40,10 @@ class CLIWorker(Thread):
                 pass
                                 
 class CLIServer (Listener):
-    def __init__ (self):
-        config = ProvCon.Configuration()
-        self.logger = ProvCon.LoggingClient(name="UIHUB")
-        addr = ProvCon.parse_socket_address ( config.get ( "CLI", "server_address" ) )
+    def __init__ (self):   
+        from app import APP
+        self.logger = APP.LoggingClient(name="UIHUB")
+        addr = APP.Functions.parse_socket_address ( APP.BE.CLI.server_address )
         try: os.unlink (addr)
         except: pass
         self.logger( "Starting. Listening on {0}".format (addr) )
@@ -104,8 +106,8 @@ class CLIServer (Listener):
         
         
 def CLIClient ():
-    config = ProvCon.Configuration()
-    addr = ProvCon.parse_socket_address ( config.get ( "CLI", "server_address" ) )
+    from app import APP
+    addr = APP.Functions.parse_socket_address ( APP.BE.CLI.server_address)
     return Client (addr)
         
     

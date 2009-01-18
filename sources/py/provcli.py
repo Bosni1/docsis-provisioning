@@ -1,7 +1,12 @@
 #!/bin/env python
-import ProvCon
+from app import APP
 import socket, sys, os
-import readline
+try:
+    import readline
+    hasReadline = True
+except ImportError:
+    hasReadline = False
+
 import atexit
 
 class CliNode(object):
@@ -202,7 +207,7 @@ signature = None
 sigidx = {}
 
 try:
-    client = ProvCon.CLIClient()
+    client = APP.CLIClient()
     signature = client.recv()
 except socket.error:
     print "Connection failed."
@@ -215,13 +220,16 @@ print cliRoot.printall()
 
 
 try:
-    readline.read_history_file ( os.path.expanduser("~/.prov-history") )
+    if hasReadline:
+        readline.read_history_file ( os.path.expanduser("~/.prov-history") )
 except IOError:
     pass
-atexit.register(readline.write_history_file, os.path.expanduser("~/.prov-history") )
-readline.parse_and_bind("tab: complete")
-readline.set_completer ( command_completer )
-readline.set_completer_delims("\n")
+if hasReadline:
+    atexit.register(readline.write_history_file, os.path.expanduser("~/.prov-history") )
+    readline.parse_and_bind("tab: complete")
+    readline.set_completer ( command_completer )
+    readline.set_completer_delims("\n")
+
 currentLevel = cliRoot
 
 while True:
