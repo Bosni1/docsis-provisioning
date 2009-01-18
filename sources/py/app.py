@@ -1,4 +1,3 @@
-from ConfigParser import ConfigParser        
 from os import getenv
 from exceptions import BaseException
 
@@ -6,6 +5,7 @@ __all__ = [ "APP" ]
 
 _PROVISIONING_ROOT = getenv ("PROVISIONING_ROOT") or "/home/kuba/src/docsis-provisioning/site"
 _PROVISIONING_MODE = getenv ("PROVISIONING_MODE") or "DEVEL"
+_PROVISIONING_SIDE = getenv ("PROVISIONING_SIDE") or "BACKEND"
 
 from ProvCon.func.objects import AttrDict
 
@@ -25,8 +25,7 @@ class SectionProxy(object):
                 attrname = attrname[3:]
                 conv = int
             
-            if self._configobj._config_parser.has_option (self._sectionname, attrname):
-                print attrname, conv
+            if self._configobj._config_parser.has_option (self._sectionname, attrname):                
                 return conv(self._configobj._config_parser.get (self._sectionname, attrname))
             else:
                 raise AttributeError (attrname)          
@@ -55,8 +54,7 @@ class ProvConConfig(object):
             raise AttributeError
         
     def __init__(self):
-        #self.__dict__["__sectionproxies"] = None
-        #self.__dict__["__config_parser"] = None
+        from ConfigParser import ConfigParser        
         self._sectionproxies = {}
         self._config_parser = ConfigParser()
         parserOk = False
@@ -100,7 +98,46 @@ class App(object):
 
         def __init__(self):
             ProvConConfig.__init__(self)
-             
+
+    def imp_Logging(self):
+        from ProvCon.log import LoggingClient, LoggingServer
+        self.LoggingClient = LoggingClient
+        self.LoggingServer = LoggingServer
+    imp_LoggingClient = imp_Logging
+    imp_LoggingServer = imp_Logging
+
+    def imp_CLI(self):
+        from ProvCon.cli import CLIServer, CLIClient
+        
+        self.CLIServer = CLIServer
+        self.CLIClient = CLIClient
+    imp_CLIServer = imp_CLI
+    imp_CLIClient = imp_CLI
+
+    def imp_Control(self):
+        from ProvCon import ControllerAction, Controller, ControllerWait
+        
+        self.ControllerAction = ControllerAction
+        self.Controller = Controller
+        self.ControllerWait = ControllerWait
+    imp_Controller = imp_Control
+    imp_ControllerAction =  imp_Control
+    imp_ControllerWait = imp_Control
+
+    def imp_Services(self):
+        self.Services = AttrDict()
+        from ProvCon.TFTP import pcTFTPD 
+        self.Services.TFTP = pcTFTPD
+
+    def imp_Functions(self):
+        self.Functions = AttrDict()
+        from ProvCon.wronolib import daemonize, set_process_name
+        from ProvCon import parse_socket_address
+        self.Functions.daemonize = daemonize
+        self.Functions.set_process_name = set_process_name
+        self.Functions.parse_socket_address = parse_socket_address
+        
+        
     def __getattr__(self, attrname):
         if attrname in self.__dict__:
             return self.__dict__[attrname]
@@ -109,34 +146,23 @@ class App(object):
             obj = getattr(self.__class__, "Obj_" + attrname) ()
             self.__dict__[attrname]  = obj
             return obj
+        elif hasattr(self.__class__, "imp_" + attrname):
+            getattr(self.__class__, "imp_" + attrname) (self)        
+            return self.__dict__[attrname]
         else:
             raise AttributeError
     
+    def isFrontEnd(self):
+        return _PROVISIONING_SIDE == "FRONTEND"
+
+    def isBackEnd(self):
+        return _PROVISIONING_SIDE == "BACKEND"
+
+    def isDevelMode(self):
+        return _PROVISIONING_MODE == "DEVEL"
     
-    def __init__(self):
-        from ProvCon.log import LoggingClient, LoggingServer
-        from ProvCon.cli import CLIServer, CLIClient
-        from ProvCon import ControllerAction, Controller, ControllerWait
-        
-        self.LoggingClient = LoggingClient
-        self.LoggingServer = LoggingServer
-        self.CLIServer = CLIServer
-        self.CLIClient = CLIClient
-        self.ControllerAction = ControllerAction
-        self.Controller = Controller
-        self.ControllerWait = ControllerWait
-        
-        self.Services = AttrDict()
-        from ProvCon.TFTP import pcTFTPD 
-        self.Services.TFTP = pcTFTPD
-        
-        self.Functions = AttrDict()
-        from ProvCon.wronolib import daemonize, set_process_name
-        from ProvCon import parse_socket_address
-        self.Functions.daemonize = daemonize
-        self.Functions.set_process_name = set_process_name
-        self.Functions.parse_socket_address = parse_socket_address
-        
+    def __init__(self):        
+        print "Delayed import initialized."
         
         
         

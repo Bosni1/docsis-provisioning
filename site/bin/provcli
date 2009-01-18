@@ -2,6 +2,7 @@
 . settings
 
 export PYTHONPATH=$PROVISIONING_DEV_PATH/sources/py/
-export PROVISIONING_MODE=dev
+export PROVISIONING_MODE=DEVEL
+export PROVISIONING_SIDE=BACKEND
 
 /bin/env python $PROVISIONING_DEV_PATH/sources/py/provcli.py

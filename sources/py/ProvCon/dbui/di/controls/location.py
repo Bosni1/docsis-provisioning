@@ -127,9 +127,7 @@ class LocationEditor(wx.Panel):
         self.split = wx.SplitterWindow (self)
         self.tree = tree.MVCTree (self.split, -1)
         self.tree.SetAssumeChildren(False)
-        self.tree.SetModel ( LocationTreeModel() )
-        
-        t = wx.TreeCtrl()
+        self.tree.SetModel ( LocationTreeModel() )                
         
         tmp = wx.StaticText (self.split, label="EDITOR" )
         

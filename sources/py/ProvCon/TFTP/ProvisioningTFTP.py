@@ -32,7 +32,7 @@ class TFTPDataSender(Process):
         Process.__init__(self, None, None, "pcTFTP_DATA")
         self.rfQueue = rfQueue
     
-    #The loop stops until a "None" is the first element of
+    #The loop runs until a "None" is the first element of
     #the tuple read from the queue
     def run(self):
         from app import APP

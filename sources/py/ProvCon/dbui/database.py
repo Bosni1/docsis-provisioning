@@ -13,14 +13,23 @@ class CFG:
 	"""
         @classmethod
         def initialize(cls):
-            if cls.__is_initialized: return
-            from config import config
-            cls.HOST = config.get ( "DATABASE", "host" )
-            cls.PORT = config.get ( "DATABASE", "port" )
-            cls.DBNAME = config.get ( "DATABASE", "dbname" )
-            cls.ROLE = None
-            cls.PASS = None
-            cls.SCHEMA = config.get ( "DATABASE", "schema" )        
+            if cls.__is_initialized: return            
+            from app import APP
+            if APP.isFrontEnd:
+                cls.HOST = APP.FE.DATABASE.host
+                cls.PORT = APP.FE.DATABASE.port
+                cls.DBNAME = APP.FE.DATABASE.dbname
+                cls.ROLE = None
+                cls.PASS = None
+                cls.SCHEMA = APP.FE.DATABASE.schema
+            elif APP.isBackEnd:
+                cls.HOST = APP.BE.DATABASE.host
+                cls.PORT = APP.BE.DATABASE.port
+                cls.DBNAME = APP.BE.DATABASE.dbname
+                cls.ROLE = None
+                cls.PASS = None
+                cls.SCHEMA = APP.BE.DATABASE.schema
+
             cls.__is_initialized = True
             
         HOST = None
@@ -34,8 +43,11 @@ class CFG:
     class RT:
         @classmethod
         def initialize(cls):
-            from config import config
-            cls.DATASCOPE = config.get ( "DATABASE", "scope" )
+            from app import APP
+            if APP.isFrontEnd:
+                cls.DATASCOPE = APP.FE.DATABASE.scope
+            elif APP.isBackEnd:
+                cls.DATASCOPE = APP.BE.DATABASE.scope
         DATASCOPE = None
         
     class tCX(pg.DB):        
