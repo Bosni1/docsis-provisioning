@@ -3,6 +3,7 @@
 import os
 import pymssql, _mssql
 import getpass
+import MySQLdb
 from ProvCon.dbui.database import CFG, Init
 from ProvCon.dbui.di import rObject
 Record = rObject
@@ -64,20 +65,45 @@ if __name__=="__main__":
     p_pakietTVIdx = {}
         
     
-    #cr.execute ("SELECT * FROM PakietInternet")
-    #pakiet_all = dictresult (cr)
-    #for p in pakiet_all:
-    #    print p
-    #raise SystemExit
+    cr.execute ("SELECT * FROM PakietInternet")
+    CFG.CX.query ( "DELETE FROM {0}.class_of_service".format(CFG.DB.SCHEMA) )
+    CFG.CX.query ( "DELETE FROM {0}.type_of_service".format(CFG.DB.SCHEMA) )
+    pakiet_all = dictresult (cr)
+    pakiet_IdxMap = {}
+    
+    tosRec = Record.EMPTY ( "type_of_service" )
+    tosRec.typeid = "INT"
+    tosRec.name = "Internet"
+    tosRec.official_name = "Dostęp do Internetu"
+    tosRec.classmap = []
+    tosRec.write()
+    cosIdx = []
+    for p in pakiet_all:
+        pRec = Record.EMPTY ( "class_of_service" )
+        pRec.classid = p["Index"]
+        pRec.name = p["Nazwa"].decode("cp1250")
+        pRec.official_name = pRec.name
+        pRec.write()
+        cosIdx.append ( pRec.objectid )
+        pakiet_IdxMap[p["Index"]] = pRec
+    tosRec.classmap = cosIdx
+    tosRec.write()
+    
     
     cr.execute ( "SELECT * FROM Klient" )
     klient_all = dictresult ( cr )
     cr.execute ( "SELECT * FROM DaneKlientInternet" )
     dki_all = dictresult ( cr )
-    cr.execute ( "SELECT * FROM DaneKlientTelewizja" )
-    dkt_all = dictresult ( cr )
+    dki_IdxMap = {}
+    for dki in dki_all:
+        dki_IdxMap[dki["KlientIndex"]] = dki
 
+    #cr.execute ( "SELECT * FROM DaneKlientTelewizja" )
+    #dkt_all = dictresult ( cr )
+    
     CFG.CX.query ( "DELETE FROM {0}.subscriber".format(CFG.DB.SCHEMA) )
+    CFG.CX.query ( "DELETE FROM {0}.service".format(CFG.DB.SCHEMA) )
+    
     subscriber_oldIdxMap = {}
     
     for K in klient_all:        
@@ -99,6 +125,8 @@ if __name__=="__main__":
         if K["BrakZgodyNaPrzetwarzanieDanych"]: subRec.FLAGS.BRAK_ZGODY_PD = True
         subRec.PARAM.SKROT = K["Skrot"].decode("cp1250")
         subscriber_oldIdxMap[K["Index"]] = subRec
+        
+        
             
     #Miejscowości    
     CFG.CX.query ( "DELETE FROM {0}.city".format(CFG.DB.SCHEMA) )
@@ -193,6 +221,20 @@ if __name__=="__main__":
         except KeyError:
             pass
         subRec.write()
+    
+    for K in klient_all:
+        dki = dki_IdxMap[K["Index"]]
+        
+        srvRec = Record ( "service" )
+        srvRec.subscriberid = subRec.objectid
+        try:
+            srvRec.classofservice = pakiet_IdxMap[dki["PakietIndex"]].objectid
+        except KeyError:
+            print "Service DKI key not found."
+            continue
+        srvRec.typeofservice = tosRec.objectid
+        srvRec.locationid = klient_localizationMap[K["Index"]].objectid
+        srvRec.write()
 
     
     stansatDB.close()

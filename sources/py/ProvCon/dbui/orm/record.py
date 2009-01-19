@@ -189,6 +189,8 @@ API Error: {0.pgexception}""".format ( self )
         
     
     __default_reference_mode__ = "text"  # none | text | record
+
+    DB = CFG.tCX
     
     def __init__(self, **kkw):
         """
@@ -354,7 +356,10 @@ API Error: {0.pgexception}""".format ( self )
         """            
         if self._isinstalled:
             for f in self._table:
-                del self.__dict__[f.name]
+                try:
+                    del self.__dict__[f.name]
+                except KeyError:
+                    pass
             self._original_values.clear()
             self._modified_values.clear()
             self._hasdata = False
@@ -672,7 +677,7 @@ API Error: {0.pgexception}""".format ( self )
     @classmethod
     def COPY(cls, record):        
         assert issubclass(record, Record)
-        pass
+        
 
     @classmethod
     def CHILDREN(cls, parentid, reftable, refcolumn, **kwargs):

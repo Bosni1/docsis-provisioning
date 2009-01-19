@@ -624,18 +624,17 @@ $$ LANGUAGE plpgsql;
 -- database/500application/040cos.sql
 ----------------------------------------------------------------------------------------------------
 create table pv.class_of_service (
-  classid varchar(8) not null unique,
+  classid varchar(24) not null unique,
   name varchar(256) not null,
-  official_name varchar(128) null,
-  info text null,  
-  classparams varchar(256)[] not null  
+  official_name varchar(256) null,
+  info text null  
 ) inherits (pv."object");
 SELECT pv.setup_object_subtable ( 'class_of_service' );
 
 create table pv.type_of_service (
-  typeid varchar(8) not null unique,
+  typeid varchar(24) not null unique,
   name varchar(128) not null,
-  official_name varchar(128) null,
+  official_name varchar(256) null,
   info text null,
   classmap int8[] not null  
 ) inherits (pv."object");
@@ -643,7 +642,7 @@ SELECT pv.setup_object_subtable ( 'type_of_service' );--------------------------
 --
 -- database/500application/050subscriber.sql
 ----------------------------------------------------------------------------------------------------
--- $Id:$
+-- $Id$
 create table pv.subscriber (
   subscriberid integer not null unique,
   name varchar(256) not null,  
@@ -657,7 +656,7 @@ SELECT pv.setup_object_subtable ( 'subscriber' );
 
 create table pv.service (
   subscriberid int8 REFERENCES pv.objectids ON DELETE CASCADE ON UPDATE CASCADE NOT NULL,
-  typeofservice int8 REFERENCES pv.objectids ON DELETE SET NULL ON UPDATE CASCADE NOT NULL,
+  typeofservice int8 REFERENCES pv.objectids ON DELETE SET NULL ON UPDATE CASCADE NULL,
   classofservice int8 REFERENCES pv.objectids ON DELETE SET NULL ON UPDATE CASCADE NULL,
   parentservice int8 REFERENCES pv.objectids ON DELETE CASCADE ON UPDATE CASCADE NULL,
   locationid int8 REFERENCES pv.objectids ON DELETE SET NULL ON UPDATE CASCADE NOT NULL,

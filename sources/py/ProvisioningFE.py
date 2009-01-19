@@ -17,6 +17,7 @@ db.RaiseDBException = guitk.DBErrorHandler
 class ProvisioningFE(wx.App):
     def OnInit(self):
         self.windows = AttrDict()
+        self.forms = AttrDict()
         self.windows.toplevel = wx.Frame (None, title="Provisioning", size=(1100,800))
         
         sizer = wx.BoxSizer(wx.VERTICAL)
@@ -36,21 +37,22 @@ class ProvisioningFE(wx.App):
         """ )
         notebook.AddPage ( welcome, "Powitanie" )
         
+        ##LOCATIONS
         locations = controls.LocationEditor ( notebook )
         self.windows.locations = locations
         notebook.AddPage ( locations, "Lokalizacje" )
-
         
-        sizer.Add (self.windows.notebook, 4, flag=wx.EXPAND)        
+        self.forms.subseditor = guitk.complete.CompleteGenericForm ( notebook, 
+                                                               tablename="subscriber"
+                                                              )
+        notebook.AddPage ( self.forms.subseditor, "Klient" )
         
+        
+        sizer.Add (self.windows.notebook, 4, flag=wx.EXPAND)                        
         self.windows.toplevel.SetSizer (sizer)
         self.windows.toplevel.Show()
         
-        #self.subseditor = guitk.complete.CompleteGenericForm ( self.windows.toplevel, 
-        #                                                       tablename="subscriber"
-        #                                                      )
-        #sizer.Add (self.subseditor, 4, flag=wx.EXPAND)
-        
+
         return True
     
 Init()        

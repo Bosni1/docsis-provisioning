@@ -1,3 +1,2 @@
 from rObject import rObject 
-#import controls
-#import forms
+from rLocation import rLocation

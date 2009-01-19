@@ -71,7 +71,7 @@ class CFG:
             #Attempt to make sure this class is a singleton.
             CFG.tCX.instanceCount += 1
             print "tCX init [%d]" % self.instanceCount
-
+            self.schemaname = CFG.DB.SCHEMA
             idmap = {}
             tableinfo = self.query ( "SELECT * FROM ONLY {0}.table_info".format(CFG.DB.SCHEMA) ).dictresult()
             for ti in tableinfo:
@@ -194,6 +194,7 @@ def StartupDatabaseConnection():
     CFG.RT.initialize()
     CFG.CX = CFG.tCX.instance or CFG.tCX()
     CFG.CX.debug = "===== [SQL] =====\n%s\n================="
+    #CFG.CX.debug = 
     
 Init = StartupDatabaseConnection
 

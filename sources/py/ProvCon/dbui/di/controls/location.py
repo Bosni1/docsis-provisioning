@@ -5,14 +5,17 @@ import wx.lib.mvctree as tree
 
 class LocationTreeRoot:
     def __init__(self):
-        recordlist = orm.RecordList ( meta.Table.Get("city"), select=["name"], order='name' )
-        recordlist.reload()
-        self.children = map ( lambda x: CityNode(x), recordlist )
+        self.records = orm.RecordList ( meta.Table.Get("city"), select=["name"], order='name' )                        
+        self.records.reload()
+        self.parent = None
+        self.children = map ( lambda x: None, self.records )
 
-    def GetChildCount(self):        
+    def GetChildCount(self):    
         return len(self.children)
         
-    def GetChildAt(self, index):
+    def GetChildAt(self, index):        
+        if self.children[index] is None:
+            self.children[index] = CityNode (self.records[index], self)
         return self.children[index]
         
     def isLeaf(self):
@@ -22,17 +25,21 @@ class LocationTreeRoot:
         return "Lokalizacje"
 
 class MyNode:
-    def __init__(self, record):
+    def __init__(self, record, parent):
         self.record = record
+        self.parent = parent
         self.children = []
+        self.records = []
 
     def __str__(self):
         return self.record._astxt
 
-    def GetChildCount(self):        
+    def GetChildCount(self):                
         return len(self.children)
         
-    def GetChildAt(self, index):
+    def GetChildAt(self, index):        
+        if self.children[index] is None:
+            self.children[index] = self.__childclass__ (self.records[index], self)
         return self.children[index]
     
     def IsLeaf(self):
@@ -40,40 +47,48 @@ class MyNode:
     
     
 class CityNode(MyNode):
-    def __init__(self, record):
-        MyNode.__init__(self, record)        
-        recordlist = orm.RecordList ( meta.Table.Get("street"), select=["name", "prefix"], 
+    def __init__(self, record, parent):
+        MyNode.__init__(self, record, parent)        
+        self.records = orm.RecordList ( meta.Table.Get("street"), select=["name", "prefix"], 
                                       order='name', 
                                       _filter = 'cityid = %d' % record.objectid ).reload()        
-        self.children = map ( lambda x: StreetNode(x), recordlist )    
+        self.children = map ( lambda x: None, self.records )    
+        self.__childclass__ = StreetNode
         
         
 class StreetNode(MyNode):
-    def __init__(self, record):
-        MyNode.__init__(self, record)        
-        recordlist = orm.RecordList ( meta.Table.Get("building"), select=["number"], 
+    def __init__(self, record, parent):
+        MyNode.__init__(self, record, parent)        
+        self.records = orm.RecordList ( meta.Table.Get("building"), select=["number"], 
                                       order='number', 
                                       _filter = 'streetid = %d' % record.objectid ).reload()        
-        self.children = map ( lambda x: BuildingNode(x), recordlist )    
-
+        self.children = map ( lambda x: None, self.records )    
+        self.__childclass__ = BuildingNode
 
     def __str__(self):
         return self.record.prefix + "." + self.record.name
 
 class BuildingNode(MyNode):
-    def __init__(self, record):
-        MyNode.__init__(self, record)        
-        recordlist = orm.RecordList ( meta.Table.Get("location"), select=["number", "handle"], 
+    def __init__(self, record, parent):
+        from ProvCon.dbui.di import rLocation
+        MyNode.__init__(self, record, parent)        
+        self.records = orm.RecordList ( meta.Table.Get("location"), select=["number", "handle"], 
                                       order='number', 
+                                      recordclass=rLocation,
                                       _filter = 'buildingid = %d' % record.objectid ).reload()        
-        self.children = map ( lambda x: LocationNode(x), recordlist )    
+        self.children = map ( lambda x: None, self.records )    
+        self.__childclass__ = LocationNode
     
 class LocationNode(MyNode):
-    def __init__(self, record):
-        MyNode.__init__(self, record)        
+    def __init__(self, record, parent):
+        MyNode.__init__(self, record, parent)        
+        print self.record.handle
 
     def IsLeaf(self):
         return True
+
+    def __str__(self):
+        return self.record.getGenericHandle()
     
     
 class LocationTreeModel(tree.TreeModel):
@@ -92,9 +107,8 @@ class LocationTreeModel(tree.TreeModel):
     def GetChildAt(self, node, index):
         return node.GetChildAt(index)
         
-    def GetParent(self, node):
-        if isinstance(node, LocationTreeRoot):
-            return None
+    def GetParent(self, node):        
+        return node.parent
         
     def AddChild(self, parent, child):
         print parent, child
@@ -111,7 +125,6 @@ class LocationTreeModel(tree.TreeModel):
             
     def IsLeaf(self, node):
         return node.IsLeaf()
-
     
     def IsEditable(self, node):
         return False
@@ -126,8 +139,8 @@ class LocationEditor(wx.Panel):
         
         self.split = wx.SplitterWindow (self)
         self.tree = tree.MVCTree (self.split, -1)
-        self.tree.SetAssumeChildren(False)
-        self.tree.SetModel ( LocationTreeModel() )                
+        self.tree.SetAssumeChildren(True)
+        self.tree.SetModel ( LocationTreeModel() )                        
         
         tmp = wx.StaticText (self.split, label="EDITOR" )
         
