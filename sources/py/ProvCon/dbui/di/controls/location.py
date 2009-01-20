@@ -30,11 +30,16 @@ class MyNode:
         self.parent = parent
         self.children = []
         self.records = []
-
-    def __str__(self):
+        self._reloaded = False
+    
+    def __str__(self):        
         return self.record._astxt
 
     def GetChildCount(self):                
+        if not self._reloaded:
+            self.records.reload()
+            self.children = map ( lambda x: None, self.records )    
+            self._reloaded = True
         return len(self.children)
         
     def GetChildAt(self, index):        
@@ -43,7 +48,8 @@ class MyNode:
         return self.children[index]
     
     def IsLeaf(self):
-        return len(self.children) == 0
+        #return len(self.children) == 0
+        return False
     
     
 class CityNode(MyNode):
@@ -51,8 +57,7 @@ class CityNode(MyNode):
         MyNode.__init__(self, record, parent)        
         self.records = orm.RecordList ( meta.Table.Get("street"), select=["name", "prefix"], 
                                       order='name', 
-                                      _filter = 'cityid = %d' % record.objectid ).reload()        
-        self.children = map ( lambda x: None, self.records )    
+                                      _filter = 'cityid = %d' % record.objectid )        
         self.__childclass__ = StreetNode
         
         
@@ -61,8 +66,7 @@ class StreetNode(MyNode):
         MyNode.__init__(self, record, parent)        
         self.records = orm.RecordList ( meta.Table.Get("building"), select=["number"], 
                                       order='number', 
-                                      _filter = 'streetid = %d' % record.objectid ).reload()        
-        self.children = map ( lambda x: None, self.records )    
+                                      _filter = 'streetid = %d' % record.objectid )        
         self.__childclass__ = BuildingNode
 
     def __str__(self):
@@ -75,20 +79,19 @@ class BuildingNode(MyNode):
         self.records = orm.RecordList ( meta.Table.Get("location"), select=["number", "handle"], 
                                       order='number', 
                                       recordclass=rLocation,
-                                      _filter = 'buildingid = %d' % record.objectid ).reload()        
-        self.children = map ( lambda x: None, self.records )    
+                                      _filter = 'buildingid = %d' % record.objectid )        
         self.__childclass__ = LocationNode
     
 class LocationNode(MyNode):
     def __init__(self, record, parent):
-        MyNode.__init__(self, record, parent)        
-        print self.record.handle
-
+        MyNode.__init__(self, record, parent)                
+        self.handle = self.record.getGenericHandle()
+        
     def IsLeaf(self):
         return True
 
     def __str__(self):
-        return self.record.getGenericHandle()
+        return self.handle 
     
     
 class LocationTreeModel(tree.TreeModel):

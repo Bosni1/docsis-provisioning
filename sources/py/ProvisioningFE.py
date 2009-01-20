@@ -4,6 +4,7 @@ from ProvCon.dbui.database import CFG, Init
 import ProvCon.dbui.database as db
 from ProvCon.dbui import meta, orm
 from ProvCon.dbui import wxwin as guitk
+from ProvCon.dbui.di.forms.SubscriberMain import SubscriberMain
 from ProvCon.func import AttrDict
 import ProvCon.dbui.di.controls as controls
 import wx
@@ -42,10 +43,11 @@ class ProvisioningFE(wx.App):
         self.windows.locations = locations
         notebook.AddPage ( locations, "Lokalizacje" )
         
-        self.forms.subseditor = guitk.complete.CompleteGenericForm ( notebook, 
-                                                               tablename="subscriber"
-                                                              )
-        notebook.AddPage ( self.forms.subseditor, "Klient" )
+        #self.forms.subseditor = guitk.complete.CompleteGenericForm ( notebook, 
+        #                                                       tablename="subscriber"
+        #                                                      )
+        subscriber = SubscriberMain(notebook)
+        notebook.AddPage ( subscriber, "Klient" )
         
         
         sizer.Add (self.windows.notebook, 4, flag=wx.EXPAND)                        
@@ -54,10 +56,16 @@ class ProvisioningFE(wx.App):
         
 
         return True
-    
+
+
 Init()        
 app = ProvisioningFE()
-app.MainLoop()
+import cProfile
+cProfile.run( "app.MainLoop()", "/tmp/prov-prof" )
+import pstats
+p = pstats.Stats ("/tmp/prov-prof" )
+p.strip_dirs().sort_stats(-1).print_stats()
+#app.MainLoop()
 
 
 

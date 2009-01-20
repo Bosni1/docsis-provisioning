@@ -27,9 +27,14 @@ class MetaDataEditor(wx.App):
         
         fieldinfotable = meta.Table.Get ( "field_info" )
         
-        self.fieldrecords = orm.RecordList ( fieldinfotable, select=['name'], order="lp" )
+        self.fieldrecords = orm.RecordList ( fieldinfotable, select=['lp', 'name','path','label'], order="lp" )
         self.fieldrecords.filterfunc = lambda r: r.name not in meta.Table.__special_columns__        
-        self.fieldlist = guitk.recordlists.RecordList (self.fieldrecords, self.toplevel)                
+        
+        def _fieldrepr(r):
+            return '#{0.lp}. <b>{0.path}</b><br>&nbsp;&nbsp;<i>{0.label}</i><hr>'.format(r)
+        self.fieldlist = guitk.recordlists.RecordList (self.fieldrecords, self.toplevel,
+                                                       reprfunc = _fieldrepr)                
+        
         self.fieldlist.bind_to_form ( "classid", self.tableeditor.form )
         
         lsizer.Add (self.fieldlist, 2, flag=wx.EXPAND)

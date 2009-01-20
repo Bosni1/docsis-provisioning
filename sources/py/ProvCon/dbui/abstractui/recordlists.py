@@ -18,7 +18,7 @@ class BaseRecordList(eventemitter):
                                        "navigate" ] )
         self.__current_record = None
         self.__records = None
-        self.set_records ( records )
+        self.records = records
         
         boundform = kwargs.get ( "boundform", None )        
         boundfield = kwargs.get( "boundfield", None )        
