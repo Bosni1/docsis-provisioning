@@ -274,7 +274,11 @@ API Error: {0.pgexception}""".format ( self )
         #exactly what is returned is determined by the _resolvereference object attribute
         elif attrname.endswith("_REF"):
             fname = attrname[:-4]
-            if fname in self._references: return self._references[fname]
+            if fname in self._table:
+                if fname not in self._references:
+                    self.updateReferenceField ( self._table[fname] )
+                return self._references.get(fname, None)
+            
         return self.__dict__[attrname]
     
     __getitem__ = __getattr__

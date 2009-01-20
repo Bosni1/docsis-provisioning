@@ -111,6 +111,8 @@ class Field(object):
             return "array:" + array_as_text(pyval)
         if pyval is None:
             return ''
+        elif isinstance(pyval, unicode):
+            return pyval
         elif isinstance(pyval, str):
             return pyval.decode('utf-8')
         else:

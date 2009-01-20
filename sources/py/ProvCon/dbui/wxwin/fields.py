@@ -14,7 +14,7 @@ class Entry:
             
 
         def set_current_editor_value(self, value):
-            self.SetLabel ( str(value) )
+            self.SetLabel ( self.field.val_py2txt(value) )
                 
     
     class Text (BaseFieldEditor, mwx.TextCtrl):
