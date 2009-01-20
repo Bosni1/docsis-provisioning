@@ -224,6 +224,8 @@ if __name__=="__main__":
     
     for K in klient_all:
         dki = dki_IdxMap[K["Index"]]
+
+        subRec = subscriber_oldIdxMap[K["Index"]]
         
         srvRec = Record ( "service" )
         srvRec.subscriberid = subRec.objectid

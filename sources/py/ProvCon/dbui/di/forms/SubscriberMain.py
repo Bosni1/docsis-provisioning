@@ -1,6 +1,7 @@
 from ProvCon.func import AttrDict
 from ProvCon.dbui import orm, meta
-from ProvCon.dbui.wxwin.forms import GenericForm
+from ProvCon.dbui.wxwin.forms import GenericForm, ScrolledGenericForm
+from ProvCon.dbui.wxwin import recordlists as rl
 import wx
 import wx.lib.scrolledpanel as scroll
 
@@ -12,14 +13,18 @@ class SubscriberMain(scroll.ScrolledPanel):
         self.form = AttrDict()
         self.table = AttrDict()
         self.editor = AttrDict()
+        self.store = AttrDict()
+        self.recordlist = AttrDict()
         
         self.table.subscriber = meta.Table.Get ( "subscriber" )
+        self.table.service = meta.Table.Get ( "service" )
+        
+
+        self.store.subscriber = orm.RecordList ( self.table.subscriber ).reload()
+        self.store.services = orm.RecordList ( self.table.service )
         self.form.subscriber = orm.Form ( self.table.subscriber  )
         
-        sizer_v1 = wx.BoxSizer (wx.VERTICAL)
-        
-        self.editor.subscriber  = GenericForm ( self.form.subscriber, self)
-        self.editor.subscriber.create_widget()
+        sizer_v1 = wx.BoxSizer (wx.VERTICAL)                    
         
         sizer_v1.Add ( wx.StaticText(self, label="NAVIGATION CONTROLS") )
         
@@ -42,17 +47,25 @@ class SubscriberMain(scroll.ScrolledPanel):
         
         sizer_h4.Add ( sizer_v5, 2, wx.EXPAND )
         sizer_h4.Add ( sizer_v6, 2, wx.EXPAND )
-                
-        sizer_v5.Add ( self.editor.subscriber, 1, wx.EXPAND  )
-        sizer_v5.Add ( wx.StaticText ( self, label="Lista uslug"), 2, wx.EXPAND )
+        
+        
+        subscroll = ScrolledGenericForm(self.form.subscriber, self)
+        self.editor.subscriber = subscroll.genericform                
+        
+        sizer_v5.Add ( subscroll, 2, wx.EXPAND  )
+
+        self.recordlist.services = rl.RecordList(self.store.services, self)                                                     
+        self.recordlist.services.bind_to_form ( "subscriberid", self.form.subscriber )
+        
+        sizer_v5.Add ( self.recordlist.services, 1, wx.EXPAND )
         
         sizer_v6.Add ( wx.StaticText ( self, label="URZ. IP. MAC / Notes"), 1, wx.EXPAND )
         
-
-        
+        self.form.subscriber.setid ( self.store.subscriber[0].objectid )
         
         self.SetSizer(sizer_v1)
-        
+        self.SetAutoLayout(1)
+
         
         
         

@@ -32,7 +32,7 @@ class BaseForm(object):
         if hasattr(self, "_create_field_" + field.table.name + "_" + field.name):
             creator = getattr(self, "_create_field_" + field.table.name + "_" + field.name)
         self.editor_widgets[field.name] = creator(field, parent, **kwargs)
-        return self.editor_widgets[field.name]
+        return self.editor_widgets[field.name]    
     
     def _create_default_field_editor (self, field, parent=None, **kwargs):
         raise NotImplementedError()

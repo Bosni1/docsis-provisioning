@@ -54,4 +54,29 @@ class GenericForm(BaseForm, wx.Panel):
         
         editor = editor_class (field, parent, variable = self.form.getvar(field.name), **options )        
         return editor
+
+class ScrolledGenericForm(wx.ScrolledWindow):
+    
+    def __init__(self, form, parent, *args, **kwargs):
+        wx.ScrolledWindow.__init__(self, parent)
         
+        self.genericform = GenericForm(form, self, *args, **kwargs)
+        self.genericform.create_widget()
+        self.sizer = wx.BoxSizer()        
+        self.sizer.Add ( self.genericform, flag=wx.EXPAND)
+        self.SetSizer (self.sizer)
+        self.SetScrollbars(20,20,50,50)        
+        
+        self.Bind ( wx.EVT_SIZE, self.on_resize)        
+        self.genericform.Bind ( wx.EVT_SIZE, self.on_editor_resize )
+
+    def on_editor_resize(self, event, *args):
+        self.SetVirtualSize ( event.GetSize() )        
+        event.Skip()
+        
+    def on_resize(self, event, *args):
+        w, h = self.GetSize()        
+        ew, eh = self.genericform.GetSize()
+        self.genericform.SetMinSize ( ( w-20, eh ) )        
+        self.genericform.SetVirtualSize ( (ew, eh) )
+        event.Skip() 
