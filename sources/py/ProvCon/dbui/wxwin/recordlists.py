@@ -11,7 +11,7 @@ class RecordList(BaseRecordList, wx.HtmlListBox):
                 
         self.register_event_hook ( "record_list_changed", self.populate_list )
         self.Bind ( wx.EVT_LISTBOX, self.item_selected )        
-        self.SetSelectionBackground (wx.Color(40,40,40))        
+        #self.SetSelectionBackground (wx.Color(,40,40))        
     def OnGetItem(self, n):
         return self.reprfunc(self.records[n])
         
@@ -21,8 +21,8 @@ class RecordList(BaseRecordList, wx.HtmlListBox):
                 
     def populate_list(self, *args):
         self.SetItemCount ( len(self.records) )
-        if len(self.records)>0:
-            self.SetSelection(0)
+        #if len(self.records)>0:
+        #    self.SetSelection(0)
         self.Refresh()
     
                                                         

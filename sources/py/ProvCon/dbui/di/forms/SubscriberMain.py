@@ -1,3 +1,4 @@
+# -*- coding: utf8 -*-
 from ProvCon.func import AttrDict
 from ProvCon.dbui import orm, meta
 from ProvCon.dbui.wxwin.forms import GenericForm, ScrolledGenericForm
@@ -29,10 +30,10 @@ class SubscriberMain(wx.Panel):
         self.mgr = wx.aui.AuiManager()
         self.mgr.SetManagedWindow (self)
         
-        subscroll = ScrolledGenericForm(self.form.subscriber, self)
-        self.editor.subscriber = subscroll.genericform                
-        
-        
+        #subscroll = ScrolledGenericForm(self.form.subscriber, self)
+        #self.editor.subscriber = subscroll.genericform                
+        self.editor.subscriber = GenericForm (self.form.subscriber, self)
+        self.editor.subscriber.create_widget()
         #sizer_v1 = wx.BoxSizer (wx.VERTICAL)                    
         
         #sizer_v1.Add ( wx.StaticText(self, label="NAVIGATION CONTROLS") )
@@ -57,19 +58,19 @@ class SubscriberMain(wx.Panel):
                               variable = s_form.getvar("subscriberid")                           
                               )
         ip_id.SetForegroundColour (wx.Color(40,20,20))
-        ip_id.SetFont ( wx.Font (20, wx.FONTFAMILY_TELETYPE, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_BOLD) )                
+        ip_id.SetFont ( wx.Font (17, wx.FONTFAMILY_TELETYPE, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_BOLD) )                
 
         ip_name = Entry.Static ( s_form.table["name"], ip_panel,
                               variable = s_form.getvar("name")
                               )
         ip_name.SetForegroundColour (wx.Color(40,70,20))
-        ip_name.SetFont ( wx.Font (20, wx.FONTFAMILY_TELETYPE, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_BOLD) )        
+        ip_name.SetFont ( wx.Font (17, wx.FONTFAMILY_TELETYPE, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_BOLD) )        
         
         ip_loc = Entry.StaticReference ( s_form.table["primarylocationid"], ip_panel,
                               variable = s_form.getvar("primarylocationid")                           
                               )
         ip_loc.SetForegroundColour (wx.Color(20,20,20))
-        ip_loc.SetFont ( wx.Font (20, wx.FONTFAMILY_TELETYPE, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL) )
+        ip_loc.SetFont ( wx.Font (17, wx.FONTFAMILY_TELETYPE, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL) )
         
         ip_sizer.Add (ip_id,1,  flag=wx.EXPAND)
         ip_sizer.Add (ip_name, 5, flag=wx.EXPAND)
@@ -81,16 +82,34 @@ class SubscriberMain(wx.Panel):
         ip_panel.SetSizer(ip_sizer_v)
         #sizer_v3.Add ( ip_panel, 1, flag=wx.EXPAND )
         #############################################################################
-        self.mgr.AddPane ( subscroll, wx.aui.AuiPaneInfo().Center().
-                           Name("klient").
-                           Caption("Podstawowe dane klienta").
-                           MinSize( (-1, 250) )
-                           )
-        self.mgr.AddPane ( ip_panel, wx.aui.AuiPaneInfo().Bottom().
-                           Name("info").
-                           Caption("Klient").
+        def _format_service(r):
+            return r.typeofservice_REF + "\n" + r.classofservice_REF
+        self.recordlist.services = rl.RecordList(self.store.services, self,
+                                                 reprfunc = _format_service)
+        self.recordlist.services.bind_to_form ( "subscriberid", self.form.subscriber)
+
+
+        self.mgr.AddPane ( ip_panel, wx.aui.AuiPaneInfo().Top().
+                           Floatable(False).CloseButton(False).
+                           Name("subscriber_info").
+                           Caption("Klient").                           
                            MinSize( (-1, 200) )
                            )
+        self.mgr.AddPane ( self.editor.subscriber, wx.aui.AuiPaneInfo().Center().
+                           Floatable(False).CloseButton(False).
+                           Name("subscriber_editor").
+                           Caption("Podstawowe dane klienta").
+                           Position(0).
+                           MinSize( (-1, 250) )
+                           )        
+        self.mgr.AddPane ( self.recordlist.services, wx.aui.AuiPaneInfo().Center().
+                           Floatable(False).CloseButton(False).
+                           Name("service_list").
+                           Position(1).
+                           Caption("Usługi")
+                            )
+                           
+
         self.mgr.Update()
 
         
