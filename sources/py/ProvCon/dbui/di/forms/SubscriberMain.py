@@ -7,7 +7,50 @@ from ProvCon.dbui.wxwin.fields import Entry
 import wx
 import wx.aui
 import wx.lib.scrolledpanel as scroll
+import wx.lib.rcsizer as rcs
+import wx.lib.buttonpanel as bp
 
+class SubscriberInfoPanel(wx.Panel):
+    
+    def __init__(self, parent, form, *args, **kwargs):
+        wx.Panel.__init__(self, parent, *args, **kwargs)
+        self.form = form
+        self.sizer = wx.BoxSizer(wx.VERTICAL)
+
+        font18 = wx.Font (18, wx.FONTFAMILY_TELETYPE, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL)
+        font20 = wx.Font (20, wx.FONTFAMILY_TELETYPE, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL)
+        font20b = wx.Font (20, wx.FONTFAMILY_TELETYPE, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_BOLD)
+        font22b = wx.Font (22, wx.FONTFAMILY_TELETYPE, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_BOLD)
+        
+        self.edit = AttrDict()
+        self.edit.subscriberid = Entry.Static ( self.form.table["subscriberid"], self, variable = self.form.getvar("subscriberid" ) )
+        self.edit.name = Entry.Static ( self.form.table["name"], self, variable = self.form.getvar("name" ) )
+        self.edit.primarylocation = Entry.StaticReference ( self.form.table["primarylocationid"], self, variable = self.form.getvar("primarylocationid" ) )
+        
+        for ctrl in self.edit.values():            
+            ctrl.SetForegroundColour (wx.Color(0,0,0))
+            ctrl.SetFont ( font18 )                
+        self.edit.subscriberid.SetFont ( font22b )
+        
+        self.row_1 = rcs.RowColSizer()
+        self.row_1.Add ( self.edit.subscriberid, row=1, col=1, rowspan=2, border=30, flag=wx.ALIGN_CENTER | wx.RIGHT )
+        self.row_1.Add ( self.edit.name, row=1,col=2, flag=wx.EXPAND)
+        self.row_1.Add ( self.edit.primarylocation, row=2,col=2, flag=wx.EXPAND)
+
+        self.sizer.Add (self.row_1)
+
+        
+        
+        self.SetSizer (self.sizer)
+        
+
+
+
+class SubscriberCommandPanel(wx.Panel):
+    def __init__(self, parent, form, *args, **kwargs):
+        wx.Panel.__init__(self, parent, *args, **kwargs)
+        p = bp.ButtonPanel (self, 
+    
 class SubscriberMain(wx.Panel):
     
     def __init__(self, parent, *args):
@@ -30,122 +73,50 @@ class SubscriberMain(wx.Panel):
         self.mgr = wx.aui.AuiManager()
         self.mgr.SetManagedWindow (self)
         
-        #subscroll = ScrolledGenericForm(self.form.subscriber, self)
-        #self.editor.subscriber = subscroll.genericform                
-        self.editor.subscriber = GenericForm (self.form.subscriber, self)
-        self.editor.subscriber.create_widget()
-        #sizer_v1 = wx.BoxSizer (wx.VERTICAL)                    
-        
-        #sizer_v1.Add ( wx.StaticText(self, label="NAVIGATION CONTROLS") )
-        
-        #sizer_h2 = wx.BoxSizer (wx.HORIZONTAL)
-        #sizer_v1.Add ( sizer_h2, 10, wx.EXPAND )
-        
-        #sizer_v3 = wx.BoxSizer(wx.VERTICAL)
-        
-        #sizer_h2.Add ( wx.StaticText(self, label="TOOLBOX") )
-        #sizer_h2.Add ( sizer_v3,10, wx.EXPAND) 
+        subscroll = ScrolledGenericForm(self.form.subscriber, self)
+        self.editor.subscriber = subscroll.genericform                        
         
         ###
         ###   INFO PANEL (static data)  
         ###        
-        s_form = self.form.subscriber;
-        ip_panel = wx.Panel(self)
-        ip_sizer_v = wx.BoxSizer(wx.VERTICAL)
-        ip_sizer = wx.BoxSizer(wx.HORIZONTAL)
+        self.info_panel = SubscriberInfoPanel(self, self.form.subscriber)
 
-        ip_id = Entry.Static ( s_form.table["subscriberid"], ip_panel,
-                              variable = s_form.getvar("subscriberid")                           
-                              )
-        ip_id.SetForegroundColour (wx.Color(40,20,20))
-        ip_id.SetFont ( wx.Font (17, wx.FONTFAMILY_TELETYPE, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_BOLD) )                
-
-        ip_name = Entry.Static ( s_form.table["name"], ip_panel,
-                              variable = s_form.getvar("name")
-                              )
-        ip_name.SetForegroundColour (wx.Color(40,70,20))
-        ip_name.SetFont ( wx.Font (17, wx.FONTFAMILY_TELETYPE, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_BOLD) )        
-        
-        ip_loc = Entry.StaticReference ( s_form.table["primarylocationid"], ip_panel,
-                              variable = s_form.getvar("primarylocationid")                           
-                              )
-        ip_loc.SetForegroundColour (wx.Color(20,20,20))
-        ip_loc.SetFont ( wx.Font (17, wx.FONTFAMILY_TELETYPE, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL) )
-        
-        ip_sizer.Add (ip_id,1,  flag=wx.EXPAND)
-        ip_sizer.Add (ip_name, 5, flag=wx.EXPAND)
-        ip_sizer.Add ( ip_loc, 5, flag=wx.EXPAND)
-        
-        ip_sizer_v.Add ( ip_sizer, flag=wx.EXPAND)
-        
-        
-        ip_panel.SetSizer(ip_sizer_v)
-        #sizer_v3.Add ( ip_panel, 1, flag=wx.EXPAND )
         #############################################################################
+        
         def _format_service(r):
             return r.typeofservice_REF + "\n" + r.classofservice_REF
+
         self.recordlist.services = rl.RecordList(self.store.services, self,
                                                  reprfunc = _format_service)
         self.recordlist.services.bind_to_form ( "subscriberid", self.form.subscriber)
 
 
-        self.mgr.AddPane ( ip_panel, wx.aui.AuiPaneInfo().Top().
+        self.mgr.AddPane ( self.info_panel, wx.aui.AuiPaneInfo().Top().
                            Floatable(False).CloseButton(False).
                            Name("subscriber_info").
                            Caption("Klient").                           
                            MinSize( (-1, 200) )
                            )
-        self.mgr.AddPane ( self.editor.subscriber, wx.aui.AuiPaneInfo().Center().
+        self.mgr.AddPane ( subscroll, wx.aui.AuiPaneInfo().Center().
                            Floatable(False).CloseButton(False).
                            Name("subscriber_editor").
                            Caption("Podstawowe dane klienta").
                            Position(0).
-                           MinSize( (-1, 250) )
+                           MinSize( (-1, 300) )
                            )        
         self.mgr.AddPane ( self.recordlist.services, wx.aui.AuiPaneInfo().Center().
                            Floatable(False).CloseButton(False).
                            Name("service_list").
                            Position(1).
                            Caption("Usługi")
-                            )
+                        )
                            
 
         self.mgr.Update()
 
         
-        
-        #sizer_h4 = wx.BoxSizer (wx.HORIZONTAL)
-
-        #sizer_v3.Add ( sizer_h4, 5, wx.EXPAND )
-
-        #sizer_v5 = wx.BoxSizer (wx.VERTICAL)
-        #sizer_v6 = wx.BoxSizer (wx.VERTICAL)
-        
-        #sizer_h4.Add ( sizer_v5, 2, wx.EXPAND )
-        #sizer_h4.Add ( sizer_v6, 2, wx.EXPAND )
-        
-        
-        #subscroll = ScrolledGenericForm(self.form.subscriber, self)
-        #self.editor.subscriber = subscroll.genericform                
-        
-        #sizer_v5.Add ( subscroll, 4, wx.EXPAND  )
-
-        #def _format_service(r):
-            #return r.typeofservice_REF + "\n" + r.classofservice_REF
-        #self.recordlist.services = rl.RecordList(self.store.services, self,
-                                                 #reprfunc = _format_service)
-
-        #self.recordlist.services.bind_to_form ( "subscriberid", self.form.subscriber)
-        
-        #sizer_v5.Add ( self.recordlist.services, 3, wx.EXPAND )
-        
-        #sizer_v6.Add ( wx.StaticText ( self, label="URZ. IP. MAC / Notes"), 1, wx.EXPAND )
-        
         self.form.subscriber.setid ( self.store.subscriber[0].objectid )
         
-        #self.SetSizer(sizer_v1)
-        #self.SetAutoLayout(1)
-
         
         
         
