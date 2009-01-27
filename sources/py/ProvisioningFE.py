@@ -19,7 +19,7 @@ class ProvisioningFE(wx.App):
     def OnInit(self):
         self.windows = AttrDict()
         self.forms = AttrDict()
-        self.windows.toplevel = wx.Frame (None, title="Provisioning", size=(1100,800))
+        self.windows.toplevel = wx.Frame (None, title="Provisioning", size=(1100,900))
         
         sizer = wx.BoxSizer(wx.VERTICAL)
 

@@ -551,7 +551,7 @@ API Error: {0.pgexception}""".format ( self )
                 #done by triggers and default values into account.
                 self._objectid = rec['objectid']
 
-                print "Record # {0} inserted into {1}.".format(self._objectid, self._table.name)
+                #print "Record # {0} inserted into {1}.".format(self._objectid, self._table.name)
                 self.emit_event ( "record_added", self )
                 
             except pg.DatabaseError, e:
@@ -561,14 +561,14 @@ API Error: {0.pgexception}""".format ( self )
                                                      e)
         elif self._ismodified:
             for m in self._modified_values:
-                print "Modified field:", m
+                #print "Modified field:", m
                 self._modified_values[m] = self._table[m].val_py2sql(self._modified_values[m])
             self._modified_values['objectid'] = self._objectid
             try:
                 rec = CFG.CX.update ( CFG.DB.SCHEMA + "." + self._table.name,
                                       self._modified_values )
                 self.read()
-                print "Record updated"
+                #print "Record updated"
                 self.emit_event ( "record_saved", self )
             except pg.DatabaseError, e:
                 print "Error updating record"

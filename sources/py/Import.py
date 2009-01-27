@@ -10,7 +10,7 @@ Record = rObject
 import atexit
 
 def dictresult ( cr ):
-    assert isinstance( cr, pymssql.pymssqlCursor )
+    #assert isinstance( cr, pymssql.pymssqlCursor )
     result = []
     for r in cr.fetchall():
         rowresult = {}
@@ -55,8 +55,41 @@ if __name__=="__main__":
     stansatDB = pymssql.connect ( user = 'stansat', database = 'stansat', host = 'reklamy',
                                   password = pw )
     cr = stansatDB.cursor()
+
+    n2db = MySQLdb.connect ( db='techdb', user='netcon3', host='83.243.39.5', charset='utf8' )
+    n2cr = n2db.cursor()
+    
+    n2cr.execute ( "SELECT * FROM customer" )
+    n2_customer_all = dictresult (n2cr)
+    n2_customer_idMap = {}
+    n2_customer_nameMap = {}
+    for c in n2_customer_all:        
+        c['_imported'] = False
+        c['_subscriberid'] = None
+        n2_customer_idMap[c['id']] = c
+        n2_customer_nameMap[c['name']] = c
+        
+    n2cr.execute ( "SELECT *, int2ipstr(ip) as ipaddr FROM customer_ip_assignment" )
+    n2_ip_all = dictresult(n2cr)    
+    for i in n2_ip_all:
+        try:
+            assert 'IP' in n2_customer_idMap[i['customer']]
+        except AssertionError:
+            n2_customer_idMap[i['customer']]['IP'] = []
+        n2_customer_idMap[i['customer']]['IP'].append (i)
+
+    n2cr.execute ( "SELECT *, int2ipstr(dhcp_ip) as ipaddr FROM customer_known_mac" )
+    n2_mac_all = dictresult(n2cr)    
+    for i in n2_mac_all:
+        try:
+            assert 'MAC' in n2_customer_idMap[i['customer']]
+        except AssertionError:
+            n2_customer_idMap[i['customer']]['MAC'] = []
+        n2_customer_idMap[i['customer']]['MAC'].append (i)
+        
     atexit.register ( close, stansatDB )
     
+
     n_TOS = {}
     n_COS = {}
     n2o_intMap = {}
@@ -90,7 +123,7 @@ if __name__=="__main__":
     tosRec.write()
     
     
-    cr.execute ( "SELECT * FROM Klient" )
+    cr.execute ( "SELECT TOP 50 * FROM Klient" )
     klient_all = dictresult ( cr )
     cr.execute ( "SELECT * FROM DaneKlientInternet" )
     dki_all = dictresult ( cr )
@@ -103,13 +136,15 @@ if __name__=="__main__":
     
     CFG.CX.query ( "DELETE FROM {0}.subscriber".format(CFG.DB.SCHEMA) )
     CFG.CX.query ( "DELETE FROM {0}.service".format(CFG.DB.SCHEMA) )
+    CFG.CX.query ( "DELETE FROM {0}.ip_reservation".format(CFG.DB.SCHEMA) )
+    CFG.CX.query ( "DELETE FROM {0}.mac_interface".format(CFG.DB.SCHEMA) )
     
     subscriber_oldIdxMap = {}
     
     for K in klient_all:        
         subRec = Record ( "subscriber" )
         subRec.subscriberid = K["Index"]        
-        subRec.name = ( (K["Imie"] or "") + " " + (K["Nazwisko"] or "")).strip().decode ( "cp1250" )
+        subRec.name = ( (K["Imie"] or "") + " " + (K["Nazwisko"] or "")).strip().decode ( "cp1250" ).encode('utf8')
         subRec.postaladdress = (K["AdresKorespondencji"] or "").decode("cp1250").strip()
         if len(subRec.postaladdress) == 0: subRec.postaladdress = None
         if K["EMail"]:
@@ -123,9 +158,10 @@ if __name__=="__main__":
         if K["wynajmuje"]: subRec.FLAGS.WYNAJMUJE = True
         if K["Koperta"]: subRec.FLAGS.KOPERTA = True
         if K["BrakZgodyNaPrzetwarzanieDanych"]: subRec.FLAGS.BRAK_ZGODY_PD = True
+        skrot = K["Skrot"].decode("cp1250").encode('utf8')
         subRec.PARAM.SKROT = K["Skrot"].decode("cp1250")
         subscriber_oldIdxMap[K["Index"]] = subRec
-        
+            
         
             
     #Miejscowości    
@@ -237,6 +273,30 @@ if __name__=="__main__":
         srvRec.typeofservice = tosRec.objectid
         srvRec.locationid = klient_localizationMap[K["Index"]].objectid
         srvRec.write()
+        
+        n2c = None
+        skrot = K["Skrot"].decode('cp1250').encode('utf8')
+        
+        if skrot in n2_customer_idMap:
+            n2c = n2_customer_idMap[skrot]
+        elif subRec.name in n2_customer_nameMap:
+            n2c = n2_customer_nameMap[subRec.name]
+        if n2c is None:
+            print "Data Error: Klient %s nie znaleziony w bazie Netcon 2.0" % (skrot)
+            continue
+        try:
+            for ip in n2c['IP']:
+                iprRec = Record ( "ip_reservation" )
+                iprRec.ownerid = srvRec.objectid
+                iprRec.address = ip['ipaddr']
+                iprRec.write()
+        except KeyError:
+            pass
+        
+        
+            
+            
+
 
     
     stansatDB.close()

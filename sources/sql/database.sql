@@ -761,7 +761,8 @@ SELECT pv.setup_object_subtable ( 'sip_client' );
 -- $Id:$
 create table pv.mac_interface (
   mac macaddr not null unique,
-  ipreservationid int8 REFERENCES pv.objectids ON DELETE SET NULL ON UPDATE CASCADE NULL
+  ipreservationid int8 REFERENCES pv.objectids ON DELETE SET NULL ON UPDATE CASCADE NULL,
+  ownerid int8 REFERENCES pv.objectids ON DELETE SET NULL ON UPDATE CASCADE NULL
 ) inherits (pv."object");
 SELECT pv.setup_object_subtable ( 'mac_interface' );----------------------------------------------------------------------------------------------------
 --

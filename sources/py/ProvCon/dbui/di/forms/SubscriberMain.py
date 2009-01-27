@@ -8,7 +8,6 @@ import wx
 import wx.aui
 import wx.lib.scrolledpanel as scroll
 import wx.lib.rcsizer as rcs
-import wx.lib.buttonpanel as bp
 
 class SubscriberInfoPanel(wx.Panel):
     
@@ -49,7 +48,14 @@ class SubscriberInfoPanel(wx.Panel):
 class SubscriberCommandPanel(wx.Panel):
     def __init__(self, parent, form, *args, **kwargs):
         wx.Panel.__init__(self, parent, *args, **kwargs)
-        p = bp.ButtonPanel (self, 
+        sizer = wx.BoxSizer (wx.VERTICAL)
+        
+        self.form = form
+
+        for i in range(14):
+            sizer.Add ( wx.Button (self, label="TOOL%d" % i, style=wx.NO_BORDER),1, flag=wx.EXPAND)
+        
+        self.SetSizer(sizer)
     
 class SubscriberMain(wx.Panel):
     
@@ -76,12 +82,14 @@ class SubscriberMain(wx.Panel):
         subscroll = ScrolledGenericForm(self.form.subscriber, self)
         self.editor.subscriber = subscroll.genericform                        
         
-        ###
-        ###   INFO PANEL (static data)  
-        ###        
         self.info_panel = SubscriberInfoPanel(self, self.form.subscriber)
+        self.command_panel = SubscriberCommandPanel(self, self.form.subscriber)
 
-        #############################################################################
+        self.tb = wx.ToolBar (self)
+        self.tb.SetToolBitmapSize ( wx.Size(48,48) )
+        i = self.tb.AddLabelTool ( wx.NewId(), "Nowy rekord", wx.ArtProvider_GetBitmap(wx.ART_NEW) )
+        i = self.tb.AddLabelTool ( wx.NewId(), "Zapisz", wx.ArtProvider_GetBitmap(wx.ART_FILE_SAVE) )
+        self.tb.Realize()
         
         def _format_service(r):
             return r.typeofservice_REF + "\n" + r.classofservice_REF
@@ -90,28 +98,68 @@ class SubscriberMain(wx.Panel):
                                                  reprfunc = _format_service)
         self.recordlist.services.bind_to_form ( "subscriberid", self.form.subscriber)
 
-
+        
         self.mgr.AddPane ( self.info_panel, wx.aui.AuiPaneInfo().Top().
                            Floatable(False).CloseButton(False).
-                           Name("subscriber_info").
-                           Caption("Klient").                           
-                           MinSize( (-1, 200) )
+                           Caption("Podsumowanie danych klienta").
+                           Name("info_panel").
+                           Layer(1).
+                           MinSize( (-1, 170) ).
+                           BestSize( (700,170) )
                            )
-        self.mgr.AddPane ( subscroll, wx.aui.AuiPaneInfo().Center().
+        self.mgr.AddPane ( wx.Panel(self), wx.aui.AuiPaneInfo().Bottom().
+                           Floatable(True).CloseButton(True).Float().Dockable(False).Hide().
+                           Name("search_results").
+                           Caption("Wyniki wyszukiwania...").
+                           Layer(1).
+                           MinSize( ( 300, 250) )
+                           )
+
+        self.mgr.AddPane ( subscroll, wx.aui.AuiPaneInfo().CentrePane().
                            Floatable(False).CloseButton(False).
                            Name("subscriber_editor").
-                           Caption("Podstawowe dane klienta").
-                           Position(0).
-                           MinSize( (-1, 300) )
+                           Layer(0)                           
                            )        
-        self.mgr.AddPane ( self.recordlist.services, wx.aui.AuiPaneInfo().Center().
+        
+        self.mgr.AddPane ( self.recordlist.services, wx.aui.AuiPaneInfo().Bottom().
                            Floatable(False).CloseButton(False).
-                           Name("service_list").
-                           Position(1).
-                           Caption("Usługi")
+                           Name("service_list").                           
+                           Layer(0).
+                           Row(1).
+                           Caption("Usługi").
+                           MinSize( (-1, 120) )
                         )
-                           
+        self.mgr.AddPane ( wx.Panel(self), wx.aui.AuiPaneInfo().Bottom().
+                           Floatable(False).CloseButton(False).
+                           Name("device_list").                           
+                           Layer(0).
+                           Row(0).
+                           Caption("Urządzenia").
+                           MinSize( (-1, 160) )
+                        )
 
+        self.mgr.AddPane ( self.command_panel, wx.aui.AuiPaneInfo().Left().
+                           Floatable(False).CloseButton(False).
+                           Name("command_panel").Caption("Toolbox").
+                           Layer(1).
+                           MinSize((100,-1))
+                           )
+        
+        self.mgr.AddPane ( wx.Panel(self), wx.aui.AuiPaneInfo().Right().
+                           CloseButton(False).
+                           Name("ip_address_list").Caption("Adresy IP").
+                           Layer(1).                           
+                           MinSize( (300,-1) )                           
+                           )
+        self.mgr.AddPane ( wx.Panel(self), wx.aui.AuiPaneInfo().Right().
+                           CloseButton(False).
+                           Name("mac_address_list").Caption("MAC").
+                           Layer(1).
+                           MinSize( (300,-1) )                           
+                           )
+        self.mgr.AddPane ( self.tb, wx.aui.AuiPaneInfo().Name("record_toolbar").
+                           ToolbarPane().Top().Layer(2)
+                           )
         self.mgr.Update()
 
         
