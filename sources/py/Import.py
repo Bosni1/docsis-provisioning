@@ -8,6 +8,7 @@ from ProvCon.dbui.database import CFG, Init
 from ProvCon.dbui.di import rObject
 Record = rObject
 import atexit
+import StringIO
 
 def dictresult ( cr ):
     #assert isinstance( cr, pymssql.pymssqlCursor )
@@ -49,16 +50,23 @@ def setObjectFlag (obj, flagname):
     
     
 if __name__=="__main__":
-    #pw = getpass.getpass("Password for \\SQLEXPRESS\stansat:stansat@reklamy >")
+    DataErrors = StringIO.StringIO()
+    
+    #połączenie z bazą docsis-provisioning
     Init()    
+        
+    #polaczenie z SQLEXPRESS - bazą BOK
+    #pw = getpass.getpass("Password for \\SQLEXPRESS\stansat:stansat@reklamy >")
     pw = "wajig05850_hax0r"
     stansatDB = pymssql.connect ( user = 'stansat', database = 'stansat', host = 'reklamy',
                                   password = pw )
     cr = stansatDB.cursor()
-
+    
+    #połączenie z bazą NetCon 2.0
     n2db = MySQLdb.connect ( db='techdb', user='netcon3', host='83.243.39.5', charset='utf8' )
     n2cr = n2db.cursor()
     
+    #Pobieranie danych z NetCon 2.0
     n2cr.execute ( "SELECT * FROM customer" )
     n2_customer_all = dictresult (n2cr)
     n2_customer_idMap = {}
@@ -66,25 +74,19 @@ if __name__=="__main__":
     for c in n2_customer_all:        
         c['_imported'] = False
         c['_subscriberid'] = None
+        c['IP'] = []
+        c['MAC'] = []
         n2_customer_idMap[c['id']] = c
         n2_customer_nameMap[c['name']] = c
         
     n2cr.execute ( "SELECT *, int2ipstr(ip) as ipaddr FROM customer_ip_assignment" )
     n2_ip_all = dictresult(n2cr)    
     for i in n2_ip_all:
-        try:
-            assert 'IP' in n2_customer_idMap[i['customer']]
-        except AssertionError:
-            n2_customer_idMap[i['customer']]['IP'] = []
         n2_customer_idMap[i['customer']]['IP'].append (i)
 
     n2cr.execute ( "SELECT *, int2ipstr(dhcp_ip) as ipaddr FROM customer_known_mac" )
     n2_mac_all = dictresult(n2cr)    
     for i in n2_mac_all:
-        try:
-            assert 'MAC' in n2_customer_idMap[i['customer']]
-        except AssertionError:
-            n2_customer_idMap[i['customer']]['MAC'] = []
         n2_customer_idMap[i['customer']]['MAC'].append (i)
         
     atexit.register ( close, stansatDB )
@@ -98,6 +100,7 @@ if __name__=="__main__":
     p_pakietTVIdx = {}
         
     
+    #Import pakietów dostępu do Internetu
     cr.execute ("SELECT * FROM PakietInternet")
     CFG.CX.query ( "DELETE FROM {0}.class_of_service".format(CFG.DB.SCHEMA) )
     CFG.CX.query ( "DELETE FROM {0}.type_of_service".format(CFG.DB.SCHEMA) )
@@ -282,18 +285,35 @@ if __name__=="__main__":
         elif subRec.name in n2_customer_nameMap:
             n2c = n2_customer_nameMap[subRec.name]
         if n2c is None:
-            print "Data Error: Klient %s nie znaleziony w bazie Netcon 2.0" % (skrot)
+            DataErrors.write( "Data Error: Klient %s nie znaleziony w bazie Netcon 2.0\n" % (skrot))
             continue
         try:
+            ip_id_map = {}
             for ip in n2c['IP']:
                 iprRec = Record ( "ip_reservation" )
                 iprRec.ownerid = srvRec.objectid
-                iprRec.address = ip['ipaddr']
+                iprRec.address = ip['ipaddr']                
                 iprRec.write()
+                ip_id_map[ip['ipaddr']] = iprRec.objectid
+            
+            for mac in n2c['MAC']:
+                macRec = Record ( "mac_interface" )
+                macRec.ownerid = srvRec.objectid
+                macRec.mac = mac['mac']
+                if mac['ipaddr'] is not None:
+                    try:
+                        macRec.ipreservationid = ip_id_map[mac['ipaddr']]
+                    except KeyError:
+                        DataErrors.write ( "MAC: %s (%s) ma przypisany nieznany adres IP.\n" % (mac['mac'], mac['customer']) )
+                        pass
+                macRec.write()
+                
         except KeyError:
             pass
         
-        
+    print "#" * 80
+    print "## DATA ERRORS ##"
+    print DataErrors.getvalue()
             
             
 

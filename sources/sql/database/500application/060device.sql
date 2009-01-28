@@ -4,8 +4,15 @@ create table {:SCHEMA:}device (
   ownerid int8 REFERENCES {:SCHEMA:}objectids ON DELETE SET NULL ON UPDATE CASCADE NULL,
   devicelevel varchar(4) not null,
   devicerole varchar(64)[] null,
-  modelid int8 null,
+  modelid int8 REFERENCES {:SCHEMA:}objectids ON DELETE SET NULL ON UPDATE CASCADE NULL,
   serialnumber varchar(128) null
 ) inherits ({:SCHEMA:}"object");
 SELECT {:SCHEMA:}setup_object_subtable ( 'device' );
+
+create table {:SCHEMA:}device_model (
+  name varchar(128) null,
+  defaultroles varchar(64)[] null,
+  info text
+) inherits ({:SCHEMA:}"object");
+SELECT {:SCHEMA:}setup_object_subtable ( 'device_model' );
 

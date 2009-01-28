@@ -24,6 +24,7 @@ BEGIN
  PERFORM {:SCHEMA:}set_reference ( 'field_info.arrayof', 'table_info');
  --PERFORM {:SCHEMA:}set_reference ( 'field_info_variant.fieldid', 'field_info');
  --PERFORM {:SCHEMA:}set_reference ( 'table_info_variant.classid', 'table_info');
+ PERFORM {:SCHEMA:}set_reference ( 'device.modelid', 'model');
  PERFORM {:SCHEMA:}set_reference ( 'routeros_device.deviceid', 'device');
  PERFORM {:SCHEMA:}set_reference ( 'nat_router.deviceid', 'device');
  PERFORM {:SCHEMA:}set_reference ( 'core_radio_link.deviceid', 'device');
