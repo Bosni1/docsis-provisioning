@@ -86,7 +86,6 @@ class CFG:
             #import foreign key relationships
             for t in Table.__all_tables__.values():
                 if t.superclass: t.superclass = idmap[t.superclass]
-
                 else: t.superclass = None
                 for f in t.fields:
                     #For columns that reference a table_info row, replace the appropriate
@@ -97,7 +96,18 @@ class CFG:
                         idmap[t.objectid].reference_child.append ( (t, f) )
                         idmap[t.objectid].reference_child_hash[(t.name, f.name)] = (t,f)
                     if f.arrayof:
-                        f.arrayof = idmap[f.arrayof]                
+                        f.arrayof = idmap[f.arrayof]               
+            #import many-to-many relationships
+            mtm_info = self.query ( "SELECT * FROM ONLY {0}.mtm_relationship".format(CFG.DB.SCHEMA) ).dictresult()
+            for mtm in mtm_info:
+                table1 = Table.Get ( mtm['table_1'] )
+                table2 = Table.Get ( mtm['table_2'] )
+                
+                table1.mtm_relationships[ mtm['relationship_name'] ] = ( 
+                    mtm['table_1_handle'], mtm['mtm_table_name'], table2 )
+                table1.mtm_relationships[ mtm['relationship_name'] ] = ( 
+                    mtm['table_2_handle'], mtm['mtm_table_name'], table1 )
+                
             self.instance = self
         def delete(self, cl, a):
             """Delete an existing row in a database table.

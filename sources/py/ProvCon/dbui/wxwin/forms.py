@@ -7,6 +7,7 @@ import wx
 
 __revision__ = "$Revision$"
 
+
 class GenericForm(BaseForm, wx.Panel):
     
     def __init__(self, form, parent, *args, **kwargs):
@@ -30,28 +31,34 @@ class GenericForm(BaseForm, wx.Panel):
         e.Skip()
                 
     def _create_default_field_editor (self, field, parent=None, **kwargs):
-        editor_class_name = "Text"
+        from app import APP
+        editor_class_name = field.editor_class
+        default_class = EntryWidgets.Text
         options = {}
+        prefix = ''
+        suffix = ''
         if field.isarray:
             if field.arrayof:
-                editor_class_name = "ArrayCombo"
+                editor_class_name = "Combo"
+                prefix = "Array"
                 options['recordlist'] = RecordList ( field.arrayof ).reload()           
+                default_class = EntryWidgets.ArrayCombo
             else:
-                editor_class_name = "Array" + field.editor_class
-                if not hasattr(EntryWidgets, editor_class_name):
-                    editor_class_name = "ArrayText"
+                prefix = 'Array'
+                default_class = EntryWidgets.ArrayText
         elif field.reference:
-            editor_class_name = field.editor_class + "Reference"
-            if not hasattr(EntryWidgets, editor_class_name):
-                editor_class_name = "ComboReference"
-        else:
-            editor_class_name = field.editor_class
+            suffix = 'Reference'
+            default_class = EntryWidgets.ComboReference
+            
+        print field, field.editor_class, editor_class_name
         
-        try:
+        if hasattr (EntryWidgets, prefix + editor_class_name + suffix):
             editor_class = getattr(EntryWidgets, editor_class_name)
-        except AttributeError:
-            editor_class = EntryWidgets.Text        
-        
+        elif APP.getExtraDataEditor (prefix + editor_class_name + suffix):
+            editor_class = APP.getExtraDataEditor (prefix + editor_class_name + suffix)
+        else:
+            editor_class = default_class
+            
         editor = editor_class (field, parent, variable = self.form.getvar(field.name), **options )        
         return editor
 

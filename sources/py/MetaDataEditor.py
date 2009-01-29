@@ -3,12 +3,15 @@
 from ProvCon.dbui.database import CFG, Init
 from ProvCon.dbui import meta, orm
 from ProvCon.dbui import wxwin as guitk
+from ProvCon.dbui.di import controls as datacontrols
 
 import wx
+import wx.aui as aui
+
 #from wx.lib import scrolledpanel as scrolled
 
 __revision__ = "$Revision$"
-    
+
 class MetaDataEditor(wx.App):
     def OnInit(self):
         
@@ -77,125 +80,31 @@ class MetaDataEditor(wx.App):
         return True
     
     def ExportData(self, *args):
-        import cPickle
-        ti_rs = CFG.CX.query ( "SELECT * FROM {0}.table_info".format (CFG.DB.SCHEMA) ).dictresult()
-        fi_rs = CFG.CX.query ( "SELECT * FROM {0}.field_info".format (CFG.DB.SCHEMA) ).dictresult()
-        export = { 'table' : ti_rs, 'field' : fi_rs }        
-        
         dlg = wx.FileDialog(self.toplevel, message="Export to file...",
-                            style=wx.SAVE,
-                            wildcard = "Meta-Data backup (*.md) |*.md|"  \
-                                       "All files (*.*)|*.*" )
+                    style=wx.SAVE,
+                    wildcard = "Meta-Data backup (*.md) |*.md|"  \
+                               "All files (*.*)|*.*" )
         if dlg.ShowModal() == wx.ID_OK:
-            f = open(dlg.GetPath(), 'w')
-            cPickle.dump(export, f)
-            f.close()
-            
+            from ProvCon.dbui.di import meta
+            meta.ExportMetaData ( dlg.GetPath() )
         dlg.Destroy()
-                                    
-    
+        
     def ImportData(self, *args):
-        import cPickle
         dlg = wx.FileDialog(self.toplevel, message="Import from file...",
                             style=wx.OPEN,
                             wildcard = "Meta-Data backup (*.md) |*.md|"  \
                                        "All files (*.*)|*.*" )
         if dlg.ShowModal() == wx.ID_OK:
+            from ProvCon.dbui.di import meta
+            filename = dlg.GetPath()
             dlg.Destroy()            
-            export = cPickle.load ( open(dlg.GetPath(), 'r') )            
-            
-        
             dlg = wx.ProgressDialog ("Import danych z " + dlg.GetPath(), "Importowanie...",
                                      parent = self.toplevel)
-                                     
+            dlg.Size = wx.Size(400, 120)
             dlg.Show()
-
-            dlg.Pulse()
-            current_ti = CFG.CX.query ( "SELECT objectid, schema || '.' || name as path FROM {0}.table_info".format(CFG.DB.SCHEMA) ).dictresult()
-            dlg.Pulse()
-            current_fi = CFG.CX.query ( "SELECT objectid, classid as parent, path FROM {0}.field_info".format(CFG.DB.SCHEMA) ).dictresult()
-            
-            
-            cTI = {}
-            cFI = {}
-            for t in current_ti: cTI[t['path']] = t['objectid']
-            for f in current_fi: cFI[f['path']] = f['objectid']
-
-            oTI = {}
-            oFI = {}            
-            o_idTI = {}
-            o_idFI = {}            
-
-            ti = export['table']
-            fi = export['field']
-            
-            for t in ti: 
-                o_idTI[t['objectid']] = t
-                oTI[t['schema'] + "." + t['name']] = t
-                
-            for f in fi: 
-                o_idFI[t['objectid']] = f
-                oFI[f['path']] = f
-                
-            cTable = orm.Record.EMPTY("table_info")
-            cField = orm.Record.EMPTY("field_info")
-            
-            direct_copy = [ "label", "title", "info", "pprint_expression",
-                            "disabledfields", "recordlistpopup",
-                            "knownflags", "knownparams","hasevents",
-                            "hasnotes","excludedfields", 
-                            "txtexpression", "recordlisttoolbox" ]
-            for t in cTI:
-                dlg.Pulse(t)
-                ot = oTI[t]
-                cTable.setObjectID ( cTI[t] )
-
-                for cn in direct_copy:                    
-                    fld = cTable._table[cn]
-                    val = ot[cn]
-                    if fld.isarray: 
-                        if val: val = "array:" + val
-                        else: val = '' 
-                        val = fld.val_txt2py(val)                    
-                    print cn, val
-                    cTable.setFieldValue(cn, val)
-                                
-                cTable.write()
-                
-            
-            direct_copy = [ "label", "length", "choices", "ndims",
-                            "reference_editable", "pprint_fkexpression",
-                            "required", "protected", "nullable",
-                            "quickhelp", "helptopic", "info",
-                            "editor_class", "editor_class_params" ]
-            #direct_copy.remove("choices")
-            #direct_copy.remove('editor_class_params')
-            for f in cFI:                
-                try:
-                    of = oFI[f]
-                except KeyError:
-                    continue
-                dlg.Pulse(f)
-                cField.setObjectID (cFI[f])
-                
-                for cn in direct_copy:                    
-                    fld = cField._table[cn]                    
-                    val = of[cn]
-                    if fld.isarray: 
-                        if val: val = "array:" + val
-                        else: val = '' 
-                        val = fld.val_txt2py(val)                    
-                    cField.setFieldValue(cn, val)
-                
-                if of["arrayof"]:    
-                    oldt = o_idTI [ of["arrayof"] ]
-                    oldtpath = oldt["schema"] + "." + oldt["name"]
-                    cField.arrayof = cTI[ oldtpath ]                                                        
-
-                cField.write()
-                
+            for msg in meta.ImportMetaData (filename):
+                dlg.Pulse(msg)
             dlg.Destroy()
-                                                
         else:
             dlg.Destroy()
         

@@ -56,6 +56,22 @@ CREATE TABLE {:SCHEMA:}field_info (
 ) inherits ({:SCHEMA:}"object");
 SELECT {:SCHEMA:}setup_object_subtable ( 'field_info' );
 
+--
+-- Table column information used by GUI
+--
+CREATE TABLE {:SCHEMA:}mtm_relationship (  
+  mtm_table_name name not null,
+  relationship_name name not null,
+  table_1 name not null,
+  table_1_handle name not null,
+  table_2 name not null,
+  table_2_handle name not null,
+  unique (table_1, table_1_handle),
+  unique (table_2, table_2_handle),
+  unique (relationship_name)
+) inherits ({:SCHEMA:}"object");
+SELECT {:SCHEMA:}setup_object_subtable ( 'mtm_relationship' );
+
 CREATE VIEW {:SCHEMA:}map_class_ids AS
 select c.oid as systemid, ac.objectid as localid 
 from {:SCHEMA:}table_info ac inner join pg_class c on c.relname = ac.name 
@@ -162,8 +178,8 @@ BEGIN
       cmd := 'ALTER TABLE {:SCHEMA:}' || child.name || ' ADD  FOREIGN KEY (' || refs.refcolumn || ') REFERENCES {:SCHEMA:}objectids ';
       SELECT * INTO con FROM pg_constraint WHERE oid = refs.refcon;                       
       
-      cmd := cmd || {:SCHEMA:}constraint_constrtuct ( 'DELETE', con.confdeltype );
-      cmd := cmd || ' ' || {:SCHEMA:}constraint_constrtuct ( 'UPDATE', con.confupdtype );
+      cmd := cmd || {:SCHEMA:}constraint_construct ( 'DELETE', con.confdeltype );
+      cmd := cmd || ' ' || {:SCHEMA:}constraint_construct ( 'UPDATE', con.confupdtype );
       EXECUTE cmd;               
       -- insert into {:SCHEMA:}x values (cmd);      
       cmd := 'UPDATE {:SCHEMA:}field_info SET reference = {:SCHEMA:}table_object_id (''object'') WHERE path = ''' || child.name || '.' || refs.refcolumn || '''';
@@ -200,7 +216,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE FUNCTION {:SCHEMA:}constraint_constrtuct ( ev text, t text) returns text as $$
+CREATE FUNCTION {:SCHEMA:}constraint_construct ( ev text, t text) returns text as $$
 DECLARE
   r text;
 BEGIN
@@ -222,3 +238,20 @@ END;
 $$ LANGUAGE plpgsql;
 
 
+CREATE FUNCTION {:SCHEMA:}create_mtm_relationship ( t1 name, t2 name, rname name) returns text as $$
+DECLARE
+  tname name;
+BEGIN
+  tname = '_mtm_' || rname || '_' || t1 || '_' || t2;
+  EXECUTE 'CREATE TABLE {:SCHEMA:}' || tname || ' ( ' ||
+  ' refobjectid1 int8 REFERENCES {:SCHEMA:}objectids ON DELETE CASCADE ON UPDATE CASCADE NOT NULL, ' ||
+  ' refobjectid2 int8 REFERENCES {:SCHEMA:}objectids ON DELETE CASCADE ON UPDATE CASCADE NOT NULL, ' ||
+  ' PRIMARY KEY (refobjectid1, refobjectid2) ' ||
+  ' ) ';
+  INSERT INTO {:SCHEMA:}mtm_relationship (mtm_table_name, relationship_name, 
+    table_1, table_1_handle, 
+    table_2, table_2_handle)
+    VALUES (tname, rname, t1, rname, t2, rname);
+  return tname;  
+END;
+$$ LANGUAGE plpgsql;

@@ -11,9 +11,9 @@ class Navigator(BaseNavigator, wx.Panel):
         elements = []
         
         labels = {}
-        for bname in [ "first", "prev", "next", "last", "search"]:
+        for bname in ["first", "prev", "next", "last", "search"]:
             elements.append ( wx.Button ( self, label=labels.get(bname, bname), name=bname, **button_opt ) )
-        
+            
         for b in elements:
             b.SetFont (wx.Font(8, wx.FONTFAMILY_SWISS, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_BOLD))            
             b.Bind ( wx.EVT_BUTTON,getattr(self, b.Name) )

@@ -60,6 +60,7 @@ class Table(object):
         self.fields_hash = {}
         self.reference_child = []
         self.reference_child_hash = {}
+        self.mtm_relationships = {}
         self.schema = kwargs.get ( "schema", CFG.DB.SCHEMA )
         self.label = kwargs.get ( "label", self.name )
     

@@ -222,7 +222,7 @@ API Error: {0.pgexception}""".format ( self )
         self._modified_values = {}
         self._references = {}
         self._table = None
-        self._astxt = None
+        self._astxt = "<NULL>"
         self._feed = False
         self._resolvereference = kkw.get("resolvereference", self.__default_reference_mode__)  # none | text | record
         self._reprfunc = kkw.get ( "reprfunc", None )        
@@ -315,7 +315,7 @@ API Error: {0.pgexception}""".format ( self )
         self._references.clear()
         self._ismodified = False
         self._hasdata = False
-        self._astxt = None
+        self._astxt = "<NULL>"
         if self._table:            
             for f in self._table:
                 self._original_values[f.name] = None                
@@ -372,6 +372,7 @@ API Error: {0.pgexception}""".format ( self )
             self._isnew = False
             self._objectid = None
             self._isinstalled = False
+            self._astxt = "<NULL>"
 
     def setFieldValue (self, fieldname, fieldvalue):
         """
@@ -493,7 +494,7 @@ API Error: {0.pgexception}""".format ( self )
                                           { 'objectid' : self._objectid} )['txt']
             except KeyError:
                 if self._reprfunc: self._astxt = self._reprfunc (self)
-                else: self._astxt = None
+                else: self._astxt = "<NULL>"
             except pg.DatabaseError, e:
                 raise Record.DataQueryError ( "Error retrieving text value current record.", 
                                               "OBJECT[{0._objectid}].{1}".format (self, field.path),

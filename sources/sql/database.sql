@@ -235,6 +235,22 @@ CREATE TABLE pv.field_info (
 ) inherits (pv."object");
 SELECT pv.setup_object_subtable ( 'field_info' );
 
+--
+-- Table column information used by GUI
+--
+CREATE TABLE pv.mtm_relationship (  
+  mtm_table_name name not null,
+  relationship_name name not null,
+  table_1 name not null,
+  table_1_handle name not null,
+  table_2 name not null,
+  table_2_handle name not null,
+  unique (table_1, table_1_handle),
+  unique (table_2, table_2_handle),
+  unique (relationship_name)
+) inherits (pv."object");
+SELECT pv.setup_object_subtable ( 'mtm_relationship' );
+
 CREATE VIEW pv.map_class_ids AS
 select c.oid as systemid, ac.objectid as localid 
 from pv.table_info ac inner join pg_class c on c.relname = ac.name 
@@ -341,8 +357,8 @@ BEGIN
       cmd := 'ALTER TABLE pv.' || child.name || ' ADD  FOREIGN KEY (' || refs.refcolumn || ') REFERENCES pv.objectids ';
       SELECT * INTO con FROM pg_constraint WHERE oid = refs.refcon;                       
       
-      cmd := cmd || pv.constraint_constrtuct ( 'DELETE', con.confdeltype );
-      cmd := cmd || ' ' || pv.constraint_constrtuct ( 'UPDATE', con.confupdtype );
+      cmd := cmd || pv.constraint_construct ( 'DELETE', con.confdeltype );
+      cmd := cmd || ' ' || pv.constraint_construct ( 'UPDATE', con.confupdtype );
       EXECUTE cmd;               
       -- insert into pv.x values (cmd);      
       cmd := 'UPDATE pv.field_info SET reference = pv.table_object_id (''object'') WHERE path = ''' || child.name || '.' || refs.refcolumn || '''';
@@ -379,7 +395,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE FUNCTION pv.constraint_constrtuct ( ev text, t text) returns text as $$
+CREATE FUNCTION pv.constraint_construct ( ev text, t text) returns text as $$
 DECLARE
   r text;
 BEGIN
@@ -401,6 +417,23 @@ END;
 $$ LANGUAGE plpgsql;
 
 
+CREATE FUNCTION pv.create_mtm_relationship ( t1 name, t2 name, rname name) returns text as $$
+DECLARE
+  tname name;
+BEGIN
+  tname = '_mtm_' || rname || '_' || t1 || '_' || t2;
+  EXECUTE 'CREATE TABLE pv.' || tname || ' ( ' ||
+  ' refobjectid1 int8 REFERENCES pv.objectids ON DELETE CASCADE ON UPDATE CASCADE NOT NULL, ' ||
+  ' refobjectid2 int8 REFERENCES pv.objectids ON DELETE CASCADE ON UPDATE CASCADE NOT NULL, ' ||
+  ' PRIMARY KEY (refobjectid1, refobjectid2) ' ||
+  ' ) ';
+  INSERT INTO pv.mtm_relationship (mtm_table_name, relationship_name, 
+    table_1, table_1_handle, 
+    table_2, table_2_handle)
+    VALUES (tname, rname, t1, rname, t2, rname);
+  return tname;  
+END;
+$$ LANGUAGE plpgsql;
 ----------------------------------------------------------------------------------------------------
 --
 -- database/500application/010objectaddin.sql
@@ -675,10 +708,17 @@ create table pv.device (
   ownerid int8 REFERENCES pv.objectids ON DELETE SET NULL ON UPDATE CASCADE NULL,
   devicelevel varchar(4) not null,
   devicerole varchar(64)[] null,
-  modelid int8 null,
+  modelid int8 REFERENCES pv.objectids ON DELETE SET NULL ON UPDATE CASCADE NULL,
   serialnumber varchar(128) null
 ) inherits (pv."object");
 SELECT pv.setup_object_subtable ( 'device' );
+
+create table pv.device_model (
+  name varchar(128) null,
+  defaultroles varchar(64)[] null,
+  info text
+) inherits (pv."object");
+SELECT pv.setup_object_subtable ( 'device_model' );
 
 ----------------------------------------------------------------------------------------------------
 --
@@ -760,9 +800,11 @@ SELECT pv.setup_object_subtable ( 'sip_client' );
 ----------------------------------------------------------------------------------------------------
 -- $Id:$
 create table pv.mac_interface (
-  mac macaddr not null unique,
+  mac macaddr not null,
+  designation int default 0,
   ipreservationid int8 REFERENCES pv.objectids ON DELETE SET NULL ON UPDATE CASCADE NULL,
-  ownerid int8 REFERENCES pv.objectids ON DELETE SET NULL ON UPDATE CASCADE NULL
+  ownerid int8 REFERENCES pv.objectids ON DELETE SET NULL ON UPDATE CASCADE NULL,
+  unique (mac, designation)
 ) inherits (pv."object");
 SELECT pv.setup_object_subtable ( 'mac_interface' );----------------------------------------------------------------------------------------------------
 --
@@ -794,6 +836,7 @@ BEGIN
  PERFORM pv.set_reference ( 'field_info.arrayof', 'table_info');
  --PERFORM pv.set_reference ( 'field_info_variant.fieldid', 'field_info');
  --PERFORM pv.set_reference ( 'table_info_variant.classid', 'table_info');
+ PERFORM pv.set_reference ( 'device.modelid', 'model');
  PERFORM pv.set_reference ( 'routeros_device.deviceid', 'device');
  PERFORM pv.set_reference ( 'nat_router.deviceid', 'device');
  PERFORM pv.set_reference ( 'core_radio_link.deviceid', 'device');

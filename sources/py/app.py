@@ -160,9 +160,18 @@ class App(object):
 
     def isDevelMode(self):
         return _PROVISIONING_MODE == "DEVEL"
+
+    def getExtraDataEditor(self, editorname):
+        from ProvCon.dbui.di.controls import Entry
+        
+        if hasattr(Entry, editorname):
+            return getattr(Entry, editorname)
+        return None
+        
     
     def __init__(self):        
         print "Delayed import initialized."
+    
         
         
         
