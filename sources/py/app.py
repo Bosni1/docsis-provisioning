@@ -137,6 +137,10 @@ class App(object):
         self.Functions.set_process_name = set_process_name
         self.Functions.parse_socket_address = parse_socket_address
         
+
+    def imp_DataStore(self):
+        from ProvCon.dbui.store import Store
+        self.DataStore = Store
         
     def __getattr__(self, attrname):
         if attrname in self.__dict__:

@@ -203,7 +203,7 @@ def StartupDatabaseConnection():
     CFG.DB.initialize()
     CFG.RT.initialize()
     CFG.CX = CFG.tCX.instance or CFG.tCX()
-    CFG.CX.debug = "===== [SQL] =====\n%s\n================="
+    CFG.CX.debug = "[SQL] %s"
     #CFG.CX.debug = 
     
 Init = StartupDatabaseConnection

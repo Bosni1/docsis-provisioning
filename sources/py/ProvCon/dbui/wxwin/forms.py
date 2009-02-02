@@ -39,7 +39,7 @@ class GenericForm(BaseForm, wx.Panel):
         suffix = ''
         if field.isarray:
             if field.arrayof:
-                editor_class_name = "Combo"
+                editor_class_name = "List"
                 prefix = "Array"
                 options['recordlist'] = RecordList ( field.arrayof ).reload()           
                 default_class = EntryWidgets.ArrayCombo
@@ -48,14 +48,15 @@ class GenericForm(BaseForm, wx.Panel):
                 default_class = EntryWidgets.ArrayText
         elif field.reference:
             suffix = 'Reference'
-            default_class = EntryWidgets.ComboReference
-            
-        print field, field.editor_class, editor_class_name
+            default_class = EntryWidgets.ListReference
         
-        if hasattr (EntryWidgets, prefix + editor_class_name + suffix):
-            editor_class = getattr(EntryWidgets, editor_class_name)
-        elif APP.getExtraDataEditor (prefix + editor_class_name + suffix):
-            editor_class = APP.getExtraDataEditor (prefix + editor_class_name + suffix)
+        wanted_class_name = prefix + editor_class_name + suffix
+        print field, field.editor_class, wanted_class_name
+        
+        if hasattr (EntryWidgets,wanted_class_name ):
+            editor_class = getattr(EntryWidgets, wanted_class_name)
+        elif APP.getExtraDataEditor (wanted_class_name):
+            editor_class = APP.getExtraDataEditor (wanted_class_name)
         else:
             editor_class = default_class
             

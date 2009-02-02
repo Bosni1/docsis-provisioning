@@ -649,6 +649,13 @@ API Error: {0.pgexception}""".format ( self )
             return "<{1}> {2}".format (self._table.name, self._objectid,
                                                       self._astxt )
         return "<record>"    
+
+    def __str__(self):
+        try:
+            return self._astxt
+        except AttributeError:
+            return "<empty record>"
+    
     @classmethod
     def ID(cls,objectid, **kkw):
         """

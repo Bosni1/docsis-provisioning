@@ -90,7 +90,19 @@ class Entry:
                 self._on_checked.thaw()
         
     ##choosers
-    
+    class ListReference(BaseReferenceEditor, mwx.ListReference):
+        def __init__(self, field, parent, *args, **kwargs):            
+            BaseReferenceEditor.__init__(self, field, **kwargs)
+            mwx.ListReference.__init__(self, parent, name=field.path)                        
+            self.popup_ctrl.reprfunc = self.reprfunc
+            self.popup_ctrl.SetRecords (self.records)        
+            
+        def set_current_editor_value (self, value):
+            self.popup_ctrl.CurrentOID = value
+
+        def get_current_editor_value (self):
+            return self.popup_ctrl.CurrentOID
+                
     ## reference editors
     class ComboReference(BaseReferenceEditor, mwx.ComboReference):
         def __init__(self, field, parent, *args, **kwargs):
