@@ -1,5 +1,5 @@
 from ProvCon.dbui.abstractui.recordlists import BaseRecordList
-import wx, sys
+import wx, sys, wx.combo
 
 class RecordList(BaseRecordList, wx.HtmlListBox):
     def __init__(self, records, parent, *args, **kwargs):
@@ -25,4 +25,4 @@ class RecordList(BaseRecordList, wx.HtmlListBox):
         #    self.SetSelection(0)
         self.Refresh()
     
-                                                        
+#class RecordListSelector(BaseRecordList, wx.

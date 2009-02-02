@@ -4,7 +4,7 @@ from ProvCon.dbui.database import CFG, Init
 from ProvCon.dbui import meta, orm
 from ProvCon.dbui import wxwin as guitk
 from ProvCon.dbui.di import controls as datacontrols
-
+from app import APP
 import wx
 import wx.aui as aui
 
@@ -54,7 +54,8 @@ class MetaDataEditor(wx.App):
         sizer.Add (hsizer, 1, flag=wx.EXPAND)
 
         tablenav = guitk.navigators.Navigator (self.toplevel)
-        tablenav.set_records ( orm.RecordList ( self.tableeditor.table ).reload() )        
+        #tablenav.set_records ( orm.RecordList ( self.tableeditor.table ).reload() )        
+        tablenav.set_records ( APP.DataStore.table_info )
         sizer.Add (tablenav, 0, flag=wx.EXPAND)
         tablenav.navigate (0)
         tablenav.Show()

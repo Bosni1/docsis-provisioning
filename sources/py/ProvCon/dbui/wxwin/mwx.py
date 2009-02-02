@@ -1,3 +1,4 @@
+from ProvCon.func import eventemitter
 import wx, wx.combo
 
 class mwxControl(object):
@@ -63,17 +64,18 @@ class RecordsComboPopup(wx.HtmlListBox, wx.combo.ComboPopup):
             self.records_changed_hook.remove()
             self.records_changed_hook = None
         self.populate_list()
-        self.records_changed_hook = recordlist.register_event_hook ("record_list_changed", self.populate_list )        
+        self.records_changed_hook = recordlist.register_event_hook ("record_list_changed", self.populate_list )
         
     def GetRecords(self):
         return self.records
     Records = property(GetRecords, SetRecords)
 
-    def populate_list(self):
+    def populate_list(self, *args):
+        print "populate_list", args
         self.object_idx_hash = {}        
         for idx, r in enumerate(self.records):
             self.object_idx_hash[r.objectid] = idx 
-        self.SetItemCount( len(self.Records) + 1)
+        self.SetItemCount( len(self.records) + 1)
         self.Refresh()
     
     def SetCurrentOID(self, value):
@@ -91,6 +93,13 @@ class RecordsComboPopup(wx.HtmlListBox, wx.combo.ComboPopup):
         except KeyError:
             return None
     CurrentOID = property(GetCurrentOID, SetCurrentOID)
+
+    def GetCurrentRecord(self):
+        try:
+            return self.Records[self.Selection-1]
+        except KeyError:
+            return None
+        
     
     def Init(self):
         self.records = None
@@ -99,7 +108,7 @@ class RecordsComboPopup(wx.HtmlListBox, wx.combo.ComboPopup):
         wx.HtmlListBox.Create (self, parent, 
                                style=wx.LC_NO_HEADER | wx.LC_REPORT | wx.LC_SINGLE_SEL )
         #self.Bind (wx.EVT_MOTION, self.OnMotion)
-        #self.Bind (wx.EVT_LEFT_DOWN, self.OnLeftDown)
+        self.Bind (wx.EVT_LEFT_UP, self.OnLeftUp)
         return True
     
     def GetControl(self):
@@ -110,9 +119,9 @@ class RecordsComboPopup(wx.HtmlListBox, wx.combo.ComboPopup):
         print "GetStringValue", n
         if n == 0:
             return "<null>"
-        else:
+        elif n > 0:
             return self.Records[n-1]._astxt
-
+        
     def OnGetItem(self, n):
         #print "??? OnGetItem ", n    
         if n == 0:
@@ -135,12 +144,9 @@ class RecordsComboPopup(wx.HtmlListBox, wx.combo.ComboPopup):
     #def OnComboDoubleClick(self, evt):
         #wx.combo.ComboPopup.OnComboDoubleClick(self, evt)
         
-    #def OnLeftDown(self, evt):
-        #item, flags = self.HitTest ( evt.GetPosition() )
-        #if item >= 0:
-        #    self.Select (item)            
-        #self.Dismiss()   
-        #pass
+    def OnLeftUp(self, evt):
+        self.Dismiss()   
+
     
 class ComboCtrl(mwxControl, wx.combo.ComboCtrl):
     def __init__(self, *args, **kwargs):
@@ -157,6 +163,45 @@ class ComboCtrl(mwxControl, wx.combo.ComboCtrl):
         self.popup_ctrl.Dismiss()
         self.SetValue ( self.popup_ctrl.GetStringValue() )
         self.update_variable()
+
+class RecordListCombo(eventemitter, wx.combo.ComboCtrl):
+            
+    def __init__(self, parent, recordlist, *args, **kwargs):
+        wx.combo.ComboCtrl.__init__(self, parent, *args, **kwargs)
+        eventemitter.__init__ (self,  [ "current_record_changed", "keyboard_command" ] )
+        self.recordlist = recordlist
+        self.popup_ctrl = RecordsComboPopup( **kwargs )
+        self.SetPopupControl ( self.popup_ctrl )
+        self.popup_ctrl.Records = self.recordlist
+        self.set_null()
+        self.popup_ctrl.Bind (wx.EVT_LISTBOX, self.item_selected) 
+        self.Bind (wx.EVT_KEY_UP, self.key_pressed )
+        
+    def current_record(self):
+        return self.popup_ctrl.GetCurrentRecord()
+
+    def key_pressed(self, event, *args):
+        if event.KeyCode == 13:
+            self.emit_event ( "keyboard_command", "ENTER" )
+        elif event.KeyCode == 27:
+            self.emit_event ( "keyboard_command", "ESCAPE" )
+
+    def set_null(self):
+        self.popup_ctrl.CurrentOID = None
+        
+    def item_selected(self, event, *args):
+        #Any exception raised here hangs my X, hence the handler
+        try:
+            #self.SetValue ( self.popup_ctrl.GetStringValue() )
+            self.Refresh()
+            event.Skip()        
+            rec = self.current_record()        
+            self.emit_event ( "current_record_changed", rec )
+        except:
+            print "=" * 80
+            import sys, traceback
+            traceback.print_exc(file=sys.stdout)            
+            print "=" * 80
         
 Text = TextCtrl
 Static = StaticText

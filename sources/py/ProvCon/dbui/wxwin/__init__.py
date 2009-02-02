@@ -1,4 +1,4 @@
-import fields, forms, navigators, recordlists, complete
+import fields, forms, navigators, recordlists, complete, mwx
 # -*- coding: utf8 -*-
 
 def DBErrorHandler(exc):

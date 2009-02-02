@@ -140,7 +140,7 @@ class App(object):
 
     def imp_DataStore(self):
         from ProvCon.dbui.store import Store
-        self.DataStore = Store
+        self.DataStore = Store()
         
     def __getattr__(self, attrname):
         if attrname in self.__dict__:
@@ -151,6 +151,7 @@ class App(object):
             self.__dict__[attrname]  = obj
             return obj
         elif hasattr(self.__class__, "imp_" + attrname):
+            print "Delayed import of " + attrname
             getattr(self.__class__, "imp_" + attrname) (self)        
             return self.__dict__[attrname]
         else:
