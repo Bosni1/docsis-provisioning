@@ -49,6 +49,8 @@ class ProvisioningFE(wx.App):
         subscriber = SubscriberMain(notebook)
         notebook.AddPage ( subscriber, "Klient" )
         
+        datastore = wx.Panel(notebook)
+        notebook.AddPage (datastore, "DATA STORE")
         
         sizer.Add (self.windows.notebook, 4, flag=wx.EXPAND)                        
         self.windows.toplevel.SetSizer (sizer)

@@ -114,8 +114,9 @@ class GenericFormDialog(wx.Dialog):
 
         btsizer = wx.BoxSizer (wx.HORIZONTAL)
         btsave = wx.Button(self, label="Zapisz")
+        btsave.Bind ( wx.EVT_BUTTON, self.on_save )        
         btcancel = wx.Button(self, label="Anuluj")
-
+        btcancel.Bind ( wx.EVT_BUTTON, self.on_cancel )
         btsizer.Add (btsave, 1, flag=wx.EXPAND)
         btsizer.Add (btcancel, 1, flag=wx.EXPAND)
         
@@ -123,6 +124,13 @@ class GenericFormDialog(wx.Dialog):
                 
         self.SetSizer (sizer)        
 
+    def on_save(self, evt, *args):
+        self.form.save()        
+        self.Close()
+
+    def on_cancel(self, evt, *args):
+        self.Close()
+    
     def Load(self, objectid):
         self.form.setid (objectid)
     

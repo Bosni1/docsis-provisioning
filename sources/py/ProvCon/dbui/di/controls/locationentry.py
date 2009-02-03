@@ -149,6 +149,10 @@ class LocationEntry(BaseReferenceEditor, wx.CollapsiblePane):
             self._dialogs[what] = Dialog[what](self)
         self._dialogs[what].New()
         self._dialogs[what].Edit()
+        objectid = self._dialogs[what].form.current._objectid
+        if objectid:
+            APP.DataStore[what].reloadsingle ( objectid )
+        
         
     def save(self, evt, *args):        
         self.Label = self._current.location._astxt
