@@ -3,10 +3,17 @@
 from ProvCon.dbui.abstractui.fields import BaseReferenceEditor
 from ProvCon.func import AttrDict
 from ProvCon.dbui import orm, meta
-from ProvCon.dbui.wxwin import mwx
+from ProvCon.dbui.wxwin import mwx, forms
 from functools import partial
 from app import APP
 import wx, wx.combo
+
+Dialog = {
+ "city" : forms.GenerateEditorDialog ( "city", "Nowa miejscowość..." ),
+ "street" : forms.GenerateEditorDialog ( "street", "Nowa ulica..." ),
+ "building" : forms.GenerateEditorDialog ( "building", "Nowy budynek..." ),
+ "location" : forms.GenerateEditorDialog ( "location", "Nowy lokal..." )
+}
 
 class LocationEntry(BaseReferenceEditor, wx.CollapsiblePane):
     def __init__(self, field, parent, *args, **kwargs):
@@ -15,6 +22,8 @@ class LocationEntry(BaseReferenceEditor, wx.CollapsiblePane):
         wx.CollapsiblePane.__init__(self, parent, style=wx.CP_DEFAULT_STYLE | wx.CP_NO_TLW_RESIZE)        
         
         self._current = AttrDict()
+
+        self._dialogs = AttrDict()
         
         self._current.city = Record.EMPTY ( "city" )
         self._current.street = Record.EMPTY ( "street" )
@@ -35,6 +44,7 @@ class LocationEntry(BaseReferenceEditor, wx.CollapsiblePane):
             "current_record_changed", partial(self.ref_record_changed, "city") )
         self._hooks.city_command = self._widgets.city.register_event_hook ( 
             "keyboard_command", partial(self.ref_keyboard_command, "city") )
+        self._widgets.city.TextCtrl.Bind ( wx.EVT_LEFT_DCLICK, partial(self.add, "city") )
         sizer.Add ( self._widgets.city, flag=wx.EXPAND)
                 
         self._store.street = orm.RecordListFilter ( APP.DataStore.street )
@@ -43,6 +53,7 @@ class LocationEntry(BaseReferenceEditor, wx.CollapsiblePane):
             "current_record_changed", partial(self.ref_record_changed, "street") )
         self._hooks.street_command = self._widgets.street.register_event_hook ( 
             "keyboard_command", partial(self.ref_keyboard_command, "street") )        
+        self._widgets.street.TextCtrl.Bind ( wx.EVT_LEFT_DCLICK, partial(self.add, "street") )
         sizer.Add ( self._widgets.street, flag=wx.EXPAND)
         
         self._store.building = orm.RecordListFilter ( APP.DataStore.building )
@@ -51,6 +62,7 @@ class LocationEntry(BaseReferenceEditor, wx.CollapsiblePane):
             "current_record_changed", partial(self.ref_record_changed, "building") )
         self._hooks.building_command = self._widgets.building.register_event_hook ( 
             "keyboard_command", partial(self.ref_keyboard_command, "building") )        
+        self._widgets.building.TextCtrl.Bind ( wx.EVT_LEFT_DCLICK, partial(self.add, "building") )
         sizer.Add ( self._widgets.building, flag=wx.EXPAND)
         
         self._store.location = orm.RecordListFilter ( APP.DataStore.location )
@@ -59,6 +71,7 @@ class LocationEntry(BaseReferenceEditor, wx.CollapsiblePane):
             "current_record_changed", partial(self.ref_record_changed, "location") )
         self._hooks.location_command = self._widgets.location.register_event_hook ( 
             "keyboard_command", partial(self.ref_keyboard_command, "location") )        
+        self._widgets.location.TextCtrl.Bind ( wx.EVT_LEFT_DCLICK, partial(self.add, "location") )
         sizer.Add ( self._widgets.location, flag=wx.EXPAND)
 
         btsizer = wx.BoxSizer (wx.HORIZONTAL)
@@ -69,8 +82,12 @@ class LocationEntry(BaseReferenceEditor, wx.CollapsiblePane):
         
         self._widgets.revert = wx.Button (pane, size=(-1,30), label="Przywróć" )
         btsizer.Add (self._widgets.revert, 1, flag=wx.EXPAND)
+        
+        self._widgets.add = wx.Button (pane, size=(-1,30), label="Dodaj..." )
+        self._widgets.add.Bind (wx.EVT_BUTTON, self.add)
+        btsizer.Add (self._widgets.add, 1, flag=wx.EXPAND)
 
-        sizer.Add (btsizer, flag=wx.EXPAND)
+        sizer.Add (btsizer, flag=wx.EXPAND)               
         
         self._widgets.street.Enabled = False
         self._widgets.building.Enabled = False
@@ -125,7 +142,14 @@ class LocationEntry(BaseReferenceEditor, wx.CollapsiblePane):
             
     def ref_keyboard_command(self, tbl, key):
         print tbl, key
-
+        
+    def add(self, what, evt, *args):
+        print self, what, evt
+        if what not in self._dialogs:
+            self._dialogs[what] = Dialog[what](self)
+        self._dialogs[what].New()
+        self._dialogs[what].Edit()
+        
     def save(self, evt, *args):        
         self.Label = self._current.location._astxt
         self.update_variable()

@@ -16,7 +16,7 @@ class GenericForm(BaseForm, wx.Panel):
         self.excluded_fields = kwargs.get ( "excluded", [] )
         
     def _build_ui(self):
-        self.sizer = wx.FlexGridSizer( self.form.table.fieldCount() + 1 - len(self.excluded_fields), 3, 1, 0 )                                
+        self.sizer = wx.FlexGridSizer( self.form.table.fieldCount() + 1 - len(self.excluded_fields) + len(self.form.extra_fields), 3, 1, 0 )                                
         self.sizer.AddGrowableCol (1)
         for f in filter(lambda f: f.name not in Table.__special_columns__, self.form.table):   
             if f.name in self.excluded_fields: continue
@@ -24,6 +24,13 @@ class GenericForm(BaseForm, wx.Panel):
             self.sizer.Add ( label, flag=wx.ALIGN_RIGHT | wx.ALIGN_CENTER_VERTICAL | wx.RIGHT, border=20 )
             self.sizer.Add ( self._create_field_editor (f, self), 20, flag=wx.EXPAND)
             self.sizer.AddSpacer ( 20 )
+            
+        for f in self.form.extra_fields:
+            label = wx.StaticText (self, label = f.label )
+            self.sizer.Add ( label, flag=wx.ALIGN_RIGHT | wx.ALIGN_CENTER_VERTICAL | wx.RIGHT, border=20 )
+            self.sizer.Add ( f.create_editor(self, self.form), 20, flag=wx.EXPAND)
+            self.sizer.AddSpacer ( 20 )
+            
         self.SetSizer (self.sizer)
         self.SetAutoLayout(1)
         
@@ -91,5 +98,47 @@ class ScrolledGenericForm(wx.ScrolledWindow):
         self.genericform.SetVirtualSize ( (ew, eh) )
         event.Skip() 
         
-class GenericFormDialog(wx.MiniFrame):
-    pass
+class GenericFormDialog(wx.Dialog):
+    def __init__(self, parent, form, title, **kwargs):
+        
+        self.form = form
+        pre = wx.PreDialog()
+        #pre.SetExtraStyle(...)
+        pre.Create (parent, -1, title, wx.DefaultPosition, wx.Size(600, 500)) 
+        self.PostCreate(pre)
+        
+        sizer = wx.BoxSizer (wx.VERTICAL)        
+        
+        sgform = ScrolledGenericForm (form, self, **kwargs)
+        sizer.Add (sgform, 10, flag=wx.EXPAND)
+
+        btsizer = wx.BoxSizer (wx.HORIZONTAL)
+        btsave = wx.Button(self, label="Zapisz")
+        btcancel = wx.Button(self, label="Anuluj")
+
+        btsizer.Add (btsave, 1, flag=wx.EXPAND)
+        btsizer.Add (btcancel, 1, flag=wx.EXPAND)
+        
+        sizer.Add (btsizer, flag=wx.EXPAND)
+                
+        self.SetSizer (sizer)        
+
+    def Load(self, objectid):
+        self.form.setid (objectid)
+    
+    def Edit(self):        
+        self.ShowModal()
+        
+    def New(self):
+        self.form.new ()
+
+def GenerateEditorDialog ( tablename, title, excluded=[], extra=[] ):
+    from ProvCon.dbui.orm import Form
+    class _EditorDialog(GenericFormDialog):
+        def __init__(self, parent, **kw):
+            form = Form ( Table.Get ( tablename ), extra_fields = extra  )
+            GenericFormDialog.__init__( self, parent, form, title, **kw )
+    _EditorDialog.__name__ = "GenericFormDialog_" + tablename
+    return _EditorDialog
+        
+        

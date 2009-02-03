@@ -77,7 +77,9 @@ class Form(eventemitter):
             self.tkvars[f.name].trace ( 'w', partial (self.value_change_handler, f.name), name="form of " + self.table.name ) 
 
         self.extra_fields = kkw.get ( "extra_fields", [] )
+        self.extra_fields_hash = {}
         for f in self.extra_fields:
+            self.extra_fields_hash[f.name] = f
             self.tkvars[f.name] = self.variableclass( name=self.table.name + "." + f.name)
             self.tkvars[f.name].trace ( 'w', partial (self.value_change_handler, f.name), name="form of " + self.table.name ) 
         
@@ -179,6 +181,7 @@ class Form(eventemitter):
         try:
             self.value_change_handler.freeze()
             if fname in self.table: self.on_edit_handler ( fname )
+            elif fname in self.extra_fields_hash: self.extra_fields_hash[fname].value_changed ( self )
         finally:
             self.value_change_handler.thaw()
                     

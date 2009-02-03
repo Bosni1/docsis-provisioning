@@ -145,3 +145,16 @@ class Field(object):
         from ProvCon.dbui.meta import Table
         return self.name in Table.__special_columns__
     
+
+class VirtualField(object):
+    """
+    VirtualFields are fields used in gui forms, which do not have a corresponding column
+    in the edited table.
+    
+    VirtualFields may have complex logic embedded into them, like foreign-key editing,
+    displaying complex information about current record etc.
+    """
+    def __init__(self, name, **kw):
+        self.name = name
+        self.label = kw.get ( "label", self.name )
+        
