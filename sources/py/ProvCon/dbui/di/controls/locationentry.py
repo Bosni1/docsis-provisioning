@@ -36,8 +36,7 @@ class LocationEntry(BaseReferenceEditor, wx.CollapsiblePane):
         self._hooks.city_command = self._widgets.city.register_event_hook ( 
             "keyboard_command", partial(self.ref_keyboard_command, "city") )
         sizer.Add ( self._widgets.city, flag=wx.EXPAND)
-        
-        
+                
         self._store.street = orm.RecordListFilter ( APP.DataStore.street )
         self._widgets.street = mwx.RecordListCombo ( pane, self._store.street )
         self._hooks.street_change = self._widgets.street.register_event_hook ( 
@@ -54,32 +53,44 @@ class LocationEntry(BaseReferenceEditor, wx.CollapsiblePane):
             "keyboard_command", partial(self.ref_keyboard_command, "building") )        
         sizer.Add ( self._widgets.building, flag=wx.EXPAND)
         
-        self._widgets.location = wx.TextCtrl ( pane, value = "")
+        self._store.location = orm.RecordListFilter ( APP.DataStore.location )
+        self._widgets.location = mwx.RecordListCombo ( pane, self._store.location )
+        self._hooks.location_change = self._widgets.location.register_event_hook ( 
+            "current_record_changed", partial(self.ref_record_changed, "location") )
+        self._hooks.location_command = self._widgets.location.register_event_hook ( 
+            "keyboard_command", partial(self.ref_keyboard_command, "location") )        
         sizer.Add ( self._widgets.location, flag=wx.EXPAND)
 
+        btsizer = wx.BoxSizer (wx.HORIZONTAL)
+        
+        self._widgets.save = wx.Button (pane, size=(-1,30), label="Ustaw" )
+        self._widgets.save.Bind (wx.EVT_BUTTON, self.save)
+        btsizer.Add (self._widgets.save, 1, flag=wx.EXPAND)
+        
+        self._widgets.revert = wx.Button (pane, size=(-1,30), label="Przywróć" )
+        btsizer.Add (self._widgets.revert, 1, flag=wx.EXPAND)
+
+        sizer.Add (btsizer, flag=wx.EXPAND)
+        
         self._widgets.street.Enabled = False
         self._widgets.building.Enabled = False
-        self._widgets.location.Enabled = False
-                    
+        self._widgets.location.Enabled = False                    
         
         pane.SetSizer(sizer)    
         
         self.Bind ( wx.EVT_COLLAPSIBLEPANE_CHANGED, self.OnPaneToggled)
                 
     def OnPaneToggled(self, evt, *args):
-        #self.Collapse(self.IsCollapsed())
-        #self.Layout()
-        #print self.IsCollapsed()
-        #self.widgets
         self.Parent.Layout()
         
 
     def ref_record_changed(self, tbl, record):
-        print tbl, record
+        print tbl, record        
         if tbl == "city":
             if record:
+                self._widgets.city.SetValue (record._astxt)                
                 self._store.street.predicate = lambda r: r.cityid == record.objectid
-                self._widgets.street.Enabled = True
+                self._widgets.street.Enabled = True                
                 self._widgets.street.set_null()                
                 self._widgets.building.set_null()
             else:
@@ -87,7 +98,9 @@ class LocationEntry(BaseReferenceEditor, wx.CollapsiblePane):
                 self._store.street.predicate = lambda r: False            
             self._widgets.building.Enabled = False
             self._widgets.location.Enabled = False
-        elif tbl == "street":
+            self._widgets.save.Enabled = False
+        elif tbl == "street":            
+            self._widgets.street.SetValue (record._astxt)                
             if record:
                 self._store.building.predicate = lambda r: r.streetid == record.objectid
                 self._widgets.building.Enabled = True
@@ -97,28 +110,46 @@ class LocationEntry(BaseReferenceEditor, wx.CollapsiblePane):
                 self._widgets.building.Enabled = False
             self._widgets.location.Enabled = False
         elif tbl == "building":
+            self._widgets.building.SetValue (record._astxt)                
             if record:
                 self._store.location.predicate = lambda r: r.buildingid == record.objectid
                 self._widgets.location.Enabled = True
             else:
                 self._store.location.predicate = lambda r: False
-                self._widgets.location.Enabled = False
-            
+                self._widgets.location.Enabled = False        
+        elif tbl == "location":
+            self._widgets.location.SetValue (record._astxt)                
+            self._current.location = record   
+            if record:
+                self._widgets.save.Enabled = True
             
     def ref_keyboard_command(self, tbl, key):
         print tbl, key
+
+    def save(self, evt, *args):        
+        self.Label = self._current.location._astxt
+        self.update_variable()
         
     def set_current_editor_value(self, value):
         loc = self._current.location
-        loc.setObjectID (value)                
+        loc.setObjectID (value)                        
         self._widgets.location.Enabled = False
         if loc.hasData:
             self._widgets.location.Enabled = True
-            self._widgets.location.Value = loc.number
+            
+            self._current.building.setObjectID ( loc.buildingid )
+            self._current.street.setObjectID ( self._current.building.streetid )
+            self._current.city.setObjectID ( self._current.street.cityid )
+            
+            self.ref_record_changed ( "city",  self._current.city)
+            self.ref_record_changed ( "street",  self._current.street)
+            self.ref_record_changed ( "building",  self._current.building)
+            self.ref_record_changed ( "location",  self._current.location)
+            
             self.Label = loc._astxt
         else:
             self.Label = "(nie ustawiony)"
         
-    def get_current_editor_value(self):
+    def get_current_editor_value(self):        
         return self._current.location._objectid
                 

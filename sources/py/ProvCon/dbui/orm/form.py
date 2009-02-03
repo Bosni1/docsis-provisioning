@@ -75,7 +75,13 @@ class Form(eventemitter):
         for f in self.table:
             self.tkvars[f.name] = self.variableclass( name=self.table.name + "." + f.name)
             self.tkvars[f.name].trace ( 'w', partial (self.value_change_handler, f.name), name="form of " + self.table.name ) 
+
+        self.extra_fields = kkw.get ( "extra_fields", [] )
+        for f in self.extra_fields:
+            self.tkvars[f.name] = self.variableclass( name=self.table.name + "." + f.name)
+            self.tkvars[f.name].trace ( 'w', partial (self.value_change_handler, f.name), name="form of " + self.table.name ) 
         
+            
         self.defaultvalues = kkw.get ( "defaults", {} )
 
     def get_current_record(self):
@@ -90,7 +96,9 @@ class Form(eventemitter):
     def save(self):
         try:
             wasnew = self.current._isnew
+            for extra_field in self.extra_fields: extra_field.pre_write ( self )
             self.current.write()        
+            for extra_field in self.extra_fields: extra_field.post_write ( self )
             self.on_record_changed_handler()
             self.emit_event ( "current_record_saved", self.current, wasnew )
             self.modification_notification = False
@@ -99,7 +107,9 @@ class Form(eventemitter):
 
     def revert(self):
         try:
+            for extra_field in self.extra_fields: extra_field.pre_read ( self )
             self.current.read()
+            for extra_field in self.extra_fields: extra_field.post_read ( self )
             self.on_record_changed_handler()        
             self.emit_event ( "data_loaded", self.current )
             self.emit_event ( "navigate", self.current.objectid )
@@ -112,6 +122,8 @@ class Form(eventemitter):
             self.emit_event ( "request_record_change", self.current, None )
         except eventcancelled:
             return False
+        
+        for extra_field in self.extra_fields: extra_field.new ( self )
         
         self.current.setObjectID ( None )
         for fname in self.defaultvalues:
@@ -132,7 +144,9 @@ class Form(eventemitter):
         except eventcancelled:
             return False
         try:
+            for extra_field in self.extra_fields: extra_field.pre_read ( self )                        
             self.current.setObjectID ( objectid )
+            for extra_field in self.extra_fields: extra_field.post_read ( self )
             self.on_record_changed_handler()
             self.modification_notification = False
             self.emit_event ( "data_loaded", self.current )
@@ -144,7 +158,9 @@ class Form(eventemitter):
     def delete(self):
         try:
             objid = self.current.objectid
+            for extra_field in self.extra_fields: extra_field.pre_delete ( self )                        
             self.current.delete()
+            for extra_field in self.extra_fields: extra_field.post_delete ( self )                        
             self.emit_event ( "current_record_deleted", objid )
         except self.ormerror, e:
             self.ormerrorhandler(e)
@@ -173,6 +189,8 @@ class Form(eventemitter):
             self.value_change_handler.freeze()
             for f in self.table:
                 self.tkvars[f.name].set ( self.current.getFieldValue ( f.name ) )
+            for f in self.extra_fields:
+                f.init_value (self)
         finally:
             self.value_change_handler.thaw()
     

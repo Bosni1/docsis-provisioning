@@ -8,12 +8,14 @@ class mwxControl(object):
     
     def CheckVariableValue(self, value):
         pass
-
-    def GetEditorFont(self, name):
+    
+    @staticmethod
+    def GetEditorFont(name):
         if mwxControl.Fonts is None:            
             mwxControl.Fonts = {
                 'Edit' : wx.Font ( 9, wx.FONTFAMILY_MODERN, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL ),
                 'Static' : wx.Font ( 11, wx.FONTFAMILY_MODERN, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL ),
+                'Small' : wx.Font ( 7, wx.FONTFAMILY_MODERN, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL ),
             }
         return mwxControl.Fonts[name]
 
@@ -56,7 +58,7 @@ class RecordsComboPopup(wx.HtmlListBox, wx.combo.ComboPopup):
         self.PostCreate(wx.PreHtmlListBox())
         wx.combo.ComboPopup.__init__(self)
         self.records_changed_hook = None
-        self.reprfunc = lambda x: x._astxt
+        self.reprfunc = kwargs.get ( "reprfunc", lambda r: r._astxt)
         
     def SetRecords(self, recordlist):
         self.records = recordlist
@@ -88,6 +90,7 @@ class RecordsComboPopup(wx.HtmlListBox, wx.combo.ComboPopup):
         self.GetCombo().SetValue( self.GetStringValue() )
         
     def GetCurrentOID(self):
+        if self.Selection <= 0: return None
         try:
             return self.Records[self.Selection-1].objectid    
         except KeyError:
@@ -95,6 +98,7 @@ class RecordsComboPopup(wx.HtmlListBox, wx.combo.ComboPopup):
     CurrentOID = property(GetCurrentOID, SetCurrentOID)
 
     def GetCurrentRecord(self):
+        if self.Selection <= 0: return None
         try:
             return self.Records[self.Selection-1]
         except KeyError:
@@ -118,14 +122,14 @@ class RecordsComboPopup(wx.HtmlListBox, wx.combo.ComboPopup):
         n = self.Selection
         print "GetStringValue", n
         if n == 0:
-            return "<null>"
+            return ""
         elif n > 0:
             return self.Records[n-1]._astxt
         
     def OnGetItem(self, n):
         #print "??? OnGetItem ", n    
         if n == 0:
-            return "\n<null>"
+            return "(null)"
         else:
             return self.reprfunc(self.Records[n-1])
     
@@ -167,7 +171,7 @@ class ComboCtrl(mwxControl, wx.combo.ComboCtrl):
 class RecordListCombo(eventemitter, wx.combo.ComboCtrl):
             
     def __init__(self, parent, recordlist, *args, **kwargs):
-        wx.combo.ComboCtrl.__init__(self, parent, *args, **kwargs)
+        wx.combo.ComboCtrl.__init__(self, parent)
         eventemitter.__init__ (self,  [ "current_record_changed", "keyboard_command" ] )
         self.recordlist = recordlist
         self.popup_ctrl = RecordsComboPopup( **kwargs )
@@ -175,8 +179,13 @@ class RecordListCombo(eventemitter, wx.combo.ComboCtrl):
         self.popup_ctrl.Records = self.recordlist
         self.set_null()
         self.popup_ctrl.Bind (wx.EVT_LISTBOX, self.item_selected) 
-        self.Bind (wx.EVT_KEY_UP, self.key_pressed )
+        self.Bind (wx.EVT_KEY_UP, self.key_pressed )     
         
+        self.search_function = self.regex_search
+    
+    def regex_search(self, query, *args):
+        pass
+    
     def current_record(self):
         return self.popup_ctrl.GetCurrentRecord()
 
@@ -188,12 +197,15 @@ class RecordListCombo(eventemitter, wx.combo.ComboCtrl):
 
     def set_null(self):
         self.popup_ctrl.CurrentOID = None
+
+    def set_oid(self, oid):
+        self.popup_ctrl.CurrentOID = oid
         
     def item_selected(self, event, *args):
         #Any exception raised here hangs my X, hence the handler
         try:
             #self.SetValue ( self.popup_ctrl.GetStringValue() )
-            self.Refresh()
+            self.Refresh()                        
             event.Skip()        
             rec = self.current_record()        
             self.emit_event ( "current_record_changed", rec )

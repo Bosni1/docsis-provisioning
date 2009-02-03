@@ -12,12 +12,14 @@ class GenericForm(BaseForm, wx.Panel):
     
     def __init__(self, form, parent, *args, **kwargs):
         BaseForm.__init__( self, form, *args, **kwargs )
-        wx.Panel.__init__( self, parent, style=wx.TAB_TRAVERSAL)                
+        wx.Panel.__init__( self, parent, style=wx.TAB_TRAVERSAL)
+        self.excluded_fields = kwargs.get ( "excluded", [] )
         
     def _build_ui(self):
-        self.sizer = wx.FlexGridSizer( self.form.table.fieldCount() + 1, 3, 1, 0 )                                
+        self.sizer = wx.FlexGridSizer( self.form.table.fieldCount() + 1 - len(self.excluded_fields), 3, 1, 0 )                                
         self.sizer.AddGrowableCol (1)
-        for f in filter(lambda f: f.name not in Table.__special_columns__, self.form.table):
+        for f in filter(lambda f: f.name not in Table.__special_columns__, self.form.table):   
+            if f.name in self.excluded_fields: continue
             label = wx.StaticText ( self, label = f.label )                        
             self.sizer.Add ( label, flag=wx.ALIGN_RIGHT | wx.ALIGN_CENTER_VERTICAL | wx.RIGHT, border=20 )
             self.sizer.Add ( self._create_field_editor (f, self), 20, flag=wx.EXPAND)
@@ -88,3 +90,6 @@ class ScrolledGenericForm(wx.ScrolledWindow):
         self.genericform.SetMinSize ( ( w-20, eh ) )        
         self.genericform.SetVirtualSize ( (ew, eh) )
         event.Skip() 
+        
+class GenericFormDialog(wx.MiniFrame):
+    pass

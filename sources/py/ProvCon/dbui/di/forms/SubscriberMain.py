@@ -163,8 +163,8 @@ class SubscriberMain(wx.Panel):
         self.mgr.Update()
 
         
-        #self.form.subscriber.setid ( self.store.subscriber[0].objectid )
-        self.form.subscriber.new()
+        self.form.subscriber.setid ( self.store.subscriber[10].objectid )
+        #self.form.subscriber.new()
         
         
         

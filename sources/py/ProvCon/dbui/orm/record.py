@@ -187,10 +187,38 @@ Query    : {0.query}
 Message  : {0.msg}
 API Error: {0.pgexception}""".format ( self )     
         
+        
+    class TextRepresentationCache(object):
+        def __init__(self):
+            self.cache = {}
+            self.db = CFG.tCX
+        
+        def __getitem__(self, key):
+            value = None
+            try:
+                value = self.cache[key]
+            except KeyError:
+                try:
+                    value = CFG.CX.get ( CFG.DB.SCHEMA + ".object_search_txt",
+                                         {"objectid" : key} )['txt']
+                    self.cache[key] = value
+                except pg.DatabaseError, e:
+                    raise Record.DataQueryError ( "Error retrieving text value for object.", 
+                                              "OBJECT[{0}]".format (key),
+                                              e )
+            return value
+        
+        def __delitem__(self, key):
+            try:
+                del self.cache[key]
+            except KeyError:
+                pass
+            
     
     __default_reference_mode__ = "text"  # none | text | record
-
+    
     DB = CFG.tCX
+    TextCache = TextRepresentationCache()
     
     def __init__(self, **kkw):
         """
@@ -438,16 +466,7 @@ API Error: {0.pgexception}""".format ( self )
         if self._resolvereference == "none":
             self._references[field.name] = decoded
         elif self._resolvereference == "text":
-            try:
-                self._references[field.name] = CFG.CX.get ( CFG.DB.SCHEMA + ".object_search_txt",
-                                                    {"objectid" : decoded} )['txt']
-            except KeyError:
-                self._references[field.name] = "<null>"
-            except pg.DatabaseError, e:
-                raise Record.DataQueryError ( "Error retrieving text value for referenced row.", 
-                                              "OBJECT[{0._objectid}].{1} -> OBJECT[{2}".format (self, field.path, decoded),
-                                              e )
-                                              
+            self._references[field.name] = self.TextCache[decoded] or "(null)"                                              
         elif self._resolvereference == "record":
             self._references[field.name] = Record.ID (decoded)
 
@@ -489,16 +508,7 @@ API Error: {0.pgexception}""".format ( self )
         elif self._reprfunc:
             self._astxt = self._reprfunc (self)
         else:            
-            try:
-                self._astxt = CFG.CX.get (CFG.DB.SCHEMA + ".object_search_txt", 
-                                          { 'objectid' : self._objectid} )['txt']
-            except KeyError:
-                if self._reprfunc: self._astxt = self._reprfunc (self)
-                else: self._astxt = "<NULL>"
-            except pg.DatabaseError, e:
-                raise Record.DataQueryError ( "Error retrieving text value current record.", 
-                                              "OBJECT[{0._objectid}].{1}".format (self, field.path),
-                                              e )
+            self._astxt = self.TextCache[self._objectid] or "(none)"
                 
             
         self._hasdata = True
@@ -561,15 +571,16 @@ API Error: {0.pgexception}""".format ( self )
                                                      str(self._modified_values),
                                                      e)
         elif self._ismodified:
-            for m in self._modified_values:
-                #print "Modified field:", m
+            
+            for m in self._modified_values:                
                 self._modified_values[m] = self._table[m].val_py2sql(self._modified_values[m])
+                
             self._modified_values['objectid'] = self._objectid
+            del self.TextCache[self._objectid]
             try:
                 rec = CFG.CX.update ( CFG.DB.SCHEMA + "." + self._table.name,
                                       self._modified_values )
-                self.read()
-                #print "Record updated"
+                self.read()                
                 self.emit_event ( "record_saved", self )
             except pg.DatabaseError, e:
                 print "Error updating record"
