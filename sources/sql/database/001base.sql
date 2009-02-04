@@ -6,16 +6,16 @@
 create table {:SCHEMA:}objectids (
   objectid int8 primary key
 );
-create index idx_objectids_objectid on {:SCHEMA:}objectids (objectid);
+-- create index idx_objectids_objectid on {:SCHEMA:}objectids (objectid);
 
 --
 -- Objects' textual representations are kept here
 --
 create table {:SCHEMA:}object_search_txt (
   objectid int8 PRIMARY KEY,
-  txt varchar(128)
+  txt varchar(256)
 );
-create index object_search_txt_objectid on {:SCHEMA:}object_search_txt (objectid);
+-- create index object_search_txt_objectid on {:SCHEMA:}object_search_txt (objectid);
 
 --
 -- Expressions used to generate objects' text representations.

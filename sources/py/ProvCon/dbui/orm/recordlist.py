@@ -27,7 +27,7 @@ class RecordList(list, eventemitter):
         """
         Re-query the database and refresh the list.
         """
-        list.__init__(self)
+        list.__init__(self)        
         self += filter(self.filterfunc, self.table.recordObjectList (self.filter, self.select, self.order, self.recordclass))
         self.hash_id.clear()
         self.hash_index.clear()
@@ -72,7 +72,7 @@ class RecordList(list, eventemitter):
         return self.hash_id[objectid]
 
 @Implements(IRecordList)
-class RecordListFilter(eventemitter):    
+class RecordListView(eventemitter):    
     def __init__(self, masterlist, predicate = lambda x: False):
         eventemitter.__init__(self, [ "record_list_reloaded", 
                                       "record_list_item_reloaded",

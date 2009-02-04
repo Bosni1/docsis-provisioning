@@ -10,9 +10,9 @@ import wx, wx.combo
 
 Dialog = {
  "city" : forms.GenerateEditorDialog ( "city", "Nowa miejscowość..." ),
- "street" : forms.GenerateEditorDialog ( "street", "Nowa ulica..." ),
- "building" : forms.GenerateEditorDialog ( "building", "Nowy budynek..." ),
- "location" : forms.GenerateEditorDialog ( "location", "Nowy lokal..." )
+ "street" : forms.GenerateEditorDialog ( "street", "Nowa ulica...", fixed = {'cityid': None} ),
+ "building" : forms.GenerateEditorDialog ( "building", "Nowy budynek...", fixed = { 'streetid' : None} ),
+ "location" : forms.GenerateEditorDialog ( "location", "Nowy lokal...", fixed = {'buildingid' : None}  )
 }
 
 class LocationEntry(BaseReferenceEditor, wx.CollapsiblePane):
@@ -47,7 +47,7 @@ class LocationEntry(BaseReferenceEditor, wx.CollapsiblePane):
         self._widgets.city.TextCtrl.Bind ( wx.EVT_LEFT_DCLICK, partial(self.add, "city") )
         sizer.Add ( self._widgets.city, flag=wx.EXPAND)
                 
-        self._store.street = orm.RecordListFilter ( APP.DataStore.street )
+        self._store.street = orm.RecordListView ( APP.DataStore.street )
         self._widgets.street = mwx.RecordListCombo ( pane, self._store.street )
         self._hooks.street_change = self._widgets.street.register_event_hook ( 
             "current_record_changed", partial(self.ref_record_changed, "street") )
@@ -56,7 +56,7 @@ class LocationEntry(BaseReferenceEditor, wx.CollapsiblePane):
         self._widgets.street.TextCtrl.Bind ( wx.EVT_LEFT_DCLICK, partial(self.add, "street") )
         sizer.Add ( self._widgets.street, flag=wx.EXPAND)
         
-        self._store.building = orm.RecordListFilter ( APP.DataStore.building )
+        self._store.building = orm.RecordListView ( APP.DataStore.building )
         self._widgets.building = mwx.RecordListCombo ( pane, self._store.building )
         self._hooks.building_change = self._widgets.building.register_event_hook ( 
             "current_record_changed", partial(self.ref_record_changed, "building") )
@@ -65,7 +65,7 @@ class LocationEntry(BaseReferenceEditor, wx.CollapsiblePane):
         self._widgets.building.TextCtrl.Bind ( wx.EVT_LEFT_DCLICK, partial(self.add, "building") )
         sizer.Add ( self._widgets.building, flag=wx.EXPAND)
         
-        self._store.location = orm.RecordListFilter ( APP.DataStore.location )
+        self._store.location = orm.RecordListView ( APP.DataStore.location )
         self._widgets.location = mwx.RecordListCombo ( pane, self._store.location )
         self._hooks.location_change = self._widgets.location.register_event_hook ( 
             "current_record_changed", partial(self.ref_record_changed, "location") )
@@ -145,8 +145,21 @@ class LocationEntry(BaseReferenceEditor, wx.CollapsiblePane):
         
     def add(self, what, evt, *args):
         print self, what, evt
-        if what not in self._dialogs:
+
+        try: 
+            dialog = self._dialogs[what]
+        except KeyError:            
             self._dialogs[what] = Dialog[what](self)
+            
+            dialog = self._dialogs[what]
+            
+        if what == 'street': 
+            dialog.form.set_fixed_value ( "cityid", self._widgets.city.current_record().objectid )
+        if what == 'building': 
+            dialog.form.set_fixed_value ( "streetid", self._widgets.street.current_record().objectid )
+        if what == 'location': 
+            dialog.form.set_fixed_value ( "buildingid", self._widgets.building.current_record().objectid )
+            
         self._dialogs[what].New()
         self._dialogs[what].Edit()
         objectid = self._dialogs[what].form.current._objectid

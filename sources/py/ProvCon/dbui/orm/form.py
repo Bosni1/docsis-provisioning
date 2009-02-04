@@ -82,16 +82,38 @@ class Form(eventemitter):
             self.extra_fields_hash[f.name] = f
             self.tkvars[f.name] = self.variableclass( name=self.table.name + "." + f.name)
             self.tkvars[f.name].trace ( 'w', partial (self.value_change_handler, f.name), name="form of " + self.table.name ) 
-        
-            
+                    
         self.defaultvalues = kkw.get ( "defaults", {} )
-
+        self.fixed_fields = kkw.get ( "fixed_fields", {} )
+        
     def get_current_record(self):
-        return self.__current
+        return self.__current    
     def set_current_record(self, r):
         self.__current = r
     current = property(get_current_record, set_current_record)
+
+    def is_field_fixed(self, fieldname):
+        return fieldname in self.fixed_fields
+    
+    def get_fixed_value(self, fieldname):
+        try:
+            return self.fixed_fields[fieldname]
+        except KeyError:
+            return None
+
+    def set_fixed_value(self, fieldname, fieldvalue):
+        self.fixed_fields[fieldname] = fieldvalue
         
+    def del_fixed_value(self, fieldname):
+        try:
+            del self.fixed_fields[fieldname]
+        except KeyError:
+            pass
+
+    def set_all_fixed_fields(self):
+        for fname in self.fixed_fields:
+            self.current[fname] = self.fixed_fields[fname]
+            
     def getvar(self, fieldname):
         return self.tkvars[fieldname]
     
@@ -111,6 +133,7 @@ class Form(eventemitter):
         try:
             for extra_field in self.extra_fields: extra_field.pre_read ( self )
             self.current.read()
+            self.set_all_fixed_fields()
             for extra_field in self.extra_fields: extra_field.post_read ( self )
             self.on_record_changed_handler()        
             self.emit_event ( "data_loaded", self.current )
@@ -126,10 +149,13 @@ class Form(eventemitter):
             return False
         
         for extra_field in self.extra_fields: extra_field.new ( self )
-        
         self.current.setObjectID ( None )
+        self.set_all_fixed_fields()
+        
         for fname in self.defaultvalues:
             self.current[fname] = self.defaultvalues[fname]            
+            if self.is_field_fixed(fname): self.current[fname] = self.get_fixed_value(fname)
+            
         self.on_record_changed_handler()
         self.emit_event ( "new_record", self.current )
         self.emit_event ( "current_record_changed", self.current )
@@ -148,6 +174,7 @@ class Form(eventemitter):
         try:
             for extra_field in self.extra_fields: extra_field.pre_read ( self )                        
             self.current.setObjectID ( objectid )
+            self.set_all_fixed_fields()
             for extra_field in self.extra_fields: extra_field.post_read ( self )
             self.on_record_changed_handler()
             self.modification_notification = False

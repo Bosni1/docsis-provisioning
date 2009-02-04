@@ -303,6 +303,8 @@ API Error: {0.pgexception}""".format ( self )
         elif attrname.endswith("_REF"):
             fname = attrname[:-4]
             if fname in self._table:
+                if not self._table[fname].reference:
+                    return None
                 if fname not in self._references:
                     self.updateReferenceField ( self._table[fname] )
                 return self._references.get(fname, None)
@@ -343,7 +345,7 @@ API Error: {0.pgexception}""".format ( self )
         self._references.clear()
         self._ismodified = False
         self._hasdata = False
-        self._astxt = "<NULL>"
+        self._astxt = "(null)"
         if self._table:            
             for f in self._table:
                 self._original_values[f.name] = None                
@@ -400,7 +402,7 @@ API Error: {0.pgexception}""".format ( self )
             self._isnew = False
             self._objectid = None
             self._isinstalled = False
-            self._astxt = "<NULL>"
+            self._astxt = "(null)"
 
     def setFieldValue (self, fieldname, fieldvalue):
         """
@@ -486,7 +488,7 @@ API Error: {0.pgexception}""".format ( self )
         @param row: a dictionary of database row (column name -> value).                
         """
         
-        #avoid calling "read" after changing the _objectid
+        #avoid automatic call to "read" after _objectid changes
         self._feed = True
         self._objectid = row['objectid']
         self._feed = False
@@ -498,8 +500,6 @@ API Error: {0.pgexception}""".format ( self )
             decoded = field.val_sql2py ( row[cn] )
             self.__dict__[cn] = decoded
             self._original_values[cn] = decoded
-            if field.reference:
-                self.updateReferenceField(field)
         
         #if _astxt was not provided with the data, _reprfunc is not set,
         #get the text from database

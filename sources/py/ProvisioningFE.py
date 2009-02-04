@@ -9,6 +9,7 @@ from ProvCon.func import AttrDict
 import ProvCon.dbui.di.controls as controls
 import wx
 import wx.html as html
+import cProfile, pstats
 
 
 import time, traceback
@@ -47,6 +48,8 @@ class ProvisioningFE(wx.App):
         #                                                       tablename="subscriber"
         #                                                      )
         subscriber = SubscriberMain(notebook)
+
+
         notebook.AddPage ( subscriber, "Klient" )
         
         datastore = wx.Panel(notebook)
@@ -61,13 +64,15 @@ class ProvisioningFE(wx.App):
 
 
 Init()        
-app = ProvisioningFE()
-import cProfile
-cProfile.run( "app.MainLoop()", "/tmp/prov-prof" )
-import pstats
+#app = ProvisioningFE()
+
+#### PROFILER
+cProfile.run( "app = ProvisioningFE()", "/tmp/prov-prof" )
 p = pstats.Stats ("/tmp/prov-prof" )
 p.strip_dirs().sort_stats(-1).print_stats()
-#app.MainLoop()
+
+#### NORMAL RUN
+app.MainLoop()
 
 
 

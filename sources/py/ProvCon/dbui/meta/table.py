@@ -122,8 +122,8 @@ class Table(object):
         @rtype: list of Record
         """
         from ProvCon.dbui.orm import Record
-        RecordClass = recordObjectClass or Record
-        rl = self.recordList(_filter, select, order)
+        RecordClass = recordObjectClass or Record        
+        rl = self.recordList(_filter, select, order)        
         li = []
         for r in rl:
             rec = RecordClass.EMPTY (self)

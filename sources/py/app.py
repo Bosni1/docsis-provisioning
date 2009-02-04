@@ -172,8 +172,7 @@ class App(object):
         if hasattr(Entry, editorname):
             return getattr(Entry, editorname)
         return None
-        
-    
+            
     def __init__(self):        
         print "Delayed import initialized."
     

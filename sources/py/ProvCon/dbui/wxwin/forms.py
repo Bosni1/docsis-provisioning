@@ -46,6 +46,10 @@ class GenericForm(BaseForm, wx.Panel):
         options = {}
         prefix = ''
         suffix = ''
+
+        if self.form.is_field_fixed ( field.name ):
+            editor_class_name = 'Static'
+            
         if field.isarray:
             if field.arrayof:
                 editor_class_name = "List"
@@ -140,11 +144,11 @@ class GenericFormDialog(wx.Dialog):
     def New(self):
         self.form.new ()
 
-def GenerateEditorDialog ( tablename, title, excluded=[], extra=[] ):
+def GenerateEditorDialog ( tablename, title, excluded=[], extra=[], fixed={} ):
     from ProvCon.dbui.orm import Form
     class _EditorDialog(GenericFormDialog):
         def __init__(self, parent, **kw):
-            form = Form ( Table.Get ( tablename ), extra_fields = extra  )
+            form = Form ( Table.Get ( tablename ), extra_fields = extra, fixed_fields = fixed  )
             GenericFormDialog.__init__( self, parent, form, title, **kw )
     _EditorDialog.__name__ = "GenericFormDialog_" + tablename
     return _EditorDialog
