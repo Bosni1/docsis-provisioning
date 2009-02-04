@@ -171,7 +171,7 @@ class ComboCtrl(mwxControl, wx.combo.ComboCtrl):
 class RecordListCombo(eventemitter, wx.combo.ComboCtrl):
             
     def __init__(self, parent, recordlist, *args, **kwargs):
-        wx.combo.ComboCtrl.__init__(self, parent)
+        wx.combo.ComboCtrl.__init__(self, parent)        
         eventemitter.__init__ (self,  [ "current_record_changed", "keyboard_command" ] )
         self.recordlist = recordlist
         self.popup_ctrl = RecordsComboPopup( **kwargs )

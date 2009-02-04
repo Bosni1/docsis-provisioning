@@ -41,16 +41,23 @@ class RecordList(list, eventemitter):
     def reloadsingle(self, objectid):
         """
         Refresh one record with given objectid.
+        If the record was not in the list, it is appended to it.
+        
         @type objectid: int
         """
         try:
-            rl = self.table.recordObjectList ( self.filter + " AND o.objectid = %d " % objectid, self.select, self.order,self.recordclass)
-            self[self.hash_index[objectid]] = rl[0]            
+            rl = self.table.recordObjectList ( self.filter + " AND o.objectid = %d " % objectid, self.select, self.order,self.recordclass)[0]
+        except KeyError:   #record not found
+            return
+        try:
+            self[self.hash_index[objectid]] = rl            
+        except KeyError:
+            self.append (rl)
+            self.hash_index[objectid] = len(self) - 1
+            self.hash_id[objectid] = rl            
+        finally:
             self.emit_event ( "record_list_item_reloaded", self.hash_index[objectid] )
             self.emit_event ( "record_list_changed", self )
-        except KeyError:
-            self.reload()
-        
             
     def clear(self):
         """

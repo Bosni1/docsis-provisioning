@@ -146,6 +146,8 @@ class LocationEntry(BaseReferenceEditor, wx.CollapsiblePane):
     def add(self, what, evt, *args):
         print self, what, evt
 
+        is_new_record = self._widgets[what].current_record() is None
+        
         try: 
             dialog = self._dialogs[what]
         except KeyError:            
@@ -159,10 +161,13 @@ class LocationEntry(BaseReferenceEditor, wx.CollapsiblePane):
             dialog.form.set_fixed_value ( "streetid", self._widgets.street.current_record().objectid )
         if what == 'location': 
             dialog.form.set_fixed_value ( "buildingid", self._widgets.building.current_record().objectid )
-            
-        self._dialogs[what].New()
-        self._dialogs[what].Edit()
-        objectid = self._dialogs[what].form.current._objectid
+        
+        if is_new_record:
+            dialog.New()
+        else:
+            dialog.Load ( self._widgets[what].current_record().objectid )
+        dialog.Edit()
+        objectid = dialog.form.current._objectid
         if objectid:
             APP.DataStore[what].reloadsingle ( objectid )
         
