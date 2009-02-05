@@ -2,6 +2,9 @@
 ##$Id:$
 
 class AttrDict(dict):
+    def __init__(self):
+        dict.__init__(self)
+        
     def __setattr__(self, attrname, attrval):        
         if attrname in self.__dict__:
             self.__dict__[attrname] = attrval

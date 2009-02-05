@@ -2,13 +2,31 @@
 from ProvCon.func import AttrDict
 from ProvCon.dbui import orm, meta
 from ProvCon.dbui.wxwin.forms import GenericForm, ScrolledGenericForm
-from ProvCon.dbui.wxwin import recordlists as rl
+from ProvCon.dbui.wxwin import recordlists as rl, mwx, forms
 from ProvCon.dbui.wxwin.fields import Entry
+from app import APP
 import wx
 import wx.aui
 import wx.lib.scrolledpanel as scroll
 import wx.lib.rcsizer as rcs
 
+class SubscriberSearchToolbar(wx.Panel):
+
+    def __init__(self, main, *args, **kw):
+        wx.Panel.__init__ (self, main)
+        sizer = wx.BoxSizer(wx.HORIZONTAL)
+        self.searchctrl = wx.SearchCtrl (self, style=wx.TE_PROCESS_ENTER)
+        self.recordlist = orm.RecordList ( meta.Table.Get ( "subscriber" ) )
+        self.resultspopup = mwx.RecordListCombo (self, self.recordlist)
+        sizer.Add ( wx.StaticText ( self, label="Szukaj: " ), flag=wx.ALIGN_CENTER )        
+        sizer.Add ( self.searchctrl, 10, flag=wx.ALIGN_CENTER)
+        sizer.Add ( wx.StaticText ( self, label="  Wyniki: " ), flag=wx.ALIGN_CENTER )        
+        sizer.Add ( self.resultspopup, 14, flag=wx.ALIGN_CENTER)
+        sizer.Add ( wx.Button(self, label="<<"), flag=wx.ALIGN_CENTER )
+        sizer.Add ( wx.Button(self, label=">>"), flag=wx.ALIGN_CENTER )        
+        self.SetSizer (sizer)
+        
+        
 class SubscriberInfoPanel(wx.Panel):
     
     def __init__(self, parent, form, *args, **kwargs):
@@ -36,8 +54,13 @@ class SubscriberInfoPanel(wx.Panel):
         self.row_1.Add ( self.edit.name, row=1,col=2, flag=wx.EXPAND)
         self.row_1.Add ( self.edit.primarylocation, row=2,col=2, flag=wx.EXPAND)
 
-        self.sizer.Add (self.row_1)
-
+        self.sizer.Add (self.row_1,10,flag=wx.EXPAND)
+        
+        self.row_2 = wx.BoxSizer(wx.HORIZONTAL)
+        self.row_2.AddStretchSpacer(5)
+        self.row_2.Add ( wx.StaticText ( self, label="DANE ZOSTAŁY ZMIENIONE") )
+        self.row_2.Add ( wx.Button ( self, id=wx.ID_SAVE, label="Zapisz") )
+        self.sizer.Add ( self.row_2,0,wx.EXPAND)
         
         
         self.SetSizer (self.sizer)
@@ -51,9 +74,19 @@ class SubscriberCommandPanel(wx.Panel):
         sizer = wx.BoxSizer (wx.VERTICAL)
         
         self.form = form
-
-        for i in range(14):
-            sizer.Add ( wx.Button (self, label="TOOL%d" % i, style=wx.NO_BORDER),1, flag=wx.EXPAND)
+        self.buttons = AttrDict()
+        self.buttons.new_subscriber = wx.Button ( self, label = "Nowy\nklient", style=wx.NO_BORDER )
+        self.buttons.new_device = wx.Button ( self, label = "Nowe\nurządzenie", style=wx.NO_BORDER )
+        self.buttons.cos_change = wx.Button ( self, label = "Zmiana\npakietu", style=wx.NO_BORDER )
+        self.buttons.status_change = wx.Button ( self, label = "Diagnostyka", style=wx.NO_BORDER )
+        self.buttons.diagnostics = wx.Button ( self, label = "Blokady", style=wx.NO_BORDER )
+        self.buttons.service_change = wx.Button ( self, label = "Przełączenie", style=wx.NO_BORDER )
+        self.buttons.equipment_change = wx.Button ( self, label = "Wymiana\nsprzętu", style=wx.NO_BORDER )        
+        for b in self.buttons:
+            b = self.buttons[b]
+            sizer.Add ( b,0, flag=wx.EXPAND)
+        
+        sizer.AddStretchSpacer (10)
         
         self.SetSizer(sizer)
     
@@ -67,11 +100,13 @@ class SubscriberMain(wx.Panel):
         self.editor = AttrDict()
         self.store = AttrDict()
         self.recordlist = AttrDict()
+        self.dialogs = {
+            "service" : forms.GenerateEditorDialog ( "service", "Usługa"),            
+            }
         
         self.table.subscriber = meta.Table.Get ( "subscriber" )
         self.table.service = meta.Table.Get ( "service" )
         
-
         self.store.subscriber = orm.RecordList ( self.table.subscriber ).reload()
         self.store.services = orm.RecordList ( self.table.service, select=["classofservice","typeofservice","handle"] )
         self.form.subscriber = orm.Form ( self.table.subscriber  )
@@ -84,15 +119,9 @@ class SubscriberMain(wx.Panel):
         
         self.info_panel = SubscriberInfoPanel(self, self.form.subscriber)
         self.command_panel = SubscriberCommandPanel(self, self.form.subscriber)
-
-        self.tb = wx.ToolBar (self)
-        self.tb.SetToolBitmapSize ( wx.Size(48,48) )
-        i = self.tb.AddLabelTool ( wx.NewId(), "Nowy rekord", wx.ArtProvider_GetBitmap(wx.ART_NEW) )
-        i = self.tb.AddLabelTool ( wx.NewId(), "Zapisz", wx.ArtProvider_GetBitmap(wx.ART_FILE_SAVE) )
-        self.tb.Realize()
         
         def _format_service(r):
-            return r.typeofservice_REF + "\n" + r.classofservice_REF
+            return r.typeofservice_REF + "\n<br>" + r.classofservice_REF
 
         self.recordlist.services = rl.RecordList(self.store.services, self,
                                                  reprfunc = _format_service)
@@ -107,12 +136,12 @@ class SubscriberMain(wx.Panel):
                            MinSize( (-1, 170) ).
                            BestSize( (700,170) )
                            )
-        self.mgr.AddPane ( wx.Panel(self), wx.aui.AuiPaneInfo().Bottom().
-                           Floatable(True).CloseButton(True).Float().Dockable(False).Hide().
+        self.mgr.AddPane ( SubscriberSearchToolbar(self), wx.aui.AuiPaneInfo().Bottom().
+                           Floatable(True).CloseButton(True).Floatable(False).Dockable(False).Show().
                            Name("search_results").
                            Caption("Wyniki wyszukiwania...").
                            Layer(1).
-                           MinSize( ( 300, 250) )
+                           MinSize( ( -1, 40) )
                            )
 
         self.mgr.AddPane ( subscroll, wx.aui.AuiPaneInfo().CentrePane().
@@ -157,14 +186,12 @@ class SubscriberMain(wx.Panel):
                            Layer(1).
                            MinSize( (300,-1) )                           
                            )
-        self.mgr.AddPane ( self.tb, wx.aui.AuiPaneInfo().Name("record_toolbar").
-                           ToolbarPane().Top().Layer(2)
-                           )
+
         self.mgr.Update()
 
         
-        #self.form.subscriber.setid ( self.store.subscriber[10].objectid )
-        self.form.subscriber.new()
+        self.form.subscriber.setid ( self.store.subscriber[10].objectid )
+        #self.form.subscriber.new()
         
         
         

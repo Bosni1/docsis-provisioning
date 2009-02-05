@@ -22,7 +22,6 @@ class LocationEntry(BaseReferenceEditor, wx.CollapsiblePane):
         wx.CollapsiblePane.__init__(self, parent, style=wx.CP_DEFAULT_STYLE | wx.CP_NO_TLW_RESIZE)        
         
         self._current = AttrDict()
-
         self._dialogs = AttrDict()
         
         self._current.city = Record.EMPTY ( "city" )
@@ -44,7 +43,7 @@ class LocationEntry(BaseReferenceEditor, wx.CollapsiblePane):
             "current_record_changed", partial(self.ref_record_changed, "city") )
         self._hooks.city_command = self._widgets.city.register_event_hook ( 
             "keyboard_command", partial(self.ref_keyboard_command, "city") )
-        self._widgets.city.TextCtrl.Bind ( wx.EVT_LEFT_DCLICK, partial(self.add, "city") )
+        self._widgets.city.Bind ( wx.EVT_RIGHT_DOWN, partial(self.add, "city") )
         sizer.Add ( self._widgets.city, flag=wx.EXPAND)
                 
         self._store.street = orm.RecordListView ( APP.DataStore.street )
@@ -53,7 +52,7 @@ class LocationEntry(BaseReferenceEditor, wx.CollapsiblePane):
             "current_record_changed", partial(self.ref_record_changed, "street") )
         self._hooks.street_command = self._widgets.street.register_event_hook ( 
             "keyboard_command", partial(self.ref_keyboard_command, "street") )        
-        self._widgets.street.TextCtrl.Bind ( wx.EVT_LEFT_DCLICK, partial(self.add, "street") )
+        self._widgets.street.Bind ( wx.EVT_RIGHT_DOWN, partial(self.add, "street") )
         sizer.Add ( self._widgets.street, flag=wx.EXPAND)
         
         self._store.building = orm.RecordListView ( APP.DataStore.building )
@@ -62,7 +61,7 @@ class LocationEntry(BaseReferenceEditor, wx.CollapsiblePane):
             "current_record_changed", partial(self.ref_record_changed, "building") )
         self._hooks.building_command = self._widgets.building.register_event_hook ( 
             "keyboard_command", partial(self.ref_keyboard_command, "building") )        
-        self._widgets.building.TextCtrl.Bind ( wx.EVT_LEFT_DCLICK, partial(self.add, "building") )
+        self._widgets.building.Bind ( wx.EVT_RIGHT_DOWN, partial(self.add, "building") )
         sizer.Add ( self._widgets.building, flag=wx.EXPAND)
         
         self._store.location = orm.RecordListView ( APP.DataStore.location )
@@ -71,7 +70,7 @@ class LocationEntry(BaseReferenceEditor, wx.CollapsiblePane):
             "current_record_changed", partial(self.ref_record_changed, "location") )
         self._hooks.location_command = self._widgets.location.register_event_hook ( 
             "keyboard_command", partial(self.ref_keyboard_command, "location") )        
-        self._widgets.location.TextCtrl.Bind ( wx.EVT_LEFT_DCLICK, partial(self.add, "location") )
+        self._widgets.location.Bind ( wx.EVT_RIGHT_DOWN, partial(self.add, "location") )
         sizer.Add ( self._widgets.location, flag=wx.EXPAND)
 
         btsizer = wx.BoxSizer (wx.HORIZONTAL)
@@ -83,10 +82,6 @@ class LocationEntry(BaseReferenceEditor, wx.CollapsiblePane):
         self._widgets.revert = wx.Button (pane, size=(-1,30), label="Przywróć" )
         btsizer.Add (self._widgets.revert, 1, flag=wx.EXPAND)
         
-        self._widgets.add = wx.Button (pane, size=(-1,30), label="Dodaj..." )
-        self._widgets.add.Bind (wx.EVT_BUTTON, self.add)
-        btsizer.Add (self._widgets.add, 1, flag=wx.EXPAND)
-
         sizer.Add (btsizer, flag=wx.EXPAND)               
         
         self._widgets.street.Enabled = False

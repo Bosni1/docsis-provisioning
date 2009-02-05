@@ -87,7 +87,7 @@ class RecordsComboPopup(wx.HtmlListBox, wx.combo.ComboPopup):
             self.Selection = self.object_idx_hash[value] + 1 
             self.Refresh()
         
-        self.GetCombo().SetValue( self.GetStringValue() )
+        self.GetCombo().SetText( self.GetStringValue() )
         
     def GetCurrentOID(self):
         if self.Selection <= 0: return None
@@ -165,13 +165,13 @@ class ComboCtrl(mwxControl, wx.combo.ComboCtrl):
     def item_selected(self, event, *args):
         print "SELECTED ", event.GetInt()        
         self.popup_ctrl.Dismiss()
-        self.SetValue ( self.popup_ctrl.GetStringValue() )
+        self.SetText ( self.popup_ctrl.GetStringValue() )
         self.update_variable()
 
 class RecordListCombo(eventemitter, wx.combo.ComboCtrl):
             
     def __init__(self, parent, recordlist, *args, **kwargs):
-        wx.combo.ComboCtrl.__init__(self, parent)        
+        wx.combo.ComboCtrl.__init__(self, parent, style=wx.CB_READONLY)                
         eventemitter.__init__ (self,  [ "current_record_changed", "keyboard_command" ] )
         self.recordlist = recordlist
         self.popup_ctrl = RecordsComboPopup( **kwargs )

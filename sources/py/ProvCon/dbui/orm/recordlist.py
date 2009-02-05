@@ -65,6 +65,7 @@ class RecordList(list, eventemitter):
         """
         list.__init__(self)
         self.hash_id.clear()
+        self.hash_index.clear()
         self.emit_event ( "record_list_changed", self )
         
     def getindex(self, objectid):
@@ -77,7 +78,7 @@ class RecordList(list, eventemitter):
     def getbyid(self, objectid):
         """Get an object from the list."""
         return self.hash_id[objectid]
-
+            
 @Implements(IRecordList)
 class RecordListView(eventemitter):    
     def __init__(self, masterlist, predicate = lambda x: False):
@@ -175,4 +176,5 @@ class RecordListView(eventemitter):
     def reloadsingle(self, objectid):
         self.master.reloadsingle(objectid)
         
-                    
+        
+    
