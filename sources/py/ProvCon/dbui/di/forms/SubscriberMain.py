@@ -24,6 +24,11 @@ class SubscriberSearchToolbar(wx.Panel):
         sizer.Add ( self.resultspopup, 14, flag=wx.ALIGN_CENTER)
         sizer.Add ( wx.Button(self, label="<<"), flag=wx.ALIGN_CENTER )
         sizer.Add ( wx.Button(self, label=">>"), flag=wx.ALIGN_CENTER )        
+
+        self.recordlist.reload()        
+
+        self.resultspopup.register_event_hook ( "current_record_changed", main.setCurrentRecord)
+        
         self.SetSizer (sizer)
         
         
@@ -58,10 +63,19 @@ class SubscriberInfoPanel(wx.Panel):
         
         self.row_2 = wx.BoxSizer(wx.HORIZONTAL)
         self.row_2.AddStretchSpacer(5)
-        self.row_2.Add ( wx.StaticText ( self, label="DANE ZOSTAŁY ZMIENIONE") )
-        self.row_2.Add ( wx.Button ( self, id=wx.ID_SAVE, label="Zapisz") )
-        self.sizer.Add ( self.row_2,0,wx.EXPAND)
+        txt = wx.StaticText ( self, label="DANE ZOSTAŁY ZMIENIONE")
+        txt.Font = font20b
+        txt.ForegroundColour = "BROWN"
+        self.row_2.Add ( txt, flag=wx.ALIGN_CENTER_VERTICAL )
+        self.row_2.AddSpacer ( 40 )
+        btn = wx.Button ( self, label="Zapisz", style=wx.NO_BORDER)
+        btn.Font = font22b
+        btn.ForegroundColour = "BROWN"
+        self.row_2.Add ( btn, flag=wx.ALIGN_CENTER_VERTICAL)
+        self.row_2.AddSpacer ( 40 )        
+        i = self.sizer.Add ( self.row_2,0,wx.EXPAND)
         
+        self.sizer.Hide(self.row_2)
         
         self.SetSizer (self.sizer)
         
@@ -77,6 +91,7 @@ class SubscriberCommandPanel(wx.Panel):
         self.buttons = AttrDict()
         self.buttons.new_subscriber = wx.Button ( self, label = "Nowy\nklient", style=wx.NO_BORDER )
         self.buttons.new_device = wx.Button ( self, label = "Nowe\nurządzenie", style=wx.NO_BORDER )
+        self.buttons.new_contact = wx.Button ( self, label = "Nowe\nzgłoszenie", style=wx.NO_BORDER )
         self.buttons.cos_change = wx.Button ( self, label = "Zmiana\npakietu", style=wx.NO_BORDER )
         self.buttons.status_change = wx.Button ( self, label = "Diagnostyka", style=wx.NO_BORDER )
         self.buttons.diagnostics = wx.Button ( self, label = "Blokady", style=wx.NO_BORDER )
@@ -190,12 +205,29 @@ class SubscriberMain(wx.Panel):
         self.mgr.Update()
 
         
-        self.form.subscriber.setid ( self.store.subscriber[10].objectid )
-        #self.form.subscriber.new()
+        f = self.form.subscriber
+        f.register_event_hook ( "request_record_change", self.subscriberRecordChanged )
+        f.register_event_hook ( "current_record_modified", self.subscriberRecordModified )
+        f.register_event_hook ( "current_record_deleted", self.subscriberRecordDeleted )
+        f.register_event_hook ( "current_record_saved", self.subscriberRecordSaved )
+        f.register_event_hook ( "data_loaded", self.subscriberDataLoaded )
         
+        #self.form.subscriber.setid ( self.store.subscriber[10].objectid )
+        self.form.subscriber.new()
         
+    def setCurrentRecord(self, record):
+        self.form.subscriber.setid ( record.objectid )
         
-        
+    def subscriberRecordChanged(self, *args):
+        print args
+    def subscriberRecordModified(self, *args):
+        print args
+    def subscriberRecordDeleted(self, *args):
+        print args
+    def subscriberRecordSaved(self, *args):
+        print args
+    def subscriberDataLoaded(self, *args):
+        print args
         
         
         
