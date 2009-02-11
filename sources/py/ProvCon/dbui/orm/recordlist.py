@@ -29,14 +29,18 @@ class RecordList(list, eventemitter):
         """
         list.__init__(self)        
         self += filter(self.filterfunc, self.table.recordObjectList (self.filter, self.select, self.order, self.recordclass))
+        self.rehash()
+        self.raiseEvent ( "record_list_reloaded", self )
+        self.raiseEvent ( "record_list_changed", self )
+        return self
+    
+    def rehash(self):
         self.hash_id.clear()
         self.hash_index.clear()
         for idx, r in enumerate(self): 
             self.hash_id[r.objectid] = r
             self.hash_index[r.objectid] = idx
-        self.emit_event ( "record_list_reloaded", self )
-        self.emit_event ( "record_list_changed", self )
-        return self
+
     
     def reloadsingle(self, objectid):
         """
@@ -56,8 +60,8 @@ class RecordList(list, eventemitter):
             self.hash_index[objectid] = len(self) - 1
             self.hash_id[objectid] = rl            
         finally:
-            self.emit_event ( "record_list_item_reloaded", self.hash_index[objectid] )
-            self.emit_event ( "record_list_changed", self )
+            self.raiseEvent ( "record_list_item_reloaded", self.hash_index[objectid] )
+            self.raiseEvent ( "record_list_changed", self )
             
     def clear(self):
         """
@@ -66,7 +70,7 @@ class RecordList(list, eventemitter):
         list.__init__(self)
         self.hash_id.clear()
         self.hash_index.clear()
-        self.emit_event ( "record_list_changed", self )
+        self.raiseEvent ( "record_list_changed", self )
         
     def getindex(self, objectid):
         """
@@ -78,7 +82,40 @@ class RecordList(list, eventemitter):
     def getbyid(self, objectid):
         """Get an object from the list."""
         return self.hash_id[objectid]
-            
+
+@Implements(IRecordList)    
+class RelatedRecordList(RecordList):
+    def __init__(self, table, mtm_handle, **kw):
+        RecordList.__init__ (self, table, **kw)
+        self.parent_objectid = None
+
+    def setParentObjectID(self, objectid):
+        if objectid == self.parent_objectid: return
+        self.parent_objectid = objectid
+        if objectid is None: self.clear()
+        else: self.reload()
+    def getParentObjectID(self):
+        return self.parent_objectid
+    parentobjectid = property(getParentObjectID, setParentObjectID)
+    def isbound(self):
+        return self.parentobjectid is not None
+    bound = property(isbound)
+    
+    def reload(self):        
+        list.__init__(self)
+        if not self.bound: return self
+        
+        self += filter( self.filterfunc, self.table.relatedRecordList ( self.parentobjectid, self.mtm_handle ) )
+        self.rehash()
+        self.raiseEvent ( "record_list_reloaded", self )
+        self.raiseEvent ( "record_list_changed", self )
+        return self
+    
+    def reloadsingle(self, objectid):
+        if objectid in self.hash_index:
+            return RecordList.reloadsingle(self, objectid)
+        return None
+    
 @Implements(IRecordList)
 class RecordListView(eventemitter):    
     def __init__(self, masterlist, predicate = lambda x: False):
@@ -93,9 +130,9 @@ class RecordListView(eventemitter):
         self.hash_index = None        
         self.hash_id = None
         
-        self.reload_hook = self.master.register_event_hook ( "record_list_reloaded", self.master_reloaded )
-        self.change_hook = self.master.register_event_hook ( "record_list_changed", self.master_changed )
-        self.item_reload_hook = self.master.register_event_hook ( "record_list_item_reloaded", self.master_item_reloaded )
+        self.reload_hook = self.master.listenForEvent ( "record_list_reloaded", self.master_reloaded )
+        self.change_hook = self.master.listenForEvent ( "record_list_changed", self.master_changed )
+        self.item_reload_hook = self.master.listenForEvent ( "record_list_item_reloaded", self.master_item_reloaded )
         
     def set_predicate(self, predicate):
         self._predicate = predicate
@@ -138,16 +175,16 @@ class RecordListView(eventemitter):
 
     def master_changed(self, *args):
         self.clear()
-        self.emit_event ( "record_list_changed", self )
+        self.raiseEvent ( "record_list_changed", self )
     
     def master_reloaded(self, *args):
         self.clear()
-        self.emit_event ( "record_list_reloaded", self )
+        self.raiseEvent ( "record_list_reloaded", self )
 
     def master_item_reloaded(self, masteridx):
         if self.master[masteridx].objectid in self:
             self.clear()
-            self.emit_event ( "record_list_reloaded", self)
+            self.raiseEvent ( "record_list_reloaded", self)
         
     def getindex(self, objectid):
         self.get_or_init_cache()
@@ -159,7 +196,7 @@ class RecordListView(eventemitter):
                                
     def clear(self, *args):
         self.cache = None
-        self.emit_event ( "record_list_changed", self )
+        self.raiseEvent ( "record_list_changed", self )
         
     def reload(self):
         if len(self.master) > 0:
@@ -170,8 +207,8 @@ class RecordListView(eventemitter):
                 self.master.reload()
             self.clear()
             self.get_or_init_cache()
-            self.emit_event ( "record_list_reloaded", self )
-            self.emit_event ( "record_list_changed", self )
+            self.raiseEvent ( "record_list_reloaded", self )
+            self.raiseEvent ( "record_list_changed", self )
     
     def reloadsingle(self, objectid):
         self.master.reloadsingle(objectid)

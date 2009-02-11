@@ -124,7 +124,7 @@ class Form(eventemitter):
             self.current.write()        
             for extra_field in self.extra_fields: extra_field.post_write ( self )
             self.on_record_changed_handler()
-            self.emit_event ( "current_record_saved", self.current, wasnew )
+            self.raiseEvent ( "current_record_saved", self.current, wasnew )
             self.modification_notification = False
         except self.ormerror, e:
             self.ormerrorhandler (e)
@@ -136,15 +136,15 @@ class Form(eventemitter):
             self.set_all_fixed_fields()
             for extra_field in self.extra_fields: extra_field.post_read ( self )
             self.on_record_changed_handler()        
-            self.emit_event ( "data_loaded", self.current )
-            self.emit_event ( "navigate", self.current.objectid )
+            self.raiseEvent ( "data_loaded", self.current )
+            self.raiseEvent ( "navigate", self.current.objectid )
             self.modification_notification = False
         except self.ormerror, e:
             self.ormerrorhandler(e)
 
     def new(self):        
         try:
-            self.emit_event ( "request_record_change", self.current, None )
+            self.raiseEvent ( "request_record_change", self.current, None )
         except eventcancelled:
             return False
         
@@ -157,9 +157,9 @@ class Form(eventemitter):
             if self.is_field_fixed(fname): self.current[fname] = self.get_fixed_value(fname)
             
         self.on_record_changed_handler()
-        self.emit_event ( "new_record", self.current )
-        self.emit_event ( "current_record_changed", self.current )
-        self.emit_event ( "navigate", None )
+        self.raiseEvent ( "new_record", self.current )
+        self.raiseEvent ( "current_record_changed", self.current )
+        self.raiseEvent ( "navigate", None )
 
     def setid(self, objectid):
         """this function is used by the GUI to load a record into a form"""
@@ -168,7 +168,7 @@ class Form(eventemitter):
         ##   2. the record emits a 'record_changed' event
         ##   3. form's handler of this event fills in the values
         try:
-            self.emit_event ( "request_record_change", self.current, objectid )
+            self.raiseEvent ( "request_record_change", self.current, objectid )
         except eventcancelled:
             return False
         try:
@@ -178,9 +178,9 @@ class Form(eventemitter):
             for extra_field in self.extra_fields: extra_field.post_read ( self )
             self.on_record_changed_handler()
             self.modification_notification = False
-            self.emit_event ( "data_loaded", self.current )
-            self.emit_event ( "current_record_changed", self.current )
-            self.emit_event ( "navigate", self.current.objectid )        
+            self.raiseEvent ( "data_loaded", self.current )
+            self.raiseEvent ( "current_record_changed", self.current )
+            self.raiseEvent ( "navigate", self.current.objectid )        
         except self.ormerror, e:
             self.ormerrorhandler (e)
             
@@ -190,7 +190,7 @@ class Form(eventemitter):
             for extra_field in self.extra_fields: extra_field.pre_delete ( self )                        
             self.current.delete()
             for extra_field in self.extra_fields: extra_field.post_delete ( self )                        
-            self.emit_event ( "current_record_deleted", objid )
+            self.raiseEvent ( "current_record_deleted", objid )
         except self.ormerror, e:
             self.ormerrorhandler(e)
 
@@ -199,7 +199,7 @@ class Form(eventemitter):
         self.current.setFieldValue ( fieldname, self.tkvars[fieldname].get() )
         if self.current._ismodified and not self.modification_notification:
             self.modification_notification = True
-            self.emit_event ( "current_record_modified", self.current )
+            self.raiseEvent ( "current_record_modified", self.current )
             
     def value_change_handler(self, fname, *args):                        
         """The tkVariable was changed, propagate this value to the handler

@@ -241,7 +241,7 @@ API Error: {0.pgexception}""".format ( self )
             "record_deleted"
         ] )
         self._isnew = False
-        self._hasdata = False        
+        self._hasdata = False
         self._isinstalled = False
         self._isreference = False
         self._objectid = None
@@ -252,7 +252,11 @@ API Error: {0.pgexception}""".format ( self )
         self._table = None
         self._astxt = "<NULL>"
         self._feed = False
+        self._resolve_mtm = kkw.get ("mtm", False)
+        self._resolve_child_ref = kkw.get("children", False)
         self._resolvereference = kkw.get("resolvereference", self.__default_reference_mode__)  # none | text | record
+        self._mtm_referencelist = {}
+        self._child_referencelist = {}
         self._reprfunc = kkw.get ( "reprfunc", None )        
         
                 
@@ -288,10 +292,24 @@ API Error: {0.pgexception}""".format ( self )
             #this is a record attribute
             if attrname in self._table:
                 self.setFieldValue ( attrname, attrval )
-    
+                
     def __getattr__(self, attrname):
-        #special PP_* attributes return a "pretty printed" representation of the record
-        if attrname.startswith ("PP_"):
+        if attrname in self._mtm_referencelist:
+            if not self.hasData: return None
+            theList = self._mtm_referencelist[attrname]
+            if not theList.bound: theList.parentobjectid = self.objectid
+            return theList
+        #special PP_* attributes return a "pretty printed" representation of the record        
+        elif attrname.startswith ("list_") and self.hasData:
+            rest = attrname[5:]
+            if rest in self._child_referencelist:
+                rlist = self._child_referencelist[rest]
+                t, f = self._table.reference_child_hash [rest]
+                rlist._filter = f.name + " = '" + self.objectid + "'"
+                rlist.reload()
+                return rlist
+            return None
+        elif attrname.startswith ("PP_"):
             sio = cStringIO.StringIO()
             rest = attrname[3:]
             if rest == "TABLE":                      
@@ -331,11 +349,40 @@ API Error: {0.pgexception}""".format ( self )
     isInstalled = property(__is_installed)
     """C{True} if the record has a table schema installed"""
 
+    def enableMTM(self):
+        self._resolve_mtm = True
+        self.setupMTM()
+        
+    def disableMTM(self):
+        self._resolve_mtm = False
+        self._mtm_referencelist.clear()
+
+    def setupMTM(self):
+        from ProvCon.dbui.orm import RelatedRecordList
+        self._mtm_referencelist.clear()
+        for mtm_handle in self._table.mtm_relationships:
+            self._mtm_referencelist[mtm_handle] = RelatedRecordList (self._table, mtm_handle)
+
+    def enableChildren(self):
+        self._resolve_child_ref = True
+        self.setupChildren()
+        
+    def disableChildren(self):
+        self._resolve_child_ref = False
+        self._child_referencelist.clear()
+
+    def setupChildren(self):
+        from ProvCon.dbui.orm import RecordList
+        self._child_referencelist.clear()        
+        for child_handle in self._table.reference_child_hash:
+            t, f = self._table.reference_child_hash[child_handle]
+            self._child_referencelist[child_handle] = RecordList (t, select=['*'] )
+        
     def nullify(self):
         """
         Clear all data. 
         
-        Note that _objectid remains unchanged, soafter a Record has been nullified, 
+        Note that _objectid remains unchanged, so after a Record has been nullified, 
         it may be read again.
         
         Do not call on Records that are not yet installed (have no table definition).
@@ -343,6 +390,10 @@ API Error: {0.pgexception}""".format ( self )
         self._original_values.clear()
         self._modified_values.clear()
         self._references.clear()
+        for mtm in self._mtm_referencelist:
+            self._mtm_referencelist[mtm].parentobjectid = None
+        for chl in self._child_referencelist:
+            self._child_referencelist[chl].clear()            
         self._ismodified = False
         self._hasdata = False
         self._astxt = "(null)"
@@ -362,6 +413,7 @@ API Error: {0.pgexception}""".format ( self )
         On success the record has attributes corresponding to database table columns, and
         isInstalled returns True.
         """
+        from ProvCon.dbui.orm import RelatedRecordList
         if not self._table:
             if not self._objectid:
                 raise Record.RecordIncomplete()
@@ -379,6 +431,11 @@ API Error: {0.pgexception}""".format ( self )
             self.__dict__[f.name] = vals.get(f.name, None)
             self._original_values[f.name] = self.__dict__[f.name]
         
+        if self._resolve_mtm:
+            self.setupMTM()
+        if self._resolve_child_ref:
+            self.setupChildren()
+            
         self._isinstalled = True
         self._ismodified = False
         self._hasdata = False
@@ -396,6 +453,8 @@ API Error: {0.pgexception}""".format ( self )
                     pass
             self._original_values.clear()
             self._modified_values.clear()
+            self._mtm_referencelist.clear()
+            self._child_referencelist.clear()
             self._hasdata = False
             self._ismodified = False
             self._hasdata = False
@@ -472,7 +531,7 @@ API Error: {0.pgexception}""".format ( self )
         elif self._resolvereference == "record":
             self._references[field.name] = Record.ID (decoded)
 
-    
+            
     def feedDataRow(self, row, **kwargs):
         """
         Fill record data structures from a dictionary object.
@@ -486,9 +545,11 @@ API Error: {0.pgexception}""".format ( self )
         
         @type row: dict
         @param row: a dictionary of database row (column name -> value).                
-        """
+        """        
+
+        self.nullify()
         
-        #avoid automatic call to "read" after _objectid changes
+        #avoid automatic call to "read" after _objectid changes        
         self._feed = True
         self._objectid = row['objectid']
         self._feed = False
@@ -563,7 +624,7 @@ API Error: {0.pgexception}""".format ( self )
                 self._objectid = rec['objectid']
 
                 #print "Record # {0} inserted into {1}.".format(self._objectid, self._table.name)
-                self.emit_event ( "record_added", self )
+                self.raiseEvent ( "record_added", self )
                 
             except pg.DatabaseError, e:
                 print "Error inserting record."
@@ -581,7 +642,7 @@ API Error: {0.pgexception}""".format ( self )
                 rec = CFG.CX.update ( CFG.DB.SCHEMA + "." + self._table.name,
                                       self._modified_values )
                 self.read()                
-                self.emit_event ( "record_saved", self )
+                self.raiseEvent ( "record_saved", self )
             except pg.DatabaseError, e:
                 print "Error updating record"
                 raise Record.DataManipulationError ( "Updating record {1} of '{0}'".format(self._table.name, self._objectid),
@@ -603,7 +664,7 @@ API Error: {0.pgexception}""".format ( self )
             try:
                 CFG.CX.delete ( CFG.DB.SCHEMA + ".object", { 'objectid' : self._objectid } )
                 self.clearRecord()
-                self.emit_event ( "record_deleted", self )
+                self.raiseEvent ( "record_deleted", self )
             except pg.DatabaseError, e:
                 raise Record.DataManipulationError ( "Deleting record {1} of '{0}'".format(self._table.name, self._objectid),
                                                      "",
@@ -772,13 +833,9 @@ API Error: {0.pgexception}""".format ( self )
         @rtype: list
         @returns: list of object ids
         """
-        limit = kwargs.get ( "limit", None )
-        if limit: limit = "LIMIT " + str(limit)
-        else: limit = ""
-        offset = kwargs.get ( "offset", None )
-        if offset: offset = "OFFSET " + str(offset)
-        else: offset = ""
-        
+        limit = "LIMIT " + kwargs.get ( "limit", "ALL" )                
+        offset = "OFFSET " + kwargs.get ( "offset", "0" )
+                        
         order = kwargs.get ( "order", ['objectid ASC'] )
         order = ",".join (order)
         where = kwargs.get ( "where", ['TRUE'] )

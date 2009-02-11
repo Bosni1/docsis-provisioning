@@ -27,7 +27,7 @@ class SubscriberSearchToolbar(wx.Panel):
 
         self.recordlist.reload()        
 
-        self.resultspopup.register_event_hook ( "current_record_changed", main.setCurrentRecord)
+        self.resultspopup.listenForEvent ( "current_record_changed", main.setCurrentRecord)
         
         self.SetSizer (sizer)
         
@@ -206,11 +206,11 @@ class SubscriberMain(wx.Panel):
 
         
         f = self.form.subscriber
-        f.register_event_hook ( "request_record_change", self.subscriberRecordChanged )
-        f.register_event_hook ( "current_record_modified", self.subscriberRecordModified )
-        f.register_event_hook ( "current_record_deleted", self.subscriberRecordDeleted )
-        f.register_event_hook ( "current_record_saved", self.subscriberRecordSaved )
-        f.register_event_hook ( "data_loaded", self.subscriberDataLoaded )
+        f.listenForEvent ( "request_record_change", self.subscriberRecordChanged )
+        f.listenForEvent ( "current_record_modified", self.subscriberRecordModified )
+        f.listenForEvent ( "current_record_deleted", self.subscriberRecordDeleted )
+        f.listenForEvent ( "current_record_saved", self.subscriberRecordSaved )
+        f.listenForEvent ( "data_loaded", self.subscriberDataLoaded )
         
         #self.form.subscriber.setid ( self.store.subscriber[10].objectid )
         self.form.subscriber.new()

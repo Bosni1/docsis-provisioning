@@ -9,7 +9,7 @@ class RecordList(BaseRecordList, wx.HtmlListBox):
                               style=wx.LC_NO_HEADER | wx.LC_REPORT | wx.LC_SINGLE_SEL     
                               )        
                 
-        self.register_event_hook ( "record_list_changed", self.populate_list )
+        self.listenForEvent ( "record_list_changed", self.populate_list )
         self.Bind ( wx.EVT_LISTBOX, self.item_selected )        
         #self.SetSelectionBackground (wx.Color(,40,40))        
     def OnGetItem(self, n):

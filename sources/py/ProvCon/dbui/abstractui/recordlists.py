@@ -30,7 +30,7 @@ class BaseRecordList(eventemitter):
         self.__records = records
         self.records_count = len(self.__records)
         self.current_record = None
-        self.emit_event ( "record_list_changed", self.get_records() )
+        self.raiseEvent ( "record_list_changed", self.get_records() )
 
     def get_records(self):
         return self.__records
@@ -49,8 +49,8 @@ class BaseRecordList(eventemitter):
         oldrecord = self.current_record        
         try: 
             self.__current_record = record
-            self.emit_event ( "navigate", self.currentid() )
-            self.emit_event ( "current_record_changed", self.__current_record )            
+            self.raiseEvent ( "navigate", self.currentid() )
+            self.raiseEvent ( "current_record_changed", self.__current_record )            
         except eventcancelled:
             self.__current_record = oldrecord
     
@@ -63,7 +63,7 @@ class BaseRecordList(eventemitter):
     
     def bind_to_form (self, myfield, form):
         self.parentform = (form, myfield)        
-        self.parenthook = form.register_event_hook ( "current_record_changed", self._on_parent_record_changed)            
+        self.parenthook = form.listenForEvent ( "current_record_changed", self._on_parent_record_changed)            
         
     def _on_parent_record_changed(self, parentrecord):
         if parentrecord and parentrecord._objectid:
@@ -83,7 +83,7 @@ class BasePager(BaseRecordList):
         self.pagesize = pagesize
         
         BaseRecordList.__init__ (self, records, **kkw )
-        self.add_emitted_event ( "page" )
+        self.registerMyEvent ( "page" )
         
         self.current_page = None
         self.page_count = None
@@ -104,7 +104,7 @@ class BasePager(BaseRecordList):
         if pageno < 0 or pageno >= self.page_count: return
         self.current_page = pageno
         self.current_record_set = self.records[pageno*self.pagesize:][:self.pagesize]
-        self.emit_event ( "page", pageno, self.current_record_set )
+        self.raiseEvent ( "page", pageno, self.current_record_set )
 
     def page_relative(self, move):
         self.set_page ( (self.current_page + move) % self.page_count )

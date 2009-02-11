@@ -15,9 +15,9 @@ class BaseForm(object):
         for kw in self.__defaultattrs__: self.__dict__[kw] = self.__defaultattrs__[kw]
         for kw in kwargs: self.__dict__[kw] = kwargs[kw]
         self.form = form
-        self.form.register_event_hook ( "current_record_changed", self._on_record_data_changed )
-        self.form.register_event_hook ( "current_record_modified", self._on_record_data_modified )
-        self.form.register_event_hook ( "current_record_saved", self._on_record_data_saved )
+        self.form.listenForEvent ( "current_record_changed", self._on_record_data_changed )
+        self.form.listenForEvent ( "current_record_modified", self._on_record_data_modified )
+        self.form.listenForEvent ( "current_record_saved", self._on_record_data_saved )
         
         self.editor_widgets = {}
         

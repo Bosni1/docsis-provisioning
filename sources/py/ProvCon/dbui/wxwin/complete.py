@@ -146,11 +146,11 @@ class CompleteGenericForm(wx.Panel):
         if navigator:
             self.set_navigator ( navigator )
             
-        self.form.register_event_hook ( "request_record_change", self.before_record_change )
-        self.form.register_event_hook ( "current_record_modified", self.current_record_modified )
-        self.form.register_event_hook ( "current_record_deleted", self.current_record_deleted )
-        self.form.register_event_hook ( "current_record_saved", self.current_record_saved )
-        self.form.register_event_hook ( "data_loaded", self.data_loaded )
+        self.form.listenForEvent ( "request_record_change", self.before_record_change )
+        self.form.listenForEvent ( "current_record_modified", self.current_record_modified )
+        self.form.listenForEvent ( "current_record_deleted", self.current_record_deleted )
+        self.form.listenForEvent ( "current_record_saved", self.current_record_saved )
+        self.form.listenForEvent ( "data_loaded", self.data_loaded )
 
         self.infowindow = InfoPopup(self)
         
@@ -212,7 +212,7 @@ class CompleteGenericForm(wx.Panel):
     
     def set_navigator(self, navigator):
         self.navigator = navigator
-        self.navigator.register_event_hook ( "navigate", self.navigate )                
+        self.navigator.listenForEvent ( "navigate", self.navigate )                
         self.navigate ( self.navigator.currentid() )
     
     def new(self):

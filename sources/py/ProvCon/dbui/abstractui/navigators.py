@@ -108,7 +108,7 @@ class BaseNavigator(eventemitter):
         
         try:
             self.update()
-            self.emit_event ( "navigate", self.currentid())
+            self.raiseEvent ( "navigate", self.currentid())
         except eventcancelled:
             self.current_index = self.previous_index
             self.update()

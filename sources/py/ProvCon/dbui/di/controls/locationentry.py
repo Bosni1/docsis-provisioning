@@ -39,36 +39,36 @@ class LocationEntry(BaseReferenceEditor, wx.CollapsiblePane):
 
         self._store.city = APP.DataStore.city
         self._widgets.city = mwx.RecordListCombo ( pane, self._store.city )
-        self._hooks.city_change = self._widgets.city.register_event_hook ( 
+        self._hooks.city_change = self._widgets.city.listenForEvent ( 
             "current_record_changed", partial(self.ref_record_changed, "city") )
-        self._hooks.city_command = self._widgets.city.register_event_hook ( 
+        self._hooks.city_command = self._widgets.city.listenForEvent ( 
             "keyboard_command", partial(self.ref_keyboard_command, "city") )
         self._widgets.city.Bind ( wx.EVT_RIGHT_DOWN, partial(self.add, "city") )
         sizer.Add ( self._widgets.city, flag=wx.EXPAND)
                 
         self._store.street = orm.RecordListView ( APP.DataStore.street )
         self._widgets.street = mwx.RecordListCombo ( pane, self._store.street )
-        self._hooks.street_change = self._widgets.street.register_event_hook ( 
+        self._hooks.street_change = self._widgets.street.listenForEvent ( 
             "current_record_changed", partial(self.ref_record_changed, "street") )
-        self._hooks.street_command = self._widgets.street.register_event_hook ( 
+        self._hooks.street_command = self._widgets.street.listenForEvent ( 
             "keyboard_command", partial(self.ref_keyboard_command, "street") )        
         self._widgets.street.Bind ( wx.EVT_RIGHT_DOWN, partial(self.add, "street") )
         sizer.Add ( self._widgets.street, flag=wx.EXPAND)
         
         self._store.building = orm.RecordListView ( APP.DataStore.building )
         self._widgets.building = mwx.RecordListCombo ( pane, self._store.building )
-        self._hooks.building_change = self._widgets.building.register_event_hook ( 
+        self._hooks.building_change = self._widgets.building.listenForEvent ( 
             "current_record_changed", partial(self.ref_record_changed, "building") )
-        self._hooks.building_command = self._widgets.building.register_event_hook ( 
+        self._hooks.building_command = self._widgets.building.listenForEvent ( 
             "keyboard_command", partial(self.ref_keyboard_command, "building") )        
         self._widgets.building.Bind ( wx.EVT_RIGHT_DOWN, partial(self.add, "building") )
         sizer.Add ( self._widgets.building, flag=wx.EXPAND)
         
         self._store.location = orm.RecordListView ( APP.DataStore.location )
         self._widgets.location = mwx.RecordListCombo ( pane, self._store.location )
-        self._hooks.location_change = self._widgets.location.register_event_hook ( 
+        self._hooks.location_change = self._widgets.location.listenForEvent ( 
             "current_record_changed", partial(self.ref_record_changed, "location") )
-        self._hooks.location_command = self._widgets.location.register_event_hook ( 
+        self._hooks.location_command = self._widgets.location.listenForEvent ( 
             "keyboard_command", partial(self.ref_keyboard_command, "location") )        
         self._widgets.location.Bind ( wx.EVT_RIGHT_DOWN, partial(self.add, "location") )
         sizer.Add ( self._widgets.location, flag=wx.EXPAND)

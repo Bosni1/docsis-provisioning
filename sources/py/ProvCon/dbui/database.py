@@ -94,7 +94,7 @@ class CFG:
                         f.reference = idmap[f.reference]
                         #fill the table's children list
                         idmap[t.objectid].reference_child.append ( (t, f) )
-                        idmap[t.objectid].reference_child_hash[(t.name, f.name)] = (t,f)
+                        idmap[t.objectid].reference_child_hash[t.name + "_" + f.name] = (t,f)
                     if f.arrayof:
                         f.arrayof = idmap[f.arrayof]               
             #import many-to-many relationships
@@ -103,10 +103,10 @@ class CFG:
                 table1 = Table.Get ( mtm['table_1'] )
                 table2 = Table.Get ( mtm['table_2'] )
                 
-                table1.mtm_relationships[ mtm['relationship_name'] ] = ( 
-                    mtm['table_1_handle'], mtm['mtm_table_name'], table2 )
-                table1.mtm_relationships[ mtm['relationship_name'] ] = ( 
-                    mtm['table_2_handle'], mtm['mtm_table_name'], table1 )
+                table1.mtm_relationships[ mtm['table_1_handle'] ] = ( 
+                    mtm['relationship_name'], mtm['mtm_table_name'], "refobjectid1", "refobjectid2", table2 )
+                table2.mtm_relationships[ mtm['table_2_handle'] ] = ( 
+                    mtm['relationship_name'], mtm['mtm_table_name'], "refobjectid2", "refobjectid1", table1 )
                 
             self.instance = self
         def delete(self, cl, a):

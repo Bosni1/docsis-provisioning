@@ -89,7 +89,21 @@ class Table(object):
         """
         return CFG.CX.query ( "SELECT count(*) as recordCount FROM {0}.{1} WHERE objectscope={2}".format(
             CFG.DB.SCHEMA, self.name, CFG.RT.DATASCOPE )).dictresult()[0]['recordCount']
-                              
+
+    def relatedOIDList (self, parentoid, mtm_handle):
+        relname, tablename, my_pointer, ref_pointer, referenced_table = self.mtm_relationships[mtm_handle]
+                
+        result = CFG.CX.query ( "SELECT {2} as objectid FROM {0}.{1} WHERE {3} = '{4}'".format(
+            CFG.DB.SCHEMA, tablename, ref_pointer, my_pointer, parentoid ) )
+        return map(lambda x: x['objectid'], result.dictresult() )
+
+    def relatedRecordList (self, parentoid, mtm_handle, recordclass=None):
+        from ProvCon.dbui.orm import Record
+        
+        oidlist = self.relatedOIDList(parentoid, mtm_handle)        
+        recordclass = recordclass or Record
+        return map (lambda x: recordclass.ID(x), oidlist)
+
     def recordList(self, _filter="TRUE", select=['0'], order="objectid"):
         """
         Get results of a SELECT query.

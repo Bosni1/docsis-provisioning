@@ -66,7 +66,7 @@ class RecordsComboPopup(wx.HtmlListBox, wx.combo.ComboPopup):
             self.records_changed_hook.remove()
             self.records_changed_hook = None
         self.populate_list()
-        self.records_changed_hook = recordlist.register_event_hook ("record_list_changed", self.populate_list )
+        self.records_changed_hook = recordlist.listenForEvent ("record_list_changed", self.populate_list )
         
     def GetRecords(self):
         return self.records
@@ -191,9 +191,9 @@ class RecordListCombo(eventemitter, wx.combo.ComboCtrl):
 
     def key_pressed(self, event, *args):
         if event.KeyCode == 13:
-            self.emit_event ( "keyboard_command", "ENTER" )
+            self.raiseEvent ( "keyboard_command", "ENTER" )
         elif event.KeyCode == 27:
-            self.emit_event ( "keyboard_command", "ESCAPE" )
+            self.raiseEvent ( "keyboard_command", "ESCAPE" )
 
     def set_null(self):
         self.popup_ctrl.CurrentOID = None
@@ -208,7 +208,7 @@ class RecordListCombo(eventemitter, wx.combo.ComboCtrl):
             self.Refresh()                        
             event.Skip()        
             rec = self.current_record()        
-            self.emit_event ( "current_record_changed", rec )
+            self.raiseEvent ( "current_record_changed", rec )
         except:
             print "=" * 80
             import sys, traceback
