@@ -137,9 +137,10 @@ class SubscriberMain(wx.Panel):
         
         def _format_service(r):
             return r.typeofservice_REF + "\n<br>" + r.classofservice_REF
-
+                
         self.recordlist.services = rl.RecordList(self.store.services, self,
                                                  reprfunc = _format_service)
+        
         self.recordlist.services.bind_to_form ( "subscriberid", self.form.subscriber)
 
         
@@ -152,7 +153,7 @@ class SubscriberMain(wx.Panel):
                            BestSize( (700,170) )
                            )
         self.mgr.AddPane ( SubscriberSearchToolbar(self), wx.aui.AuiPaneInfo().Bottom().
-                           Floatable(True).CloseButton(True).Floatable(False).Dockable(False).Show().
+                           CloseButton(True).Floatable(False).Dockable(False).Show().
                            Name("search_results").
                            Caption("Wyniki wyszukiwania...").
                            Layer(1).
