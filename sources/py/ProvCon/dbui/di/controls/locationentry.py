@@ -176,16 +176,24 @@ class LocationEntry(BaseReferenceEditor, wx.CollapsiblePane):
         loc.setObjectID (value)                        
         self._widgets.location.Enabled = False
         if loc.hasData:
-            self._widgets.location.Enabled = True
+            self._widgets.location.Enabled = False
+            self._widgets.building.Enabled = False
+            self._widgets.street.Enabled = False
+            self._widgets.city.Enabled = True
             
-            self._current.building.setObjectID ( loc.buildingid )
-            self._current.street.setObjectID ( self._current.building.streetid )
-            self._current.city.setObjectID ( self._current.street.cityid )
+            self._widgets.city.set_null()                
+            self._widgets.street.set_null()                
+            self._widgets.building.set_null()
+            self._widgets.location.set_null()
             
-            self.ref_record_changed ( "city",  self._current.city)
-            self.ref_record_changed ( "street",  self._current.street)
-            self.ref_record_changed ( "building",  self._current.building)
-            self.ref_record_changed ( "location",  self._current.location)
+            #self._current.building.setObjectID ( loc.buildingid )
+            #self._current.street.setObjectID ( self._current.building.streetid )
+            #self._current.city.setObjectID ( self._current.street.cityid )
+            
+            #self.ref_record_changed ( "city",  self._current.city)
+            #self.ref_record_changed ( "street",  self._current.street)
+            #self.ref_record_changed ( "building",  self._current.building)
+            #self.ref_record_changed ( "location",  self._current.location)
             
             self.Label = loc._astxt
         else:

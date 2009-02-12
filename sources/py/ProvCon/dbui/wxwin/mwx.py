@@ -200,20 +200,15 @@ class RecordListCombo(eventemitter, wx.combo.ComboCtrl):
 
     def set_oid(self, oid):
         self.popup_ctrl.CurrentOID = oid
+
+    def _process_item_selection(self):
+        self.Refresh()        
+        self.raiseEvent ( "current_record_changed", self.current_record() )
         
     def item_selected(self, event, *args):
         #Any exception raised here hangs my X, hence the handler
-        try:
-            #self.SetValue ( self.popup_ctrl.GetStringValue() )
-            self.Refresh()                        
-            event.Skip()        
-            rec = self.current_record()        
-            self.raiseEvent ( "current_record_changed", rec )
-        except:
-            print "=" * 80
-            import sys, traceback
-            traceback.print_exc(file=sys.stdout)            
-            print "=" * 80
+        wx.CallAfter (self._process_item_selection)
+        event.Skip()        
         
 Text = TextCtrl
 Static = StaticText

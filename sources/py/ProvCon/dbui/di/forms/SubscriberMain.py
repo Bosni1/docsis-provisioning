@@ -27,7 +27,7 @@ class SubscriberSearchToolbar(wx.Panel):
         self.resultspopup = mwx.RecordListCombo (self, self.recordlist)
         sizer.Add ( wx.StaticText ( self, label="Szukaj: " ), flag=wx.ALIGN_CENTER )        
         sizer.Add ( self.searchctrl, 10, flag=wx.ALIGN_CENTER)
-        self.results_txt = wx.StaticText ( self, label="  Wyniki (   ): " )
+        self.results_txt = wx.StaticText ( self, label="  Wyniki (    ): " )
         sizer.Add ( self.results_txt, flag=wx.ALIGN_CENTER )        
         sizer.Add ( self.resultspopup, 14, flag=wx.ALIGN_CENTER)
         sizer.Add ( wx.Button(self, label="<<"), flag=wx.ALIGN_CENTER )
@@ -52,7 +52,7 @@ class SubscriberSearchToolbar(wx.Panel):
     def on_do_search(self, evt):    
         self.recordlist.query = "SELECT s.* FROM pv.subscriber s INNER JOIN pv.object_search_txt t ON s.objectid = t.objectid WHERE t.txt ~* '%s'" % self.searchctrl.GetValue() 
         self.recordlist.reload(feed=True)
-        self.results_txt.Label  = "Wyniki (%d) :" % len(self.recordlist)
+        self.results_txt.Label  = "Wyniki (%4d) :" % len(self.recordlist)
         if len(self.recordlist) > 0:
             oid = self.recordlist[0].objectid
             wx.CallLater (100, self.resultspopup.set_oid, oid)
@@ -102,6 +102,7 @@ class SubscriberInfoPanel(wx.Panel):
         btn = wx.Button ( self, label="Zapisz!")
         btn.Font = font22b
         btn.ForegroundColour = "RED"
+        btn.Bind (wx.EVT_BUTTON, self.doSave)
         self.row_2.Add ( btn, flag=wx.ALIGN_CENTER_VERTICAL)
         
         self.row_2.AddSpacer ( 40 )        
@@ -118,7 +119,8 @@ class SubscriberInfoPanel(wx.Panel):
     def hideSaveOption(self):
         self.sizer.Hide (self.row_2)
         
-
+    def doSave(self, evt, *args):
+        self.form.save()
 
 class SubscriberCommandPanel(wx.Panel):
     def __init__(self, main, form, *args, **kwargs):
@@ -271,8 +273,8 @@ class SubscriberMain(wx.Panel):
         f.listenForEvent ( "current_record_saved", self.subscriberRecordSaved )
         f.listenForEvent ( "data_loaded", self.subscriberDataLoaded )
         
-        self.form.subscriber.setid ( self.store.subscriber[10].objectid )
-        #self.form.subscriber.new()
+        #self.form.subscriber.setid ( self.store.subscriber[10].objectid )
+        self.form.subscriber.new()
               
         
     def setCurrentRecord(self, record):
