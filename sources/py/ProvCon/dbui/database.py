@@ -93,8 +93,8 @@ class CFG:
                     if f.reference: 
                         f.reference = idmap[f.reference]
                         #fill the table's children list
-                        idmap[t.objectid].reference_child.append ( (t, f) )
-                        idmap[t.objectid].reference_child_hash[t.name + "_" + f.name] = (t,f)
+                        f.reference.reference_child.append ( (t, f) )
+                        f.reference.reference_child_hash[t.name + "_" + f.name] = (t,f)
                     if f.arrayof:
                         f.arrayof = idmap[f.arrayof]               
             #import many-to-many relationships

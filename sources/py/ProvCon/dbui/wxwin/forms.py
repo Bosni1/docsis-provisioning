@@ -149,7 +149,7 @@ def GenerateEditorDialog ( tablename, title, excluded=[], extra=[], fixed={} ):
     class _EditorDialog(GenericFormDialog):
         def __init__(self, parent, **kw):
             form = Form ( Table.Get ( tablename ), extra_fields = extra, fixed_fields = fixed  )
-            GenericFormDialog.__init__( self, parent, form, title, **kw )
+            GenericFormDialog.__init__( self, parent, form, title, excluded=excluded, **kw )
     _EditorDialog.__name__ = "GenericFormDialog_" + tablename
     return _EditorDialog
         

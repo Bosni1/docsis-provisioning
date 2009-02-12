@@ -300,13 +300,10 @@ API Error: {0.pgexception}""".format ( self )
             if not theList.bound: theList.parentobjectid = self.objectid
             return theList
         #special PP_* attributes return a "pretty printed" representation of the record        
-        elif attrname.startswith ("list_") and self.hasData:
+        elif attrname.startswith ("list_"):
             rest = attrname[5:]
             if rest in self._child_referencelist:
                 rlist = self._child_referencelist[rest]
-                t, f = self._table.reference_child_hash [rest]
-                rlist._filter = f.name + " = '" + self.objectid + "'"
-                rlist.reload()
                 return rlist
             return None
         elif attrname.startswith ("PP_"):
@@ -363,20 +360,21 @@ API Error: {0.pgexception}""".format ( self )
         for mtm_handle in self._table.mtm_relationships:
             self._mtm_referencelist[mtm_handle] = RelatedRecordList (self._table, mtm_handle)
 
-    def enableChildren(self):
+    def enableChildren(self, exclude=[]):
         self._resolve_child_ref = True
-        self.setupChildren()
+        self.setupChildren(exclude)
         
     def disableChildren(self):
         self._resolve_child_ref = False
         self._child_referencelist.clear()
 
-    def setupChildren(self):
+    def setupChildren(self, exclude=[]):
         from ProvCon.dbui.orm import RecordList
         self._child_referencelist.clear()        
         for child_handle in self._table.reference_child_hash:
+            if child_handle in exclude: continue
             t, f = self._table.reference_child_hash[child_handle]
-            self._child_referencelist[child_handle] = RecordList (t, select=['*'] )
+            self._child_referencelist[child_handle] = RecordList (t, select=['*'], order="o.objectid" )
         
     def nullify(self):
         """
@@ -571,7 +569,12 @@ API Error: {0.pgexception}""".format ( self )
         else:            
             self._astxt = self.TextCache[self._objectid] or "(none)"
                 
-            
+        if self._resolve_child_ref:
+            for child_handle in self._child_referencelist:
+                t, f = self._table.reference_child_hash[child_handle]                
+                self._child_referencelist[child_handle].filter = f.name + " = '" + str(row['objectid']) + "'"
+                self._child_referencelist[child_handle].reload()
+                
         self._hasdata = True
         self._isnew = False
         self._ismodified = False
@@ -594,11 +597,11 @@ API Error: {0.pgexception}""".format ( self )
                 raise Record.RecordIncomplete()
         try:
             row = CFG.CX.get ( CFG.DB.SCHEMA + "." + self._table.name, { 'objectid' : self._objectid, 
-                                                                         'objectscope' : CFG.RT.DATASCOPE } )
-            self.feedDataRow(row)
+                                                                         'objectscope' : CFG.RT.DATASCOPE } )            
         except pg.DatabaseError, e:                        
             raise Record.RecordNotFound(self._objectid, e)
-            
+        
+        self.feedDataRow(row)
         
     def write(self):
         """

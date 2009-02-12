@@ -20,16 +20,17 @@ SET default_with_oids=TRUE;
 create table pv.objectids (
   objectid int8 primary key
 );
-create index idx_objectids_objectid on pv.objectids (objectid);
+-- create index idx_objectids_objectid on pv.objectids (objectid);
 
 --
 -- Objects' textual representations are kept here
 --
 create table pv.object_search_txt (
   objectid int8 PRIMARY KEY,
-  txt varchar(128)
+  txt varchar(256),
+  txt_vector tsvector
 );
-create index object_search_txt_objectid on pv.object_search_txt (objectid);
+-- create index object_search_txt on pv.object_search_txt USING gin( txt_vector );
 
 --
 -- Expressions used to generate objects' text representations.
@@ -45,9 +46,10 @@ create index idx_object_txt_expr_objecttype on pv.object_txt_expressions (object
 --
 create function pv.object_txt_expression_change() RETURNS trigger AS $body$  
   BEGIN
-    IF (NEW.objecttxtexpr <> OLD.objecttxtexpr) THEN
+    IF (NEW.objecttxtexpr <> OLD.objecttxtexpr) THEN    
       UPDATE pv.object_search_txt AS ost SET 
-        txt = pv.obj_txt_repr ( ost.objectid::int8, o.objecttype::name ) 
+        txt = pv.obj_txt_repr ( ost.objectid::int8, o.objecttype::name ), 
+        txt_vector = to_tsvector(pv.obj_txt_repr ( ost.objectid::int8, o.objecttype::name ))
         FROM pv.object o WHERE o.objectid = ost.objectid AND o.objecttype = NEW.objecttype;
     END IF;    
     RETURN NEW;
@@ -102,12 +104,16 @@ $handle_object_lifespan$ LANGUAGE plpgsql;
 -- on insert: set object_search_txt
 -- on update: update object_search_txt
 create function pv.handle_object_lifespan_after() RETURNS trigger AS $handle_object_lifespan$
+  DECLARE
+    txt_expr text;
   BEGIN
     IF (TG_OP = 'INSERT') THEN      
       INSERT INTO pv.object_search_txt (objectid, txt) VALUES ( NEW.objectid, pv.obj_txt_repr (NEW.objectid, NEW.objecttype) );
     END IF;
     IF (TG_OP = 'UPDATE') THEN
-      UPDATE pv.object_search_txt SET txt = pv.obj_txt_repr (NEW.objectid, NEW.objecttype) WHERE objectid = NEW.objectid;
+      txt_expr := pv.obj_txt_repr (NEW.objectid, NEW.objecttype);
+      
+      UPDATE pv.object_search_txt SET txt = txt_expr, txt_vector = to_tsvector(txt_expr)  WHERE objectid = NEW.objectid;
     END IF;    
     RETURN NEW;      
   END;

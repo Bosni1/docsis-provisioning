@@ -13,9 +13,10 @@ create table {:SCHEMA:}objectids (
 --
 create table {:SCHEMA:}object_search_txt (
   objectid int8 PRIMARY KEY,
-  txt varchar(256)
+  txt varchar(256),
+  txt_vector tsvector
 );
--- create index object_search_txt_objectid on {:SCHEMA:}object_search_txt (objectid);
+-- create index object_search_txt on {:SCHEMA:}object_search_txt USING gin( txt_vector );
 
 --
 -- Expressions used to generate objects' text representations.
@@ -31,9 +32,10 @@ create index idx_object_txt_expr_objecttype on {:SCHEMA:}object_txt_expressions 
 --
 create function {:SCHEMA:}object_txt_expression_change() RETURNS trigger AS $body$  
   BEGIN
-    IF (NEW.objecttxtexpr <> OLD.objecttxtexpr) THEN
+    IF (NEW.objecttxtexpr <> OLD.objecttxtexpr) THEN    
       UPDATE {:SCHEMA:}object_search_txt AS ost SET 
-        txt = {:SCHEMA:}obj_txt_repr ( ost.objectid::int8, o.objecttype::name ) 
+        txt = {:SCHEMA:}obj_txt_repr ( ost.objectid::int8, o.objecttype::name )
+        --, txt_vector = to_tsvector({:SCHEMA:}obj_txt_repr ( ost.objectid::int8, o.objecttype::name ))
         FROM {:SCHEMA:}object o WHERE o.objectid = ost.objectid AND o.objecttype = NEW.objecttype;
     END IF;    
     RETURN NEW;
@@ -88,12 +90,16 @@ $handle_object_lifespan$ LANGUAGE plpgsql;
 -- on insert: set object_search_txt
 -- on update: update object_search_txt
 create function {:SCHEMA:}handle_object_lifespan_after() RETURNS trigger AS $handle_object_lifespan$
+  DECLARE
+    txt_expr text;
   BEGIN
     IF (TG_OP = 'INSERT') THEN      
       INSERT INTO {:SCHEMA:}object_search_txt (objectid, txt) VALUES ( NEW.objectid, {:SCHEMA:}obj_txt_repr (NEW.objectid, NEW.objecttype) );
     END IF;
     IF (TG_OP = 'UPDATE') THEN
-      UPDATE {:SCHEMA:}object_search_txt SET txt = {:SCHEMA:}obj_txt_repr (NEW.objectid, NEW.objecttype) WHERE objectid = NEW.objectid;
+      txt_expr := {:SCHEMA:}obj_txt_repr (NEW.objectid, NEW.objecttype);
+      
+      UPDATE {:SCHEMA:}object_search_txt SET txt = txt_expr WHERE objectid = NEW.objectid;
     END IF;    
     RETURN NEW;      
   END;

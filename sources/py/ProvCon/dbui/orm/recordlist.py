@@ -116,6 +116,45 @@ class RelatedRecordList(RecordList):
             return RecordList.reloadsingle(self, objectid)
         return None
     
+
+class GenericQueryRecordList(RecordList):
+    def __init__(self, query, filters = [], recordclass=None):
+        from ProvCon.dbui.orm import Record
+        
+        RecordList.__init__(self, None)
+        self.filters = filters
+        self.query = query
+        self.recordclass = recordclass or Record        
+        
+    def reload(self, feed=False):
+        from ProvCon.dbui.database import CFG        
+        list.__init__(self)
+        result = CFG.CX.query ( self.query.format ( " AND ".join (self.filters) ) ).dictresult()
+        for row in result:
+            rec = self.recordclass.EMPTY ( row ['objecttype'] )
+            if feed:
+                rec.feedDataRow (row)
+            else:                
+                rec.setObjectID ( row['objectid'] )
+            self.append (rec)
+            
+        self.rehash()
+        self.raiseEvent ( "record_list_reloaded", self )
+        self.raiseEvent ( "record_list_changed", self )
+        return self
+    
+    def reloadsingle(self, objectid):
+        try:
+            rec = self.getbyid(objectid)
+            rec.read()
+        except KeyError:
+            rec = self.recordclass.ID (objectid)
+            self.append (rec)
+            self.rehash()
+        finally:
+            self.raiseEvent ( "record_list_item_reloaded", self.hash_index[objectid] )
+            self.raiseEvent ( "record_list_changed", self )
+        
 @Implements(IRecordList)
 class RecordListView(eventemitter):    
     def __init__(self, masterlist, predicate = lambda x: False):

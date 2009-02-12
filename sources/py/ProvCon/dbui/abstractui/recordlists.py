@@ -18,6 +18,7 @@ class BaseRecordList(eventemitter):
                                        "navigate" ] )
         self.__current_record = None
         self.__records = None
+        self.recordlist_changed_hook = None
         self.records = records
         
         boundform = kwargs.get ( "boundform", None )        
@@ -30,12 +31,17 @@ class BaseRecordList(eventemitter):
         self.__records = records
         self.records_count = len(self.__records)
         self.current_record = None
+        if self.recordlist_changed_hook: self.recordlist_changed_hook.remove()
+        self.recordlist_changed_hook = records.listenForEvent ( "record_list_changed", self._on_records_changed )
         self.raiseEvent ( "record_list_changed", self.get_records() )
 
     def get_records(self):
         return self.__records
     records = property (get_records, set_records)
 
+    def _on_records_changed(self, *args):
+        self.raiseEvent ( "record_list_changed", self.records )
+        
     def currentid(self):
         if self.current_record:
             return self.current_record._objectid

@@ -18,7 +18,8 @@ class Store:
     def __init__(self):
         self.__recordlists__ = {}
     
-    init__city = partial(basic_store_initializer, "city",  order="name" )
+    init__subscriber = partial(basic_store_initializer, "subscriber",  order="name" )
+    init__city = partial(basic_store_initializer, "city",  order="name" )    
     init__street = partial(basic_store_initializer, "street", order="cityid, name" )
     init__building = partial(basic_store_initializer, "building", order="streetid, number" )
     init__location = partial(basic_store_initializer, "location", order="buildingid, number" )
