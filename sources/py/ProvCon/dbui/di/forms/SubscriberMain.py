@@ -11,14 +11,18 @@ import wx.lib.scrolledpanel as scroll
 import wx.lib.rcsizer as rcs
 
 NewSubscriberDialog = GenerateEditorDialog ( "subscriber", 
-                        "Nowy klient...", 
-                        excluded=["primarylocationid", "postaladdress", "email", "telephone"] )
+                        "Nowy klient...",                         
+                        excluded=["primarylocationid", "postaladdress", "email", "telephone"],
+                        height=200)
+
+ServiceDialog = GenerateEditorDialog ( "service",
+                                       "Usługa" )
+                                       
 
 class SubscriberSearchToolbar(wx.Panel):
 
     def __init__(self, main, *args, **kw):
         wx.Panel.__init__ (self, main)
-
         self.main = main
         
         sizer = wx.BoxSizer(wx.HORIZONTAL)
@@ -131,6 +135,7 @@ class SubscriberCommandPanel(wx.Panel):
         self.form = form
         self.buttons = AttrDict()
         self.buttons.new_subscriber = wx.Button ( self, label = "Nowy\nklient", style=wx.NO_BORDER )
+        self.buttons.new_service = wx.Button ( self, label = "Nowa\nusługa", style=wx.NO_BORDER )
         self.buttons.new_device = wx.Button ( self, label = "Nowe\nurządzenie", style=wx.NO_BORDER )
         self.buttons.new_contact = wx.Button ( self, label = "Nowe\nzgłoszenie", style=wx.NO_BORDER )
         self.buttons.cos_change = wx.Button ( self, label = "Zmiana\npakietu", style=wx.NO_BORDER )
@@ -178,8 +183,9 @@ class SubscriberMain(wx.Panel):
         self.table.subscriber = meta.Table.Get ( "subscriber" )
         self.table.service = meta.Table.Get ( "service" )
         
-        self.store.subscriber = orm.RecordList ( self.table.subscriber ).reload()
+        self.store.subscriber = APP.DataStore.subscriber
         self.store.services = orm.RecordList ( self.table.service, select=["classofservice","typeofservice","handle"] )
+        
         self.form.subscriber = orm.Form ( self.table.subscriber  )
         subscriberRec = self.form.subscriber.current
         subscriberRec.enableChildren ()        
@@ -294,7 +300,7 @@ class SubscriberMain(wx.Panel):
         print args
         
     def subscriberRecordSaved(self, *args):
-        self.info_panel.showSaveOption()
+        self.info_panel.hideSaveOption()
         
     def subscriberDataLoaded(self, *args):
         self.info_panel.hideSaveOption()

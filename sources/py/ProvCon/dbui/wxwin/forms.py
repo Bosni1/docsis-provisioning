@@ -108,7 +108,8 @@ class GenericFormDialog(wx.Dialog):
         self.form = form
         pre = wx.PreDialog()
         #pre.SetExtraStyle(...)
-        pre.Create (parent, -1, title, wx.DefaultPosition, wx.Size(600, 500)) 
+        size = wx.Size ( kwargs.get ( "width", 600 ), kwargs.get ("height", 500) )
+        pre.Create (parent, -1, title, wx.DefaultPosition, size) 
         self.PostCreate(pre)
         
         sizer = wx.BoxSizer (wx.VERTICAL)        
@@ -144,12 +145,13 @@ class GenericFormDialog(wx.Dialog):
     def New(self):
         self.form.new ()
 
-def GenerateEditorDialog ( tablename, title, excluded=[], extra=[], fixed={} ):
+def GenerateEditorDialog ( tablename, title, excluded=[], extra=[], fixed={}, width=600, height=500 ):
     from ProvCon.dbui.orm import Form
     class _EditorDialog(GenericFormDialog):
         def __init__(self, parent, **kw):
             form = Form ( Table.Get ( tablename ), extra_fields = extra, fixed_fields = fixed  )
-            GenericFormDialog.__init__( self, parent, form, title, excluded=excluded, **kw )
+            GenericFormDialog.__init__( self, parent, form, title, excluded=excluded, 
+                                        width=width, height=height, **kw )
     _EditorDialog.__name__ = "GenericFormDialog_" + tablename
     return _EditorDialog
         
