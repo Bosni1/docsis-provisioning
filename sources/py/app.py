@@ -174,6 +174,7 @@ class App(object):
         return None
             
     def __init__(self):        
+        self.ROOT = _PROVISIONING_ROOT
         print "Delayed import initialized."
     
         

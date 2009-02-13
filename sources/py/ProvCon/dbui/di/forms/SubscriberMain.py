@@ -22,6 +22,7 @@ ServiceDialog = GenerateEditorDialog ( "service",
 class SubscriberSearchToolbar(wx.Panel):
 
     def __init__(self, main, *args, **kw):
+        
         wx.Panel.__init__ (self, main)
         self.main = main
         
@@ -54,7 +55,7 @@ class SubscriberSearchToolbar(wx.Panel):
         pass
     
     def on_do_search(self, evt):    
-        self.recordlist.query = "SELECT s.* FROM pv.subscriber s INNER JOIN pv.object_search_txt t ON s.objectid = t.objectid WHERE t.txt ~* '%s'" % self.searchctrl.GetValue() 
+        self.recordlist.query = "SELECT s.*, t.txt as _astxt FROM pv.subscriber s INNER JOIN pv.object_search_txt t ON s.objectid = t.objectid WHERE t.txt ~* '%s'" % self.searchctrl.GetValue() 
         self.recordlist.reload(feed=True)
         self.results_txt.Label  = "Wyniki (%4d) :" % len(self.recordlist)
         if len(self.recordlist) > 0:
@@ -66,6 +67,7 @@ class SubscriberSearchToolbar(wx.Panel):
 class SubscriberInfoPanel(wx.Panel):
     
     def __init__(self, parent, form, *args, **kwargs):
+        from ProvCon.dbui.wxwin.art import BITMAPS
         wx.Panel.__init__(self, parent, *args, **kwargs)
         self.form = form
         self.sizer = wx.BoxSizer(wx.VERTICAL)
@@ -86,7 +88,7 @@ class SubscriberInfoPanel(wx.Panel):
         self.edit.subscriberid.SetFont ( font22b )
         
         self.row_1 = rcs.RowColSizer()
-        self.row_1.Add ( self.edit.subscriberid, row=1, col=1, rowspan=2, border=30, flag=wx.ALIGN_CENTER | wx.RIGHT )
+        self.row_1.Add ( self.edit.subscriberid, row=1, col=1, rowspan=2, border=30, flag=wx.EXPAND )
         self.row_1.Add ( self.edit.name, row=1,col=2, flag=wx.EXPAND)
         self.row_1.Add ( self.edit.primarylocation, row=2,col=2, flag=wx.EXPAND)
 
@@ -94,18 +96,17 @@ class SubscriberInfoPanel(wx.Panel):
 
         ##Save option
         self.row_2 = wx.BoxSizer(wx.HORIZONTAL)
+        #self.row_2.Add ( wx.StaticBitmap (self, bitmap=BITMAPS.WRITE) )
         
         self.row_2.AddStretchSpacer(5)
 
         txt = wx.StaticText ( self, label="DANE ZOSTAŁY ZMIENIONE")
-        txt.Font = font18        
+        #txt.Font = font18        
         self.row_2.Add ( txt, flag=wx.ALIGN_CENTER_VERTICAL )
         
         self.row_2.AddSpacer ( 40 )
 
-        btn = wx.Button ( self, label="Zapisz!")
-        btn.Font = font22b
-        btn.ForegroundColour = "RED"
+        btn = wx.BitmapButton ( self, bitmap=BITMAPS.WRITE)
         btn.Bind (wx.EVT_BUTTON, self.doSave)
         self.row_2.Add ( btn, flag=wx.ALIGN_CENTER_VERTICAL)
         
@@ -113,12 +114,12 @@ class SubscriberInfoPanel(wx.Panel):
         
         self.sizer.Add ( self.row_2,0,wx.EXPAND)
                         
-        self.SetSizer (self.sizer)
-        
+        self.SetSizer (self.sizer)        
         self.sizer.Hide(self.row_2)
 
     def showSaveOption(self):
         self.sizer.Show (self.row_2)
+        self.Layout()
 
     def hideSaveOption(self):
         self.sizer.Hide (self.row_2)
@@ -128,23 +129,29 @@ class SubscriberInfoPanel(wx.Panel):
 
 class SubscriberCommandPanel(wx.Panel):
     def __init__(self, main, form, *args, **kwargs):
+        from ProvCon.dbui.wxwin.art import BITMAPS
         wx.Panel.__init__(self, main, *args, **kwargs)
         sizer = wx.BoxSizer (wx.VERTICAL)
         
         self.main = main
         self.form = form
         self.buttons = AttrDict()
-        self.buttons.new_subscriber = wx.Button ( self, label = "Nowy\nklient", style=wx.NO_BORDER )
-        self.buttons.new_service = wx.Button ( self, label = "Nowa\nusługa", style=wx.NO_BORDER )
-        self.buttons.new_device = wx.Button ( self, label = "Nowe\nurządzenie", style=wx.NO_BORDER )
-        self.buttons.new_contact = wx.Button ( self, label = "Nowe\nzgłoszenie", style=wx.NO_BORDER )
-        self.buttons.cos_change = wx.Button ( self, label = "Zmiana\npakietu", style=wx.NO_BORDER )
-        self.buttons.status_change = wx.Button ( self, label = "Diagnostyka", style=wx.NO_BORDER )
-        self.buttons.diagnostics = wx.Button ( self, label = "Blokady", style=wx.NO_BORDER )
-        self.buttons.service_change = wx.Button ( self, label = "Przełączenie", style=wx.NO_BORDER )
-        self.buttons.equipment_change = wx.Button ( self, label = "Wymiana\nsprzętu", style=wx.NO_BORDER )        
-        for b in self.buttons:
-            bt = self.buttons[b]            
+        self.buttons.new_subscriber = wx.BitmapButton ( self, bitmap = BITMAPS.ADDUSER, style=wx.NO_BORDER )
+        self.buttons.new_subscriber.SetToolTipString ( "Dodaj nowego klienta" )
+        
+        self.buttons.new_service = wx.BitmapButton ( self, bitmap = BITMAPS.ADDSERVICE, style=wx.NO_BORDER )
+        self.buttons.new_service.SetToolTipString ( "Dodaj nową usługę" )
+
+        self.buttons.new_issue = wx.BitmapButton ( self, bitmap = BITMAPS.SUPPORT, style=wx.NO_BORDER )
+        self.buttons.new_issue.SetToolTipString ( "Nowe zgłoszenie" )
+        
+        #self.buttons.new_device = wx.Button ( self, label = "Nowe\nurządzenie", style=wx.NO_BORDER )        
+        #self.buttons.cos_change = wx.Button ( self, label = "Zmiana\npakietu", style=wx.NO_BORDER )
+        #self.buttons.status_change = wx.Button ( self, label = "Diagnostyka", style=wx.NO_BORDER )
+        #self.buttons.diagnostics = wx.Button ( self, label = "Blokady", style=wx.NO_BORDER )
+        #self.buttons.service_change = wx.Button ( self, label = "Przełączenie", style=wx.NO_BORDER )
+        #self.buttons.equipment_change = wx.Button ( self, label = "Wymiana\nsprzętu", style=wx.NO_BORDER )        
+        for b, bt in self.buttons.inorder():            
             sizer.Add ( bt,0, flag=wx.EXPAND)
             if hasattr(self, "on_" + b): 
                 bt.Bind ( wx.EVT_BUTTON, getattr(self, "on_" + b ) )
@@ -188,7 +195,7 @@ class SubscriberMain(wx.Panel):
         
         self.form.subscriber = orm.Form ( self.table.subscriber  )
         subscriberRec = self.form.subscriber.current
-        subscriberRec.enableChildren ()        
+        subscriberRec.enableChildren()        
         
         self.mgr = wx.aui.AuiManager()
         self.mgr.SetManagedWindow (self)
@@ -206,7 +213,7 @@ class SubscriberMain(wx.Panel):
         #                                         reprfunc = _format_service)
         
         self.recordlist.services = rl.RecordList(subscriberRec.list_service_subscriberid, self,
-                                                 reprfunc = _format_service)        
+                                                 reprfunc = _format_service)
         #self.recordlist.services.bind_to_form ( "subscriberid", self.form.subscriber)
 
         
@@ -273,14 +280,14 @@ class SubscriberMain(wx.Panel):
 
         
         f = self.form.subscriber
-        f.listenForEvent ( "request_record_change", self.subscriberRecordChanged )
+        f.listenForEvent ( "request_record_change", self.subscriberRecordChange )
         f.listenForEvent ( "current_record_modified", self.subscriberRecordModified )
         f.listenForEvent ( "current_record_deleted", self.subscriberRecordDeleted )
         f.listenForEvent ( "current_record_saved", self.subscriberRecordSaved )
         f.listenForEvent ( "data_loaded", self.subscriberDataLoaded )
         
-        #self.form.subscriber.setid ( self.store.subscriber[10].objectid )
-        self.form.subscriber.new()
+        self.form.subscriber.setid ( self.store.subscriber[0].objectid )
+        #self.form.subscriber.new()
               
         
     def setCurrentRecord(self, record):
@@ -290,7 +297,7 @@ class SubscriberMain(wx.Panel):
         wx.CallLater ( 100, self.form.subscriber.setid, objectid )
         #self.form.subscriber.setid ( record.objectid )
         
-    def subscriberRecordChanged(self, *args):
+    def subscriberRecordChange(self, *args):
         print args
         
     def subscriberRecordModified(self, *args):
@@ -304,6 +311,4 @@ class SubscriberMain(wx.Panel):
         
     def subscriberDataLoaded(self, *args):
         self.info_panel.hideSaveOption()
-        
-        
-        
+                                     
