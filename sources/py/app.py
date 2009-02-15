@@ -74,7 +74,11 @@ class ProvConConfig(object):
             return self.__dict__[attrname]
         elif self._config_parser.has_section ( attrname ):
             return self.getSectionProxy ( attrname )
-            
+
+class Logger(object):
+    def __call__(self, msg, priority=1):
+        print msg
+        
 class App(object):
     
     class Obj_FE(ProvConConfig):        
@@ -174,8 +178,9 @@ class App(object):
         return None
             
     def __init__(self):        
-        self.ROOT = _PROVISIONING_ROOT
-        print "Delayed import initialized."
+        self.ROOT = _PROVISIONING_ROOT        
+        self.log = Logger()
+        self.log("Delayed import initialized.")
     
         
         

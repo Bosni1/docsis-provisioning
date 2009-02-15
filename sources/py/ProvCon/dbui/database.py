@@ -2,6 +2,7 @@ import contextlib
 import cStringIO
 import pg, re
 import exceptions
+import postgres
 
 class CFG:
     """
@@ -49,7 +50,7 @@ class CFG:
             elif APP.isBackEnd:
                 cls.DATASCOPE = APP.BE.DATABASE.scope
         DATASCOPE = None
-        
+    
     class tCX(pg.DB):        
         """    
         Besides being a PostgreSQL connection object, this class builds the ER
@@ -190,6 +191,7 @@ def text_to_array(text, depth):
                 curitem += char            
 
             prev = char
+            
     if text is None or len(text) == 0: return None
     arr = list(inside_array(text))[0] 
     if depth > 0: return map( lambda x: text_to_array(x, depth-1), arr )
