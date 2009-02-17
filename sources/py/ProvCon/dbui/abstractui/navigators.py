@@ -18,15 +18,15 @@ class BaseNavigator(eventemitter):
         eventemitter.__init__ (self, [ "navigate" ] )
         
         self.index_id_hash = {}        
+        self.oidname = kwargs.get ( "oidname", "objectid" )
+        self.displayname = kwargs.get ( "displayname", "_astxt" )
+        self.current_index = kwargs.get ( "current_index", None )
         self.records_count = 0
         self.__records = None
         self.records =  kwargs.get ( "records", [] )
 
         self.searchengine = kwargs.get ( "searchengine", None )        
         
-        self.oidname = kwargs.get ( "oidname", "objectid" )
-        self.displayname = kwargs.get ( "displayname", "_astxt" )
-        self.current_index = kwargs.get ( "current_index", None )
         self.previous_index = None
         self.new_record = False
     

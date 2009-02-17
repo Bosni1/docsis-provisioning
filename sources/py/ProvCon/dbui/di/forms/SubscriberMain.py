@@ -1,5 +1,5 @@
 # -*- coding: utf8 -*-
-from ProvCon.func import AttrDict
+from ProvCon.func import AttrDict, partial
 from ProvCon.dbui import orm, meta
 from ProvCon.dbui.wxwin.forms import GenericForm, ScrolledGenericForm, GenerateEditorDialog
 from ProvCon.dbui.wxwin import recordlists as rl, mwx, forms
@@ -16,7 +16,8 @@ NewSubscriberDialog = GenerateEditorDialog ( "subscriber",
                         height=200)
 
 ServiceDialog = GenerateEditorDialog ( "service",
-                                       "Usługa" )
+                                       "Usługa",
+                                       fixed={'subscriberid' : None })
                                        
 
 class SubscriberSearchToolbar(wx.Panel):
@@ -56,12 +57,12 @@ class SubscriberSearchToolbar(wx.Panel):
     
     def on_do_search(self, evt):    
         self.recordlist.query = "SELECT s.*, t.txt as _astxt FROM pv.subscriber s INNER JOIN pv.object_search_txt t ON s.objectid = t.objectid WHERE t.txt ~* '%s'" % self.searchctrl.GetValue() 
-        self.recordlist.reload(feed=True)
+        self.recordlist.reload (feed=True)
         self.results_txt.Label  = "Wyniki (%4d) :" % len(self.recordlist)
         if len(self.recordlist) > 0:
             oid = self.recordlist[0].objectid
-            wx.CallLater (100, self.resultspopup.set_oid, oid)
-            wx.CallLater (100, self.main.setCurrentRecord, self.recordlist[0] )
+            wx.CallAfter (self.resultspopup.set_oid, oid)
+            wx.CallAfter (self.main.setCurrentRecord, self.recordlist[0] )
     
         
 class SubscriberInfoPanel(wx.Panel):
@@ -150,18 +151,22 @@ class SubscriberCommandPanel(wx.Panel):
         #self.buttons.status_change = wx.Button ( self, label = "Diagnostyka", style=wx.NO_BORDER )
         #self.buttons.diagnostics = wx.Button ( self, label = "Blokady", style=wx.NO_BORDER )
         #self.buttons.service_change = wx.Button ( self, label = "Przełączenie", style=wx.NO_BORDER )
-        #self.buttons.equipment_change = wx.Button ( self, label = "Wymiana\nsprzętu", style=wx.NO_BORDER )        
+        #self.buttons.equipment_change = wx.Button ( self, label = "Wymiana\nsprzętu", style=wx.NO_BORDER )
+        
         for b, bt in self.buttons.inorder():            
             sizer.Add ( bt,0, flag=wx.EXPAND)
             if hasattr(self, "on_" + b): 
-                bt.Bind ( wx.EVT_BUTTON, getattr(self, "on_" + b ) )
+                bt.Bind (wx.EVT_BUTTON, partial(self._run_handler, "on_" + b ) )
         
         sizer.AddStretchSpacer (10)
         
         self.SetSizer(sizer)
 
-        self.new_subscriber_dialog = None
-        
+        self.new_subscriber_dialog = None        
+    def _run_handler (self, hname, evt, *args):
+        if hasattr(self, hname):
+            wx.CallAfter ( getattr(self, hname), evt, *args )
+            
     def on_new_subscriber(self, evt, *args):
         if not self.new_subscriber_dialog:
             self.new_subscriber_dialog = NewSubscriberDialog(self.main)
@@ -169,13 +174,55 @@ class SubscriberCommandPanel(wx.Panel):
         self.new_subscriber_dialog.New ()
         self.new_subscriber_dialog.Edit()
         objectid = self.new_subscriber_dialog.form.current._objectid
+
         if objectid:
             APP.DataStore["subscriber"].reloadsingle ( objectid )
             self.main.setCurrentSubscriberId ( objectid )
             
+    def on_new_service(self, evt, *args):
+        dlg = self.main.dialogs.service
+        rec = self.main.getCurrentSubscriberRecord()
+        if not rec.hasData: return
+        dlg.form.set_fixed_value ( 'subscriberid', rec.objectid )
+        dlg.New()        
+        dlg.form["locationid"] = rec.primarylocationid
+        dlg.Edit()
+
+class IPListMenu (rl.RecordListMenu):
+    def __init__(self, recordlist, **kw):
+        rl.RecordListMenu.__init__(self, recordlist, **kw)
+        self.AddItem ( "new", "Dodaj nowy adres IP" )
+        self.AddItem ( "add", "Usuń {0.address}")
+        self.AddItem ( "block", "Zablokuj {0.address}" )
+        self.AddItem ( "unblock", "Odblokuj {0.address}" )
+        self.AddItem ( "spam", "Ustaw filtr antyspamowy dla {0.address}" )
+        self.AddItem ( "child", "Ustaw child-protection" )
+        self.AddItem ( "settings", "Pokaż ustawienia sieci" )
+        self.AppendSeparator()
+        self.AddItem ( "ping", "Ping {0.address}" )
+        self.AddItem ( "traceroute", "Traceroute {0.address}" )
+        
+class ServiceListMenu (rl.RecordListMenu):
+    def __init__(self, recordlist, **kw):
+        rl.RecordListMenu.__init__(self, recordlist, **kw)                
+        self.AddItem ( "ticket", "Zgłoszenie/Awaria usługi" )
+        self.AddItem ( "history", "Historia usługi" )
+        self.AppendSeparator()
+        self.AddItem ( "change_cos", "Zmiana pakietu" )
+        self.AddItem ( "block", "Blokada usługi" )
+        self.AddItem ( "suspend", "Zawieszenie usługi" )
+        self.AddItem ( "disconnect", "Wyłączenie usługi" )
+        self.AppendSeparator()
+        self.AddItem ( "service_check", "Sprawdzenie działania usługi" )
+        self.AppendSeparator()
+        self.AddItem ( "del", "Usuń usługę" )        
+                    
+        
+        
 class SubscriberMain(wx.Panel):
     
     def __init__(self, parent, *args):
+        from ProvCon.dbui.di import rSubscriber
         wx.Panel.__init__(self, parent, *args)
         
         self.form = AttrDict()
@@ -183,9 +230,8 @@ class SubscriberMain(wx.Panel):
         self.editor = AttrDict()
         self.store = AttrDict()
         self.recordlist = AttrDict()
-        self.dialogs = {
-            "service" : forms.GenerateEditorDialog ( "service", "Usługa"),            
-            }
+        self.dialogs = AttrDict()
+        self.dialogs.service = ServiceDialog(self)
         
         self.table.subscriber = meta.Table.Get ( "subscriber" )
         self.table.service = meta.Table.Get ( "service" )
@@ -193,9 +239,9 @@ class SubscriberMain(wx.Panel):
         self.store.subscriber = APP.DataStore.subscriber
         self.store.services = orm.RecordList ( self.table.service, select=["classofservice","typeofservice","handle"] )
         
-        self.form.subscriber = orm.Form ( self.table.subscriber  )
+        self.form.subscriber = orm.Form ( self.table.subscriber, recordclass = rSubscriber  )
         subscriberRec = self.form.subscriber.current
-        subscriberRec.enableChildren()        
+        subscriberRec.enableChildren()                
         
         self.mgr = wx.aui.AuiManager()
         self.mgr.SetManagedWindow (self)
@@ -207,13 +253,28 @@ class SubscriberMain(wx.Panel):
         self.command_panel = SubscriberCommandPanel(self, self.form.subscriber)
         
         def _format_service(r):
-            return r.typeofservice_REF + "\n<br>" + r.classofservice_REF
-                
+            return "<b>" + r.typeofservice_REF + "</b> " + r.classofservice_REF + "<br><i>" + r.locationid_REF + "</i>"
+        def _format_ip(r):
+            return "<b>" + r.address + "</b>"
+        def _format_mac(r):                        
+            fmt = "<tt>" + r.mac + "</tt>"
+            if r.ipreservationid:
+                fmt += "<br> <i>dhcp:</i>" + r.ipreservationid_REF
+            return fmt
+        def _format_device(r):                        
+            return r._astxt
+        
         #self.recordlist.services = rl.RecordList(self.store.services, self,
         #                                         reprfunc = _format_service)
         
         self.recordlist.services = rl.RecordList(subscriberRec.list_service_subscriberid, self,
                                                  reprfunc = _format_service)
+        self.recordlist.services.set_menu ( ServiceListMenu(self.recordlist.services) )
+        self.recordlist.ip = rl.RecordList(subscriberRec.ipreservations, self, reprfunc = _format_ip )
+        self.recordlist.ip.set_menu ( IPListMenu(self.recordlist.ip) )
+
+        self.recordlist.mac = rl.RecordList(subscriberRec.macaddresses, self, reprfunc = _format_mac )        
+        self.recordlist.devices = rl.RecordList(subscriberRec.devices, self, reprfunc = _format_device )        
         #self.recordlist.services.bind_to_form ( "subscriberid", self.form.subscriber)
 
         
@@ -262,17 +323,18 @@ class SubscriberMain(wx.Panel):
                            Layer(1).
                            MinSize((100,-1))
                            )
-        
-        self.mgr.AddPane ( wx.Panel(self), wx.aui.AuiPaneInfo().Right().
-                           CloseButton(False).
-                           Name("ip_address_list").Caption("Adresy IP").
-                           Layer(1).                           
-                           MinSize( (300,-1) )                           
-                           )
-        self.mgr.AddPane ( wx.Panel(self), wx.aui.AuiPaneInfo().Right().
-                           CloseButton(False).
+
+        self.mgr.AddPane ( self.recordlist.mac, wx.aui.AuiPaneInfo().Right().
+                           CloseButton(False).Floatable(False).
                            Name("mac_address_list").Caption("MAC").
                            Layer(1).
+                           MinSize( (300,-1) )                           
+                           )
+        
+        self.mgr.AddPane ( self.recordlist.ip, wx.aui.AuiPaneInfo().Right().
+                           CloseButton(False).Floatable(False).
+                           Name("ip_address_list").Caption("Adresy IP").
+                           Layer(1).                           
                            MinSize( (300,-1) )                           
                            )
 
@@ -289,7 +351,9 @@ class SubscriberMain(wx.Panel):
         self.form.subscriber.setid ( self.store.subscriber[0].objectid )
         #self.form.subscriber.new()
               
-        
+    def getCurrentSubscriberRecord(self):
+        return self.form.subscriber.current
+    
     def setCurrentRecord(self, record):
         self.setCurrentSubscriberId ( record.objectid )
         
@@ -310,5 +374,7 @@ class SubscriberMain(wx.Panel):
         self.info_panel.hideSaveOption()
         
     def subscriberDataLoaded(self, *args):
+        self.getCurrentSubscriberRecord().reloadIpReservations()
+        self.getCurrentSubscriberRecord().reloadMACAddresses()
         self.info_panel.hideSaveOption()
                                      

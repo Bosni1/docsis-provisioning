@@ -53,9 +53,9 @@ class MetaDataEditor(wx.App):
         hsizer.Add(rsizer, 1, flag=wx.EXPAND)
         sizer.Add (hsizer, 1, flag=wx.EXPAND)
 
-        tablenav = guitk.navigators.Navigator (self.toplevel)
+        tablenav = guitk.navigators.Navigator (self.toplevel, records=APP.DataStore.table_info)
         #tablenav.set_records ( orm.RecordList ( self.tableeditor.table ).reload() )        
-        tablenav.set_records ( APP.DataStore.table_info )
+        #tablenav.set_records ( APP.DataStore.table_info )
         sizer.Add (tablenav, 0, flag=wx.EXPAND)
         tablenav.navigate (0)
         tablenav.Show()

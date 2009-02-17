@@ -118,7 +118,7 @@ class RelatedRecordList(RecordList):
     
 
 class GenericQueryRecordList(RecordList):
-    def __init__(self, query, filters = [], recordclass=None):
+    def __init__(self, query="SELECT NULL LIMIT 0", filters = [], recordclass=None):
         from ProvCon.dbui.orm import Record
         
         RecordList.__init__(self, None)

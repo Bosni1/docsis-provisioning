@@ -65,10 +65,12 @@ class Form(eventemitter):
         from record import ORMError 
         from ProvCon.dbui.database import RaiseDBException
 
+        recordclass = kkw.get ( "recordclass", Record )
+        
         self.ormerror = ORMError
         self.ormerrorhandler = RaiseDBException
         self.table = table
-        self.current = Record.EMPTY (table.name)
+        self.current = recordclass.EMPTY (table.name)
         self.tkvars = {}
         self.modification_notification = False
         
@@ -223,7 +225,13 @@ class Form(eventemitter):
                 f.init_value (self)
         finally:
             self.value_change_handler.thaw()
+
+    def __setitem__(self, idx, value):
+        self.tkvars[idx].set ( value )
+    def __getitem__(self, idx):
+        return self.tkvars[idx].get()
     
+            
 def BaseSpecializedForm(table):
     class _Form(Form):
         def __init__(self):
