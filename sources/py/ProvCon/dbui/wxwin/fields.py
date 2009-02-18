@@ -89,6 +89,32 @@ class Entry:
             finally:
                 self._on_checked.thaw()
         
+    class Choice  (BaseFieldEditor, mwx.ComboBox):
+        def __init__(self, field, parent, *args, **kwargs):
+            mwx.ComboBox.__init__(self, parent,
+                                  style=wx.CB_READONLY,
+                                  name=field.path)
+            BaseFieldEditor.__init__(self, field, **kwargs)
+            self.val_idx_hash = {}
+            self.val_idx_hash[None] = self.Append ( '<null>', None )
+            for val, disp in field.choices:
+                self.val_idx_hash[val] = self.Append ( disp, val )
+            self._on_combo_box = conditionalmethod ( self._on_combo_box )
+            self.Bind (wx.EVT_COMBOBOX, self._on_combo_box )
+
+        def set_current_editor_value(self, value):
+            self.Select ( self.val_idx_hash[value] )
+        
+        def get_current_editor_value(self):
+            return self.GetClientData ( self.GetSelection() )            
+        
+        def _on_combo_box(self, event, *args):
+            try:
+                self._on_combo_box.freeze()                
+                self.update_variable()
+            finally:
+                self._on_combo_box.thaw()    
+        
     ##choosers
     class ListReference(BaseReferenceEditor, mwx.ListReference):
         def __init__(self, field, parent, *args, **kwargs):            
@@ -106,7 +132,7 @@ class Entry:
     ## reference editors
     class ComboReference(BaseReferenceEditor, mwx.ComboReference):
         def __init__(self, field, parent, *args, **kwargs):
-            mwx.ComboBox.__init__ (self, parent, 
+            mwx.ComboReference.__init__ (self, parent, 
                                   style=wx.CB_READONLY,
                                   name=field.path)            
             BaseReferenceEditor.__init__(self, field, **kwargs)
@@ -132,8 +158,8 @@ class Entry:
                 self._on_combo_box.freeze()                
                 self.update_variable()
             finally:
-                self._on_combo_box.thaw()
-    
+                self._on_combo_box.thaw()    
+                
     class StaticReference(BaseReferenceEditor, mwx.StaticReference):
         def __init__(self, field, parent, *args, **kwargs):
             mwx.StaticText.__init__ (self, parent, 

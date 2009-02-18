@@ -168,43 +168,43 @@ class SubscriberCommandPanel(wx.Panel):
             wx.CallAfter ( getattr(self, hname), evt, *args )
             
     def on_new_subscriber(self, evt, *args):
-        if not self.new_subscriber_dialog:
-            self.new_subscriber_dialog = NewSubscriberDialog(self.main)
+        self.main.addNewSubscriber()
         
-        self.new_subscriber_dialog.New ()
-        self.new_subscriber_dialog.Edit()
-        objectid = self.new_subscriber_dialog.form.current._objectid
-
-        if objectid:
-            APP.DataStore["subscriber"].reloadsingle ( objectid )
-            self.main.setCurrentSubscriberId ( objectid )
-            
     def on_new_service(self, evt, *args):
-        dlg = self.main.dialogs.service
-        rec = self.main.getCurrentSubscriberRecord()
-        if not rec.hasData: return
-        dlg.form.set_fixed_value ( 'subscriberid', rec.objectid )
-        dlg.New()        
-        dlg.form["locationid"] = rec.primarylocationid
-        dlg.Edit()
+        self.main.addNewService()
 
 class IPListMenu (rl.RecordListMenu):
-    def __init__(self, recordlist, **kw):
+    def __init__(self, main, recordlist, **kw):
         rl.RecordListMenu.__init__(self, recordlist, **kw)
+        self.main = main
         self.AddItem ( "new", "Dodaj nowy adres IP" )
-        self.AddItem ( "add", "Usuń {0.address}")
+        self.AddItem ( "del", "Usuń {0.address}")
         self.AddItem ( "block", "Zablokuj {0.address}" )
         self.AddItem ( "unblock", "Odblokuj {0.address}" )
-        self.AddItem ( "spam", "Ustaw filtr antyspamowy dla {0.address}" )
+        self.AddItem ( "spamon", "Włącz blokadę poczty dla {0.address}" )
+        self.AddItem ( "spamoff", "Usuń blokadę poczty dla {0.address}" )
         self.AddItem ( "child", "Ustaw child-protection" )
         self.AddItem ( "settings", "Pokaż ustawienia sieci" )
         self.AppendSeparator()
         self.AddItem ( "ping", "Ping {0.address}" )
         self.AddItem ( "traceroute", "Traceroute {0.address}" )
+        self.AppendSeparator()
+        self.AddItem ( "copy", "Kopiuj do schowka" )        
+
+    def prepare(self):
+        rec = rl.RecordListMenu.prepare(self)    
+        for n in self.unformatted:
+            item, fmt = self.unformatted[n]
+            if not rec and n <> "new":
+                item.Enable(False)
+            else:
+                item.Enable(True)
+        
         
 class ServiceListMenu (rl.RecordListMenu):
-    def __init__(self, recordlist, **kw):
+    def __init__(self, main, recordlist, **kw):
         rl.RecordListMenu.__init__(self, recordlist, **kw)                
+        self.main = main
         self.AddItem ( "ticket", "Zgłoszenie/Awaria usługi" )
         self.AddItem ( "history", "Historia usługi" )
         self.AppendSeparator()
@@ -215,9 +215,73 @@ class ServiceListMenu (rl.RecordListMenu):
         self.AppendSeparator()
         self.AddItem ( "service_check", "Sprawdzenie działania usługi" )
         self.AppendSeparator()
-        self.AddItem ( "del", "Usuń usługę" )        
-                    
+        self.AddItem ( "add", "Dodaj nową usługę" )        
+        self.AddItem ( "del", "Usuń usługę" )                            
+
+    def prepare(self):
+        rec = rl.RecordListMenu.prepare(self)    
+        for n in self.unformatted:
+            item, fmt = self.unformatted[n]
+            if not rec and n <> "add":
+                item.Enable(False)
+            else:
+                item.Enable(True)
+                
+class MACListMenu (rl.RecordListMenu):
+    def __init__(self, main, recordlist, **kw):
+        rl.RecordListMenu.__init__(self, recordlist, **kw)                
+        self.main = main
+        self.AddItem ( "add", "Dodaj nowy MAC" )
+        self.AddItem ( "del", "Usuń adres MAC" )
+        self.AppendSeparator()
+        self.AddItem ( "change_dhcp", "Zmień mapowanie DHCP" )
+        self.AddItem ( "extra_dhcp", "Ustaw dodatkowe opcje DHCP" )
+        self.AddItem ( "change_nas", "Zmień urządzenie dostępowe" )        
+        self.AddItem ( "find", "Znajdź w FDB" )
+        self.AddItem ( "make_static", "Ustaw static-arp" )
+        self.AppendSeparator()
+        self.AddItem ( "history", "Historia wykorzystania adresu MAC" )
+        self.AppendSeparator()
+        self.AddItem ( "copymac", "Kopiuj MAC do schowka" )        
+        self.AddItem ( "copyip", "Kopiuj IP do schowka" )        
+
+class DeviceListMenu (rl.RecordListMenu):
+
+    def __init__(self, main, recordlist, **kw):
+        rl.RecordListMenu.__init__(self, recordlist, **kw)                
+        self.main = main
+        self.AddItem ( "add", "Dodaj nowe urządzenie" )
+        self.AddItem ( "del", "Usuń urządzenie z listy" )
+        self.AppendSeparator()
+        self.AddItem ( "edit", "Przejdź do edytora urządzeń" )
+        self.AddItem ( "service_check", "Sprawdzenie działania urządzenia" )
+        self.AddItem ( "ping", "Ping" )
+        self.AddItem ( "traceroute", "Traceroute" )
         
+        self.cable_modem_submenu = rl.RecordListMenu ( recordlist, handler=self )
+        sub = self.cable_modem_submenu
+        sub.AddItem ( "cm_info", "Informacje o pracy modemu" )
+        sub.AddItem ( "cm_monitor", "Pokaż na monitorze modemów" )
+        sub.AddItem ( "cm_monitor_building", "Pokaż cały budynek monitorze modemów" )
+        sub.AddItem ( "cm_restart", "Restart modemu" )
+        sub.AddItem ( "cm_ubr_purge", "Wyczyść wpis na CMTSie" )
+        self.AppendSubMenu ( sub, "Modem kablowy" )
+
+        self.mikrotik_submenu = rl.RecordListMenu ( recordlist, handler=self )
+        sub = self.mikrotik_submenu
+        sub.AddItem ( "mikro_info", "Informacje o pracy urządzenia" )
+        sub.AddItem ( "mikro_restart", "Restart" )
+        sub.AddItem ( "mikro_qos", "Ustaw kolejki QoS" )
+        sub.AddItem ( "mikro_qos", "Ustaw przekierowanie portów" )
+        sub.AddItem ( "mikro_winbox", "Winbox" )        
+        sub.AddItem ( "mikro_ssh", "SSH" )
+        sub.AddItem ( "mikro_nas_ssh", "SSH na NAS" )
+        self.AppendSubMenu ( sub, "Mikrotik" )
+        
+        
+        self.AppendSeparator()
+        self.AddItem ( "history", "Historia wykorzystania urządzenia" )
+
         
 class SubscriberMain(wx.Panel):
     
@@ -232,6 +296,7 @@ class SubscriberMain(wx.Panel):
         self.recordlist = AttrDict()
         self.dialogs = AttrDict()
         self.dialogs.service = ServiceDialog(self)
+        self.dialogs.subscriber = NewSubscriberDialog(self)
         
         self.table.subscriber = meta.Table.Get ( "subscriber" )
         self.table.service = meta.Table.Get ( "service" )
@@ -257,9 +322,9 @@ class SubscriberMain(wx.Panel):
         def _format_ip(r):
             return "<b>" + r.address + "</b>"
         def _format_mac(r):                        
-            fmt = "<tt>" + r.mac + "</tt>"
+            fmt = "<tt><b>" + r.mac + "</b></tt>&nbsp;&nbsp; "
             if r.ipreservationid:
-                fmt += "<br> <i>dhcp:</i>" + r.ipreservationid_REF
+                fmt += " -&gt; <b>" + r.ipreservationid_REF + "</b>"
             return fmt
         def _format_device(r):                        
             return r._astxt
@@ -269,12 +334,16 @@ class SubscriberMain(wx.Panel):
         
         self.recordlist.services = rl.RecordList(subscriberRec.list_service_subscriberid, self,
                                                  reprfunc = _format_service)
-        self.recordlist.services.set_menu ( ServiceListMenu(self.recordlist.services) )
+        self.recordlist.services.set_menu ( ServiceListMenu(self, self.recordlist.services) )
+
         self.recordlist.ip = rl.RecordList(subscriberRec.ipreservations, self, reprfunc = _format_ip )
-        self.recordlist.ip.set_menu ( IPListMenu(self.recordlist.ip) )
+        self.recordlist.ip.set_menu ( IPListMenu(self, self.recordlist.ip) )
 
         self.recordlist.mac = rl.RecordList(subscriberRec.macaddresses, self, reprfunc = _format_mac )        
+        self.recordlist.mac.set_menu ( MACListMenu(self, self.recordlist.mac) )
+        
         self.recordlist.devices = rl.RecordList(subscriberRec.devices, self, reprfunc = _format_device )        
+        self.recordlist.devices.set_menu (DeviceListMenu(self, self.recordlist.devices))
         #self.recordlist.services.bind_to_form ( "subscriberid", self.form.subscriber)
 
         
@@ -283,7 +352,7 @@ class SubscriberMain(wx.Panel):
                            Caption("Podsumowanie danych klienta").
                            Name("info_panel").
                            Layer(1).
-                           MinSize( (-1, 170) ).
+                           MinSize( (-1, 100) ).
                            BestSize( (700,170) )
                            )
         self.mgr.AddPane ( SubscriberSearchToolbar(self), wx.aui.AuiPaneInfo().Bottom().
@@ -308,7 +377,7 @@ class SubscriberMain(wx.Panel):
                            Caption("Usługi").
                            MinSize( (-1, 120) )
                         )
-        self.mgr.AddPane ( wx.Panel(self), wx.aui.AuiPaneInfo().Bottom().
+        self.mgr.AddPane ( self.recordlist.devices, wx.aui.AuiPaneInfo().Bottom().
                            Floatable(False).CloseButton(False).
                            Name("device_list").                           
                            Layer(0).
@@ -377,4 +446,31 @@ class SubscriberMain(wx.Panel):
         self.getCurrentSubscriberRecord().reloadIpReservations()
         self.getCurrentSubscriberRecord().reloadMACAddresses()
         self.info_panel.hideSaveOption()
-                                     
+    
+    def addNewSubscriber(self, *args):
+        dlg = self.dialogs.subscriber
+        dlg.New ()
+        dlg.Edit()
+        objectid = dlg.form.current.objectid
+
+        if objectid:
+            APP.DataStore["subscriber"].reloadsingle ( objectid )
+            self.main.setCurrentSubscriberId ( objectid )
+
+    
+    def addNewService(self, *args):
+        dlg = self.dialogs.service
+        rec = self.getCurrentSubscriberRecord()
+        if not rec.hasData: return
+        dlg.form.set_fixed_value ( 'subscriberid', rec.objectid )
+        dlg.New()        
+        dlg.form["locationid"] = rec.primarylocationid
+        dlg.Edit()
+        objectid = dlg.form.current.objectid
+
+        if objectid:
+            APP.DataStore["service"].reloadsingle ( objectid )
+            self.getCurrentSubscriberRecord().list_service_subscriberid.reload()            
+
+
+    

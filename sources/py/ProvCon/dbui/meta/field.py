@@ -38,12 +38,16 @@ class Field(object):
             
             choices = text_to_array ( self.choices, 0 )
             self.choices = []
+            self.choices_value_hash = {}
+            self.choices_label_hash = {}
             for c in choices:
                 if c.startswith("<["):
                     cv,cd = c[2:-2].split("::=")[:2]
                 else:
-                    cv,cd = c, c
+                    cv,cd = c, c                    
                 self.choices.append ( (cv, cd) )
+                self.choices_label_hash[cd] = cv
+                self.choices_value_hash[cv] = cd
                 
             params = text_to_array ( self.editor_class_params, 0 ) or []            
             params = map ( lambda x: tuple(x.split("::=")), params )

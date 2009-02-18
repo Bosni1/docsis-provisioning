@@ -139,9 +139,15 @@ def array_as_text(arr):
     """
     if isinstance(arr, list):
         return "{" + ",".join(map(array_as_text, arr)) + "}"
-    else:
-        if arr is None: return ''
-        else: return str(arr)
+    elif arr is None: 
+        return ''
+    elif isinstance(arr, (str, unicode)):
+            try:
+                return arr.encode ( 'utf-8')
+            except UnicodeDecodeError:
+                return arr.decode ( 'utf-8' ).encode ( 'utf-8' )    
+    else: 
+        return str(arr)
 
 def text_to_array(text, depth):
     """

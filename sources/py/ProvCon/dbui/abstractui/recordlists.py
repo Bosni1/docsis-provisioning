@@ -15,7 +15,8 @@ class BaseRecordList(eventemitter):
         """ BaseRecordList ( records : IRecordList ) """
         eventemitter.__init__ (self, [ "record_list_changed", 
                                        "current_record_changed", 
-                                       "navigate" ] )
+                                       "navigate",
+                                       "record_activated"] )
         self.__current_record = None
         self.__records = None
         self.recordlist_changed_hook = None

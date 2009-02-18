@@ -288,6 +288,14 @@ API Error: {0.pgexception}""".format ( self )
                     if self._hasdata:
                         #lose it
                         self.nullify()
+        elif attrname.endswith("_LABEL"):
+            fname = attrname[:-6]
+            if fname in self._table:
+                field = self._table[fname]
+                try:
+                    self.setFieldStringValue(field.choices_value_hash[attrval])
+                except KeyError:
+                    return None                
         else:
             #this is a record attribute
             if attrname in self._table:
@@ -323,7 +331,14 @@ API Error: {0.pgexception}""".format ( self )
                 if fname not in self._references:
                     self.updateReferenceField ( self._table[fname] )
                 return self._references.get(fname, None)
-            
+        elif attrname.endswith("_LABEL"):
+            fname = attrname[:-6]
+            if fname in self._table:
+                field = self._table[fname]
+                try:
+                    return field.choices_label_hash[self.getFieldValue(fname)]
+                except KeyError:
+                    return None                
         return self.__dict__[attrname]
     
     __getitem__ = __getattr__
