@@ -55,6 +55,7 @@ class Table(object):
         
         self.name = tablename
         self.id = kwargs.get("objectid", None)
+        self.subclasses = []
         self.objectid = kwargs.get("objectid", None)
         self.fields = []
         self.fields_hash = {}

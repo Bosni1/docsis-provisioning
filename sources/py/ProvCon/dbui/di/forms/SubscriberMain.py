@@ -218,6 +218,9 @@ class ServiceListMenu (rl.RecordListMenu):
         self.AddItem ( "add", "Dodaj nową usługę" )        
         self.AddItem ( "del", "Usuń usługę" )                            
 
+    def on_add(self, record, *args):
+        wx.CallAfter(self.main.addNewService)
+        
     def prepare(self):
         rec = rl.RecordListMenu.prepare(self)    
         for n in self.unformatted:
@@ -262,7 +265,7 @@ class DeviceListMenu (rl.RecordListMenu):
         sub = self.cable_modem_submenu
         sub.AddItem ( "cm_info", "Informacje o pracy modemu" )
         sub.AddItem ( "cm_monitor", "Pokaż na monitorze modemów" )
-        sub.AddItem ( "cm_monitor_building", "Pokaż cały budynek monitorze modemów" )
+        sub.AddItem ( "cm_monitor_building", "Pokaż cały budynek na monitorze modemów" )
         sub.AddItem ( "cm_restart", "Restart modemu" )
         sub.AddItem ( "cm_ubr_purge", "Wyczyść wpis na CMTSie" )
         self.AppendSubMenu ( sub, "Modem kablowy" )
@@ -272,7 +275,7 @@ class DeviceListMenu (rl.RecordListMenu):
         sub.AddItem ( "mikro_info", "Informacje o pracy urządzenia" )
         sub.AddItem ( "mikro_restart", "Restart" )
         sub.AddItem ( "mikro_qos", "Ustaw kolejki QoS" )
-        sub.AddItem ( "mikro_qos", "Ustaw przekierowanie portów" )
+        sub.AddItem ( "mikro_port_redir", "Ustaw przekierowanie portów" )
         sub.AddItem ( "mikro_winbox", "Winbox" )        
         sub.AddItem ( "mikro_ssh", "SSH" )
         sub.AddItem ( "mikro_nas_ssh", "SSH na NAS" )
@@ -417,7 +420,7 @@ class SubscriberMain(wx.Panel):
         f.listenForEvent ( "current_record_saved", self.subscriberRecordSaved )
         f.listenForEvent ( "data_loaded", self.subscriberDataLoaded )
         
-        self.form.subscriber.setid ( self.store.subscriber[0].objectid )
+        #self.form.subscriber.setid ( self.store.subscriber[0].objectid )
         #self.form.subscriber.new()
               
     def getCurrentSubscriberRecord(self):

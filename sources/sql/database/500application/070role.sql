@@ -7,7 +7,7 @@ SELECT {:SCHEMA:}setup_object_subtable ( 'device_role');
 create table {:SCHEMA:}docsis_cable_modem (
   cmtsid int8 REFERENCES {:SCHEMA:}objectids ON DELETE SET NULL ON UPDATE CASCADE NULL,
   downstreamid int8 REFERENCES {:SCHEMA:}objectids ON DELETE SET NULL ON UPDATE CASCADE NULL,
-  upstreamid int8 REFERENCES {:SCHEMA:}objectids ON DELETE SET NULL ON UPDATE CASCADE NULL,
+  upstreamid int8 REFERENCES {:SCHEMA:}objectids ON DELETE SET NULL ON UPDATE CASCADE NULL,  
   customersn varchar(32) NULL,
   maxcpe smallint NOT NULL DEFAULT 1,  
   cpemacfilter bit NOT NULL DEFAULT '0',
@@ -34,9 +34,22 @@ create table {:SCHEMA:}routeros_device (
   swmajor smallint null,
   swminor smallint null,
   mgmt_user varchar(16) null,
-  mgmt_pass varchar(16) null  
+  mgmt_pass varchar(16) null,
+  configuration text null
 ) inherits ({:SCHEMA:}"device_role");
 SELECT {:SCHEMA:}setup_object_subtable ('routeros_device' );
+
+create table {:SCHEMA:}core_router (
+  dhcp_relay bit not null default '0',
+  default_gateway inet not null
+) inherits ({:SCHEMA:}"device_role");
+SELECT {:SCHEMA:}setup_object_subtable ( 'core_router' );
+
+create table {:SCHEMA:}core_router_bridged_network (
+  routerid int8 REFERENCES {:SCHEMA:}objectids ON DELETE CASCADE ON UPDATE CASCADE NULL,
+  subnetid int8 REFERENCES {:SCHEMA:}objectids ON DELETE CASCADE ON UPDATE CASCADE NULL
+) inherits ({:SCHEMA:}"object");
+SELECT {:SCHEMA:}setup_object_subtable ( 'core_router_bridged_network' );
 
 create table {:SCHEMA:}nat_router (
   localaddr inet not null,
@@ -46,8 +59,6 @@ create table {:SCHEMA:}nat_router (
 SELECT {:SCHEMA:}setup_object_subtable ( 'nat_router' );
 
 create table {:SCHEMA:}wireless (
-  essid varchar(128) null,
-  bssid macaddr null,
   interfaceid int8 REFERENCES {:SCHEMA:}objectids ON DELETE SET NULL ON UPDATE CASCADE NULL,  
   band varchar(32) null,
   frequency smallint null,
@@ -55,11 +66,22 @@ create table {:SCHEMA:}wireless (
 ) inherits ({:SCHEMA:}"device_role");
 SELECT {:SCHEMA:}setup_object_subtable ( 'wireless' );
 
-create table {:SCHEMA:}core_radio_link (
+create table {:SCHEMA:}wireless_client (
+  accesspointid int8 REFERENCES {:SCHEMA:}objectids ON DELETE SET NULL ON UPDATE CASCADE NULL
+) inherits ({:SCHEMA:}"wireless");
+SELECT {:SCHEMA:}setup_object_subtable ( 'wireless_client' );
+
+create table {:SCHEMA:}wireless_ap (
+  essid varchar(128) null,
+  acl macaddr[] null
+) inherits ({:SCHEMA:}"wireless");
+SELECT {:SCHEMA:}setup_object_subtable ( 'wireless_ap' );
+
+create table {:SCHEMA:}wireless_link (
   otherend int8 REFERENCES {:SCHEMA:}objectids ON DELETE SET NULL ON UPDATE CASCADE NULL,  
   mode smallint not null default 1
 ) inherits ({:SCHEMA:}"wireless");
-SELECT {:SCHEMA:}setup_object_subtable ( 'core_radio_link' );
+SELECT {:SCHEMA:}setup_object_subtable ( 'wireless_link' );
 
 create table {:SCHEMA:}sip_client (
   server varchar(256) not null,

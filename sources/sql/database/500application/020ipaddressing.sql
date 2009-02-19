@@ -3,7 +3,7 @@
 create table {:SCHEMA:}ip_subnet (
   name varchar(64) not null,
   scope varchar(64) null,  
-  designation varchar(64)[] not null default '{service}',
+  designation smallint[] not null default '{1}',
   network cidr not null unique,
   gateway inet null,
   active bit not null default '1',
@@ -15,11 +15,13 @@ SELECT {:SCHEMA:}setup_object_subtable ('ip_subnet' );
 create table {:SCHEMA:}ip_reservation (
   ownerid int8 REFERENCES {:SCHEMA:}objectids ON DELETE CASCADE ON UPDATE CASCADE NULL,
   subnetid int8 REFERENCES {:SCHEMA:}objectids ON DELETE SET NULL ON UPDATE CASCADE NULL,
+  interfaceid int8 REFERENCES {:SCHEMA:}objectids ON DELETE SET NULL ON UPDATE CASCADE NULL,
   address inet not null unique,
-  designation smallint not null default 0,
+  designation smallint not null default 1,
+  scope smallint not null default 1,
   dhcp bit not null default '1',
   lastused timestamp null,
-  state smallint not null default 0  
+  state smallint not null default 1  
 ) inherits ({:SCHEMA:}"object");
 SELECT {:SCHEMA:}setup_object_subtable ('ip_reservation' );
 

@@ -86,7 +86,9 @@ class CFG:
 
             #import foreign key relationships
             for t in Table.__all_tables__.values():
-                if t.superclass: t.superclass = idmap[t.superclass]
+                if t.superclass: 
+                    t.superclass = idmap[t.superclass]
+                    t.superclass.subclasses.append (t)
                 else: t.superclass = None
                 for f in t.fields:
                     #For columns that reference a table_info row, replace the appropriate

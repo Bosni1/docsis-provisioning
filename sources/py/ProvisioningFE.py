@@ -1,10 +1,12 @@
 #!/bin/env python
+# -*- coding: utf8 -*-
 ##$Id$
 from ProvCon.dbui.database import CFG, Init
 import ProvCon.dbui.database as db
 from ProvCon.dbui import meta, orm
 from ProvCon.dbui import wxwin as guitk
 from ProvCon.dbui.di.forms.SubscriberMain import SubscriberMain
+from ProvCon.dbui.di.forms.DeviceMain import DeviceMain
 from ProvCon.func import AttrDict
 import ProvCon.dbui.di.controls as controls
 import wx
@@ -28,32 +30,33 @@ class ProvisioningFE(wx.App):
         self.windows.notebook = notebook
 
         
-        welcome = html.HtmlWindow ( notebook )        
-        self.windows.welcome = welcome        
-        welcome.SetPage ( """
-        <br/><center>
-        <H1>NETCON 3.0 Panel administracyjny</H1>
-        <h2>$Revision$</h2>
-        </center>
-        <br/><br/>
-        """ )
-        notebook.AddPage ( welcome, "Powitanie" )
+        #welcome = html.HtmlWindow ( notebook )        
+        #self.windows.welcome = welcome        
+        #welcome.SetPage ( """
+        #<br/><center>
+        #<H1>NETCON 3.0 Panel administracyjny</H1>
+        #<h2>$Revision$</h2>
+        #</center>
+        #<br/><br/>
+        #""" )
+        #notebook.AddPage ( welcome, "Powitanie" )
         
         ##LOCATIONS
-        locations = controls.LocationEditor ( notebook )
-        self.windows.locations = locations
-        notebook.AddPage ( locations, "Lokalizacje" )
+        #locations = controls.LocationEditor ( notebook )
+        #self.windows.locations = locations
+        #notebook.AddPage ( locations, "Lokalizacje" )
         
         #self.forms.subseditor = guitk.complete.CompleteGenericForm ( notebook, 
         #                                                       tablename="subscriber"
         #                                                      )
         subscriber = SubscriberMain(notebook)
-
-
         notebook.AddPage ( subscriber, "Klient" )
-        
-        datastore = wx.Panel(notebook)
-        notebook.AddPage (datastore, "DATA STORE")
+
+        device = DeviceMain(notebook)
+        notebook.AddPage ( device, "Urządzenie" )
+
+        #datastore = wx.Panel(notebook)
+        #notebook.AddPage (datastore, "DATA STORE")
         
         sizer.Add (self.windows.notebook, 4, flag=wx.EXPAND)                        
         self.windows.toplevel.SetSizer (sizer)
@@ -64,14 +67,17 @@ class ProvisioningFE(wx.App):
 
 
 Init()        
-#app = ProvisioningFE()
+
 
 #### PROFILER
-cProfile.run( "app = ProvisioningFE()", "/tmp/prov-prof" )
-p = pstats.Stats ("/tmp/prov-prof" )
-p.strip_dirs().sort_stats(-1).print_stats()
+#cProfile.run( "app = ProvisioningFE()", "/tmp/prov-prof" )
+#p = pstats.Stats ("/tmp/prov-prof" )
+#p.strip_dirs().sort_stats(-1).print_stats()
 
 #### NORMAL RUN
+app = ProvisioningFE()
+
+#### BOTH WAYS
 app.MainLoop()
 
 

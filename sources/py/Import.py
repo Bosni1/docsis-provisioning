@@ -126,7 +126,7 @@ if __name__=="__main__":
     tosRec.write()
     
     
-    cr.execute ( "SELECT TOP 50 * FROM Klient" )
+    cr.execute ( "SELECT TOP 150 * FROM Klient" )
     klient_all = dictresult ( cr )
     cr.execute ( "SELECT * FROM DaneKlientInternet" )
     dki_all = dictresult ( cr )

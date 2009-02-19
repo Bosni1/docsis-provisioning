@@ -16,3 +16,4 @@ create table {:SCHEMA:}device_model (
 ) inherits ({:SCHEMA:}"object");
 SELECT {:SCHEMA:}setup_object_subtable ( 'device_model' );
 
+

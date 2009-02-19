@@ -9,7 +9,7 @@ WHERE n.nspname = 'pv' AND c.relkind = 'r'::char ORDER BY c.oid;
 
 
 INSERT INTO {:SCHEMA:}field_info(name, lp, ndims, type, length, classid, label, quickhelp, reference,constraintid)
-SELECT att.attname, att.attnum, att.attndims, 
+SELECT att.attname, att.attnum-5, att.attndims, 
     CASE WHEN att.attndims > 0 THEN 'array:' || substring(t.typname from 2) ELSE t.typname END, 
     att.attlen, ac.objectid, att.attname, 
     ac.name || '.' || att.attname || ' : ' || t.typname || '(' ||  att.attlen || ') [' || att.attndims || ']',

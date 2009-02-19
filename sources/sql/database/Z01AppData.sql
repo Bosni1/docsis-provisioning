@@ -31,7 +31,6 @@ $$ LANGUAGE plpgsql;
 --INSERT INTO pv.class_of_service (classid, name) VALUES ( 'INT/N', 'Średni');
 --INSERT INTO pv.class_of_service (classid, name) VALUES ( 'INT/D', 'Złoty');
 
-
-
 DROP FUNCTION T(varchar);
 DROP FUNCTION C(varchar);
+

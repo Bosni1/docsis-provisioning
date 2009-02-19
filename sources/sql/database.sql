@@ -48,8 +48,8 @@ create function pv.object_txt_expression_change() RETURNS trigger AS $body$
   BEGIN
     IF (NEW.objecttxtexpr <> OLD.objecttxtexpr) THEN    
       UPDATE pv.object_search_txt AS ost SET 
-        txt = pv.obj_txt_repr ( ost.objectid::int8, o.objecttype::name ), 
-        txt_vector = to_tsvector(pv.obj_txt_repr ( ost.objectid::int8, o.objecttype::name ))
+        txt = pv.obj_txt_repr ( ost.objectid::int8, o.objecttype::name )
+        --, txt_vector = to_tsvector(pv.obj_txt_repr ( ost.objectid::int8, o.objecttype::name ))
         FROM pv.object o WHERE o.objectid = ost.objectid AND o.objecttype = NEW.objecttype;
     END IF;    
     RETURN NEW;
@@ -113,7 +113,7 @@ create function pv.handle_object_lifespan_after() RETURNS trigger AS $handle_obj
     IF (TG_OP = 'UPDATE') THEN
       txt_expr := pv.obj_txt_repr (NEW.objectid, NEW.objecttype);
       
-      UPDATE pv.object_search_txt SET txt = txt_expr, txt_vector = to_tsvector(txt_expr)  WHERE objectid = NEW.objectid;
+      UPDATE pv.object_search_txt SET txt = txt_expr WHERE objectid = NEW.objectid;
     END IF;    
     RETURN NEW;      
   END;
@@ -517,7 +517,7 @@ $obj$ LANGUAGE plpgsql;
 create table pv.ip_subnet (
   name varchar(64) not null,
   scope varchar(64) null,  
-  designation varchar(64)[] not null default '{service}',
+  designation smallint[] not null default '{1}',
   network cidr not null unique,
   gateway inet null,
   active bit not null default '1',
@@ -529,11 +529,13 @@ SELECT pv.setup_object_subtable ('ip_subnet' );
 create table pv.ip_reservation (
   ownerid int8 REFERENCES pv.objectids ON DELETE CASCADE ON UPDATE CASCADE NULL,
   subnetid int8 REFERENCES pv.objectids ON DELETE SET NULL ON UPDATE CASCADE NULL,
+  interfaceid int8 REFERENCES pv.objectids ON DELETE SET NULL ON UPDATE CASCADE NULL,
   address inet not null unique,
-  designation smallint not null default 0,
+  designation smallint not null default 1,
+  scope smallint not null default 1,
   dhcp bit not null default '1',
   lastused timestamp null,
-  state smallint not null default 0  
+  state smallint not null default 1  
 ) inherits (pv."object");
 SELECT pv.setup_object_subtable ('ip_reservation' );
 
@@ -726,6 +728,7 @@ create table pv.device_model (
 ) inherits (pv."object");
 SELECT pv.setup_object_subtable ( 'device_model' );
 
+
 ----------------------------------------------------------------------------------------------------
 --
 -- database/500application/070role.sql
@@ -739,7 +742,7 @@ SELECT pv.setup_object_subtable ( 'device_role');
 create table pv.docsis_cable_modem (
   cmtsid int8 REFERENCES pv.objectids ON DELETE SET NULL ON UPDATE CASCADE NULL,
   downstreamid int8 REFERENCES pv.objectids ON DELETE SET NULL ON UPDATE CASCADE NULL,
-  upstreamid int8 REFERENCES pv.objectids ON DELETE SET NULL ON UPDATE CASCADE NULL,
+  upstreamid int8 REFERENCES pv.objectids ON DELETE SET NULL ON UPDATE CASCADE NULL,  
   customersn varchar(32) NULL,
   maxcpe smallint NOT NULL DEFAULT 1,  
   cpemacfilter bit NOT NULL DEFAULT '0',
@@ -766,9 +769,22 @@ create table pv.routeros_device (
   swmajor smallint null,
   swminor smallint null,
   mgmt_user varchar(16) null,
-  mgmt_pass varchar(16) null  
+  mgmt_pass varchar(16) null,
+  configuration text null
 ) inherits (pv."device_role");
 SELECT pv.setup_object_subtable ('routeros_device' );
+
+create table pv.core_router (
+  dhcp_relay bit not null default '0',
+  default_gateway inet not null
+) inherits (pv."device_role");
+SELECT pv.setup_object_subtable ( 'core_router' );
+
+create table pv.core_router_bridged_network (
+  routerid int8 REFERENCES pv.objectids ON DELETE CASCADE ON UPDATE CASCADE NULL,
+  subnetid int8 REFERENCES pv.objectids ON DELETE CASCADE ON UPDATE CASCADE NULL
+) inherits (pv."object");
+SELECT pv.setup_object_subtable ( 'core_router_bridged_network' );
 
 create table pv.nat_router (
   localaddr inet not null,
@@ -778,8 +794,6 @@ create table pv.nat_router (
 SELECT pv.setup_object_subtable ( 'nat_router' );
 
 create table pv.wireless (
-  essid varchar(128) null,
-  bssid macaddr null,
   interfaceid int8 REFERENCES pv.objectids ON DELETE SET NULL ON UPDATE CASCADE NULL,  
   band varchar(32) null,
   frequency smallint null,
@@ -787,11 +801,22 @@ create table pv.wireless (
 ) inherits (pv."device_role");
 SELECT pv.setup_object_subtable ( 'wireless' );
 
-create table pv.core_radio_link (
+create table pv.wireless_client (
+  accesspointid int8 REFERENCES pv.objectids ON DELETE SET NULL ON UPDATE CASCADE NULL
+) inherits (pv."wireless");
+SELECT pv.setup_object_subtable ( 'wireless_client' );
+
+create table pv.wireless_ap (
+  essid varchar(128) null,
+  acl macaddr[] null
+) inherits (pv."wireless");
+SELECT pv.setup_object_subtable ( 'wireless_ap' );
+
+create table pv.wireless_link (
   otherend int8 REFERENCES pv.objectids ON DELETE SET NULL ON UPDATE CASCADE NULL,  
   mode smallint not null default 1
 ) inherits (pv."wireless");
-SELECT pv.setup_object_subtable ( 'core_radio_link' );
+SELECT pv.setup_object_subtable ( 'wireless_link' );
 
 create table pv.sip_client (
   server varchar(256) not null,
@@ -805,10 +830,13 @@ SELECT pv.setup_object_subtable ( 'sip_client' );
 -- database/500application/080interface.sql
 ----------------------------------------------------------------------------------------------------
 -- $Id:$
-create table pv.mac_interface (
-  mac macaddr not null,
+create table pv.mac_interface (  
+  mac macaddr not null,  
   designation int default 0,
   ipreservationid int8 REFERENCES pv.objectids ON DELETE SET NULL ON UPDATE CASCADE NULL,
+  deviceid int8 REFERENCES pv.objectids ON DELETE SET NULL ON UPDATE CASCADE NULL,  
+  name varchar(32) null,
+  type smallint not null default '1',
   ownerid int8 REFERENCES pv.objectids ON DELETE SET NULL ON UPDATE CASCADE NULL,
   unique (mac, designation)
 ) inherits (pv."object");
@@ -822,8 +850,8 @@ BEGIN
  PERFORM pv.set_reference ( 'wireless.interfaceid', 'interface');
  PERFORM pv.set_reference ( 'docsis_cable_modem.cmtsid', 'object');
  PERFORM pv.set_reference ( 'docsis_cable_modem.downstreamid', 'object');
- PERFORM pv.set_reference ( 'core_radio_link.interfaceid', 'object');
- PERFORM pv.set_reference ( 'core_radio_link.otherend', 'object');
+ PERFORM pv.set_reference ( 'wireless_link.interfaceid', 'interface');
+ PERFORM pv.set_reference ( 'wireless_link.otherend', 'wireless_link');
  PERFORM pv.set_reference ( 'table_info.superclass', 'table_info');
  PERFORM pv.set_reference ( 'event.refobjectid', 'object');
  PERFORM pv.set_reference ( 'note.refobjectid', 'object');
@@ -840,19 +868,20 @@ BEGIN
  PERFORM pv.set_reference ( 'field_info.reference', 'table_info');
  PERFORM pv.set_reference ( 'field_info.classid', 'table_info');
  PERFORM pv.set_reference ( 'field_info.arrayof', 'table_info');
- --PERFORM pv.set_reference ( 'field_info_variant.fieldid', 'field_info');
- --PERFORM pv.set_reference ( 'table_info_variant.classid', 'table_info');
  PERFORM pv.set_reference ( 'device.modelid', 'model');
  PERFORM pv.set_reference ( 'routeros_device.deviceid', 'device');
  PERFORM pv.set_reference ( 'nat_router.deviceid', 'device');
- PERFORM pv.set_reference ( 'core_radio_link.deviceid', 'device');
+ PERFORM pv.set_reference ( 'core_router.deviceid', 'device');
+ PERFORM pv.set_reference ( 'wireless_link.deviceid', 'device');
  PERFORM pv.set_reference ( 'wireless.deviceid', 'device');
+ PERFORM pv.set_reference ( 'wireless_client.deviceid', 'device');
+ PERFORM pv.set_reference ( 'wireless_ap.deviceid', 'device');
  PERFORM pv.set_reference ( 'sip_client.deviceid', 'device');
  PERFORM pv.set_reference ( 'device_role.deviceid', 'device');
  PERFORM pv.set_reference ( 'subscriber.primarylocationid', 'location');
  PERFORM pv.set_reference ( 'service.subscriberid', 'subscriber');
- PERFORM pv.set_reference ( 'service.typeofservice', 'object');
- PERFORM pv.set_reference ( 'service.classofservice', 'object');
+ PERFORM pv.set_reference ( 'service.typeofservice', 'type_of_service');
+ PERFORM pv.set_reference ( 'service.classofservice', 'class_of_service');
  PERFORM pv.set_reference ( 'service.locationid', 'location');
  PERFORM pv.set_reference ( 'mac_interface.ipreservationid', 'ip_reservation');
  PERFORM pv.set_reference ( 'docsis_cable_modem.upstreamid', 'object');
@@ -877,6 +906,7 @@ UPDATE pv.object_txt_expressions SET objecttxtexpr = '''['' || typeid || ''] '' 
 UPDATE pv.object_txt_expressions SET objecttxtexpr = '''['' || name || ''] '' || network::text' WHERE objecttype='ip_subnet';
 UPDATE pv.object_txt_expressions SET objecttxtexpr = '''[TABLE] '' || name' WHERE objecttype='table_info';
 UPDATE pv.object_txt_expressions SET objecttxtexpr = '''[FIELD] '' || path' WHERE objecttype='field_info';
+
 ----------------------------------------------------------------------------------------------------
 --
 -- database/999finalize.sql
@@ -892,7 +922,7 @@ WHERE n.nspname = 'pv' AND c.relkind = 'r'::char ORDER BY c.oid;
 
 
 INSERT INTO pv.field_info(name, lp, ndims, type, length, classid, label, quickhelp, reference,constraintid)
-SELECT att.attname, att.attnum, att.attndims, 
+SELECT att.attname, att.attnum-5, att.attndims, 
     CASE WHEN att.attndims > 0 THEN 'array:' || substring(t.typname from 2) ELSE t.typname END, 
     att.attlen, ac.objectid, att.attname, 
     ac.name || '.' || att.attname || ' : ' || t.typname || '(' ||  att.attlen || ') [' || att.attndims || ']',

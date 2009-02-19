@@ -1,8 +1,11 @@
 -- $Id:$
-create table {:SCHEMA:}mac_interface (
-  mac macaddr not null,
+create table {:SCHEMA:}mac_interface (  
+  mac macaddr not null,  
   designation int default 0,
   ipreservationid int8 REFERENCES {:SCHEMA:}objectids ON DELETE SET NULL ON UPDATE CASCADE NULL,
+  deviceid int8 REFERENCES {:SCHEMA:}objectids ON DELETE SET NULL ON UPDATE CASCADE NULL,  
+  name varchar(32) null,
+  type smallint not null default '1',
   ownerid int8 REFERENCES {:SCHEMA:}objectids ON DELETE SET NULL ON UPDATE CASCADE NULL,
   unique (mac, designation)
 ) inherits ({:SCHEMA:}"object");
