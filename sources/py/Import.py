@@ -55,12 +55,13 @@ if __name__=="__main__":
     #połączenie z bazą docsis-provisioning
     Init()    
         
-    #polaczenie z SQLEXPRESS - bazą BOK
+    #polaczenie z SQLEXPRESS - bazą biurową
     #pw = getpass.getpass("Password for \\SQLEXPRESS\stansat:stansat@reklamy >")
     pw = "wajig05850_hax0r"
     stansatDB = pymssql.connect ( user = 'stansat', database = 'stansat', host = 'reklamy',
                                   password = pw )
     cr = stansatDB.cursor()
+    atexit.register ( close, stansatDB )
     
     #połączenie z bazą NetCon 2.0
     n2db = MySQLdb.connect ( db='techdb', user='netcon3', host='83.243.39.5', charset='utf8' )
@@ -68,52 +69,109 @@ if __name__=="__main__":
     
     #Pobieranie danych z NetCon 2.0
     n2cr.execute ( "SELECT * FROM customer" )
+    #Pobieramy dane o klientach (tabela 'customer'), i indeksujemy po
+    # - id  ( id w bazie netcona == skrót w bazie biurowej )
+    # - nazwie
     n2_customer_all = dictresult (n2cr)
     n2_customer_idMap = {}
     n2_customer_nameMap = {}
     for c in n2_customer_all:        
+        #znacznik, czy ten rekord był już importowany
         c['_imported'] = False
+        #przypisany numer klienta z bazy biurowej
         c['_subscriberid'] = None
-        c['IP'] = []
-        c['MAC'] = []
+        c['_devices'] = []
+        c['IP'] = []    #adresy ip z netcona
+        c['MAC'] = []   #adresy mac z netcona
         n2_customer_idMap[c['id']] = c
         n2_customer_nameMap[c['name']] = c
-        
+    
+    #wypełniamy adresy ip
     n2cr.execute ( "SELECT *, int2ipstr(ip) as ipaddr FROM customer_ip_assignment" )
     n2_ip_all = dictresult(n2cr)    
     for i in n2_ip_all:
         n2_customer_idMap[i['customer']]['IP'].append (i)
-
+    
+    #wypełniamy adresy MAC
     n2cr.execute ( "SELECT *, int2ipstr(dhcp_ip) as ipaddr FROM customer_known_mac" )
     n2_mac_all = dictresult(n2cr)    
     for i in n2_mac_all:
         n2_customer_idMap[i['customer']]['MAC'].append (i)
-        
-    atexit.register ( close, stansatDB )
     
+    n2cr.execute ( "SELECT * FROM ip_device")
+    n2_device_all = dictresult(n2cr)
+    device_models_map = {}
+    for device_row in n2_device_all:
+        device_row['_interfaces'] = []
+        device_row['_ip'] = []
+        device_row['_routes'] = []
+        device_row['_customers'] = []
+        device_row['__objectid'] = None
+        device_models_map[device_row['model']] = None
+        
+    n2_device_idMap = {}
+    map (lambda r: n2_device_idMap.update ( { r['id'] : r } ), n2_device_all )
+    
+    n2cr.execute ( "SELECT * FROM ip_device_interface" )
+    n2_interface_all = dictresult(n2cr)    
+    n2_interface_idMap = {}
+    map (lambda r: n2_interface_idMap.update ( { r['id'] : r }), n2_interface_all )
+             
+    for info_table in ["br_port", "cm", "cmts_ds", "cmts_us", "radio"]:
+        n2cr.execute ( "SELECT * FROM ip_device_interface_" + info_table )
+        data = dictresult(n2cr)
+        for info_row in data:
+            interface_row = n2_interface_idMap[info_row['interface']]
+            interface_row[info_table] = info_row
 
-    n_TOS = {}
-    n_COS = {}
+    for interface_row in n2_interface_all:
+        interface_row['_ip'] = []
+        n2_device_idMap[interface_row['device']]['_interfaces'].append ( interface_row )        
+    
+    n2cr.execute( "SELECT *, int2ipstr(ip) as ipstr FROM ip_device_interface_ip_assignment" )
+    n2_interface_ip = dictresult(n2cr)
+    for ip_row in n2_interface_ip:
+        interface_row = n2_interface_idMap[ip_row['interface']]
+        interface_row['_ip'].append ( ip_row )
+        n2_device_idMap[interface_row['device']]['_ip'].append ( ip_row )
+        
+    n2cr.execute ( "SELECT * FROM customer_ip_device" )
+    n2_customer_device = dictresult(n2cr)                            
+    map (lambda r: n2_customer_idMap[r['customer']]['_devices'].append ( n2_device_idMap[r['device']] ), n2_customer_device)
+    map (lambda r: n2_device_idMap[r['device']]['_customers'].append ( n2_customer_idMap[r['customer']] ), n2_customer_device)    
+
+    n2cr.execute ( "SELECT * FROM class_of_service" )
+    n2_cos_all = dictresult(n2cr)
+    n2_cos_idMap = {}
+    map (lambda r: n2_cos_idMap.update ({ r['id'] : r } ), n2_cos_all )
+    
+    n_TOS = {}   #hash z typami usługi
+    n_COS = {}   #hash z pakietami
     n2o_intMap = {}
     n2o_tvMap = {}
-    o_pakietIntIdx = {}
-    p_pakietTVIdx = {}
+    o_pakietIntIdx = {}  #??
+    p_pakietTVIdx = {}   #??
         
     
     #Import pakietów dostępu do Internetu
     cr.execute ("SELECT * FROM PakietInternet")
     CFG.CX.query ( "DELETE FROM {0}.class_of_service".format(CFG.DB.SCHEMA) )
     CFG.CX.query ( "DELETE FROM {0}.type_of_service".format(CFG.DB.SCHEMA) )
-    pakiet_all = dictresult (cr)
-    pakiet_IdxMap = {}
     
+    pakiet_all = dictresult (cr)
+    pakiet_IdxMap = {}   #pakiety (class_of_service) w nowej bazie indeksowane
+                         #wg pola 'Index' w bazie biurowej                         
+
+    #na razie dodajemy jeden typ usługi - Internet
+    #TODO: dodać inne typy usługi
     tosRec = Record.EMPTY ( "type_of_service" )
     tosRec.typeid = "INT"
     tosRec.name = "Internet"
     tosRec.official_name = "Dostęp do Internetu"
     tosRec.classmap = []
     tosRec.write()
-    cosIdx = []
+    
+    cosIdx = [] 
     for p in pakiet_all:
         pRec = Record.EMPTY ( "class_of_service" )
         pRec.classid = p["Index"]
@@ -139,11 +197,14 @@ if __name__=="__main__":
     
     CFG.CX.query ( "DELETE FROM {0}.subscriber".format(CFG.DB.SCHEMA) )
     CFG.CX.query ( "DELETE FROM {0}.service".format(CFG.DB.SCHEMA) )
+    CFG.CX.query ( "DELETE FROM {0}.device".format(CFG.DB.SCHEMA) )
+    CFG.CX.query ( "DELETE FROM {0}.device_role".format(CFG.DB.SCHEMA) )
     CFG.CX.query ( "DELETE FROM {0}.ip_reservation".format(CFG.DB.SCHEMA) )
     CFG.CX.query ( "DELETE FROM {0}.mac_interface".format(CFG.DB.SCHEMA) )
     
-    subscriber_oldIdxMap = {}
-    
+    #hash nowych rekordów, indeksowany polem 'Index' z bazy biurowej (subscriberid)
+    subscriber_oldIdxMap = {}    
+    #tworzymy rekordy subscriber
     for K in klient_all:        
         subRec = Record ( "subscriber" )
         subRec.subscriberid = K["Index"]        
@@ -157,29 +218,34 @@ if __name__=="__main__":
         if K["TelefonKomorkowy"]: subRec.telephone.append ( K["TelefonKomorkowy"][:32].decode("cp1250").encode("utf8") )
         subRec.write()        
         if K["OdbiorFaktur"]: subRec.PARAM.ODBIOR_FAKTUR = K["OdbiorFaktur"]
-        if K["Wyszukiwanie"]: subRec.PARAM.WYSZUKIWANIE = K["Wyszukiwanie"].decode ( "cp1250" )
+        if K["Wyszukiwanie"]: subRec.PARAM.SEARCH_EXPRESSION = K["Wyszukiwanie"].decode ( "cp1250" )
         if K["wynajmuje"]: subRec.FLAGS.WYNAJMUJE = True
         if K["Koperta"]: subRec.FLAGS.KOPERTA = True
         if K["BrakZgodyNaPrzetwarzanieDanych"]: subRec.FLAGS.BRAK_ZGODY_PD = True
         skrot = K["Skrot"].decode("cp1250").encode('utf8')
+        #stary skrót z bazy biurowej zapamiętujemy jako parametr SKROT
         subRec.PARAM.SKROT = K["Skrot"].decode("cp1250")
         subscriber_oldIdxMap[K["Index"]] = subRec
             
         
-            
-    #Miejscowości    
+    #Tworzymy lokalizacje        
+    #Miejscowości (city)   
     CFG.CX.query ( "DELETE FROM {0}.city".format(CFG.DB.SCHEMA) )
     cr.execute ( "SELECT [Index], Nazwa FROM Miejscowosc" )
-    city_onMap = {}
-    city_nameMap = {}
+    #nowe rekordy 'city' indeksowane po:
+    city_onMap = {}     #'Index' z bazy biurowej
+    city_nameMap = {}   #'Nazwa' z bazy biurowej
     for mIndex, mNazwa in cr.fetchall():        
         nRec = Record.EMPTY ( "city" )
         cityName = mNazwa.decode("cp1250")
-
+        
+        #W bazie biurowej nazwy miast się dublują, więc jeśli miasto o tej
+        #nazwie już jest wczytane - przyporządkowujemy mu już istniejący nowy
+        #rekord
         if cityName in city_nameMap:
             city_onMap[mIndex] = city_nameMap[cityName]        
             continue
-            
+        
         nRec.name = cityName
         nRec.handle = None
         try:
@@ -191,24 +257,30 @@ if __name__=="__main__":
 
     #Ulice
     cr.execute ( "SELECT [Index], Nazwa, Skrot FROM Ulica" )
+    #Na razie tylko budujemy ten hash, 'Index' -> (nazwa,skrot), ponieważ w bazie biurowej ulice
+    #nie są powiązane z miejscowościami czasami jedna ulica występuje w wielu.
     ulica_idMap = {}
     for uIndex, uNazwa, uSkrot in cr.fetchall():
         ulica_idMap[uIndex] = (uNazwa, uSkrot or "")
     
+    #Reszta danych o lokalizacjach w bazie biurowej jest w tabeli Klient, więc przechodzimy po wszystkich
+    #klientach i tworzymy budynki i lokale (building i location)
     cr.execute ( "SELECT [Index], Skrot, UlicaIndex, MiejscowoscIndex, NrDomu, NrMieszkania, KodPocztowy FROM Klient" )
 
-    klient_localizationMap = {}
-    city_street_objMap = {}
-    building_objMap = {}
-    location_objMap = {}
-    klient_objMap = {}
+    klient_localizationMap = {} #lokalizacje indeksowane po 'Index' klienta z bazy biurowej
+    city_street_objMap = {}     #już stworzone rekordy 'street' powiązane z miastem
+    building_objMap = {}        #hash b...[street objectid][nr domu] = nowy rekord building
+    location_objMap = {}        #hash l...[building objectid][nr lokalu] = nowy rekord location
     
     for kIndex, kSkrot, uIndex, mIndex, kNrDomu, kNrMieszkania, kKodPocztowy in cr.fetchall():
         if not (mIndex, uIndex) in city_street_objMap:
+            #jeśli ulica jeszcze nie została dodana
             uRec = Record.EMPTY ( "street" )
             try:
                 name, handle = ulica_idMap[uIndex]
             except KeyError:
+                #jeżeli nie ma takiego UlicaIndex, to coś jest w bazie pojebane,
+                #albo po prostu pole nie zostało ustawione
                 print kIndex, kSkrot, "incomplete location data."
                 continue
             uRec.name = name.decode("cp1250")
@@ -225,6 +297,7 @@ if __name__=="__main__":
         if not kNrDomu in building_objMap[uRec.objectid]:
             bRec = Record.EMPTY ( "building" )
             if kNrDomu is None:
+                #to jest dziwne, ale cóż...
                 bRec.number = "<brak>"
             else:
                 bRec.number = kNrDomu.decode ( "cp1250" )
@@ -249,7 +322,8 @@ if __name__=="__main__":
             lRec = location_objMap[bRec.objectid][kNrMieszkania]
 
         klient_localizationMap[kIndex] = lRec
-
+    
+    #Teraz przypisujemy primarylocationid do klienta:
     for kIndex in subscriber_oldIdxMap:
         subRec = subscriber_oldIdxMap[kIndex]
         try:
@@ -260,7 +334,15 @@ if __name__=="__main__":
         except KeyError:
             pass
         subRec.write()
-    
+
+    #Modele urządzeń
+    for m in device_models_map.keys():
+        mRec = Record ( "device_model" )
+        mRec.name = m
+        mRec.write()
+        device_models_map[m] = mRec
+        
+    #Dodajemy usługi, adresy IP i MAC
     for K in klient_all:
         dki = dki_IdxMap[K["Index"]]
 
@@ -284,9 +366,13 @@ if __name__=="__main__":
             n2c = n2_customer_idMap[skrot]
         elif subRec.name in n2_customer_nameMap:
             n2c = n2_customer_nameMap[subRec.name]
-        if n2c is None:
-            DataErrors.write( "Data Error: Klient %s nie znaleziony w bazie Netcon 2.0\n" % (skrot))
+            DataErrors.write ("Data Error: Klient skrót: {0} nie został znaleziony w bazie N2, ale nazwa={1} tak.\n".format (skrot, subRec.name)  )
             continue
+        
+        if n2c is None:
+            DataErrors.write( "Data Error: Klient %s [%s] #%d nie znaleziony w bazie N2\n" % (skrot, subRec.name, subRec.subscriberid))
+            continue
+
         try:
             ip_id_map = {}
             for ip in n2c['IP']:
@@ -304,10 +390,20 @@ if __name__=="__main__":
                     try:
                         macRec.ipreservationid = ip_id_map[mac['ipaddr']]
                     except KeyError:
-                        DataErrors.write ( "MAC: %s (%s) ma przypisany nieznany adres IP.\n" % (mac['mac'], mac['customer']) )
+                        DataErrors.write ( "!!!!!!! MAC: %s (%s) ma przypisany nieznany adres IP.\n" % (mac['mac'], mac['customer']) )
                         pass
                 macRec.write()
                 
+            for device in n2c['_devices']:
+                dRec = Record ( "device" )
+                dRec.name = device['name']
+                dRec.ownerid = srvRec.objectid
+                dRec.devicerole = []
+                dRec.devicelevel = 'CA'
+                dRec.modelid = device_models_map[device['model']].objectid
+                dRec.write()
+        except Record.DataManipulationError, e:
+            DataErrors.write ( str(e) )            
         except KeyError:
             pass
         

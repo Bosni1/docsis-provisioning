@@ -168,7 +168,7 @@ API Error: {1}""".format ( self, self.pgexception )
             self.msg = msg
             self.query = query
             self.pgexception = pgexception
-            
+        
         def __repr__(self):
             return """Object-Relation Mapper SQL Error 
 Query    : {0.query}
