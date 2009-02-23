@@ -95,6 +95,11 @@ class Field(object):
         elif self.type == "bit":
             if pyval: return 1
             else: return 0
+        elif self.type == 'macaddr':
+            if not pyval: return None
+            if not isinstance(pyval, (str, unicode)): return None
+            if len(pyval) != 12: return None
+            return pyval
         elif isinstance(pyval, (str, unicode)):
             try:
                 return pyval.encode ( 'utf-8')

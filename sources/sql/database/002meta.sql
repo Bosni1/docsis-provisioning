@@ -246,6 +246,7 @@ BEGIN
   EXECUTE 'CREATE TABLE {:SCHEMA:}' || tname || ' ( ' ||
   ' refobjectid1 int8 REFERENCES {:SCHEMA:}objectids ON DELETE CASCADE ON UPDATE CASCADE NOT NULL, ' ||
   ' refobjectid2 int8 REFERENCES {:SCHEMA:}objectids ON DELETE CASCADE ON UPDATE CASCADE NOT NULL, ' ||
+  ' refdata int8 NULL, ' ||
   ' PRIMARY KEY (refobjectid1, refobjectid2) ' ||
   ' ) ';
   INSERT INTO {:SCHEMA:}mtm_relationship (mtm_table_name, relationship_name, 
@@ -255,3 +256,7 @@ BEGIN
   return tname;  
 END;
 $$ LANGUAGE plpgsql;
+
+SELECT {:SCHEMA:}create_mtm_relationship ( 'device', 'service', 'service_device' );
+
+

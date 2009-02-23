@@ -1,6 +1,6 @@
 -- $Id:$
 create table {:SCHEMA:}mac_interface (  
-  mac macaddr not null,  
+  mac macaddr null,  
   designation int default 0,
   ipreservationid int8 REFERENCES {:SCHEMA:}objectids ON DELETE SET NULL ON UPDATE CASCADE NULL,
   deviceid int8 REFERENCES {:SCHEMA:}objectids ON DELETE SET NULL ON UPDATE CASCADE NULL,  

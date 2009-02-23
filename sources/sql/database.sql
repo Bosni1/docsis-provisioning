@@ -431,6 +431,7 @@ BEGIN
   EXECUTE 'CREATE TABLE pv.' || tname || ' ( ' ||
   ' refobjectid1 int8 REFERENCES pv.objectids ON DELETE CASCADE ON UPDATE CASCADE NOT NULL, ' ||
   ' refobjectid2 int8 REFERENCES pv.objectids ON DELETE CASCADE ON UPDATE CASCADE NOT NULL, ' ||
+  ' refdata int8 NULL, ' ||
   ' PRIMARY KEY (refobjectid1, refobjectid2) ' ||
   ' ) ';
   INSERT INTO pv.mtm_relationship (mtm_table_name, relationship_name, 
@@ -440,6 +441,10 @@ BEGIN
   return tname;  
 END;
 $$ LANGUAGE plpgsql;
+
+SELECT pv.create_mtm_relationship ( 'device', 'service', 'service_device' );
+
+
 ----------------------------------------------------------------------------------------------------
 --
 -- database/500application/010objectaddin.sql
@@ -748,7 +753,7 @@ create table pv.docsis_cable_modem (
   cpemacfilter bit NOT NULL DEFAULT '0',
   cpeipfilter bit NOT NULL DEFAULT '1',
   netbiosfilter bit NOT NULL DEFAULT '1',
-  docsisversion numeric(2,2) NOT NULL DEFAULT 1.00,
+  docsisversion numeric(3,2) NOT NULL DEFAULT 1.00,
   nightsurf bit NULL,
   networkaccess bit NOT NULL DEFAULT '1',
   upgradefilename varchar(128) NULL,
@@ -831,7 +836,7 @@ SELECT pv.setup_object_subtable ( 'sip_client' );
 ----------------------------------------------------------------------------------------------------
 -- $Id:$
 create table pv.mac_interface (  
-  mac macaddr not null,  
+  mac macaddr null,  
   designation int default 0,
   ipreservationid int8 REFERENCES pv.objectids ON DELETE SET NULL ON UPDATE CASCADE NULL,
   deviceid int8 REFERENCES pv.objectids ON DELETE SET NULL ON UPDATE CASCADE NULL,  

@@ -8,12 +8,16 @@ create table {:SCHEMA:}docsis_cable_modem (
   cmtsid int8 REFERENCES {:SCHEMA:}objectids ON DELETE SET NULL ON UPDATE CASCADE NULL,
   downstreamid int8 REFERENCES {:SCHEMA:}objectids ON DELETE SET NULL ON UPDATE CASCADE NULL,
   upstreamid int8 REFERENCES {:SCHEMA:}objectids ON DELETE SET NULL ON UPDATE CASCADE NULL,  
-  customersn varchar(32) NULL,
+  hfcmacid int8 REFERENCES {:SCHEMA:}objectids ON DELETE SET NULL ON UPDATE CASCADE NOT NULL,  
+  usbmacid int8 REFERENCES {:SCHEMA:}objectids ON DELETE SET NULL ON UPDATE CASCADE NULL,  
+  lanmacid int8 REFERENCES {:SCHEMA:}objectids ON DELETE SET NULL ON UPDATE CASCADE NULL,  
+  mgmtmacid int8 REFERENCES {:SCHEMA:}objectids ON DELETE SET NULL ON UPDATE CASCADE NULL,
+  customersn varchar(128) NULL,
   maxcpe smallint NOT NULL DEFAULT 1,  
   cpemacfilter bit NOT NULL DEFAULT '0',
   cpeipfilter bit NOT NULL DEFAULT '1',
   netbiosfilter bit NOT NULL DEFAULT '1',
-  docsisversion numeric(2,2) NOT NULL DEFAULT 1.00,
+  docsisversion numeric(3,2) NOT NULL DEFAULT 1.00,
   nightsurf bit NULL,
   networkaccess bit NOT NULL DEFAULT '1',
   upgradefilename varchar(128) NULL,
@@ -41,7 +45,7 @@ SELECT {:SCHEMA:}setup_object_subtable ('routeros_device' );
 
 create table {:SCHEMA:}core_router (
   dhcp_relay bit not null default '0',
-  default_gateway inet not null
+  default_nexthop inet null
 ) inherits ({:SCHEMA:}"device_role");
 SELECT {:SCHEMA:}setup_object_subtable ( 'core_router' );
 
@@ -62,14 +66,18 @@ create table {:SCHEMA:}wireless (
   interfaceid int8 REFERENCES {:SCHEMA:}objectids ON DELETE SET NULL ON UPDATE CASCADE NULL,  
   band varchar(32) null,
   frequency smallint null,
-  channelwidth smallint null
+  channelwidth smallint null,
+  UNIQUE (interfaceid)
 ) inherits ({:SCHEMA:}"device_role");
 SELECT {:SCHEMA:}setup_object_subtable ( 'wireless' );
 
 create table {:SCHEMA:}wireless_client (
-  accesspointid int8 REFERENCES {:SCHEMA:}objectids ON DELETE SET NULL ON UPDATE CASCADE NULL
+  accesspointid int8 REFERENCES {:SCHEMA:}objectids ON DELETE SET NULL ON UPDATE CASCADE NULL,
+  networkaccess bit not null default '1'
 ) inherits ({:SCHEMA:}"wireless");
 SELECT {:SCHEMA:}setup_object_subtable ( 'wireless_client' );
+-- on update (insert): if network access changed and accesspoint set - update acl of accesspoint
+-- on delete: remove from acl of accesspoint
 
 create table {:SCHEMA:}wireless_ap (
   essid varchar(128) null,

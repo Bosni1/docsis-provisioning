@@ -151,12 +151,94 @@ if __name__=="__main__":
     n2o_tvMap = {}
     o_pakietIntIdx = {}  #??
     p_pakietTVIdx = {}   #??
+
+    CFG.CX.query ( "DELETE FROM {0}.subscriber".format(CFG.DB.SCHEMA) )
+    CFG.CX.query ( "DELETE FROM {0}.service".format(CFG.DB.SCHEMA) )
+    CFG.CX.query ( "DELETE FROM {0}.device".format(CFG.DB.SCHEMA) )
+    CFG.CX.query ( "DELETE FROM {0}.device_role".format(CFG.DB.SCHEMA) )
+    CFG.CX.query ( "DELETE FROM {0}.ip_reservation".format(CFG.DB.SCHEMA) )
+    CFG.CX.query ( "DELETE FROM {0}.mac_interface".format(CFG.DB.SCHEMA) )
+    CFG.CX.query ( "DELETE FROM {0}.class_of_service".format(CFG.DB.SCHEMA) )
+    CFG.CX.query ( "DELETE FROM {0}.type_of_service".format(CFG.DB.SCHEMA) )
+
+    
+    #Modele urządzeń
+    for m in device_models_map.keys():
+        mRec = Record ( "device_model" )
+        mRec.name = m
+        mRec.write()
+        device_models_map[m] = mRec
+    
+    #Urządzenia
+    for device in n2_device_all:
+        dRec = Record ( "device" )
+        dRec.name = device['name']                
+        dRec.devicerole = []
+        dRec.devicelevel = '?'
+        dRec.modelid = device_models_map[device['model']].objectid                    
+        dRec.write()
+        deviceroles = []
+        device["_n3_objectid"] = dRec.objectid
+        for interface in device["_interfaces"]:
+            iRec = Record ( "mac_interface")
+            iRec.name = interface["name"]
+            iRec.mac = interface["mac"]
+            iRec.ownerid = dRec.objectid
+            iRec.write()
+            
+            if "cm" in interface:
+                cm = interface["cm"]
+                cmRec = Record ( "docsis_cable_modem" )
+                cmRec.deviceid = dRec.objectid
+                cmRec.customersn = device["serial_number"]
+                cmRec.maxcpe = cm["max_cpe"]
+                if cm['docsis11']:
+                    cmRec.docsisversion = 1.1
+                cmRec.nightsurf = cm['nightsurf']
+                cmRec.networkaccess = cm['active']
+                cmRec.vendor = cm['VENDOR']
+                cmRec.hw_rev = cm['HW_REV']
+                cmRec.sw_rev = cm['SW_REV']
+                cmRec.model = cm['MODEL']
+                cmRec.bootr = cm['BOOTR']
+                cmRec.basecap = cm['BASECAP']
+                deviceroles.append ( "docsis_cable_modem" )
+                cmRec.write()                
+            elif "radio" in interface:
+                radio = interface["radio"]
+                if radio["mode"] == "APC" or radio["mode"] is None:
+                    apcRec = Record ( "wireless_client" )
+                    apcRec.deviceid = dRec.objectid
+                    apcRec.interfaceid = iRec.objectid
+                    deviceroles.append ( "wireless_client" )
+                    apcRec.write()
+                elif radio["mode"] == "AP":
+                    apRec = Record ( "wireless_ap" )
+                    apRec.deviceid = dRec.objectid
+                    apRec.interfaceid = iRec.objectid
+                    apRec.essid = radio["essid"]
+                    deviceroles.append ( "wireless_ap" )
+                    apRec.write()
+                else:
+                    wir = Record ( "wireless" )
+                    wir.deviceid = dRec.objectid
+                    wir.interfaceid = iRec.objectid
+                    deviceroles.append ( "wireless" )
+                    wir.write()                                         
+        if device["type"] == 'ROUTER':
+            natRec = Record ( "nat_router" )
+            natRec.deviceid = dRec.objectid            
+            natRec.localaddr = '192.168.2.1/24'
+            natRec.lanports = 5
+            deviceroles.append ( "nat_router" )
+            natRec.write ()
+
+        dRec.devicerole = deviceroles
+        dRec.write()
         
     
     #Import pakietów dostępu do Internetu
     cr.execute ("SELECT * FROM PakietInternet")
-    CFG.CX.query ( "DELETE FROM {0}.class_of_service".format(CFG.DB.SCHEMA) )
-    CFG.CX.query ( "DELETE FROM {0}.type_of_service".format(CFG.DB.SCHEMA) )
     
     pakiet_all = dictresult (cr)
     pakiet_IdxMap = {}   #pakiety (class_of_service) w nowej bazie indeksowane
@@ -184,7 +266,7 @@ if __name__=="__main__":
     tosRec.write()
     
     
-    cr.execute ( "SELECT TOP 150 * FROM Klient" )
+    cr.execute ( "SELECT TOP 15 * FROM Klient" )
     klient_all = dictresult ( cr )
     cr.execute ( "SELECT * FROM DaneKlientInternet" )
     dki_all = dictresult ( cr )
@@ -195,12 +277,6 @@ if __name__=="__main__":
     #cr.execute ( "SELECT * FROM DaneKlientTelewizja" )
     #dkt_all = dictresult ( cr )
     
-    CFG.CX.query ( "DELETE FROM {0}.subscriber".format(CFG.DB.SCHEMA) )
-    CFG.CX.query ( "DELETE FROM {0}.service".format(CFG.DB.SCHEMA) )
-    CFG.CX.query ( "DELETE FROM {0}.device".format(CFG.DB.SCHEMA) )
-    CFG.CX.query ( "DELETE FROM {0}.device_role".format(CFG.DB.SCHEMA) )
-    CFG.CX.query ( "DELETE FROM {0}.ip_reservation".format(CFG.DB.SCHEMA) )
-    CFG.CX.query ( "DELETE FROM {0}.mac_interface".format(CFG.DB.SCHEMA) )
     
     #hash nowych rekordów, indeksowany polem 'Index' z bazy biurowej (subscriberid)
     subscriber_oldIdxMap = {}    
@@ -335,14 +411,9 @@ if __name__=="__main__":
             pass
         subRec.write()
 
-    #Modele urządzeń
-    for m in device_models_map.keys():
-        mRec = Record ( "device_model" )
-        mRec.name = m
-        mRec.write()
-        device_models_map[m] = mRec
         
-    #Dodajemy usługi, adresy IP i MAC
+        
+    #Dodajemy usługi, adresy IP i MAC, urządzenia klienckie
     for K in klient_all:
         dki = dki_IdxMap[K["Index"]]
 
@@ -392,16 +463,11 @@ if __name__=="__main__":
                     except KeyError:
                         DataErrors.write ( "!!!!!!! MAC: %s (%s) ma przypisany nieznany adres IP.\n" % (mac['mac'], mac['customer']) )
                         pass
-                macRec.write()
-                
-            for device in n2c['_devices']:
-                dRec = Record ( "device" )
-                dRec.name = device['name']
-                dRec.ownerid = srvRec.objectid
-                dRec.devicerole = []
-                dRec.devicelevel = 'CA'
-                dRec.modelid = device_models_map[device['model']].objectid
-                dRec.write()
+                macRec.write()                                        
+
+            for device in n2c["_devices"]:
+                pass
+            
         except Record.DataManipulationError, e:
             DataErrors.write ( str(e) )            
         except KeyError:
