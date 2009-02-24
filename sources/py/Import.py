@@ -175,10 +175,11 @@ if __name__=="__main__":
         dRec.name = device['name']                
         dRec.devicerole = []
         dRec.devicelevel = '?'
+        dRec.serialnumber = device["serial_number"]
         dRec.modelid = device_models_map[device['model']].objectid                    
         dRec.write()
-        deviceroles = []
-        device["_n3_objectid"] = dRec.objectid
+        deviceroles = set()
+        device["_n3"] = dRec
         for interface in device["_interfaces"]:
             iRec = Record ( "mac_interface")
             iRec.name = interface["name"]
@@ -190,7 +191,8 @@ if __name__=="__main__":
                 cm = interface["cm"]
                 cmRec = Record ( "docsis_cable_modem" )
                 cmRec.deviceid = dRec.objectid
-                cmRec.customersn = device["serial_number"]
+                cmRec.hfcmacid = iRec.objectid
+                cmRec.customersn = device["serial_number"]                
                 cmRec.maxcpe = cm["max_cpe"]
                 if cm['docsis11']:
                     cmRec.docsisversion = 1.1
@@ -202,7 +204,7 @@ if __name__=="__main__":
                 cmRec.model = cm['MODEL']
                 cmRec.bootr = cm['BOOTR']
                 cmRec.basecap = cm['BASECAP']
-                deviceroles.append ( "docsis_cable_modem" )
+                deviceroles.add ( "docsis_cable_modem" )
                 cmRec.write()                
             elif "radio" in interface:
                 radio = interface["radio"]
@@ -210,30 +212,31 @@ if __name__=="__main__":
                     apcRec = Record ( "wireless_client" )
                     apcRec.deviceid = dRec.objectid
                     apcRec.interfaceid = iRec.objectid
-                    deviceroles.append ( "wireless_client" )
+                    deviceroles.add ( "wireless_client" )
                     apcRec.write()
                 elif radio["mode"] == "AP":
                     apRec = Record ( "wireless_ap" )
                     apRec.deviceid = dRec.objectid
                     apRec.interfaceid = iRec.objectid
                     apRec.essid = radio["essid"]
-                    deviceroles.append ( "wireless_ap" )
+                    deviceroles.add ( "wireless_ap" )
                     apRec.write()
                 else:
                     wir = Record ( "wireless" )
                     wir.deviceid = dRec.objectid
                     wir.interfaceid = iRec.objectid
-                    deviceroles.append ( "wireless" )
-                    wir.write()                                         
+                    deviceroles.add ( "wireless" )
+                    wir.write()            
+                    
         if device["type"] == 'ROUTER':
             natRec = Record ( "nat_router" )
             natRec.deviceid = dRec.objectid            
             natRec.localaddr = '192.168.2.1/24'
             natRec.lanports = 5
-            deviceroles.append ( "nat_router" )
+            deviceroles.add ( "nat_router" )
             natRec.write ()
 
-        dRec.devicerole = deviceroles
+        dRec.devicerole = list(deviceroles)
         dRec.write()
         
     
@@ -266,7 +269,7 @@ if __name__=="__main__":
     tosRec.write()
     
     
-    cr.execute ( "SELECT TOP 15 * FROM Klient" )
+    cr.execute ( "SELECT * FROM Klient" )
     klient_all = dictresult ( cr )
     cr.execute ( "SELECT * FROM DaneKlientInternet" )
     dki_all = dictresult ( cr )
@@ -345,8 +348,8 @@ if __name__=="__main__":
 
     klient_localizationMap = {} #lokalizacje indeksowane po 'Index' klienta z bazy biurowej
     city_street_objMap = {}     #już stworzone rekordy 'street' powiązane z miastem
-    building_objMap = {}        #hash b...[street objectid][nr domu] = nowy rekord building
-    location_objMap = {}        #hash l...[building objectid][nr lokalu] = nowy rekord location
+    building_objMap = {}        #[street objectid][nr domu] = nowy rekord building
+    location_objMap = {}        #[building objectid][nr lokalu] = nowy rekord location
     
     for kIndex, kSkrot, uIndex, mIndex, kNrDomu, kNrMieszkania, kKodPocztowy in cr.fetchall():
         if not (mIndex, uIndex) in city_street_objMap:
@@ -416,7 +419,8 @@ if __name__=="__main__":
     #Dodajemy usługi, adresy IP i MAC, urządzenia klienckie
     for K in klient_all:
         dki = dki_IdxMap[K["Index"]]
-
+        skrot = K["Skrot"].decode('cp1250').encode('utf8')
+        
         subRec = subscriber_oldIdxMap[K["Index"]]
         
         srvRec = Record ( "service" )
@@ -424,6 +428,7 @@ if __name__=="__main__":
         try:
             srvRec.classofservice = pakiet_IdxMap[dki["PakietIndex"]].objectid
         except KeyError:
+            DataErrors.write ( " 'PakietIndex' = '{0}' (klient: {1}), nie znaleziony pakiet.\n".format (dki["PakietIndex"], skrot) )
             print "Service DKI key not found."
             continue
         srvRec.typeofservice = tosRec.objectid
@@ -431,7 +436,6 @@ if __name__=="__main__":
         srvRec.write()
         
         n2c = None
-        skrot = K["Skrot"].decode('cp1250').encode('utf8')
         
         if skrot in n2_customer_idMap:
             n2c = n2_customer_idMap[skrot]
@@ -466,7 +470,8 @@ if __name__=="__main__":
                 macRec.write()                                        
 
             for device in n2c["_devices"]:
-                pass
+                dRec = device["_n3"]
+                srvRec.related_device = dRec.objectid
             
         except Record.DataManipulationError, e:
             DataErrors.write ( str(e) )            

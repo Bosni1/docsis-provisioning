@@ -448,7 +448,8 @@ class SubscriberMain(wx.Panel):
     def subscriberDataLoaded(self, *args):
         self.getCurrentSubscriberRecord().reloadIpReservations()
         self.getCurrentSubscriberRecord().reloadMACAddresses()
-        self.info_panel.hideSaveOption()
+        self.getCurrentSubscriberRecord().reloadDevices()
+        self.info_panel.hideSaveOption()        
     
     def addNewSubscriber(self, *args):
         dlg = self.dialogs.subscriber

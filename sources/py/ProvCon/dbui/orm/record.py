@@ -259,6 +259,8 @@ API Error: {0.pgexception}""".format ( self )
         self._child_referencelist = {}
         self._reprfunc = kkw.get ( "reprfunc", None )        
         
+        if 0:
+            assert isinstance(self._table, Table)            
                 
     def __setattr__(self, attrname, attrval):
         if attrname.startswith ( "_" ):
@@ -296,17 +298,23 @@ API Error: {0.pgexception}""".format ( self )
                     self.setFieldStringValue(field.choices_value_hash[attrval])
                 except KeyError:
                     return None                
+        elif attrname in self._table.mtm_relationships:
+            self.addMTMAssociation (attrname, attrval)
+        elif attrname[7:] in self._table.mtm_relationships and attrname.startswith("delete_"):
+            self.delMTMAssociation (attrname[7:], attrval)
         else:
             #this is a record attribute
             if attrname in self._table:
                 self.setFieldValue ( attrname, attrval )
-                
+    
     def __getattr__(self, attrname):
         if attrname in self._mtm_referencelist:
             if not self.hasData: return None
             theList = self._mtm_referencelist[attrname]
             if not theList.bound: theList.parentobjectid = self.objectid
             return theList
+        elif attrname.endswith('_oids') and attrname[:-5] in self._table.mtm_relationships:
+            return self.getMTMAssociation(attrname[:-5])
         #special PP_* attributes return a "pretty printed" representation of the record        
         elif attrname.startswith ("list_"):
             rest = attrname[5:]
@@ -375,6 +383,22 @@ API Error: {0.pgexception}""".format ( self )
         for mtm_handle in self._table.mtm_relationships:
             self._mtm_referencelist[mtm_handle] = RelatedRecordList (self._table, mtm_handle)
 
+    def addMTMAssociation(self, mtm_handle, refobjectid):
+        if not self.hasData: return
+        self._table.addRelatedOID (self.objectid, refobjectid, mtm_handle )
+        if self._resolve_mtm:
+            self._mtm_referencelist[mtm_handle].reload()
+
+    def delMTMAssociation(self, mtm_assoc_name, refobjectid):
+        if not self.hasData: return
+        self._table.delRelatedOID (self.objectid, refobjectid, mtm_handle )
+        if self._resolve_mtm:
+            self._mtm_referencelist[mtm_handle].reload()
+        
+    def getMTMAssociation(self, mtm_handle):
+        if not self.hasData: return []
+        return self._table.relatedOIDList (self.objectid, mtm_handle)
+    
     def enableChildren(self, exclude=[]):
         self._resolve_child_ref = True
         self.setupChildren(exclude)

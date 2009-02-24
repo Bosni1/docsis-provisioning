@@ -64,8 +64,10 @@ CREATE TABLE {:SCHEMA:}mtm_relationship (
   relationship_name name not null,
   table_1 name not null,
   table_1_handle name not null,
+  table_1_column name not null,
   table_2 name not null,
   table_2_handle name not null,
+  table_2_column name not null,
   unique (table_1, table_1_handle),
   unique (table_2, table_2_handle),
   unique (relationship_name)
@@ -242,17 +244,18 @@ CREATE FUNCTION {:SCHEMA:}create_mtm_relationship ( t1 name, t2 name, rname name
 DECLARE
   tname name;
 BEGIN
-  tname = '_mtm_' || rname || '_' || t1 || '_' || t2;
+  tname = '_mtm_' || rname;
   EXECUTE 'CREATE TABLE {:SCHEMA:}' || tname || ' ( ' ||
-  ' refobjectid1 int8 REFERENCES {:SCHEMA:}objectids ON DELETE CASCADE ON UPDATE CASCADE NOT NULL, ' ||
-  ' refobjectid2 int8 REFERENCES {:SCHEMA:}objectids ON DELETE CASCADE ON UPDATE CASCADE NOT NULL, ' ||
+  t1 || 'id int8 REFERENCES {:SCHEMA:}objectids ON DELETE CASCADE ON UPDATE CASCADE NOT NULL, ' ||
+  t2 || 'id int8 REFERENCES {:SCHEMA:}objectids ON DELETE CASCADE ON UPDATE CASCADE NOT NULL, ' ||
   ' refdata int8 NULL, ' ||
-  ' PRIMARY KEY (refobjectid1, refobjectid2) ' ||
+  ' PRIMARY KEY (' || t1 || 'id, ' || t2 || 'id) ' ||
   ' ) ';
   INSERT INTO {:SCHEMA:}mtm_relationship (mtm_table_name, relationship_name, 
-    table_1, table_1_handle, 
-    table_2, table_2_handle)
-    VALUES (tname, rname, t1, rname, t2, rname);
+    table_1, table_1_handle, table_1_column, 
+    table_2, table_2_handle, table_2_column)
+    VALUES (tname, rname, t1, 'related_' || t2, t1 || 'id',
+            t2, 'related_' || t1, t2 || 'id' );
   return tname;  
 END;
 $$ LANGUAGE plpgsql;

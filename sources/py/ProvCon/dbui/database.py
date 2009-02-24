@@ -107,9 +107,9 @@ class CFG:
                 table2 = Table.Get ( mtm['table_2'] )
                 
                 table1.mtm_relationships[ mtm['table_1_handle'] ] = ( 
-                    mtm['relationship_name'], mtm['mtm_table_name'], "refobjectid1", "refobjectid2", table2 )
+                    mtm['relationship_name'], mtm['mtm_table_name'], mtm['table_1_column'], mtm['table_2_column'], table2 )
                 table2.mtm_relationships[ mtm['table_2_handle'] ] = ( 
-                    mtm['relationship_name'], mtm['mtm_table_name'], "refobjectid2", "refobjectid1", table1 )
+                    mtm['relationship_name'], mtm['mtm_table_name'], mtm['table_2_column'], mtm['table_1_column'], table1 )
                 
             self.instance = self
         def delete(self, cl, a):

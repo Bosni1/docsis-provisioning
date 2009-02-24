@@ -43,6 +43,12 @@ create table {:SCHEMA:}routeros_device (
 ) inherits ({:SCHEMA:}"device_role");
 SELECT {:SCHEMA:}setup_object_subtable ('routeros_device' );
 
+create table {:SCHEMA:}core_switch (
+  connected int8[] not null default '{}',
+  ports smallint not null default 8
+) inherits ({:SCHEMA:}"device_role");
+SELECT {:SCHEMA:}setup_object_subtable ('core_switch' );
+
 create table {:SCHEMA:}core_router (
   dhcp_relay bit not null default '0',
   default_nexthop inet null

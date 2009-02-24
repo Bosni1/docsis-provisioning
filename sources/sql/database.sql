@@ -249,8 +249,10 @@ CREATE TABLE pv.mtm_relationship (
   relationship_name name not null,
   table_1 name not null,
   table_1_handle name not null,
+  table_1_column name not null,
   table_2 name not null,
   table_2_handle name not null,
+  table_2_column name not null,
   unique (table_1, table_1_handle),
   unique (table_2, table_2_handle),
   unique (relationship_name)
@@ -427,17 +429,18 @@ CREATE FUNCTION pv.create_mtm_relationship ( t1 name, t2 name, rname name) retur
 DECLARE
   tname name;
 BEGIN
-  tname = '_mtm_' || rname || '_' || t1 || '_' || t2;
+  tname = '_mtm_' || rname;
   EXECUTE 'CREATE TABLE pv.' || tname || ' ( ' ||
-  ' refobjectid1 int8 REFERENCES pv.objectids ON DELETE CASCADE ON UPDATE CASCADE NOT NULL, ' ||
-  ' refobjectid2 int8 REFERENCES pv.objectids ON DELETE CASCADE ON UPDATE CASCADE NOT NULL, ' ||
+  t1 || 'id int8 REFERENCES pv.objectids ON DELETE CASCADE ON UPDATE CASCADE NOT NULL, ' ||
+  t2 || 'id int8 REFERENCES pv.objectids ON DELETE CASCADE ON UPDATE CASCADE NOT NULL, ' ||
   ' refdata int8 NULL, ' ||
-  ' PRIMARY KEY (refobjectid1, refobjectid2) ' ||
+  ' PRIMARY KEY (' || t1 || 'id, ' || t2 || 'id) ' ||
   ' ) ';
   INSERT INTO pv.mtm_relationship (mtm_table_name, relationship_name, 
-    table_1, table_1_handle, 
-    table_2, table_2_handle)
-    VALUES (tname, rname, t1, rname, t2, rname);
+    table_1, table_1_handle, table_1_column, 
+    table_2, table_2_handle, table_2_column)
+    VALUES (tname, rname, t1, 'related_' || t2, t1 || 'id',
+            t2, 'related_' || t1, t2 || 'id' );
   return tname;  
 END;
 $$ LANGUAGE plpgsql;
@@ -748,7 +751,11 @@ create table pv.docsis_cable_modem (
   cmtsid int8 REFERENCES pv.objectids ON DELETE SET NULL ON UPDATE CASCADE NULL,
   downstreamid int8 REFERENCES pv.objectids ON DELETE SET NULL ON UPDATE CASCADE NULL,
   upstreamid int8 REFERENCES pv.objectids ON DELETE SET NULL ON UPDATE CASCADE NULL,  
-  customersn varchar(32) NULL,
+  hfcmacid int8 REFERENCES pv.objectids ON DELETE SET NULL ON UPDATE CASCADE NOT NULL,  
+  usbmacid int8 REFERENCES pv.objectids ON DELETE SET NULL ON UPDATE CASCADE NULL,  
+  lanmacid int8 REFERENCES pv.objectids ON DELETE SET NULL ON UPDATE CASCADE NULL,  
+  mgmtmacid int8 REFERENCES pv.objectids ON DELETE SET NULL ON UPDATE CASCADE NULL,
+  customersn varchar(128) NULL,
   maxcpe smallint NOT NULL DEFAULT 1,  
   cpemacfilter bit NOT NULL DEFAULT '0',
   cpeipfilter bit NOT NULL DEFAULT '1',
@@ -779,9 +786,15 @@ create table pv.routeros_device (
 ) inherits (pv."device_role");
 SELECT pv.setup_object_subtable ('routeros_device' );
 
+create table pv.core_switch (
+  connected int8[] not null default '{}',
+  ports smallint not null default 8
+) inherits (pv."device_role");
+SELECT pv.setup_object_subtable ('core_switch' );
+
 create table pv.core_router (
   dhcp_relay bit not null default '0',
-  default_gateway inet not null
+  default_nexthop inet null
 ) inherits (pv."device_role");
 SELECT pv.setup_object_subtable ( 'core_router' );
 
@@ -802,14 +815,18 @@ create table pv.wireless (
   interfaceid int8 REFERENCES pv.objectids ON DELETE SET NULL ON UPDATE CASCADE NULL,  
   band varchar(32) null,
   frequency smallint null,
-  channelwidth smallint null
+  channelwidth smallint null,
+  UNIQUE (interfaceid)
 ) inherits (pv."device_role");
 SELECT pv.setup_object_subtable ( 'wireless' );
 
 create table pv.wireless_client (
-  accesspointid int8 REFERENCES pv.objectids ON DELETE SET NULL ON UPDATE CASCADE NULL
+  accesspointid int8 REFERENCES pv.objectids ON DELETE SET NULL ON UPDATE CASCADE NULL,
+  networkaccess bit not null default '1'
 ) inherits (pv."wireless");
 SELECT pv.setup_object_subtable ( 'wireless_client' );
+-- on update (insert): if network access changed and accesspoint set - update acl of accesspoint
+-- on delete: remove from acl of accesspoint
 
 create table pv.wireless_ap (
   essid varchar(128) null,
@@ -852,45 +869,85 @@ SELECT pv.setup_object_subtable ( 'mac_interface' );----------------------------
 
 CREATE FUNCTION pv.set_all_references() returns int as $$
 BEGIN
- PERFORM pv.set_reference ( 'wireless.interfaceid', 'interface');
- PERFORM pv.set_reference ( 'docsis_cable_modem.cmtsid', 'object');
- PERFORM pv.set_reference ( 'docsis_cable_modem.downstreamid', 'object');
- PERFORM pv.set_reference ( 'wireless_link.interfaceid', 'interface');
- PERFORM pv.set_reference ( 'wireless_link.otherend', 'wireless_link');
  PERFORM pv.set_reference ( 'table_info.superclass', 'table_info');
- PERFORM pv.set_reference ( 'event.refobjectid', 'object');
- PERFORM pv.set_reference ( 'note.refobjectid', 'object');
- PERFORM pv.set_reference ( 'object_parameter.refobjectid', 'object');
- PERFORM pv.set_reference ( 'object_flag.refobjectid', 'object');
- PERFORM pv.set_reference ( 'building.streetid', 'street');
- PERFORM pv.set_reference ( 'street.cityid', 'city');
- PERFORM pv.set_reference ( 'ip_reservation.ownerid', 'object');
- PERFORM pv.set_reference ( 'ip_reservation.subnetid', 'ip_subnet');
- PERFORM pv.set_reference ( 'location.buildingid', 'building');
- PERFORM pv.set_reference ( 'device.parentid', 'object');
- PERFORM pv.set_reference ( 'device.ownerid', 'object');
- PERFORM pv.set_reference ( 'docsis_cable_modem.deviceid', 'device');
+ 
  PERFORM pv.set_reference ( 'field_info.reference', 'table_info');
  PERFORM pv.set_reference ( 'field_info.classid', 'table_info');
  PERFORM pv.set_reference ( 'field_info.arrayof', 'table_info');
- PERFORM pv.set_reference ( 'device.modelid', 'model');
- PERFORM pv.set_reference ( 'routeros_device.deviceid', 'device');
- PERFORM pv.set_reference ( 'nat_router.deviceid', 'device');
- PERFORM pv.set_reference ( 'core_router.deviceid', 'device');
- PERFORM pv.set_reference ( 'wireless_link.deviceid', 'device');
- PERFORM pv.set_reference ( 'wireless.deviceid', 'device');
- PERFORM pv.set_reference ( 'wireless_client.deviceid', 'device');
- PERFORM pv.set_reference ( 'wireless_ap.deviceid', 'device');
- PERFORM pv.set_reference ( 'sip_client.deviceid', 'device');
- PERFORM pv.set_reference ( 'device_role.deviceid', 'device');
+
+ PERFORM pv.set_reference ( 'event.refobjectid', 'object');
+
+ PERFORM pv.set_reference ( 'note.refobjectid', 'object');
+
+ PERFORM pv.set_reference ( 'object_parameter.refobjectid', 'object');
+
+ PERFORM pv.set_reference ( 'object_flag.refobjectid', 'object');
+
+ PERFORM pv.set_reference ( 'ip_reservation.ownerid', 'object');
+ PERFORM pv.set_reference ( 'ip_reservation.subnetid', 'ip_subnet');
+ PERFORM pv.set_reference ( 'ip_reservation.interfaceid', 'mac_interface');
+
+ PERFORM pv.set_reference ( 'street.cityid', 'city');
+
+ PERFORM pv.set_reference ( 'street_aggregate.streetid', 'street');
+
+ PERFORM pv.set_reference ( 'building.streetid', 'street'); 
+
+ PERFORM pv.set_reference ( 'location.buildingid', 'building');
+
  PERFORM pv.set_reference ( 'subscriber.primarylocationid', 'location');
+
  PERFORM pv.set_reference ( 'service.subscriberid', 'subscriber');
  PERFORM pv.set_reference ( 'service.typeofservice', 'type_of_service');
  PERFORM pv.set_reference ( 'service.classofservice', 'class_of_service');
  PERFORM pv.set_reference ( 'service.locationid', 'location');
+ 
+ PERFORM pv.set_reference ( 'device.ownerid', 'subscriber'); 
+ PERFORM pv.set_reference ( 'device.parentid', 'device');
+ PERFORM pv.set_reference ( 'device.modelid', 'device_model');
+ 
+ PERFORM pv.set_reference ( 'device_role.deviceid', 'device');
+ 
+ PERFORM pv.set_reference ( 'docsis_cable_modem.deviceid', 'device');
+ PERFORM pv.set_reference ( 'docsis_cable_modem.cmtsid', 'object');
+ PERFORM pv.set_reference ( 'docsis_cable_modem.downstreamid', 'object');
+ PERFORM pv.set_reference ( 'docsis_cable_modem.hfcmacid', 'mac_interface');
+ PERFORM pv.set_reference ( 'docsis_cable_modem.usbmacid', 'mac_interface');
+ PERFORM pv.set_reference ( 'docsis_cable_modem.lanmacid', 'mac_interface');
+ PERFORM pv.set_reference ( 'docsis_cable_modem.mgmtmacid', 'mac_interface');
+ 
+ PERFORM pv.set_reference ( 'routeros_device.deviceid', 'device');
+
+ PERFORM pv.set_reference ( 'core_switch.deviceid', 'device');
+ 
+ PERFORM pv.set_reference ( 'core_router.deviceid', 'device');
+ 
+ PERFORM pv.set_reference ( 'core_router_bridged_network.routerid', 'device_role');
+ PERFORM pv.set_reference ( 'core_router_bridged_network.subnetid', 'ip_subnet');
+
+ PERFORM pv.set_reference ( 'core_router.deviceid', 'nat_router');
+
+ PERFORM pv.set_reference ( 'wireless.deviceid', 'device');
+ PERFORM pv.set_reference ( 'wireless.interfaceid', 'mac_interface');
+
+ PERFORM pv.set_reference ( 'wireless_client.deviceid', 'device');
+ PERFORM pv.set_reference ( 'wireless_client.interfaceid', 'mac_interface');
+ PERFORM pv.set_reference ( 'wireless_client.accesspointid', 'device_role');
+
+ PERFORM pv.set_reference ( 'wireless_ap.deviceid', 'device');
+ PERFORM pv.set_reference ( 'wireless_ap.interfaceid', 'mac_interface');
+
+ PERFORM pv.set_reference ( 'wireless_link.deviceid', 'device');
+ PERFORM pv.set_reference ( 'wireless_link.interfaceid', 'mac_interface');
+ PERFORM pv.set_reference ( 'wireless_link.otherend', 'wireless_link');
+  
+ PERFORM pv.set_reference ( 'sip_client.deviceid', 'device');
+ 
+ 
  PERFORM pv.set_reference ( 'mac_interface.ipreservationid', 'ip_reservation');
- PERFORM pv.set_reference ( 'docsis_cable_modem.upstreamid', 'object');
- PERFORM pv.set_reference ( 'docsis_cable_modem.cvc', 'object');
+ PERFORM pv.set_reference ( 'mac_interface.deviceid', 'device');
+ PERFORM pv.set_reference ( 'mac_interface.ownerid', 'service');
+ 
  RETURN 0;
 END;
 $$ LANGUAGE plpgsql;

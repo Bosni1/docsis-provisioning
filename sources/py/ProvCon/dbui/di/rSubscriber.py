@@ -22,9 +22,10 @@ class rSubscriber (rObject.rObject):
         self._macaddresses.reload ( feed=True )
 
     def reloadDevices(self):
-        #self._devices.query = ("SELECT dev.* FROM {0}.mac_interface mac INNER JOIN {0}.service s " +
-        #    "ON mac.ownerid = s.objectid WHERE s.subscriberid = {1} ORDER BY mac.mac").format (
-        #        CFG.DB.SCHEMA, self.objectid )
+        self._devices.query = ("SELECT dev.* FROM {0}.service s INNER JOIN {0}._mtm_service_device mtm " +
+            " ON mtm.serviceid = s.objectid INNER JOIN {0}.device dev ON mtm.deviceid = dev.objectid " +
+            " WHERE s.subscriberid= {1} ").format (
+                CFG.DB.SCHEMA, self.objectid )
         self._devices.reload ( feed=True )
         
     def _get_ipreservations(self):

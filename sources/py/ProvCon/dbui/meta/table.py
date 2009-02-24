@@ -90,7 +90,12 @@ class Table(object):
         """
         return CFG.CX.query ( "SELECT count(*) as recordCount FROM {0}.{1} WHERE objectscope={2}".format(
             CFG.DB.SCHEMA, self.name, CFG.RT.DATASCOPE )).dictresult()[0]['recordCount']
-
+    
+    ## MTM relationships 
+    def relatedTable (self, mtm_handle):
+        relname, tablename, my_pointer, ref_pointer, referenced_table = self.mtm_relationships[mtm_handle]
+        return referenced_table
+    
     def relatedOIDList (self, parentoid, mtm_handle):
         relname, tablename, my_pointer, ref_pointer, referenced_table = self.mtm_relationships[mtm_handle]
                 
@@ -98,13 +103,24 @@ class Table(object):
             CFG.DB.SCHEMA, tablename, ref_pointer, my_pointer, parentoid ) )
         return map(lambda x: x['objectid'], result.dictresult() )
 
+    def addRelatedOID (self, parentoid, refoid, mtm_handle):
+        relname, tablename, my_pointer, ref_pointer, referenced_table = self.mtm_relationships[mtm_handle]
+        CFG.CX.query ( "INSERT INTO {0}.{1} (\"{2}\", \"{3}\") VALUES ( {4}, {5} )".format (
+            CFG.DB.SCHEMA, tablename, my_pointer, ref_pointer, parentoid, refoid ) )
+
+    def delRelatedOID (self, parentoid, refoid, mtm_handle):
+        relname, tablename, my_pointer, ref_pointer, referenced_table = self.mtm_relationships[mtm_handle]
+        CFG.CX.query ( "DELETE FROM {0}.{1} WHERE \"{2}\" = {4} AND  \"{3}\" = {5}".format (
+            CFG.DB.SCHEMA, tablename, my_pointer, ref_pointer, parentoid, refoid ) )
+
     def relatedRecordList (self, parentoid, mtm_handle, recordclass=None):
         from ProvCon.dbui.orm import Record
         
         oidlist = self.relatedOIDList(parentoid, mtm_handle)        
         recordclass = recordclass or Record
         return map (lambda x: recordclass.ID(x), oidlist)
-
+    ## end of MTM relationships
+    
     def recordList(self, _filter="TRUE", select=['0'], order="objectid"):
         """
         Get results of a SELECT query.
