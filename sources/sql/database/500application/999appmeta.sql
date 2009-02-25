@@ -15,7 +15,9 @@ BEGIN
 
  PERFORM {:SCHEMA:}set_reference ( 'object_flag.refobjectid', 'object');
 
- PERFORM {:SCHEMA:}set_reference ( 'ip_reservation.ownerid', 'object');
+ PERFORM {:SCHEMA:}set_reference ( 'ip_subnet.subnetgroupid', 'ip_subnet_group');
+
+ PERFORM {:SCHEMA:}set_reference ( 'ip_reservation.ownerid', 'service');
  PERFORM {:SCHEMA:}set_reference ( 'ip_reservation.subnetid', 'ip_subnet');
  PERFORM {:SCHEMA:}set_reference ( 'ip_reservation.interfaceid', 'mac_interface');
 
@@ -30,6 +32,7 @@ BEGIN
  PERFORM {:SCHEMA:}set_reference ( 'subscriber.primarylocationid', 'location');
 
  PERFORM {:SCHEMA:}set_reference ( 'service.subscriberid', 'subscriber');
+ PERFORM {:SCHEMA:}set_reference ( 'service.parentservice', 'service');
  PERFORM {:SCHEMA:}set_reference ( 'service.typeofservice', 'type_of_service');
  PERFORM {:SCHEMA:}set_reference ( 'service.classofservice', 'class_of_service');
  PERFORM {:SCHEMA:}set_reference ( 'service.locationid', 'location');
@@ -40,9 +43,12 @@ BEGIN
  
  PERFORM {:SCHEMA:}set_reference ( 'device_role.deviceid', 'device');
  
+ PERFORM {:SCHEMA:}set_reference ( 'cpe.deviceid', 'device');
+ PERFORM {:SCHEMA:}set_reference ( 'cpe.macid', 'mac_interface');
+ 
  PERFORM {:SCHEMA:}set_reference ( 'docsis_cable_modem.deviceid', 'device');
- PERFORM {:SCHEMA:}set_reference ( 'docsis_cable_modem.cmtsid', 'object');
- PERFORM {:SCHEMA:}set_reference ( 'docsis_cable_modem.downstreamid', 'object');
+ PERFORM {:SCHEMA:}set_reference ( 'docsis_cable_modem.cmtsid', 'device_role');
+ PERFORM {:SCHEMA:}set_reference ( 'docsis_cable_modem.downstreamid', 'device_role');
  PERFORM {:SCHEMA:}set_reference ( 'docsis_cable_modem.hfcmacid', 'mac_interface');
  PERFORM {:SCHEMA:}set_reference ( 'docsis_cable_modem.usbmacid', 'mac_interface');
  PERFORM {:SCHEMA:}set_reference ( 'docsis_cable_modem.lanmacid', 'mac_interface');
@@ -52,6 +58,9 @@ BEGIN
 
  PERFORM {:SCHEMA:}set_reference ( 'core_switch.deviceid', 'device');
  
+ PERFORM {:SCHEMA:}set_reference ( 'core_switch_port.switchid', 'core_switch');
+ PERFORM {:SCHEMA:}set_reference ( 'core_switch_port.linkedto', 'device');
+    
  PERFORM {:SCHEMA:}set_reference ( 'core_router.deviceid', 'device');
  
  PERFORM {:SCHEMA:}set_reference ( 'core_router_bridged_network.routerid', 'device_role');

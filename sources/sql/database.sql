@@ -523,6 +523,7 @@ $obj$ LANGUAGE plpgsql;
 -- $Id:$
 
 create table pv.ip_subnet (
+  subnetgroupid int8 REFERENCES pv.objectids ON DELETE CASCADE ON UPDATE CASCADE NOT NULL,
   name varchar(64) not null,
   scope varchar(64) null,  
   designation smallint[] not null default '{1}',
@@ -533,6 +534,37 @@ create table pv.ip_subnet (
   dhcpserver inet null  
 ) inherits (pv."object");
 SELECT pv.setup_object_subtable ('ip_subnet' );
+
+create function pv.update_ip_reservations_subnet() returns TRIGGER AS $trig$
+DECLARE
+   subnet_network cidr;
+BEGIN  
+  IF (TG_OP = 'UPDATE') OR (TG_OP = 'INSERT') THEN
+    subnet_network = NEW.network;
+  END IF;
+  IF (TG_OP = 'DELETE') THEN
+    subnet_network = OLD.network;  
+  END IF;
+  
+  UPDATE pv.ip_reservation ip SET 
+  subnetid = (SELECT objectid FROM pv.ip_subnet WHERE network >> ip.address ORDER BY masklen(network) DESC LIMIT 1 )
+  WHERE ip.address << subnet_network;
+  IF (TG_OP = 'UPDATE') OR (TG_OP = 'INSERT') THEN
+    RETURN NEW;
+  END IF;
+  IF (TG_OP = 'DELETE') THEN
+    RETURN OLD;
+  END IF;
+END;
+$trig$ language plpgsql;
+CREATE TRIGGER ip_subnet_on_update_reservations AFTER INSERT OR UPDATE OR DELETE ON pv.ip_subnet
+  FOR EACH ROW EXECUTE PROCEDURE pv.update_ip_reservations_subnet();
+
+create table pv.ip_subnet_group (
+  name varchar(64) not null,
+  info text null
+) inherits (pv."object");
+SELECT pv.setup_object_subtable ('ip_subnet_group' );
 
 create table pv.ip_reservation (
   ownerid int8 REFERENCES pv.objectids ON DELETE CASCADE ON UPDATE CASCADE NULL,
@@ -553,10 +585,10 @@ create function pv.check_ip_reservation_uniqueness() returns TRIGGER AS $ip_uniq
     subnetid int8;
     cnt int;
   BEGIN
-    SELECT count(address) FROM pv.ip_reservation WHERE address >>= NEW.address AND objectid <> NEW.objectid into addrcnt;
+    SELECT count(address) FROM pv.ip_reservation WHERE address >>= NEW.address AND objectid <> NEW.objectid AND designation = NEW.designation into addrcnt;
     IF (addrcnt > 0) THEN
-      RAISE EXCEPTION 'Duplicate IP address reservation requested. ';
-    END IF;
+      RAISE EXCEPTION 'Duplicate IP address reservation requested. (designation: ' || NEW.designation || ')';
+    END IF;    
     SELECT "objectid" FROM pv.ip_subnet WHERE network >> NEW.address ORDER BY masklen(network) DESC LIMIT 1 INTO subnetid;
     GET DIAGNOSTICS cnt = ROW_COUNT;
     IF (cnt > 0) THEN 
@@ -747,13 +779,21 @@ create table pv.device_role (
 ) inherits (pv."object");
 SELECT pv.setup_object_subtable ( 'device_role');
 
+create table pv.cpe (
+  macid int8 REFERENCES pv.objectids ON DELETE SET NULL ON UPDATE CASCADE NULL,
+  name varchar(32) null,
+  info text null,
+  os varchar(32) null
+) inherits (pv."device_role");
+SELECT pv.setup_object_subtable ( 'cpe');
+
 create table pv.docsis_cable_modem (
   cmtsid int8 REFERENCES pv.objectids ON DELETE SET NULL ON UPDATE CASCADE NULL,
   downstreamid int8 REFERENCES pv.objectids ON DELETE SET NULL ON UPDATE CASCADE NULL,
-  upstreamid int8 REFERENCES pv.objectids ON DELETE SET NULL ON UPDATE CASCADE NULL,  
-  hfcmacid int8 REFERENCES pv.objectids ON DELETE SET NULL ON UPDATE CASCADE NOT NULL,  
-  usbmacid int8 REFERENCES pv.objectids ON DELETE SET NULL ON UPDATE CASCADE NULL,  
-  lanmacid int8 REFERENCES pv.objectids ON DELETE SET NULL ON UPDATE CASCADE NULL,  
+  upstreamid int8 REFERENCES pv.objectids ON DELETE SET NULL ON UPDATE CASCADE NULL,
+  hfcmacid int8 REFERENCES pv.objectids ON DELETE SET NULL ON UPDATE CASCADE NOT NULL,
+  usbmacid int8 REFERENCES pv.objectids ON DELETE SET NULL ON UPDATE CASCADE NULL,
+  lanmacid int8 REFERENCES pv.objectids ON DELETE SET NULL ON UPDATE CASCADE NULL,
   mgmtmacid int8 REFERENCES pv.objectids ON DELETE SET NULL ON UPDATE CASCADE NULL,
   customersn varchar(128) NULL,
   maxcpe smallint NOT NULL DEFAULT 1,  
@@ -787,10 +827,18 @@ create table pv.routeros_device (
 SELECT pv.setup_object_subtable ('routeros_device' );
 
 create table pv.core_switch (
-  connected int8[] not null default '{}',
   ports smallint not null default 8
 ) inherits (pv."device_role");
 SELECT pv.setup_object_subtable ('core_switch' );
+
+create table pv.core_switch_port (
+  switchid int8 REFERENCES pv.objectids ON DELETE CASCADE ON UPDATE CASCADE NOT NULL,
+  portid int not null,
+  portname varchar(16) null,
+  linkedto int8 REFERENCES pv.objectids ON DELETE CASCADE ON UPDATE CASCADE NULL,
+  UNIQUE (switchid, portid)
+) inherits (pv."object");
+SELECT pv.setup_object_subtable ('core_switch_port' );
 
 create table pv.core_router (
   dhcp_relay bit not null default '0',
@@ -807,7 +855,8 @@ SELECT pv.setup_object_subtable ( 'core_router_bridged_network' );
 create table pv.nat_router (
   localaddr inet not null,
   dhcp bit not null default '1',
-  lanports smallint null
+  lanports smallint null,
+  wanmacid int8 REFERENCES pv.objectids ON DELETE CASCADE ON UPDATE CASCADE NULL
 ) inherits (pv."device_role");
 SELECT pv.setup_object_subtable ( 'nat_router' );
 
@@ -854,12 +903,12 @@ SELECT pv.setup_object_subtable ( 'sip_client' );
 -- $Id:$
 create table pv.mac_interface (  
   mac macaddr null,  
-  designation int default 0,
+  designation smallint default 1,
   ipreservationid int8 REFERENCES pv.objectids ON DELETE SET NULL ON UPDATE CASCADE NULL,
   deviceid int8 REFERENCES pv.objectids ON DELETE SET NULL ON UPDATE CASCADE NULL,  
-  name varchar(32) null,
-  type smallint not null default '1',
   ownerid int8 REFERENCES pv.objectids ON DELETE SET NULL ON UPDATE CASCADE NULL,
+  name varchar(32) null,
+  type smallint not null default '1',  
   unique (mac, designation)
 ) inherits (pv."object");
 SELECT pv.setup_object_subtable ( 'mac_interface' );----------------------------------------------------------------------------------------------------
@@ -867,7 +916,7 @@ SELECT pv.setup_object_subtable ( 'mac_interface' );----------------------------
 -- database/500application/999appmeta.sql
 ----------------------------------------------------------------------------------------------------
 
-CREATE FUNCTION pv.set_all_references() returns int as $$
+CREATE FUNCTION pv.set_all_references_2() returns int as $$
 BEGIN
  PERFORM pv.set_reference ( 'table_info.superclass', 'table_info');
  
@@ -882,6 +931,8 @@ BEGIN
  PERFORM pv.set_reference ( 'object_parameter.refobjectid', 'object');
 
  PERFORM pv.set_reference ( 'object_flag.refobjectid', 'object');
+
+ PERFORM pv.set_reference ( 'ip_subnet.subnetgroupid', 'ip_subnet_group');
 
  PERFORM pv.set_reference ( 'ip_reservation.ownerid', 'object');
  PERFORM pv.set_reference ( 'ip_reservation.subnetid', 'ip_subnet');
@@ -908,6 +959,9 @@ BEGIN
  
  PERFORM pv.set_reference ( 'device_role.deviceid', 'device');
  
+ PERFORM pv.set_reference ( 'cpe.deviceid', 'device');
+ PERFORM pv.set_reference ( 'cpe.macid', 'mac_interface');
+ 
  PERFORM pv.set_reference ( 'docsis_cable_modem.deviceid', 'device');
  PERFORM pv.set_reference ( 'docsis_cable_modem.cmtsid', 'object');
  PERFORM pv.set_reference ( 'docsis_cable_modem.downstreamid', 'object');
@@ -920,6 +974,9 @@ BEGIN
 
  PERFORM pv.set_reference ( 'core_switch.deviceid', 'device');
  
+ PERFORM pv.set_reference ( 'core_switch_port.switchid', 'core_switch');
+ PERFORM pv.set_reference ( 'core_switch_port.linkedto', 'device');
+    
  PERFORM pv.set_reference ( 'core_router.deviceid', 'device');
  
  PERFORM pv.set_reference ( 'core_router_bridged_network.routerid', 'device_role');

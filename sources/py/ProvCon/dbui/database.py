@@ -218,7 +218,10 @@ def StartupDatabaseConnection():
         st = traceback.extract_stack(limit=5)
         fname1, lineno1, fn1, code = st[-5]
         fname, lineno, fn, code = st[-4]
-        print os.path.basename(fname1) + "/" + fn1 + (" >> {0} line {1} ({3}) SQL: {2}".format(os.path.basename(fname), lineno, qry, fn))
+        try:
+            print os.path.basename(fname1) + "/" + fn1 + (" >> {0} line {1} ({3}) SQL: {2}".format(os.path.basename(fname), lineno, qry, fn))
+        except:
+            pass
     CFG.CX.debug = sql_debugger
     #CFG.CX.debug = 
     

@@ -123,9 +123,11 @@ if __name__=="__main__":
         for info_row in data:
             interface_row = n2_interface_idMap[info_row['interface']]
             interface_row[info_table] = info_row
-
+            if info_table == "br_port": interface_row["br_port"] = data
+            
     for interface_row in n2_interface_all:
         interface_row['_ip'] = []
+        interface_row['_n3'] = None
         n2_device_idMap[interface_row['device']]['_interfaces'].append ( interface_row )        
     
     n2cr.execute( "SELECT *, int2ipstr(ip) as ipstr FROM ip_device_interface_ip_assignment" )
@@ -144,6 +146,9 @@ if __name__=="__main__":
     n2_cos_all = dictresult(n2cr)
     n2_cos_idMap = {}
     map (lambda r: n2_cos_idMap.update ({ r['id'] : r } ), n2_cos_all )
+
+    n2cr.execute ( "SELECT *, int2ipstr(network) as netstr, int2ipstr(default_router) as gateway FROM ip_address_space" )
+    n2_subnet_all = dictresult(n2cr)
     
     n_TOS = {}   #hash z typami usługi
     n_COS = {}   #hash z pakietami
@@ -157,10 +162,37 @@ if __name__=="__main__":
     CFG.CX.query ( "DELETE FROM {0}.device".format(CFG.DB.SCHEMA) )
     CFG.CX.query ( "DELETE FROM {0}.device_role".format(CFG.DB.SCHEMA) )
     CFG.CX.query ( "DELETE FROM {0}.ip_reservation".format(CFG.DB.SCHEMA) )
+    CFG.CX.query ( "DELETE FROM {0}.ip_subnet".format(CFG.DB.SCHEMA) )
+    CFG.CX.query ( "DELETE FROM {0}.ip_subnet_group".format(CFG.DB.SCHEMA) )
     CFG.CX.query ( "DELETE FROM {0}.mac_interface".format(CFG.DB.SCHEMA) )
     CFG.CX.query ( "DELETE FROM {0}.class_of_service".format(CFG.DB.SCHEMA) )
     CFG.CX.query ( "DELETE FROM {0}.type_of_service".format(CFG.DB.SCHEMA) )
 
+    #Podsieci IP
+    mainSubnetGroupRec = Record ( "ip_subnet_group" )
+    mainSubnetGroupRec.name = "Wszystkie adresy IP"
+    mainSubnetGroupRec.write()
+
+    for subnet in n2_subnet_all:
+        subRec = Record ( "ip_subnet" )
+        subRec.subnetgroupid = mainSubnetGroupRec.objectid
+        subRec.name = subnet["name"]
+        if subnet["address_type"] == "CUST":
+            subRec.designation = [1]
+            subRec.scope = "SUBSCRIBER"
+        elif subnet["address_type"] == "EQUI":
+            subRec.designation = [2]
+            subRec.scope = "MANAGEMENT"
+        elif subnet["address_type"] == "CM":
+            subRec.designation = [3]
+            subRec.scope = "DOCSIS"
+        subRec.network = subnet["netstr"]
+        subRec.gateway = subnet["gateway"]
+        subRec.active = subnet["active"]
+        subRec.allownew = subnet["new_allowed"]
+        subRec.dhcpserver = "10.1.0.2"
+        subRec.write()
+        
     
     #Modele urządzeń
     for m in device_models_map.keys():
@@ -184,6 +216,7 @@ if __name__=="__main__":
             iRec = Record ( "mac_interface")
             iRec.name = interface["name"]
             iRec.mac = interface["mac"]
+            iRec.designation = 2
             iRec.ownerid = dRec.objectid
             iRec.write()
             
@@ -227,7 +260,18 @@ if __name__=="__main__":
                     wir.interfaceid = iRec.objectid
                     deviceroles.add ( "wireless" )
                     wir.write()            
-                    
+            elif "br_port" in interface:
+                br = interface["br_port"]
+                brRec = Record ( "core_switch" )
+                
+            for ip in interface['_ip']:
+                ipRec = Record ( "ip_reservation" )
+                ipRec.interfaceid = iRec.objectid
+                ipRec.address = ip["ipstr"]
+                ipRec.designation = 2
+                ipRec.state = 1                                
+                ipRec.write()
+            
         if device["type"] == 'ROUTER':
             natRec = Record ( "nat_router" )
             natRec.deviceid = dRec.objectid            
@@ -269,7 +313,7 @@ if __name__=="__main__":
     tosRec.write()
     
     
-    cr.execute ( "SELECT * FROM Klient" )
+    cr.execute ( "SELECT TOP 10000 * FROM Klient" )
     klient_all = dictresult ( cr )
     cr.execute ( "SELECT * FROM DaneKlientInternet" )
     dki_all = dictresult ( cr )
@@ -428,7 +472,7 @@ if __name__=="__main__":
         try:
             srvRec.classofservice = pakiet_IdxMap[dki["PakietIndex"]].objectid
         except KeyError:
-            DataErrors.write ( " 'PakietIndex' = '{0}' (klient: {1}), nie znaleziony pakiet.\n".format (dki["PakietIndex"], skrot) )
+            #DataErrors.write ( " 'PakietIndex' = '{0}' (klient: {1}), nie znaleziony pakiet.\n".format (dki["PakietIndex"], skrot) )
             print "Service DKI key not found."
             continue
         srvRec.typeofservice = tosRec.objectid
@@ -457,10 +501,21 @@ if __name__=="__main__":
                 iprRec.write()
                 ip_id_map[ip['ipaddr']] = iprRec.objectid
             
-            for mac in n2c['MAC']:
+            for idx, mac in enumerate(n2c['MAC']):
                 macRec = Record ( "mac_interface" )
+                macRec.designation = 1
                 macRec.ownerid = srvRec.objectid
                 macRec.mac = mac['mac']
+            
+                devRec = Record( "device" )
+                devRec.name = "KARTA SIECIOWA #{0} [{1}]".format (idx+1, skrot)                
+                devRec.devicelevel = "CPE"
+                devRec.devicerole = ["cpe"]
+                devRec.write()
+                
+                cpeRec = Record ( "cpe" )
+                cpeRec.deviceid = devRec.objectid
+                                
                 if mac['ipaddr'] is not None:
                     try:
                         macRec.ipreservationid = ip_id_map[mac['ipaddr']]
@@ -468,6 +523,10 @@ if __name__=="__main__":
                         DataErrors.write ( "!!!!!!! MAC: %s (%s) ma przypisany nieznany adres IP.\n" % (mac['mac'], mac['customer']) )
                         pass
                 macRec.write()                                        
+                cpeRec.macid = macRec.objectid
+                cpeRec.write()
+                
+                srvRec.related_device = devRec.objectid
 
             for device in n2c["_devices"]:
                 dRec = device["_n3"]

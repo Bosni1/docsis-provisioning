@@ -4,13 +4,21 @@ create table {:SCHEMA:}device_role (
 ) inherits ({:SCHEMA:}"object");
 SELECT {:SCHEMA:}setup_object_subtable ( 'device_role');
 
+create table {:SCHEMA:}cpe (
+  macid int8 REFERENCES {:SCHEMA:}objectids ON DELETE SET NULL ON UPDATE CASCADE NULL,
+  name varchar(32) null,
+  info text null,
+  os varchar(32) null
+) inherits ({:SCHEMA:}"device_role");
+SELECT {:SCHEMA:}setup_object_subtable ( 'cpe');
+
 create table {:SCHEMA:}docsis_cable_modem (
   cmtsid int8 REFERENCES {:SCHEMA:}objectids ON DELETE SET NULL ON UPDATE CASCADE NULL,
   downstreamid int8 REFERENCES {:SCHEMA:}objectids ON DELETE SET NULL ON UPDATE CASCADE NULL,
-  upstreamid int8 REFERENCES {:SCHEMA:}objectids ON DELETE SET NULL ON UPDATE CASCADE NULL,  
-  hfcmacid int8 REFERENCES {:SCHEMA:}objectids ON DELETE SET NULL ON UPDATE CASCADE NOT NULL,  
-  usbmacid int8 REFERENCES {:SCHEMA:}objectids ON DELETE SET NULL ON UPDATE CASCADE NULL,  
-  lanmacid int8 REFERENCES {:SCHEMA:}objectids ON DELETE SET NULL ON UPDATE CASCADE NULL,  
+  upstreamid int8 REFERENCES {:SCHEMA:}objectids ON DELETE SET NULL ON UPDATE CASCADE NULL,
+  hfcmacid int8 REFERENCES {:SCHEMA:}objectids ON DELETE SET NULL ON UPDATE CASCADE NOT NULL,
+  usbmacid int8 REFERENCES {:SCHEMA:}objectids ON DELETE SET NULL ON UPDATE CASCADE NULL,
+  lanmacid int8 REFERENCES {:SCHEMA:}objectids ON DELETE SET NULL ON UPDATE CASCADE NULL,
   mgmtmacid int8 REFERENCES {:SCHEMA:}objectids ON DELETE SET NULL ON UPDATE CASCADE NULL,
   customersn varchar(128) NULL,
   maxcpe smallint NOT NULL DEFAULT 1,  
@@ -44,10 +52,18 @@ create table {:SCHEMA:}routeros_device (
 SELECT {:SCHEMA:}setup_object_subtable ('routeros_device' );
 
 create table {:SCHEMA:}core_switch (
-  connected int8[] not null default '{}',
   ports smallint not null default 8
 ) inherits ({:SCHEMA:}"device_role");
 SELECT {:SCHEMA:}setup_object_subtable ('core_switch' );
+
+create table {:SCHEMA:}core_switch_port (
+  switchid int8 REFERENCES {:SCHEMA:}objectids ON DELETE CASCADE ON UPDATE CASCADE NOT NULL,
+  portid int not null,
+  portname varchar(16) null,
+  linkedto int8 REFERENCES {:SCHEMA:}objectids ON DELETE CASCADE ON UPDATE CASCADE NULL,
+  UNIQUE (switchid, portid)
+) inherits ({:SCHEMA:}"object");
+SELECT {:SCHEMA:}setup_object_subtable ('core_switch_port' );
 
 create table {:SCHEMA:}core_router (
   dhcp_relay bit not null default '0',
@@ -64,7 +80,8 @@ SELECT {:SCHEMA:}setup_object_subtable ( 'core_router_bridged_network' );
 create table {:SCHEMA:}nat_router (
   localaddr inet not null,
   dhcp bit not null default '1',
-  lanports smallint null
+  lanports smallint null,
+  wanmacid int8 REFERENCES {:SCHEMA:}objectids ON DELETE CASCADE ON UPDATE CASCADE NULL
 ) inherits ({:SCHEMA:}"device_role");
 SELECT {:SCHEMA:}setup_object_subtable ( 'nat_router' );
 
