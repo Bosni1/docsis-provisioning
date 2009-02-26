@@ -514,14 +514,15 @@ if __name__=="__main__":
                 macRec.mac = mac['mac']
             
                 devRec = Record( "device" )
-                devRec.name = "KARTA SIECIOWA #{0} [{1}]".format (idx+1, skrot)                
+                
                 devRec.devicelevel = "CPE"
                 devRec.devicerole = ["cpe"]
                 devRec.write()
                 
                 cpeRec = Record ( "cpe" )
                 cpeRec.deviceid = devRec.objectid
-                                
+                cpeRec.name = "#{0}".format (idx+1)                                                
+                
                 if mac['ipaddr'] is not None:
                     try:
                         macRec.ipreservationid = ip_id_map[mac['ipaddr']]
