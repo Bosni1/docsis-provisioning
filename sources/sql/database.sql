@@ -601,6 +601,8 @@ create function pv.check_ip_reservation_uniqueness() returns TRIGGER AS $ip_uniq
 $ip_uniq$ language plpgsql;
 CREATE TRIGGER ip_reservation_uniqueness_check BEFORE INSERT OR UPDATE ON pv.ip_reservation 
   FOR EACH ROW EXECUTE PROCEDURE pv.check_ip_reservation_uniqueness();
+
+
 ----------------------------------------------------------------------------------------------------
 --
 -- database/500application/030location.sql
@@ -726,9 +728,10 @@ SELECT pv.setup_object_subtable ( 'type_of_service' );--------------------------
 -- $Id$
 create table pv.subscriber (
   subscriberid integer not null unique,
-  name varchar(256) not null,  
-  postaladdress varchar(512) null,
+  name varchar(256) not null,    
   primarylocationid int8 REFERENCES pv.objectids ON DELETE SET NULL ON UPDATE CASCADE NULL,
+  postaladdress varchar(512) null,  
+  info text null,
   email varchar(128)[] null,
   telephone varchar(32)[] null
 ) inherits (pv."object");
@@ -769,6 +772,51 @@ create table pv.device_model (
 SELECT pv.setup_object_subtable ( 'device_model' );
 
 
+CREATE FUNCTION pv.get_device_text (objid int8) returns text AS $$
+  DECLARE
+    dev RECORD;
+    txt text;
+    cnt integer;
+  BEGIN
+    SELECT d.*, m.name as modelname INTO dev FROM pv.device d LEFT JOIN pv.device_model m ON m.objectid = d.modelid WHERE d.objectid = objid LIMIT 1;
+    GET DIAGNOSTICS cnt = ROW_COUNT;
+
+    IF cnt = 0 THEN
+       RETURN NULL;
+    END IF;
+
+    IF 'docsis_cable_modem' = ANY ( dev.devicerole ) THEN 
+       txt := 'MODEM KABLOWY';
+       IF 'nat_router' = ANY ( dev.devicerole ) THEN
+          txt := txt || ' z ROUTEREM';
+       END IF;
+       IF 'wireless_ap' = ANY ( dev.devicerole ) THEN
+          txt := txt || ' z WiFi';
+       END IF;
+       IF 'sip_client' = ANY ( dev.devicerole ) THEN
+          txt := txt || ' + Bramka VoIP';
+       END IF;
+    ELSIF 'cpe' = ANY ( dev.devicerole ) THEN
+       IF 'wireless_client' = ANY ( dev.devicerole ) THEN
+          txt := 'KARTA BEZPRZEWODOWA';
+       ELSE
+          txt := 'KARTA SIECIOWA';
+       END IF;
+    ELSIF 'sip_client' = ANY ( dev.devicerole ) THEN
+       txt := 'Bramka VoIP';
+    ELSIF 'nat_router' = ANY ( dev.devicerole ) THEN
+       IF 'wireless_ap' = ANY ( dev.devicerole ) THEN
+           txt := 'ROUTER z WiFi';
+       ELSE 
+           txt := 'ROUTER';
+       END IF;
+    ELSE    
+       txt := dev.name || ' ' || dev.devicerole::text;
+    END IF;
+    txt := txt || ' ' || coalesce(dev.modelname,'');
+    RETURN txt;
+  END;
+$$ LANGUAGE plpgsql;
 ----------------------------------------------------------------------------------------------------
 --
 -- database/500application/070role.sql
@@ -783,7 +831,8 @@ create table pv.cpe (
   macid int8 REFERENCES pv.objectids ON DELETE SET NULL ON UPDATE CASCADE NULL,
   name varchar(32) null,
   info text null,
-  os varchar(32) null
+  os varchar(32) null,
+  UNIQUE (macid)
 ) inherits (pv."device_role");
 SELECT pv.setup_object_subtable ( 'cpe');
 
@@ -896,6 +945,46 @@ create table pv.sip_client (
   pstn_number varchar(64) not null
 ) inherits (pv."device_role");
 SELECT pv.setup_object_subtable ( 'sip_client' );
+
+create function pv.handle_all_device_role_change() RETURNS trigger AS $body$
+  DECLARE
+    deviceid int8;
+    mytable RECORD;
+    subf RECORD;
+  BEGIN
+  IF (TG_OP = 'INSERT') OR (TG_OP = 'UPDATE') THEN
+    deviceid := NEW.deviceid;
+  ELSIF (TG_OP = 'DELETE') THEN
+    deviceid := OLD.deviceid;
+  END IF;  
+  UPDATE pv.object_search_txt SET txt = pv.obj_txt_repr ( deviceid, 'device' ) WHERE
+      objectid = deviceid;
+  IF (TG_OP = 'INSERT') OR (TG_OP = 'UPDATE') THEN
+    RETURN NEW;
+  ELSIF (TG_OP = 'DELETE') THEN
+    RETURN OLD;
+  END IF;
+  END;
+$body$ LANGUAGE plpgsql;
+
+create function pv.set_all_device_role_triggers() RETURNS void AS $body$
+DECLARE
+   device_role RECORD;
+   trigger_cmd text;
+BEGIN
+   FOR device_role IN select tc.* from pv.table_info tc, pv.table_info tp where tc.objectid = ANY( tp.subclasses ) AND tp.name = 'device_role' LOOP
+      trigger_cmd := 'CREATE TRIGGER update_parent_device_name_' || device_role.name || 
+        ' AFTER UPDATE OR INSERT OR DELETE ON pv.' || device_role.name || 
+        ' FOR EACH ROW EXECUTE PROCEDURE pv.handle_all_device_role_change();';      
+      EXECUTE trigger_cmd;
+   END LOOP;
+END;
+$body$ LANGUAGE plpgsql;
+
+
+-- CREATE TRIGGER set_field_info_path AFTER UPDATE OR INSERT OR DELETE ON pv.
+-- FOR EACH ROW EXECUTE PROCEDURE pv.handle_field_info_change();
+
 ----------------------------------------------------------------------------------------------------
 --
 -- database/500application/080interface.sql
@@ -911,12 +1000,58 @@ create table pv.mac_interface (
   type smallint not null default '1',  
   unique (mac, designation)
 ) inherits (pv."object");
-SELECT pv.setup_object_subtable ( 'mac_interface' );----------------------------------------------------------------------------------------------------
+SELECT pv.setup_object_subtable ( 'mac_interface' );
+CREATE INDEX idx_mac_interface_mac on pv.mac_interface (mac);
+
+CREATE FUNCTION pv.get_interface_mac (objid int8) returns macaddr AS $$
+  DECLARE
+    m varchar;    
+  BEGIN
+    SELECT mac INTO m 
+    FROM pv.mac_interface WHERE 
+       objectid = objid
+       LIMIT 1;    
+    RETURN m;
+  END;
+$$ LANGUAGE plpgsql;
+
+create function pv.get_interface_first_ip(interfaceoid int8) returns inet AS $intip$ 
+DECLARE
+  ip inet;
+BEGIN
+  SELECT address INTO ip
+  FROM pv.ip_reservation i WHERE i.interfaceid = interfaceoid LIMIT 1;
+  RETURN ip;
+END;
+$intip$ LANGUAGE plpgsql;
+
+create function pv.get_device_first_ip(deviceoid int8) returns inet AS $intip$ 
+DECLARE
+  ip inet;
+BEGIN
+  SELECT r.address INTO ip
+  FROM pv.ip_reservation r, pv.mac_interface i WHERE r.interfaceid = i.objectid  AND 
+    i.deviceid = deviceoid LIMIT 1;
+  RETURN ip;
+END;
+$intip$ LANGUAGE plpgsql;
+
+create function pv.get_interface_reserved_ip(interfaceoid int8) returns inet AS $intip$ 
+DECLARE
+  ip inet;
+BEGIN
+  SELECT i.address INTO ip
+  FROM pv.ip_reservation i, pv.mac_interface m WHERE m.ipreservationid = i.objectid 
+     AND m.objectid = interfaceoid LIMIT 1;
+  RETURN ip;
+END;
+$intip$ LANGUAGE plpgsql;
+----------------------------------------------------------------------------------------------------
 --
 -- database/500application/999appmeta.sql
 ----------------------------------------------------------------------------------------------------
 
-CREATE FUNCTION pv.set_all_references_2() returns int as $$
+CREATE FUNCTION pv.set_all_references() returns int as $$
 BEGIN
  PERFORM pv.set_reference ( 'table_info.superclass', 'table_info');
  
@@ -934,7 +1069,7 @@ BEGIN
 
  PERFORM pv.set_reference ( 'ip_subnet.subnetgroupid', 'ip_subnet_group');
 
- PERFORM pv.set_reference ( 'ip_reservation.ownerid', 'object');
+ PERFORM pv.set_reference ( 'ip_reservation.ownerid', 'service');
  PERFORM pv.set_reference ( 'ip_reservation.subnetid', 'ip_subnet');
  PERFORM pv.set_reference ( 'ip_reservation.interfaceid', 'mac_interface');
 
@@ -949,6 +1084,7 @@ BEGIN
  PERFORM pv.set_reference ( 'subscriber.primarylocationid', 'location');
 
  PERFORM pv.set_reference ( 'service.subscriberid', 'subscriber');
+ PERFORM pv.set_reference ( 'service.parentservice', 'service');
  PERFORM pv.set_reference ( 'service.typeofservice', 'type_of_service');
  PERFORM pv.set_reference ( 'service.classofservice', 'class_of_service');
  PERFORM pv.set_reference ( 'service.locationid', 'location');
@@ -963,8 +1099,8 @@ BEGIN
  PERFORM pv.set_reference ( 'cpe.macid', 'mac_interface');
  
  PERFORM pv.set_reference ( 'docsis_cable_modem.deviceid', 'device');
- PERFORM pv.set_reference ( 'docsis_cable_modem.cmtsid', 'object');
- PERFORM pv.set_reference ( 'docsis_cable_modem.downstreamid', 'object');
+ PERFORM pv.set_reference ( 'docsis_cable_modem.cmtsid', 'device_role');
+ PERFORM pv.set_reference ( 'docsis_cable_modem.downstreamid', 'device_role');
  PERFORM pv.set_reference ( 'docsis_cable_modem.hfcmacid', 'mac_interface');
  PERFORM pv.set_reference ( 'docsis_cable_modem.usbmacid', 'mac_interface');
  PERFORM pv.set_reference ( 'docsis_cable_modem.lanmacid', 'mac_interface');
@@ -1067,3 +1203,4 @@ choices = ARRAY['Text', 'Memo', 'Static', 'Combo', 'Search', 'Time', 'Boolean', 
 WHERE classid = pv.table_object_id('field_info') AND name = 'editor_class';
 
 SELECT pv.set_editors();
+SELECT pv.set_all_device_role_triggers();

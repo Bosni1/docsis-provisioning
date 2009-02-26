@@ -79,3 +79,5 @@ create function {:SCHEMA:}check_ip_reservation_uniqueness() returns TRIGGER AS $
 $ip_uniq$ language plpgsql;
 CREATE TRIGGER ip_reservation_uniqueness_check BEFORE INSERT OR UPDATE ON {:SCHEMA:}ip_reservation 
   FOR EACH ROW EXECUTE PROCEDURE {:SCHEMA:}check_ip_reservation_uniqueness();
+
+

@@ -8,7 +8,8 @@ create table {:SCHEMA:}cpe (
   macid int8 REFERENCES {:SCHEMA:}objectids ON DELETE SET NULL ON UPDATE CASCADE NULL,
   name varchar(32) null,
   info text null,
-  os varchar(32) null
+  os varchar(32) null,
+  UNIQUE (macid)
 ) inherits ({:SCHEMA:}"device_role");
 SELECT {:SCHEMA:}setup_object_subtable ( 'cpe');
 
@@ -121,3 +122,43 @@ create table {:SCHEMA:}sip_client (
   pstn_number varchar(64) not null
 ) inherits ({:SCHEMA:}"device_role");
 SELECT {:SCHEMA:}setup_object_subtable ( 'sip_client' );
+
+create function {:SCHEMA:}handle_all_device_role_change() RETURNS trigger AS $body$
+  DECLARE
+    deviceid int8;
+    mytable RECORD;
+    subf RECORD;
+  BEGIN
+  IF (TG_OP = 'INSERT') OR (TG_OP = 'UPDATE') THEN
+    deviceid := NEW.deviceid;
+  ELSIF (TG_OP = 'DELETE') THEN
+    deviceid := OLD.deviceid;
+  END IF;  
+  UPDATE {:SCHEMA:}object_search_txt SET txt = {:SCHEMA:}obj_txt_repr ( deviceid, 'device' ) WHERE
+      objectid = deviceid;
+  IF (TG_OP = 'INSERT') OR (TG_OP = 'UPDATE') THEN
+    RETURN NEW;
+  ELSIF (TG_OP = 'DELETE') THEN
+    RETURN OLD;
+  END IF;
+  END;
+$body$ LANGUAGE plpgsql;
+
+create function {:SCHEMA:}set_all_device_role_triggers() RETURNS void AS $body$
+DECLARE
+   device_role RECORD;
+   trigger_cmd text;
+BEGIN
+   FOR device_role IN select tc.* from pv.table_info tc, pv.table_info tp where tc.objectid = ANY( tp.subclasses ) AND tp.name = 'device_role' LOOP
+      trigger_cmd := 'CREATE TRIGGER update_parent_device_name_' || device_role.name || 
+        ' AFTER UPDATE OR INSERT OR DELETE ON {:SCHEMA:}' || device_role.name || 
+        ' FOR EACH ROW EXECUTE PROCEDURE {:SCHEMA:}handle_all_device_role_change();';      
+      EXECUTE trigger_cmd;
+   END LOOP;
+END;
+$body$ LANGUAGE plpgsql;
+
+
+-- CREATE TRIGGER set_field_info_path AFTER UPDATE OR INSERT OR DELETE ON {:SCHEMA:}
+-- FOR EACH ROW EXECUTE PROCEDURE {:SCHEMA:}handle_field_info_change();
+

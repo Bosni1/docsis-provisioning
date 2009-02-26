@@ -1,9 +1,10 @@
 -- $Id$
 create table {:SCHEMA:}subscriber (
   subscriberid integer not null unique,
-  name varchar(256) not null,  
-  postaladdress varchar(512) null,
+  name varchar(256) not null,    
   primarylocationid int8 REFERENCES {:SCHEMA:}objectids ON DELETE SET NULL ON UPDATE CASCADE NULL,
+  postaladdress varchar(512) null,  
+  info text null,
   email varchar(128)[] null,
   telephone varchar(32)[] null
 ) inherits ({:SCHEMA:}"object");

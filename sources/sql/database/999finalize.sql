@@ -35,3 +35,4 @@ choices = ARRAY['Text', 'Memo', 'Static', 'Combo', 'Search', 'Time', 'Boolean', 
 WHERE classid = {:SCHEMA:}table_object_id('field_info') AND name = 'editor_class';
 
 SELECT {:SCHEMA:}set_editors();
+SELECT {:SCHEMA:}set_all_device_role_triggers();

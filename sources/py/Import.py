@@ -78,9 +78,10 @@ if __name__=="__main__":
     for c in n2_customer_all:        
         #znacznik, czy ten rekord był już importowany
         c['_imported'] = False
-        #przypisany numer klienta z bazy biurowej
+        #przypisany numer klienta z bazy biurowej        
         c['_subscriberid'] = None
         c['_devices'] = []
+        c['_n3'] = None
         c['IP'] = []    #adresy ip z netcona
         c['MAC'] = []   #adresy mac z netcona
         n2_customer_idMap[c['id']] = c
@@ -217,6 +218,7 @@ if __name__=="__main__":
             iRec.name = interface["name"]
             iRec.mac = interface["mac"]
             iRec.designation = 2
+            iRec.deviceid = dRec.objectid            
             iRec.ownerid = dRec.objectid
             iRec.write()
             
@@ -469,14 +471,16 @@ if __name__=="__main__":
         
         srvRec = Record ( "service" )
         srvRec.subscriberid = subRec.objectid
+
         try:
             srvRec.classofservice = pakiet_IdxMap[dki["PakietIndex"]].objectid
         except KeyError:
             #DataErrors.write ( " 'PakietIndex' = '{0}' (klient: {1}), nie znaleziony pakiet.\n".format (dki["PakietIndex"], skrot) )
             print "Service DKI key not found."
             continue
+        
         srvRec.typeofservice = tosRec.objectid
-        srvRec.locationid = klient_localizationMap[K["Index"]].objectid
+        srvRec.locationid = klient_localizationMap[K["Index"]].objectid        
         srvRec.write()
         
         n2c = None
@@ -489,9 +493,11 @@ if __name__=="__main__":
             continue
         
         if n2c is None:
-            DataErrors.write( "Data Error: Klient %s [%s] #%d nie znaleziony w bazie N2\n" % (skrot, subRec.name, subRec.subscriberid))
-            continue
+            #DataErrors.write( "Data Error: Klient %s [%s] #%d nie znaleziony w bazie N2\n" % (skrot, subRec.name, subRec.subscriberid))
+            continue        
 
+        n2c['_n3'] = subRec
+        
         try:
             ip_id_map = {}
             for ip in n2c['IP']:

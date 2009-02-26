@@ -17,3 +17,48 @@ create table {:SCHEMA:}device_model (
 SELECT {:SCHEMA:}setup_object_subtable ( 'device_model' );
 
 
+CREATE FUNCTION {:SCHEMA:}get_device_text (objid int8) returns text AS $$
+  DECLARE
+    dev RECORD;
+    txt text;
+    cnt integer;
+  BEGIN
+    SELECT d.*, m.name as modelname INTO dev FROM {:SCHEMA:}device d LEFT JOIN {:SCHEMA:}device_model m ON m.objectid = d.modelid WHERE d.objectid = objid LIMIT 1;
+    GET DIAGNOSTICS cnt = ROW_COUNT;
+
+    IF cnt = 0 THEN
+       RETURN NULL;
+    END IF;
+
+    IF 'docsis_cable_modem' = ANY ( dev.devicerole ) THEN 
+       txt := 'MODEM KABLOWY';
+       IF 'nat_router' = ANY ( dev.devicerole ) THEN
+          txt := txt || ' z ROUTEREM';
+       END IF;
+       IF 'wireless_ap' = ANY ( dev.devicerole ) THEN
+          txt := txt || ' z WiFi';
+       END IF;
+       IF 'sip_client' = ANY ( dev.devicerole ) THEN
+          txt := txt || ' + Bramka VoIP';
+       END IF;
+    ELSIF 'cpe' = ANY ( dev.devicerole ) THEN
+       IF 'wireless_client' = ANY ( dev.devicerole ) THEN
+          txt := 'KARTA BEZPRZEWODOWA';
+       ELSE
+          txt := 'KARTA SIECIOWA';
+       END IF;
+    ELSIF 'sip_client' = ANY ( dev.devicerole ) THEN
+       txt := 'Bramka VoIP';
+    ELSIF 'nat_router' = ANY ( dev.devicerole ) THEN
+       IF 'wireless_ap' = ANY ( dev.devicerole ) THEN
+           txt := 'ROUTER z WiFi';
+       ELSE 
+           txt := 'ROUTER';
+       END IF;
+    ELSE    
+       txt := dev.name || ' ' || dev.devicerole::text;
+    END IF;
+    txt := txt || ' ' || coalesce(dev.modelname,'');
+    RETURN txt;
+  END;
+$$ LANGUAGE plpgsql;
