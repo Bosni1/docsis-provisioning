@@ -4,10 +4,11 @@ from ProvCon.dbui.orm import GenericQueryRecordList
 
 class rSubscriber (rObject.rObject):
     def __init__(self, **kkw):
+        from rDevice import rDevice
         rObject.rObject.__init__(self, table="subscriber", **kkw)
         self._ipreservations = GenericQueryRecordList ()
         self._macaddresses = GenericQueryRecordList ()
-        self._devices = GenericQueryRecordList ()
+        self._devices = GenericQueryRecordList ( recordclass = rDevice )
         
     def reloadIpReservations(self):
         self._ipreservations.query = ("SELECT ip.* FROM {0}.ip_reservation ip INNER JOIN {0}.service s " +

@@ -124,6 +124,16 @@ class CFG:
             self._do_debug(q)
             self.db.query(q)
 
+        def getrow(self, cl, objectid, extra_sql=[]):
+            qcl = pg._join_parts(self._split_schema(cl)) # build qualified name
+            extra_sql.append ( '*' )
+            
+            q = 'SELECT {0} FROM {1} WHERE "objectid" = \'{2}\' LIMIT 1'.format( ",".join(extra_sql), qcl, objectid)
+            res = self.query (q).dictresult()
+            if res:
+                return res[0]
+            else:
+                raise pg.DatabaseError ( 'No such record (objectid={0})'.format(objectid) )
         CX = None
 
 RaiseDBException = lambda *a: a

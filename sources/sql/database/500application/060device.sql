@@ -32,14 +32,14 @@ CREATE FUNCTION {:SCHEMA:}get_device_text (objid int8) returns text AS $$
 
     IF 'docsis_cable_modem' = ANY ( dev.devicerole ) THEN 
        txt := 'MODEM KABLOWY';
+       IF 'sip_client' = ANY ( dev.devicerole ) THEN
+          txt := txt || ' (MTA)';
+       END IF;
        IF 'nat_router' = ANY ( dev.devicerole ) THEN
           txt := txt || ' z ROUTEREM';
        END IF;
        IF 'wireless_ap' = ANY ( dev.devicerole ) THEN
           txt := txt || ' z WiFi';
-       END IF;
-       IF 'sip_client' = ANY ( dev.devicerole ) THEN
-          txt := txt || ' + Bramka VoIP';
        END IF;
     ELSIF 'cpe' = ANY ( dev.devicerole ) THEN
        IF 'wireless_client' = ANY ( dev.devicerole ) THEN

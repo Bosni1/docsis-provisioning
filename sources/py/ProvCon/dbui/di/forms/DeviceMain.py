@@ -30,7 +30,6 @@ class DeviceMain(wx.Panel):
         
         self.form.device = orm.Form ( self.table.device, recordclass = rDevice  )                
         self.devicerecord.enableChildren()                
-
         
         
         self.mgr = wx.aui.AuiManager()

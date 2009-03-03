@@ -257,6 +257,8 @@ API Error: {0.pgexception}""".format ( self )
         self._resolvereference = kkw.get("resolvereference", self.__default_reference_mode__)  # none | text | record
         self._mtm_referencelist = {}
         self._child_referencelist = {}
+        self._extra_sql_columns = {}
+        self._extra_record_data = {}
         self._reprfunc = kkw.get ( "reprfunc", None )        
         
         if 0:
@@ -369,6 +371,16 @@ API Error: {0.pgexception}""".format ( self )
     isInstalled = property(__is_installed)
     """C{True} if the record has a table schema installed"""
 
+    def setExtraRecordData (self, key, value):
+        self._extra_record_data[key] = value
+    def getExtraRecordData (self, key):
+        return self._extra_record_data.get ( key, None )
+    
+    
+    def addExtraSQLColumn (self, name, sql):
+        self._extra_sql_columns[name] = sql
+    
+    
     def enableMTM(self):
         self._resolve_mtm = True
         self.setupMTM()
@@ -426,6 +438,7 @@ API Error: {0.pgexception}""".format ( self )
         """
         self._original_values.clear()
         self._modified_values.clear()
+        self._extra_record_data.clear()
         self._references.clear()
         for mtm in self._mtm_referencelist:
             self._mtm_referencelist[mtm].parentobjectid = None
@@ -467,7 +480,10 @@ API Error: {0.pgexception}""".format ( self )
         for f in self._table:
             self.__dict__[f.name] = vals.get(f.name, None)
             self._original_values[f.name] = self.__dict__[f.name]
-        
+
+        for f in self._extra_sql_columns:
+            self.__dict__[f] = None            
+            
         if self._resolve_mtm:
             self.setupMTM()
         if self._resolve_child_ref:
@@ -488,6 +504,13 @@ API Error: {0.pgexception}""".format ( self )
                     del self.__dict__[f.name]
                 except KeyError:
                     pass
+                
+            for f in self._extra_sql_columns:
+                try:
+                    del self.__dict__[f]
+                except KeyError:
+                    pass
+                
             self._original_values.clear()
             self._modified_values.clear()
             self._mtm_referencelist.clear()
@@ -593,6 +616,8 @@ API Error: {0.pgexception}""".format ( self )
         
         self._original_values.clear()
         for cn in row:
+            if cn in self._extra_sql_columns:
+                self.__dict__[cn] = row[cn]
             if cn not in self._table: continue
             field = self._table[cn]
             decoded = field.val_sql2py ( row[cn] )
@@ -635,8 +660,9 @@ API Error: {0.pgexception}""".format ( self )
             if not self.setupRecord():
                 raise Record.RecordIncomplete()
         try:
-            row = CFG.CX.get ( CFG.DB.SCHEMA + "." + self._table.name, { 'objectid' : self._objectid, 
-                                                                         'objectscope' : CFG.RT.DATASCOPE } )            
+            extra = map (lambda x: '{1} {0}'.format(x), self._extra_sql_columns.items() )
+            row = CFG.CX.getrow ( CFG.DB.SCHEMA + "." + self._table.name, 
+                                  self._objectid, extra)
         except pg.DatabaseError, e:                        
             raise Record.RecordNotFound(self._objectid, e)
         
